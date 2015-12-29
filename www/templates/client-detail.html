@@ -4,38 +4,48 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
+<style>
+label {
+  color: #558;
+}
+.item,
+ion-item {
+  margin: 2px;
+  padding: 2px 5px;
+  border: none;
+}
+</style>
 <ion-view view-title="{{client.name}}">
   <ion-content class="padding">
-    <img ng-src="{{client.face}}" style="width: 64px; height: 64px">
-    <h4> {{client.fullname}} </h4>
-<!--
-var data = {
-	year: 2016,
-	company: "thelab",
-	location, "bangalore"
-}
--->
-
-    <p>
+    <div style="clear:both; height:205px">
+    <img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
 	<ion-list>
-                <ion-item class="item item-positive">
-                PERSONAL INFO :
-                </ion-item>
-	<!--br /> {{client.fullname}} -->
-		<br /> D.O.B.	: Dec 1st, 1980	{{}}
-		<br /> <i class="icon ion-android-call"></i> : 9988776622	{{Client.Mobile}}
-		<br /> <i class="icon ion-ios-email-outline"></i> : sample@email.com {{Client.Email}}
-                <br /> Occupation : Trader {{Client.Occupation}}
-		<br /> Location	: {{Client.Sector}}
-                <br /> Address	: # 45, Av. de la Rue {{Client.FullAddress}}
-
-		<ion-item class="item item-positive">
-                ACCOUNT INFO :
-                </ion-item>
-		<br />Account No : #
-		<br /> Loans	: <i class="icon ion-social-bitcoin-outline"></i> {{Client.TotalLoans}} 40
-		<br /> Savings	: <i class="icon ion-social-bitcoin-outline"></i> {{Client.TotalSavings}} 25
+    <h4> {{client.fullname}} </h4>
+    <ion-item>
+		<label>D.O.B</label>: Dec 1st, 1980	{{}}
+    </ion-item>
+    <ion-item>
+		<label class="icon ion-android-call" title="Mobile"></label> {{client.mobile ? client.mobile : "9876543210"}}
+    </ion-item>
+    <ion-item>
+		<label class="icon ion-ios-email-outline" title="Email"></label>  {{client.email ? client.email : "sample@email.com" }}
+    </ion-item>
+    <ion-item>
+                <label>Occupation</label> : Trader {{client.Occupation}}
+    </ion-item>
+    <ion-item>
+    </ion-item>
 	</ion-list>
-    </p>
+    </div>
+		<label>Location</label>	: {{client.Sector}}
+    <label>Address</label>	: # 45, Av. de la Rue {{client.FullAddress}}
+    <div>
+		<h4 class="positive">
+                Account Summary
+                </h4>
+		Account No : #
+		<br /> Loans	: <i class="icon ion-social-bitcoin"></i> {{client.TotalLoans}} 40
+		<br /> Savings	: <i class="icon ion-social-bitcoin"></i> {{client.TotalSavings}} 25
+    </div>
   </ion-content>
 </ion-view>
