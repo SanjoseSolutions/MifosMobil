@@ -1,6 +1,45 @@
 angular.module('starter.services', [])
 
-.factory('Clients', function($http) {
+.factory('authHttp', [ '$http', function($http) {
+  var authHttp = {};
+
+  authHttp.setAuthHeader = function(key) {
+    $http.defaults.headers.common.Authorization = 'Basic ' + key;
+  };
+
+  authHttp.clearAuthHeader = function() {
+    delete $http.defaults.headers.common.Authorization;
+  };
+
+  angular.forEach(['get', 'delete', 'head'], function (method) {
+    authHttp[method] = function(url, config) {
+      config = config || {};
+      return $http[method](url, config);
+    };
+  } );
+
+  angular.forEach(['post', 'put'], function(method) {
+    authHttp[method] = function(url, data, config) {
+      config = config || {};
+      return $http[method](url, data, config);
+    };
+  } );
+
+  return authHttp;
+} ] )
+
+.factory('Staff', function(authHttp) {
+  var staff = [ {
+
+  } ];
+  return {
+    all: function(){},
+    remove: function(staff){},
+    get: function(staff){}
+  }
+} )
+
+.factory('Clients', function(authHttp) {
   var clients = [ {
     id: 1,
     name: 'Ben Wallace',
@@ -28,7 +67,7 @@ angular.module('starter.services', [])
     face: 'img/mike.png'
   } ];
 
-  $http.get('js/client-data.json', function(response) {
+  authHttp.get('js/client-data.json', function(response) {
     clients = response;
   } );
 
