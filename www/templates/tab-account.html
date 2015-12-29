@@ -1,17 +1,51 @@
 <ion-view view-title="Account">
   <ion-content>
+    <ion-list class="ion-list-calm">
+    <ion-toggle  ng-model="settings.enableFriends">
+        Enable Friends
+    </ion-toggle>
+
+	<br />
+	<center>
+	<button class="button button-clear button-calm button-outline"
+			ng-click="registerUser()">
+	    Register
+	</button>
+	<button class="button button-positive"
+		ng-click="Login()">
+	    <h4>Login</h4>
+	</button>
+	</center>
+
+	<br /><br />
+	<center>Forgot your password ?<br />
+                <!-- call a popup
+		to enter the username OR email
+		to which the link to reset the password will be sent -->
+	<button class="button button-calm"
+		ng-click="resetPassword()">
+		Reset Password
+	</button>
+	</center>
+    </ion-list>
+
+<hr />
+<!-- -->
+
     <ion-card>
       <ion-list inline>
-        <ion-label for="username">Username</ion-label>
+
+        <ion-label for="username">Username : </ion-label>
         <input type="text" name="username" id="username" placeholder="Your k-Mayra username" />
-        <ion-label for="password">Password</ion-label>
+
+        <ion-label for="password">Password : </ion-label>
         <input type="password" name="password" id="password" placeholder="Your password" />
-        <ion-checkbox dark checked="true">
-          Remember Me
-        </ion-checkbox>
+
+        <ion-checkbox dark checked="true">Remember Me</ion-checkbox>
+
         <div>
-        <button class="button button-block button-calm">Login</button>
-        </div>
+	    <button class="button button-block button-calm">Login</button>
+	</div>
       </ion-list>
     </ion-card>
   </ion-content>
