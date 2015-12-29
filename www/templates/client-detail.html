@@ -7,8 +7,35 @@
 <ion-view view-title="{{client.name}}">
   <ion-content class="padding">
     <img ng-src="{{client.face}}" style="width: 64px; height: 64px">
+    <h4> {{client.fullname}} </h4>
+<!--
+var data = {
+	year: 2016,
+	company: "thelab",
+	location, "bangalore"
+}
+-->
+
     <p>
-      {{client.fullname}}
+	<ion-list>
+                <ion-item class="item item-positive">
+                PERSONAL INFO :
+                </ion-item>
+	<!--br /> {{client.fullname}} -->
+		<br /> D.O.B.	: Dec 1st, 1980	{{}}
+		<br /> <i class="icon ion-android-call"></i> : 9988776622	{{Client.Mobile}}
+		<br /> <i class="icon ion-ios-email-outline"></i> : sample@email.com {{Client.Email}}
+                <br /> Occupation : Trader {{Client.Occupation}}
+		<br /> Location	: {{Client.Sector}}
+                <br /> Address	: # 45, Av. de la Rue {{Client.FullAddress}}
+
+		<ion-item class="item item-positive">
+                ACCOUNT INFO :
+                </ion-item>
+		<br />Account No : #
+		<br /> Loans	: <i class="icon ion-social-bitcoin-outline"></i> {{Client.TotalLoans}} 40
+		<br /> Savings	: <i class="icon ion-social-bitcoin-outline"></i> {{Client.TotalSavings}} 25
+	</ion-list>
     </p>
   </ion-content>
 </ion-view>

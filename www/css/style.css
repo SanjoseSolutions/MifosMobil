@@ -2,3 +2,20 @@
 .account-status {
   float: right;
 }
+
+
+
+//ion-nav-view
+//ion-nav-bar
+body	{
+	background-color:yellow;	
+}
+
+.item-divider	{
+	text-align: center;
+	font-family: corsiva;
+	font-size: 20px;
+	font-style: bold;
+	font-style: italic;
+	background-color: green;
+}
