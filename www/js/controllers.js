@@ -28,15 +28,17 @@ angular.module('starter.controllers', [])
   $scope.client = Clients.get($stateParams.clientId);
 })
 
-.controller('AccountCtrl', function($scope, $http, $state, baseUrl) {
-  var uri = baseUrl + "/authentication";
+.controller('AccountCtrl', function($scope, $http, $state, authHttp, baseUrl) {
+  $scope.cred = {};
   $scope.login = function(auth) {
-    $http.post(uri, {
-      username: auth.username,
-      password: auth.password,
-      tenantIdentifier: "default"
-    } ).success(function(data) {
-      authHttp.setAuthHeader(data['base64EncodedAuthenticationKey']);
+    console.log("login attempted..");
+    var uri = baseUrl + "/authentication";
+    console.log("uri: " + uri);
+    console.log("user: " + auth.username + ", passwd: " + auth.password);
+    var uri = "?username" + auth.username + "&password" + auth.password;
+    authHttp.clearAuthHeader();
+    $http.post(uri).then(function(data) {
+      console.log("Login successful");
       $state.go('tab.dash');
     } );
   };
