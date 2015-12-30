@@ -1,5 +1,9 @@
 angular.module('starter.services', [])
 
+.factory('baseUrl', function() {
+  return "https://demo.openmf.org/mifosng-provider/api/v1";
+} )
+
 .factory('authHttp', [ '$http', function($http) {
   var authHttp = {};
 

@@ -28,8 +28,16 @@ angular.module('starter.controllers', [])
   $scope.client = Clients.get($stateParams.clientId);
 })
 
-.controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
+.controller('AccountCtrl', function($scope, $http, $state, baseUrl) {
+  var uri = baseUrl + "/authentication";
+  $scope.login = function(auth) {
+    $http.post(uri, {
+      username: auth.username,
+      password: auth.password,
+      tenantIdentifier: "default"
+    } ).success(function(data) {
+      authHttp.setAuthHeader(data['base64EncodedAuthenticationKey']);
+      $state.go('tab.dash');
+    } );
   };
 });
