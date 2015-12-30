@@ -1,7 +1,14 @@
 angular.module('starter.services', [])
 
+.factory('baseUrl', function() {
+  return "https://demo.openmf.org/mifosng-provider/api/v1";
+} )
+
 .factory('authHttp', [ '$http', function($http) {
   var authHttp = {};
+
+  $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = 'default';
+  $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
   authHttp.setAuthHeader = function(key) {
     $http.defaults.headers.common.Authorization = 'Basic ' + key;

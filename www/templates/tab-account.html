@@ -1,50 +1,31 @@
 <ion-view view-title="Account">
   <ion-content>
-    <ion-list class="ion-list-calm">
-    <!--ion-toggle  ng-model="settings.enableFriends">
-        Enable Friends
-    </ion-toggle -->
-
-	<br />
-	<center>
-	<button class="button button-clear button-calm button-outline"
-			ng-click="registerUser()">
-	    Register
-	</button>
-	<button class="button button-positive"
-		ng-click="Login()">
-	    <h4>Login</h4>
-	</button>
-	</center>
-
-	<br /><br />
-	<center>Forgot your password ?<br />
-                <!-- call a popup
-		to enter the username OR email
-		to which the link to reset the password will be sent -->
-	<button class="button button-calm"
-		ng-click="resetPassword()">
-		Reset Password
-	</button>
-	</center>
-    </ion-list>
-
-<hr />
 <!-- -->
 
     <ion-card>
       <ion-list inline>
 
         <ion-label for="username">Username : </ion-label>
-        <input type="text" name="username" id="username" placeholder="Your k-Mayra username" />
+        <input type="text" name="username" id="username" ng-model="cred.username" placeholder="Your k-Mayra username" />
 
         <ion-label for="password">Password : </ion-label>
-        <input type="password" name="password" id="password" placeholder="Your password" />
+        <input type="password" ng-model="cred.password" id="password" placeholder="Your password" />
 
         <ion-checkbox dark checked="true">Remember Me</ion-checkbox>
 
         <div>
-	    <button class="button button-block button-calm">Login</button>
+	    <button class="button button-block button-calm" ng-click="login(cred)">Login</button>
+	</div>
+	<div class="item">Forgot your password ?
+	<button class="button button-calm"
+		ng-click="resetPassword()">
+		Reset Password
+	</button></div>
+	<div class="item">
+	<button class="button button-clear button-calm button-outline"
+			ng-click="registerUser()">
+	    Register
+	</button>
 	</div>
       </ion-list>
     </ion-card>
