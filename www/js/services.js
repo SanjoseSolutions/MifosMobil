@@ -9,9 +9,12 @@ angular.module('starter.services', [])
 
   $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = 'default';
   $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+	$http.defaults.headers.common['Accept'] = '*/*';
+	$http.defaults.headers.common['Content-type'] = 'application/json';
 
   authHttp.setAuthHeader = function(key) {
     $http.defaults.headers.common.Authorization = 'Basic ' + key;
+		console.log("Authorization header set.");
   };
 
   authHttp.clearAuthHeader = function() {
@@ -20,6 +23,11 @@ angular.module('starter.services', [])
 
   angular.forEach(['get', 'delete', 'head'], function (method) {
     authHttp[method] = function(url, config) {
+			var b64key = localStorage.getItem("b64key");
+			console.log("Got b64key:"+b64key);
+			if (b64key != null) {
+				authHttp.setAuthHeader(b64key);
+			}
       config = config || {};
       return $http[method](url, config);
     };
@@ -46,53 +54,28 @@ angular.module('starter.services', [])
   }
 } )
 
-.factory('Clients', function(authHttp) {
-  var clients = [ {
-    id: 1,
-    name: 'Ben Wallace',
-    fullname: 'Benjamin Wallace',
-    face: 'img/ben.png'
-  }, {
-    id: 2,
-    name: 'M. Mirnyi',
-    fullname: 'Max Mirnyi',
-    face: 'img/max.png'
-  }, {
-    id: 3,
-    name: 'A. Tadesse',
-    fullname: 'Sir Abel Tadesse',
-    face: 'img/adam.jpg'
-  }, {
-    id: 4,
-    name: 'A. Ketahun',
-    fullname: 'Aulugeta Ketahun',
-    face: 'img/perry.png'
-  }, {
-    id: 5,
-    name: 'Mike Hington',
-    fullname: 'Michael Huffington',
-    face: 'img/mike.png'
-  } ];
-
-  authHttp.get('js/client-data.json', function(response) {
-    clients = response;
-  } );
+.factory('Clients', function(authHttp, baseUrl) {
+  var clients = [];
 
   return {
-    all: function() {
-      console.log("Clients: " + clients.length);
-      return clients;
+    query: function(fn) {
+			authHttp.get(baseUrl + '/clients').then(function(response) {
+				var data = response["data"];
+				var rClients = data["pageItems"];
+				clients = rClients;
+				console.log("Response received: " + clients.length);
+				fn(clients);
+			} );
     },
     remove: function(id) {
       clients.splice(clients.indexOf(clients), 1);
     },
-    get: function(id) {
-      for (var i = 0; i < clients.length; i++) {
-        if (clients[i].id === parseInt(id)) {
-          return clients[i];
-        }
-      }
-      return {}; 
+    get: function(id, fn) {
+			authHttp.get(baseUrl + '/clients/' + id).then(function(response) {
+				var data = response["data"];
+				console.log("Response data:"+JSON.stringify(data));
+				fn(data);
+			} );
     }
   };
 } );

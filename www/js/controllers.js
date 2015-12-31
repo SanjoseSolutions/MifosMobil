@@ -18,14 +18,18 @@ angular.module('starter.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  $scope.clients = Clients.all();
+  Clients.query(function(clients) {
+    $scope.clients = clients;
+  } );
   $scope.remove = function(client) {
     Clients.remove(client);
   };
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients) {
-  $scope.client = Clients.get($stateParams.clientId);
+  Clients.get($stateParams.clientId, function(client) {
+    $scope.client = client;
+  } );
 })
 
 .controller('AccountCtrl', function($scope, $http, $state, authHttp, baseUrl) {
@@ -35,10 +39,16 @@ angular.module('starter.controllers', [])
     var uri = baseUrl + "/authentication";
     console.log("uri: " + uri);
     console.log("user: " + auth.username + ", passwd: " + auth.password);
-    var uri = "?username" + auth.username + "&password" + auth.password;
+    uri += "?username=" + auth.username + "&password=" + auth.password;
     authHttp.clearAuthHeader();
-    $http.post(uri).then(function(data) {
+    $http.post(uri).then(function(response) {
       console.log("Login successful");
+      console.log("Resp hdr: " + JSON.stringify(response));
+      var data = response["data"];
+      var b64key = data["base64EncodedAuthenticationKey"];
+      localStorage.setItem("b64key", b64key);
+      console.log("Resp key: " + b64key);
+      authHttp.setAuthHeader(b64key);
       $state.go('tab.dash');
     } );
   };
