@@ -46,7 +46,7 @@ angular.module('starter.services', [])
   }
 } )
 
-.factory('Clients', function(authHttp) {
+.factory('Clients', function(authHttp, baseUrl) {
   var clients = [ {
     id: 1,
     name: 'Ben Wallace',
@@ -74,13 +74,16 @@ angular.module('starter.services', [])
     face: 'img/mike.png'
   } ];
 
-  authHttp.get('js/client-data.json', function(response) {
+  authHttp.get(baseUrl + '/clients', function(response) {
     clients = response;
   } );
 
   return {
     all: function() {
-      console.log("Clients: " + clients.length);
+      authHttp.get(baseUrl + '/clients', function(response) {
+        clients = response;
+        console.log("Clients: " + clients.length);
+      } );
       return clients;
     },
     remove: function(id) {
