@@ -1,16 +1,93 @@
 <ion-view view-title="Account">
   <ion-content>
+<!-- style>
+input 	{
+	background-color:grey;
+}
+</style -->
+    <!-- ion-list class="ion-list-calm">
+    	<ion-toggle  ng-model="settings.enableFriends"> Enable Friends </ion-toggle>
+    </ion-list -->
+
+    <ion-card>
+      <div class="list">
+
+        <div class="item item-input-inset">
+        <span class="input-label">Username :</span>
+        <label class="item-input-wrapper">
+            <input type="text" size="23" class="xyz" name="username" id="username"
+                ng-model="cred.username" placeholder="K-Mayra Username" />
+        </label>
+	</div>
+
+        <div class="item item-input-inset">
+        <span class="input-label">Password :</span>
+        <label class="item-input-wrapper">
+            <input type="password" size="23" class="xyz" name="username" id="username"
+                ng-model="cred.password" placeholder="Your Password" />
+        </label>
+        <!--button class="button button-small"> Submit  </button -->
+        </div>
+      </div>
+
+<hr />
+
+    <!-- div class="list">
+	<div class="item item-input-inset">
+	<label class="item-input-wrapper">
+	    <input type="text" placeholder="Email">
+	</label>
+	<button class="button button-small">
+	    Submit
+	</button>
+	</div>
+    </div -->
+
     <ion-card>
       <ion-list inline>
-        <ion-label for="username">Username : </ion-label>
-        <input type="text" name="username" id="username" ng-model="cred.username" placeholder="Your k-Mayra username" />
+        <!-- ion-label for="username">Username : </ion-label>
+        <input type="text" name="username" id="username"
+        	ng-model="cred.username" placeholder="K-Mayra Username"/>
 
         <ion-label for="password">Password : </ion-label>
-        <input type="password" ng-model="cred.password" id="password" placeholder="Your password" />
+        <input type="password" size="5" ng-model="cred.password"
+		id="password" placeholder="Your Password"/ -->
 
-        <ion-checkbox dark checked="true">Remember Me</ion-checkbox>
+        <ion-checkbox dark checked="true">
+		Remember Me
+	</ion-checkbox>
 
-        <div>
+	<button class="button button-block button-positive"
+		ng-click="login(cred)"><h4>Login Now</h4>
+	</button>
+	
+	<!-- div class="item">Forgot your password ?
+	<button class="button button-calm"
+		ng-click="resetPassword()">
+		Reset Password
+	</button>
+	</div  -->
+	
+	<div class="item" style="text-align:center">
+
+	<br />
+	Forgot your password ?
+	<br /><!-- call a popup to enter the username OR email -->
+	<button class="button button-calm"
+	    ng-click="resetPassword()">
+	    Reset Password
+	</button>
+	</div>
+
+	<div class="item" style="text-align:center">
+	    New User ? <br />
+	    <button class="button button-clear button-calm button-outline"
+		ng-click="registerUser()">
+		Register
+	    </button>
+	</div>
+
+        <!-- div>
           <button class="button button-block button-calm" ng-click="login(cred)">Login</button>
         </div>
         <div class="item">Forgot your password ?
@@ -23,7 +100,35 @@
                 ng-click="registerUser()">
             Register
         </button>
-        </div>
+        </div -->
+
+<!--
+	INITIAL DESIGN SUGGESTED BY FRANCIS
+	When a button is clicked a Modal pops up
+
+	<br />
+	<center>
+	<button class="button button-clear button-calm button-outline">
+	Register
+	</button>
+
+	<button class="button button-positive"><h4>Login</h4></button>
+	</center>
+
+	<br /><br />
+	<center>Forgot your password ?
+	<br /><!-- call a popup to enter the username OR email -- #>
+	<button class="button button-calm"
+		ng-click="resetPassword()">
+		Reset Password
+	</button>
+	</center>
+-->
+
+
+
+
+
       </ion-list>
     </ion-card>
   </ion-content>
