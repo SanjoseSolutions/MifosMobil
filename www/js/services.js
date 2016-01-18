@@ -1,13 +1,19 @@
+/*  This is the services script - contains key app services
+ *  Current services available (this should be kept up-to-date)
+ *    1. baseUrl: the base URL of Mifos X backend
+ *    2. authHttp: HTTP + Authentication (wraps around http)
+ *    3. Session: login, logout, username, authinfo
+ *    3. resources: Clients, Staff
+ */
+
 angular.module('starter.services', [])
 
-.factory('baseUrl', function() {
-  return "https://demo.openmf.org/mifosng-provider/api/v1";
-} )
+.factory('baseUrl', function() { return "https://kifiya.openmf.org/mifosng-provider/api/v1"; } )
 
 .factory('authHttp', [ '$http', function($http) {
   var authHttp = {};
 
-  $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = 'default';
+  $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = 'kifiya';
   $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
   authHttp.setAuthHeader = function(key) {
@@ -18,6 +24,7 @@ angular.module('starter.services', [])
     delete $http.defaults.headers.common.Authorization;
   };
 
+  /* Custom headers: GET, HEAD, DELETE */
   angular.forEach(['get', 'delete', 'head'], function (method) {
     authHttp[method] = function(url, config) {
       config = config || {};
@@ -25,6 +32,7 @@ angular.module('starter.services', [])
     };
   } );
 
+  /* Custom headers: POST, PUT */
   angular.forEach(['post', 'put'], function(method) {
     authHttp[method] = function(url, data, config) {
       config = config || {};
@@ -35,12 +43,107 @@ angular.module('starter.services', [])
   return authHttp;
 } ] )
 
+.factory('Session', function(baseUrl, authHttp, $http, $state) {
+  var session = { isOnline: true, role: null };
+  session.takeOnline = function() {
+    if (!session.isOnline) {
+      session.isOnline = true;
+    }
+  };
+
+  session.takeOffline = function() {
+    if (session.isOnline) {
+      session.isOnline = false;
+    }
+  };
+
+  session.login = function(auth) {
+    var uri = baseUrl + '/authentication';
+    console.log("user: " + auth.username + ", passwd: " + auth.password);
+    uri = uri + "?username=" + auth.username + "&password=" + auth.password;
+    console.log("uri: " + uri);
+
+    authHttp.clearAuthHeader();
+    $http.post(uri, {
+      'Accept': 'application/json'
+    } ).then(function(response) {
+
+      console.log("Login successful");
+      localStorage.setItem('username', auth.username);
+
+      var data = response.data;
+      console.log("Response: " + JSON.stringify(data));
+      localStorage.setItem('auth', data);
+
+      var b64key = data.base64EncodedAuthenticationKey;
+      console.log("B64 Auth Key:" + b64key);
+      authHttp.setAuthHeader(b64key);
+
+      var roles = data.roles;
+      var role = 'Client';
+      for(var i = 0; i < roles.length; ++i) {
+        var r = roles[i];
+        if (r.name == 'Super User') {
+          role = 'Admin';
+          break;
+        }
+        if (r.name == 'Staff') {
+          role = 'Staff';
+        }
+      }
+      session.role = role;
+
+      $state.go('tab.dash');
+    } );
+  };
+
+  session.hasRole = function(r) {
+    console.log("Session::hasRole called for :" + r);
+    if (null == session.role) {
+      return false;
+    }
+    if ('Super User' == session.role) {
+      return true;
+    }
+    if ('Staff' == r || 'Client' == r) {
+      return (r == session.role);
+    }
+    return false;
+  };
+
+  session.getRole = function() {
+    return session.role;
+  };
+
+  session.logout = function() {
+    console.log("Logout attempt");
+    localStorage.removeItem('username');
+    authHttp.clearAuthHeader();
+    $state.go('login');
+  };
+
+  session.auth = function() {
+    var auth = localStorage.getItem('auth');
+    return auth;
+  };
+
+  session.username = function() {
+    return localStorage.getItem('username');
+  };
+
+  session.isAuthenticated = function() {
+    return (session.username() != null && session.username() != '');
+  };
+
+  return session;
+} )
+
 .factory('Staff', function(authHttp) {
   var staff = [ {
 
   } ];
   return {
-    all: function(){},
+    query: function(){},
     remove: function(staff){},
     get: function(staff){}
   }
@@ -57,21 +160,6 @@ angular.module('starter.services', [])
     name: 'M. Mirnyi',
     fullname: 'Max Mirnyi',
     face: 'img/max.png'
-  }, {
-    id: 3,
-    name: 'A. Tadesse',
-    fullname: 'Sir Abel Tadesse',
-    face: 'img/adam.jpg'
-  }, {
-    id: 4,
-    name: 'A. Ketahun',
-    fullname: 'Aulugeta Ketahun',
-    face: 'img/perry.png'
-  }, {
-    id: 5,
-    name: 'Mike Hington',
-    fullname: 'Michael Huffington',
-    face: 'img/mike.png'
   } ];
 
   authHttp.get(baseUrl + '/clients', function(response) {
@@ -79,11 +167,17 @@ angular.module('starter.services', [])
   } );
 
   return {
-    all: function() {
-      authHttp.get(baseUrl + '/clients', function(response) {
-        clients = response;
-        console.log("Clients: " + clients.length);
-      } );
+    query: function() {
+      var username = localStorage.getItem('username');
+      if (username) {
+        /* we are logged in. attempt to get clients */
+        authHttp.get(baseUrl + '/clients').then(function(response) {
+          console.log("Response: " + JSON.stringify(response));
+          clients = response;
+          console.log("Got " + clients.length + " clients");
+          console.log("Client JSON: " + JSON.stringify(clients));
+        } );
+      }
       return clients;
     },
     remove: function(id) {
@@ -95,7 +189,7 @@ angular.module('starter.services', [])
           return clients[i];
         }
       }
-      return {}; 
+      return {};
     }
   };
 } );
