@@ -3,16 +3,14 @@
 <!--
     <ion-list>
     </ion-list>
+<ion-view view-title="Edit SACCO Details">
+  <ion-content>
+<!--
 -->
 
     <div class="list">
     <!-- span class="input-label">Full Name</span -->
       <div class="item item-input-inset">
-	<div class="row">
-	  <div class="col col-50">
-	    <label class="item-input-wrapper">
-	      <input type="text" size="13" placeholder="Your First Name">
-	      <!--input type="text" placeholder="Email2" -->
 	    </label>
 	  </div>
 	  <div class="col col-50">
@@ -20,13 +18,17 @@
 	      <input type="text" size="13" placeholder="Your Last Name">
 	    </label>
 	  </div>
-	</div>
+
+	    <label class="item-input-wrapper">
+	      <input type="text" placeholder="Enter the SACCO's Name">
+
+
       </div> <!-- End of item-input-inset -->
 
       <div class="item item-input-inset">
         <span class="input-label">Full Address:</span>
         <label class="item-input-wrapper">
-          <input type="text" placeholder="No 237, Commercial Street, C.A.">
+          <input type="text" placeholder="ex: No 237, Commercial Street, C.A.">
         </label>
       </div>
 
@@ -69,6 +71,11 @@
           <input type="date" size="9" name="DOJU" placeholder="ex: dd/mm/yy">
         </label>
       </div>
+
+	<button class="button button-block button-positive"
+		ng-click="saveNewSacco(sacco)"><h4>Save</h4>
+	</button>
+
     </div> <!-- End of List -->
 
   </ion-content>
