@@ -2,11 +2,11 @@
 
 # Jan 15th, 2016
 New Templates to be done:
-1. View SACCO
+1. SACCO view
 2. Client's details Edit [available from Tab-Client & Client-details]
 3. View Savings Details
 4. View Loans Details
-5. Staff */S/L
+5. Staff TotalMembers/Savings/Loans
 
 Correction:
 A: In file: sacco-edit : "SACCO Name" instead of "First Name and Last name"
