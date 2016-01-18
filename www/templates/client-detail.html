@@ -8,52 +8,83 @@
 label {
  	color: #558;
 }
-.item,
-ion-item {
+.item, ion-item {
 	margin: 2px;
 	padding: 2px 5px;
 	border: none;
+/*	font-style:italic;	*/
+	font-family:corsiva;
 }
 </style>
 
-<ion-view view-title="{{client.name}}">
+<ion-view view-title="Staff : {{client.name}}">
   <ion-content class="padding">
-    <div style="clear:both; height:205px">
+    <div class="list card" style="clear:both; height:160px">
+
+      <!-- TRYING TO PUT THE NAME AS AN HEADER
+	div class="item item-divider">
+	<h4>{{client.fullname}}</h4>
+      </div -->
+
     	<img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
 	<ion-list>
     	<h4>{{client.fullname}}</h4>
 	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
+  	  <ion-item>
+	    <label>Gender :</label> Male {{client.Gender}}
+	  </ion-item>
     	  <ion-item>
-	    <label>D.O.B</label>: Dec 1st, 1980	{{}}
-		<!-- client.dob ? {{client.dob}} : {{Dec 1st, 1980}} -->
+	    <label>D.O.B</label>: Dec 1st, 1980	{{}}	<!-- client.dob ? {{client.dob}} : {{Dec 1st, 1980}} -->
 	  </ion-item>
 	  <ion-item>
-	    <label class="icon ion-android-call" title="Mobile"></label> {{client.mobileNo ? client.mobileNo : "9876543210"}}
-		<!-- {{client.mobile ? client.mobile : "9876543210"}} -->
-	  </ion-item>
-    <ion-item>
-		<label class="icon ion-ios-email-outline" title="Email"></label>  {{client.email ? client.email : "extremelysimple@email.com" }}
-		<!-- {{client.email ? client.email : "extremelysimple@email.com" }} -->
-    </ion-item>
-    <ion-item>
-                <label>Occupation</label> : Trader {{client.Occupation}}
-		<!-- {{client.Occupation ? client.Occupation : Trader }} -->
-    </ion-item>
+	    <label class="icon ion-android-call" title="Mobile">
+	    </label> {{client.mobileNo ? client.mobileNo : "9876543210"}}
+	    <!-- {{client.mobile ? client.mobile : "9876543210"}} -->
+	  </ion-item> 
 	</ion-list>
-    </div>
-		<label>Location</label>	: {{client.Sector}} <!-- -->
-    <label>Address</label>	: # 45, Av. de la Rue {{client.FullAddress}}
-	<!-- {client.FullAddress ? client.FullAddress : # 45, Av. de la Rue }} -->
-    <div>
-		<h4 class="positive">
-                Account Summary
-                </h4>
-		Account No : -#- <!-- {{client.accNo ? client.accNo: # }} -->
-		<br /> Loans	: <i class="icon ion-social-bitcoin"></i> {{client.TotalLoans}} 40
-		<!-- {{client.TotalLoans ? client.TotalLoans : 40 }} -->
-		<br /> Savings	: <i class="icon ion-social-bitcoin"></i> {{client.TotalSavings}} 25
-		<!--  {{client.TotalSavings ? client.TotalSavings : 25 }} -->
+
+    <!--ion-list-->
     </div>
 
+    <div class="list card">
+      <ion-item>
+	<label class="icon ion-ios-email-outline" title="Email">
+	</label>  {{client.email ? client.email : "extremelysimple@email.com" }}
+	<!-- {{client.email ? client.email : "extremelysimple@email.com" }} -->
+      </ion-item>
+      <ion-item>
+        <label>Occupation</label> : Trader {{client.Occupation}}
+	<!-- {{client.Occupation ? client.Occupation : Trader }} -->
+      </ion-item>
+      <ion-item>
+	<label>Location</label>	: Sector 137
+      </ion-item>
+      <ion-item>
+	<label>Address</label>	:<br /> # 45, Av. de la Rue, Bourguignon, France {{client.FullAddress}}
+	<!-- {client.FullAddress ? client.FullAddress : # 45, Av. de la Rue }} -->
+      </ion-item>
+
+</div>
+
+      <ion-item class="item-divider">
+	<h4 class="positive"> Account Summary </h4>
+      </ion-item>
+
+    <div class="list card">
+      <ion-item>
+	<label>Account No</label>: -#- <!-- {{client.accNo ? client.accNo: # }} -->	
+      </ion-item>
+      <ion-item>
+	<label>	Loans </label> : <i class="icon ion-social-bitcoin"></i> {{client.TotalLoans}} 40
+	<!-- {{client.TotalLoans ? client.TotalLoans : 40 }} -->	
+      </ion-item>
+      <ion-item>
+	<label> Savings </label>: <i class="icon ion-social-bitcoin"></i> {{client.TotalSavings}} 25
+	<!--  {{client.TotalSavings ? client.TotalSavings : 25 }} -->	
+      </ion-item>
+    </div>
+
+
+    </ion-list>
   </ion-content>
 </ion-view>
