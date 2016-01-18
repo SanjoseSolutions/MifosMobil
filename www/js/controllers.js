@@ -25,8 +25,13 @@ angular.module('starter.controllers', [])
   }
 } )
 
+.controller('TabsCtrl', function($scope, Session) {
+  $scope.session = Session;
+} )
+
 .controller('DashCtrl', function($scope) {
   console.log("DashCtrl invoked");
+  console.log("Role: " + $scope.session.getRole());
 })
 
 .controller('StaffCtrl', function($scope, Staff) {
@@ -38,7 +43,9 @@ angular.module('starter.controllers', [])
 
 .controller('ClientsCtrl', function($scope, Clients) {
 
-  $scope.clients = Clients.query();
+  Clients.query(function(clients) {
+    $scope.clients = clients;
+  } );
   $scope.remove = function(client) {
     Clients.remove(client);
   };

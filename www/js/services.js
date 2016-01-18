@@ -83,15 +83,23 @@ angular.module('starter.services', [])
       var role = 'Client';
       for(var i = 0; i < roles.length; ++i) {
         var r = roles[i];
+        console.log("Got role: " + JSON.stringify(r));
         if (r.name == 'Super User') {
           role = 'Admin';
+          session.isAdmin = true;
           break;
         }
         if (r.name == 'Staff') {
           role = 'Staff';
+          session.isStaff = true;
         }
       }
       session.role = role;
+      console.log("Role is="+role);
+      if ('Client' == role) {
+        session.isClient = true;
+      }
+      localStorage.setItem('session', session);
 
       $state.go('tab.dash');
     } );
@@ -99,16 +107,21 @@ angular.module('starter.services', [])
 
   session.hasRole = function(r) {
     console.log("Session::hasRole called for :" + r);
+    var saved_session = localStorage.getItem('session');
+    if (saved_session) {
+      session.role = saved_session.role;
+    }
+    console.log("Got role:"+session.role);
     if (null == session.role) {
-      return false;
+      return 'ng-hide';
     }
     if ('Super User' == session.role) {
-      return true;
+      return 'ng-show';
     }
     if ('Staff' == r || 'Client' == r) {
-      return (r == session.role);
+      return (r == session.role) ? 'ng-show' : 'ng-hide';
     }
-    return false;
+    return 'ng-hide';
   };
 
   session.getRole = function() {
@@ -167,18 +180,16 @@ angular.module('starter.services', [])
   } );
 
   return {
-    query: function() {
-      var username = localStorage.getItem('username');
-      if (username) {
-        /* we are logged in. attempt to get clients */
-        authHttp.get(baseUrl + '/clients').then(function(response) {
-          console.log("Response: " + JSON.stringify(response));
-          clients = response;
+    query: function(process_clients) {
+      authHttp.get(baseUrl + '/clients').then(function(response) {
+        var data = response.data;
+        if (data.totalFilteredRecords) {
+          console.log("Clients found: " + JSON.stringify(data.pageItems));
+          var clients = data.pageItems;
           console.log("Got " + clients.length + " clients");
-          console.log("Client JSON: " + JSON.stringify(clients));
-        } );
-      }
-      return clients;
+          process_clients(clients);
+        }
+      } );
     },
     remove: function(id) {
       clients.splice(clients.indexOf(clients), 1);
