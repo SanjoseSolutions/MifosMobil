@@ -17,7 +17,7 @@ label {
 }
 </style>
 
-<ion-view view-title="Client: {{client.name}}">
+<ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
     <div class="list card" style="clear:both; height:160px">
 
@@ -27,18 +27,18 @@ label {
       </div -->
 
     	<img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
-	<ion-list>
-    	<h4>{{client.fullname}}</h4>
+  <ion-list>
+      <h4>{{client.displayName}}</h4>
 	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
   	  <ion-item>
-	    <label>Gender :</label> Male {{client.Gender}}
+	    <label>Gender :</label>{{client.gender.name}}
 	  </ion-item>
     	  <ion-item>
-	    <label>D.O.B</label>: Dec 1st, 1980	{{}}	<!-- client.dob ? {{client.dob}} : {{Dec 1st, 1980}} -->
+	    <label>D.O.B</label>: {{client.dob}}
 	  </ion-item>
 	  <ion-item>
 	    <label class="icon ion-android-call" title="Mobile">
-	    </label> {{client.mobileNo ? client.mobileNo : "9876543210"}}
+	    </label> {{client.mobileNo || "9876543210"}}
 	    <!-- {{client.mobile ? client.mobile : "9876543210"}} -->
 	  </ion-item> 
 	</ion-list>
@@ -49,15 +49,15 @@ label {
     <div class="list card">
       <ion-item>
 	<label class="icon ion-ios-email-outline" title="Email">
-	</label>  {{client.email ? client.email : "extremelysimple@email.com" }}
+	</label>  {{client.email || client.firstname + "@kmayra.org" }}
 	<!-- {{client.email ? client.email : "extremelysimple@email.com" }} -->
       </ion-item>
       <ion-item>
-        <label>Occupation</label> : Trader {{client.Occupation}}
+        <label>Occupation:</label>{{client.Occupation || "Trader"}}
 	<!-- {{client.Occupation ? client.Occupation : Trader }} -->
       </ion-item>
       <ion-item>
-	<label>Location</label>	: Sector 137
+	<label>Location:</label> Sector 137
       </ion-item>
       <ion-item>
 	<label>Address</label>	:<br /> # 45, Av. de la Rue, Bourguignon, France {{client.FullAddress}}

@@ -10,28 +10,6 @@ input 	{
     </ion-list -->
 
     <ion-card>
-      <div class="list">
-
-        <div class="item item-input-inset">
-        <span class="input-label">Username :</span>
-        <label class="item-input-wrapper">
-            <input type="text" size="23" class="xyz" name="username" id="username"
-                ng-model="cred.username" placeholder="K-Mayra Username" />
-        </label>
-	</div>
-
-        <div class="item item-input-inset">
-        <span class="input-label">Password :</span>
-        <label class="item-input-wrapper">
-            <input type="password" size="23" class="xyz" name="username" id="username"
-                ng-model="cred.password" placeholder="Your Password" />
-        </label>
-        <!--button class="button button-small"> Submit  </button -->
-        </div>
-        <ion-checkbox dark checked="true">
-		Remember Me
-	</ion-checkbox>
-      </div>
 <!-- hr / -->
 
     <!-- div class="list">
@@ -47,9 +25,12 @@ input 	{
 
     <ion-card>
       <ion-list ng-show="session.username">
-        <div>Welcome {{session.username}}!
-          <button class="button-calm button button-clear button-outline" ng-click="logout()">Logout</button>
-        </div>
+        <ion-item>
+          <p>
+            <ion-label>Welcome, <strong>{{session.username}}</strong>!</ion-label>
+          </p>
+          <button class="button-calm button button-clear button-block button-outline" ng-click="logout()">Logout</button>
+        </ion-item>
 <!--
 	INITIAL DESIGN SUGGESTED BY FRANCIS
 	When a button is clicked a Modal pops up

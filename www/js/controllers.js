@@ -41,9 +41,16 @@ angular.module('starter.controllers', [])
   };
 } )
 
-.controller('ClientsCtrl', function($scope, Clients) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
 
   Clients.query(function(clients) {
+    for(var i = 0; i < clients.length; ++i) {
+      if (Settings.showClientListFaces) {
+        ClientImages.getB64(clients[i].id, function(img_data) {
+          clients[i].face = img_data;
+        } );
+      }
+    }
     $scope.clients = clients;
   } );
   $scope.remove = function(client) {
@@ -51,8 +58,18 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients) {
-  $scope.client = Clients.get($stateParams.clientId);
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages) {
+  console.log("Looking for client:"+$stateParams.clientId);
+  Clients.get($stateParams.clientId, function(client) {
+    console.log("Got client:"+JSON.stringify(client));
+    $scope.client = client;
+    var dob = client.dateOfBirth;
+    $scope.client.dob = (new Date(dob[0] + "-" + dob[1] + "-" + dob[2])).toLocaleDateString();
+    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg"
+  } );
+  ClientImages.getB64($stateParams.clientId, function(img_data) {
+    $scope.client.face = img_data;
+  } );
 })
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {

@@ -8,12 +8,22 @@
 
 angular.module('starter.services', [])
 
-.factory('baseUrl', function() { return "https://kifiya.openmf.org/mifosng-provider/api/v1"; } )
+.factory('Settings', function() {
+  return {
+    'baseUrl': 'https://kifiya.openmf.org/mifosng-provider/api/v1',
+    'tenant': 'kifiya',
+    'showClientListFaces': false
+  };
+} )
 
-.factory('authHttp', [ '$http', function($http) {
+.factory('baseUrl', function(Settings) {
+  return Settings.baseUrl;
+} )
+
+.factory('authHttp', [ '$http', 'Settings', function($http, Settings) {
   var authHttp = {};
 
-  $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = 'kifiya';
+  $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = Settings.tenant;
   $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
   authHttp.setAuthHeader = function(key) {
@@ -43,7 +53,7 @@ angular.module('starter.services', [])
   return authHttp;
 } ] )
 
-.factory('Session', function(baseUrl, authHttp, $http, $state) {
+.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', function(baseUrl, authHttp, $http, $state) {
   var session = { isOnline: true, role: null };
   session.takeOnline = function() {
     if (!session.isOnline) {
@@ -149,7 +159,7 @@ angular.module('starter.services', [])
   };
 
   return session;
-} )
+} ] )
 
 .factory('Staff', function(authHttp) {
   var staff = [ {
@@ -175,10 +185,6 @@ angular.module('starter.services', [])
     face: 'img/max.png'
   } ];
 
-  authHttp.get(baseUrl + '/clients', function(response) {
-    clients = response;
-  } );
-
   return {
     query: function(process_clients) {
       authHttp.get(baseUrl + '/clients').then(function(response) {
@@ -186,6 +192,7 @@ angular.module('starter.services', [])
         if (data.totalFilteredRecords) {
           console.log("Clients found: " + JSON.stringify(data.pageItems));
           var clients = data.pageItems;
+          localStorage.setItem('clients', JSON.stringify(clients));
           console.log("Got " + clients.length + " clients");
           process_clients(clients);
         }
@@ -194,13 +201,43 @@ angular.module('starter.services', [])
     remove: function(id) {
       clients.splice(clients.indexOf(clients), 1);
     },
-    get: function(id) {
+    get: function(id, fn_client) {
+      clients = JSON.parse(localStorage.getItem('clients'));
       for (var i = 0; i < clients.length; i++) {
-        if (clients[i].id === parseInt(id)) {
-          return clients[i];
+        var c = clients[i];
+        console.log("Client id:" + c.id + "/" + c["id"] + "::" + JSON.stringify(c));
+        if (clients[i]["id"] === parseInt(id)) {
+          fn_client(clients[i]);
         }
       }
-      return {};
+    }
+  };
+} )
+
+.factory('ClientImages', function(authHttp, baseUrl) {
+  /* ClientImages.get, getB64
+   * get image binary, base64 encoded image data
+   * Arguments:
+   *  1. id - client id
+   *  2. fn_img(img) callback function for image
+   */
+  return {
+    get: function(id, fn_img) {
+      authHttp.get(baseUrl + '/clients/' + id + '/images', {
+        'Accept': 'text/plain'
+      } ).then(function(response) {
+        console.log("Image for client " + id + " received. Size: " + response.data.length);
+        fn_img(response.data);
+      } );
+    },
+    getB64: function(id, fn_img) {
+      authHttp.get(baseUrl + '/clients/' + id + '/images', {
+        'Accept': 'application/octet-stream'
+      } ).then(function(response) {
+        console.log("Image for client " + id + " received[b64]. Size: " + response.data.length);
+        fn_img(response.data);
+      } );
     }
   };
 } );
+
