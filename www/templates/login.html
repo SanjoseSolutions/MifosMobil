@@ -12,7 +12,9 @@
           <input type="password" ng-model="cred.password" id="password" placeholder="Your password" />
         </ion-item>
 
-        <!--ion-checkbox dark checked="true">Remember Me</ion-checkbox-->
+        <ion-item>
+          <ion-checkbox ng-model="cred.client">I am a Client</ion-checkbox>
+        </ion-item>
 
         <ion-item>
           <button class="button button-block button-calm" ng-click="login(cred)">Login</button>

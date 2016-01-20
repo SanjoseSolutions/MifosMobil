@@ -11,12 +11,12 @@ navigation history that also transitions its views in and out.
   </ion-tab>
 
   <!-- Staff Tab -->
-  <ion-tab title="Staff" icon-off="ion-happy-outline" icon-on="ion-happy" href="#/tab/staff">
+  <ion-tab title="Staff" icon-off="ion-happy-outline" icon-on="ion-happy" href="#/tab/staff" class="{{session.hasRole('Admin')}}">
     <ion-nav-view name="tab-staff"></ion-nav-view>
   </ion-tab>
 
   <!-- Clients Tab -->
-  <ion-tab title="Clients" icon-off="ion-ios-people-outline" icon-on="ion-ios-people" href="#/tab/clients">
+  <ion-tab title="Clients" icon-off="ion-ios-people-outline" icon-on="ion-ios-people" href="#/tab/clients" class="{{session.hasRole('Staff')}}">
     <ion-nav-view name="tab-clients"></ion-nav-view>
   </ion-tab>
 
@@ -24,6 +24,5 @@ navigation history that also transitions its views in and out.
   <ion-tab title="Account" icon-on="ion-ios-gear" icon-off="ion-ios-gear-outline" href="#/tab/account">
     <ion-nav-view name="tab-account"></ion-nav-view>
   </ion-tab>
-
 
 </ion-tabs>

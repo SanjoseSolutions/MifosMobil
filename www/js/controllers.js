@@ -49,6 +49,8 @@ angular.module('starter.controllers', [])
         ClientImages.getB64(clients[i].id, function(img_data) {
           clients[i].face = img_data;
         } );
+      } else {
+        clients[i].face = "img/placeholder-" + clients[i].gender.name + ".jpg";
       }
     }
     $scope.clients = clients;

@@ -69,6 +69,10 @@ angular.module('starter.services', [])
 
   session.login = function(auth) {
     var uri = baseUrl + '/authentication';
+    console.log("auth:"+JSON.stringify(auth));
+    if (auth.client) {
+      uri = baseUrl + '/self/authentication';
+    }
     console.log("user: " + auth.username + ", passwd: " + auth.password);
     uri = uri + "?username=" + auth.username + "&password=" + auth.password;
     console.log("uri: " + uri);
@@ -190,7 +194,6 @@ angular.module('starter.services', [])
       authHttp.get(baseUrl + '/clients').then(function(response) {
         var data = response.data;
         if (data.totalFilteredRecords) {
-          console.log("Clients found: " + JSON.stringify(data.pageItems));
           var clients = data.pageItems;
           localStorage.setItem('clients', JSON.stringify(clients));
           console.log("Got " + clients.length + " clients");
@@ -206,6 +209,33 @@ angular.module('starter.services', [])
       for (var i = 0; i < clients.length; i++) {
         var c = clients[i];
         console.log("Client id:" + c.id + "/" + c["id"] + "::" + JSON.stringify(c));
+        if (clients[i]["id"] === parseInt(id)) {
+          fn_client(clients[i]);
+        }
+      }
+    }
+  };
+} )
+
+.factory('SelfService', function(authHttp, baseUrl) {
+  return {
+    query: function(fn_clients) {
+      authHttp.get(baseUrl + '/self/clients').then(function(response) {
+        var data = response.data;
+        if (data.totalFilteredRecords) {
+          var clients = data.pageItems;
+          console.log("Clients found: " + clients.length);
+          fn_clients(clients);
+        }
+      } );
+    },
+    remove: function(id) {
+      clients.splice(clients.indexOf(clients), 1);
+    },
+    get: function(id, fn_client) {
+      clients = JSON.parse(localStorage.getItem('clients'));
+      for (var i = 0; i < clients.length; i++) {
+        var c = clients[i];
         if (clients[i]["id"] === parseInt(id)) {
           fn_client(clients[i]);
         }
