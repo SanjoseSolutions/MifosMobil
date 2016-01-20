@@ -28,7 +28,7 @@ input 	{
         </label>
         <!--button class="button button-small"> Submit  </button -->
         </div>
-        <ion-checkbox dark checked="true">
+        <ion-checkbox class="dark" checked="true">
 		Remember Me
 	</ion-checkbox>
       </div>
@@ -60,7 +60,9 @@ input 	{
 	</ion-checkbox -->
 
 	<button class="button button-block button-positive"
-		ng-click="login(cred)"><h4>Login Now</h4>
+		style="border-radius:20px;"
+		ng-click="login(cred)">
+		<h4>Login Now</h4>
 	</button>
 	
 	<!-- div class="item">Forgot your password ?
@@ -81,13 +83,14 @@ input 	{
 	</button>
 	</div>
 
-	<div class="item" style="text-align:center">
+	<!-- REGISTER BUTTON
+		div class="item" style="text-align:center">
 	    New User ? <br />
 	    <button class="button button-clear button-calm button-outline"
 		ng-click="registerUser()">
 		Register
 	    </button>
-	</div>
+	</div -->
 
         <!-- div>
           <button class="button button-block button-calm" ng-click="login(cred)">Login</button>
