@@ -1,76 +1,32 @@
-<style>
-label {
- 	color: #558;
-}
-.item, ion-item {
-	margin: 2px;
-	padding: 2px 5px;
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
-}
-</style>
+<ion-view view-title="Staffs">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-divider">Staff's Member</ion-item>
+      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="client in clients" type="item-text-wrap" href="#/tab/staffs/{{staff.id}}">
+	<img ng-src="{{
+		staff.gender == 'Female'?
+		(staff.face? staff.face : img/Staff-Female-3.png):
+		(staff.gender == 'Male'?
+			staff.face? staff.face : img/Staff-Male-1.jpeg)
+		}}">
+        <h2 style="padding-left:10px;" class="item-icon-right">{{staff.name}}
+	    <i class="icon ion-ios-people" style="font-size:1.2rem">35</i>
+	</h2>
+        <p  style="padding-left:10px;">
+	<!--{{staff.fullname}} -->
+	<br />
+	&Sigma; Members : {{TotalMembers}} 25
+	| &Sigma; L	: {{client.TotalLoans}} 80
+	| &Sigma; S	: {{client.TotalSavings}} 50
+	</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
 
-<ion-view view-title="Staff {{Staff.Name}}">
-  <ion-content class="padding">
-
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
-
-    <!--div class="list">
-      <!--span>John Wayne</span>
-      <span class="account-status">
-        <span>Savings $10</span>
-        <span>Loans $40</span>
-      </span>
-      Tab specially dedicated to Staff privileges.
-      <br /> Work in progress ...
-
-    </div -->
-
-<!-- {{client.face}} -->
-
-    <div class="list card" style="clear:both; height:160px">
-  <div class="item item-divider">
-    Staff Name : {{Staff.Name}}
-  </div>
-    	<img ng-src="img/Staff-Male-1.jpeg" style="width: 150px; height: 150px; float: left; margin: 5px">
-	<ion-list>
-    	<h4>{{Staff.fullname}}</h4>
-	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
-  	  <ion-item>
-	    <label>Gender :</label> Male {{client.Gender}}
-	  </ion-item>
-    	  <ion-item>
-	    <label>D.O.B</label>: Jan 15th, 1975	{{}}	<!-- client.dob ? {{client.dob}} : {{Dec 1st, 1980}} -->
-	  </ion-item>
-	  <ion-item>
-	    <label class="icon ion-android-call" title="Mobile">
-	    </label> {{client.mobileNo ? client.mobileNo : "9876543210"}}
-	    <!-- {{client.mobile ? client.mobile : "9876543210"}} -->
-	  </ion-item>
-	</ion-list>
-  <div class="item item-divider">
-	    <label class="icon ion-ios-email-outline" title="Email">
-	    : </label>{{client.email?client.email:" personal@email.com" }}
-  </div>
-
-    </div>
-    <div class="list card">
-	<div class="item item-divider">
-	  <label>In Charge of </label> : {{Staff.Sector? Staff.Sector: Byrathi}} Byrathi
-	</div>
-
-      <ion-item>
-	<label>Total Members </label>: {{TotalClient? TotalClient : 25}}
+        <ion-option-button class="button-assertive" ng-click="remove(client)">
+          Delete
+        </ion-option-button>
       </ion-item>
-      <ion-item>
-	<label>	Loans </label> : <i class="icon ion-social-bitcoin"></i> {{client.TotalLoans?client.TotalLoans:350}}
-
-      </ion-item>
-      <ion-item>
-	<label>Total Savings </label>: <i class="icon ion-social-bitcoin"></i> {{client.TotalSavings?client.TotalSavings:250}}
-      </ion-item>
-    </div>
-
+    </ion-list>
   </ion-content>
 </ion-view>
+
+
