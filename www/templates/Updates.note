@@ -25,3 +25,16 @@ OK	5.
 Corrections
 A: OK
 B: OK
+
+# Jan 20th, 2016
+
+Update / creation of templates:
+tab-staff.html
+staff-details.html 
+Updates.note
+
+Small changes on files:
+> ../img/* [Folder]
+> tab-clients
+> client-detail
+> tab-account
