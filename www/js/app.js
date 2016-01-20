@@ -44,7 +44,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     url: '/dash',
     views: {
       'tab-dash': {
-        templateUrl: 'templates/tab-home.html',
+        templateUrl: 'templates/sacco-edit.html', /* <--tab-home.html */
         controller: 'DashCtrl'
       }
     }
