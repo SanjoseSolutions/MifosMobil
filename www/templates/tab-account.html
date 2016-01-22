@@ -24,10 +24,10 @@ input 	{
     </div -->
 
     <ion-card>
-      <ion-list ng-show="session.username">
+      <ion-list>
         <ion-item>
           <p>
-            <ion-label>Welcome, <strong>{{session.username}}</strong>!</ion-label>
+            <ion-label>Welcome, <strong>{{session.username()}}</strong>!</ion-label>
           </p>
           <button class="button-calm button button-clear button-block button-outline" ng-click="logout()">Logout</button>
         </ion-item>

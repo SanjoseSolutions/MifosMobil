@@ -94,48 +94,45 @@ angular.module('starter.services', [])
       authHttp.setAuthHeader(b64key);
 
       var roles = data.roles;
+      var role_names = [];
       var role = 'Client';
       for(var i = 0; i < roles.length; ++i) {
         var r = roles[i];
-        console.log("Got role: " + JSON.stringify(r));
-        if (r.name == 'Super User') {
-          role = 'Admin';
-          session.isAdmin = true;
-          break;
+        var rname = r.name;
+        if (rname == 'Super User') {
+          rname = 'Admin';
         }
-        if (r.name == 'Staff') {
-          role = 'Staff';
-          session.isStaff = true;
+        if (rname != 'Client') {
+          role = rname;
         }
+        role_names.push(rname);
       }
       session.role = role;
       console.log("Role is="+role);
       if ('Client' == role) {
         session.isClient = true;
       }
-      localStorage.setItem('session', session);
+      localStorage.setItem('session', JSON.stringify(session));
+      localStorage.setItem('roles', role_names.join(","));
 
       $state.go('tab.dash');
     } );
   };
 
-  session.hasRole = function(r) {
-    console.log("Session::hasRole called for :" + r);
-    var saved_session = localStorage.getItem('session');
-    if (saved_session) {
-      session.role = saved_session.role;
-    }
-    console.log("Got role:"+session.role);
-    if (null == session.role) {
-      return 'ng-hide';
-    }
-    if ('Super User' == session.role) {
+  session.showByRole = function(r) {
+    if (session.role == r) {
       return 'ng-show';
     }
-    if ('Staff' == r || 'Client' == r) {
-      return (r == session.role) ? 'ng-show' : 'ng-hide';
-    }
     return 'ng-hide';
+  };
+
+  session.hasRole = function(r) {
+    console.log("Session::hasRole called for :" + r);
+    var roles = localStorage.getItem('roles');
+    if (roles.indexOf(r) >= 0) {
+      return true;
+    }
+    return false;
   };
 
   session.getRole = function() {
@@ -145,6 +142,10 @@ angular.module('starter.services', [])
   session.logout = function() {
     console.log("Logout attempt");
     localStorage.removeItem('username');
+    localStorage.removeItem('session');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('auth');
+    localStorage.removeItem('clients');
     authHttp.clearAuthHeader();
     $state.go('login');
   };
@@ -162,17 +163,42 @@ angular.module('starter.services', [])
     return (session.username() != null && session.username() != '');
   };
 
+  session.get = function() {
+    return JSON.parse(localStorage.getItem('session'));
+  };
+
   return session;
 } ] )
 
-.factory('Staff', function(authHttp) {
+.factory('DateFmt', function() {
+  return {
+    localDate: function(a_date) {
+      var dt = new Date(a_date[0] + "-" + a_date[1] + "-" + a_date[2]);
+      return dt.toLocaleDateString();
+    }
+  };
+} )
+
+.factory('Staff', function(authHttp, baseUrl) {
   var staff = [ {
 
   } ];
   return {
-    query: function(){},
+    query: function(fn_staff){
+      authHttp.get(baseUrl + '/staff').then(function(response) {
+        var staff = response.data;
+        console.log("Response data: " + JSON.stringify(staff));
+        fn_staff(staff);
+      } );
+    },
     remove: function(staff){},
-    get: function(staff){}
+    get: function(id, fn_staff) {
+      authHttp.get(baseUrl + '/staff/' + id).then(function(response) {
+        var sdata = response.data;
+        console.log("Got staff: " + JSON.stringify(sdata));
+        fn_staff(sdata);
+      } );
+    }
   }
 } )
 

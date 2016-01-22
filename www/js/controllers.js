@@ -26,23 +26,33 @@ angular.module('starter.controllers', [])
 } )
 
 .controller('TabsCtrl', function($scope, Session) {
-  $scope.session = Session;
+  $scope.session = Session.get();
 } )
 
 .controller('DashCtrl', function($scope) {
   console.log("DashCtrl invoked");
-  console.log("Role: " + $scope.session.getRole());
 })
 
 .controller('StaffCtrl', function($scope, Staff) {
-  $scope.staff = Staff.query();
+  Staff.query(function(staff) {
+    $scope.staff = staff;
+  } );
   $scope.remove = function(staff) {
     Staff.remove(staff);
   };
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
+.controller('StaffDetailCtrl', function($scope, $stateParams, Staff, DateFmt) {
+  console.log("StaffDetailCtrl called");
+  Staff.get($stateParams.staffId, function(staff) {
+    console.log("Joining date array: " + JSON.stringify(staff.joiningDate));
+    staff.joiningDt = DateFmt.localDate(staff.joiningDate);
+    console.log("Joining date local: " + staff.joiningDt);
+    $scope.staff = staff;
+  } );
+} )
 
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
   Clients.query(function(clients) {
     for(var i = 0; i < clients.length; ++i) {
       if (Settings.showClientListFaces) {
@@ -60,13 +70,12 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages) {
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt) {
   console.log("Looking for client:"+$stateParams.clientId);
   Clients.get($stateParams.clientId, function(client) {
     console.log("Got client:"+JSON.stringify(client));
     $scope.client = client;
-    var dob = client.dateOfBirth;
-    $scope.client.dob = (new Date(dob[0] + "-" + dob[1] + "-" + dob[2])).toLocaleDateString();
+    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg"
   } );
   ClientImages.getB64($stateParams.clientId, function(img_data) {
@@ -76,8 +85,6 @@ angular.module('starter.controllers', [])
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {
   console.log("AccountCtrl invoked");
-  var username = Session.username();
-  console.log("Username:"+username);
-  $scope.session = { username: username };
+  $scope.session = Session;
   $scope.logout = function() { Session.logout(); }
 });

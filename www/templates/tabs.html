@@ -11,7 +11,7 @@ navigation history that also transitions its views in and out.
   </ion-tab>
 
   <!-- Staff Tab -->
-  <ion-tab title="Staff" icon-off="ion-happy-outline" icon-on="ion-happy" href="#/tab/staff" class="{{session.hasRole('Admin')}}">
+  <ion-tab title="Staff" icon-off="ion-happy-outline" icon-on="ion-happy" href="#/tab/staff" class="{{session.hasRole('Admin')}} {{session.hasRole('Staff')}}">
     <ion-nav-view name="tab-staff"></ion-nav-view>
   </ion-tab>
 
