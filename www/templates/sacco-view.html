@@ -44,21 +44,40 @@ label {
 
     <div class="list card">
       <div class="item item-divider">
-	<label>SACCO's Name</label> : {{Sacco.Name? Sacco.Name: Lisungi}} Lisungi
+		<label>SACCO's Name</label> : {{Sacco.Name? Sacco.Name: Lisungi}} Lisungi
       </div>
       <ion-item>
-	<label>Full Address </label>:<br /> {{Sacco.fullAddress? Sacco.fullAddress : 25}}
+      	<label>Parent Office </label>: {{}}
       </ion-item>
       <ion-item>
-	<label style="font-size:18px;">Location</label> <br>
-	<label>Latitude</label> Sacco.lat : | <label>Longitude</label> Sacco.long
+		<label>Date Established</label> : dd/mm/yy
       </ion-item>
       <ion-item>
-	<label>Date Established</label> : dd/mm/yy
+		<label>Date of Joining Union</label> : dd/mm/yy
       </ion-item>
       <ion-item>
-	<label>Date of Joining Union</label> : dd/mm/yy
+		<label style="font-size:18px;">Location</label> <br>
+		<label>Latitude</label> {{}} Sacco.lat : | <label>Longitude</label> {{}} Sacco.long
       </ion-item>
+      <ion-item class="itme item-divider">
+		<label>Office Full Address </label> <!-- :<br /> {{Sacco.fullAddress? Sacco.fullAddress : 25}} -->
+      </ion-item>
+      <ion-item>
+      	<label>Country </label>: {{}}
+      </ion-item>
+	  <ion-item>
+      	<label>Region </label> : {{}}
+      </ion-item>
+	  <ion-item>
+      	<label>Zone </label> : {{}}
+      </ion-item>
+	  <ion-item>
+      	<label>Wereda </label> : {{}}
+      </ion-item>
+	  <ion-item>
+      	<label>Kebele </label> : {{}}
+      </ion-item>
+
     </div>
 
   </ion-content>

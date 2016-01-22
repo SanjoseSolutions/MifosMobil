@@ -2,47 +2,24 @@
   <ion-content>
 
     <div class="list">
-      <ion-list-item>
-	    <label class="item-input-wrapper">
-	<span class="input-label">Sacco Name</span>
-      </label>
-	      <input type="text" placeholder="Enter the SACCO's Name">
+      <ion-list-item class="item item-input-inset">
+        <span class="input-label">Sacco Name</span>
+	      <label class="item-input-wrapper">
+      	   <input type="text" placeholder="Enter the SACCO's Name">
+        </label>
       </ion-list-item>
 
-
-<!-- #>
-<div class="list">
-  <label class="item item-input item-stacked-label">
-    <span class="input-label">Location</span>
-    <input type="text" placeholder="Latitude ...">
-    <input type="text" placeholder="Longitude ...">
-  </label>
-</div -->
-
-  <div class="item item-input-inset">
-  <label class="item item-input item-stacked-label">
-    <span class="input-label">Location</span>
-    <div class="row">
-      <div class="col col-50">
-        <label class="item-input-wrapper">
-          <input type="text" size="13" placeholder="Latitude">
-        </label>
-      </div>
-      <div class="col col-50">
-        <label class="item-input-wrapper">
-          <input type="text" size="13" placeholder="Longitude">
-        </label>
-      </div>
-    </div>
-  </label>
-  </div> <!-- End of item-input-inset -->
-
-      <div class="item item-input-inset">
-        <span class="input-label">Full Address:</span>
-        <label class="item-input-wrapper">
-          <input type="text" placeholder="ex: No 237, Commercial Street, C.A.">
-        </label>
-      </div>
+      <label class="item item-input item-select">
+        <div class="input-label">
+          Parent Office :
+        </div>
+        <select>
+          <option>Head Office</option>
+          <option>Likasi</option>
+          <option>Wakanda</option>
+          <option selected>Undefined</option>
+        </select>
+      </label>
 
       <div class="item item-input-inset">
         <span class="input-label">Date Established:</span>
@@ -54,6 +31,71 @@
         <span class="input-label">Date of Joining Union:</span>
         <label class="item-input-wrapper">
           <input type="date" size="9" name="DOJU" placeholder="ex: dd/mm/yy">
+        </label>
+      </div>
+
+<!-- Original Model Before Ccustomization below#>
+<div class="list">
+  <label class="item item-input item-stacked-label">
+    <span class="input-label">Location</span>
+    <input type="text" placeholder="Latitude ...">
+    <input type="text" placeholder="Longitude ...">
+  </label>
+</div -->
+
+      <div class="item item-input-inset">
+        <label class="item item-input item-stacked-label">
+          <span class="input-label">Location</span>
+          <div class="row">
+            <div class="col col-50">
+              <label class="item-input-wrapper">
+                <input type="text" size="13" placeholder="Latitude">
+              </label>
+            </div>
+            <div class="col col-50">
+              <label class="item-input-wrapper">
+                <input type="text" size="13" placeholder="Longitude">
+              </label>
+            </div>
+          </div>
+        </label>
+      </div> <!-- End of item-input-inset -->
+
+      <div class="item item-divider"> <!-- input-inset -->
+        <span class="input-label">Office Full Address:</span>
+        <!--label class="item-input-wrapper">
+          <input type="text" placeholder="ex: No 237, Commercial Street, C.A.">
+        </label -->
+      </div>
+
+      <div class="item item-input-inset">
+        <span class="input-label">Country :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" name="Country" placeholder="ex : Ethiopia">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Region :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" name="Region" placeholder="Enter Region's Name">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Zone :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" name="Zone" placeholder="Enter Zone's Name">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Wereda :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" name="Wereda" placeholder="Enter Wereda's Name">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Kebele :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" name="Kebele" placeholder="Enter Kebele's Name">
         </label>
       </div>
 
