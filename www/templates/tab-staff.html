@@ -8,9 +8,12 @@
         <h2>{{s.firstname}} {{s.lastname}}</h2>
         </div>
         <div>
-          <span style="padding-left:2em"><div style="margin-top:10px" class="icon ion-ios-people"></div>: {{s.clients || "35"}}</span>
-          | &Sigma;L: {{s.totalLoans || "80" }}
-          | &Sigma;S: {{s.totalSavings || "55" }}
+          <span style="padding-left:2em">
+            <div style="margin-top:10px" class="icon ion-ios-people">
+            </div>: {{s.clients ? s.clients "35" }}
+          </span>
+          | &Sigma;S: {{s.totalSavings || "55" }} <!-- Green -->
+          | &Sigma;L: {{s.totalLoans || "80" }}   <!-- Red / Blue -->
         </div>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
