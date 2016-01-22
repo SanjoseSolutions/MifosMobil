@@ -11,7 +11,7 @@ label {
 }
 </style>
 
-<ion-view view-title="Staff {{Staff.Name}}">
+<ion-view view-title="Staff {{staff.fullname}}">
   <ion-content class="padding"> <!-- style="background-color:grey;" -->
 
     <img src="img/kmayra.png" width="190" height="40" title="K-Mayra" alt="K-Mayra Logo" />
@@ -27,48 +27,66 @@ label {
 
     </div -->
 
-<!-- {{client.face}} -->
-
+    <!-- {{client.face}} -->
     <div class="list card" style="clear:both; height:200px">
       <div class="item item-divider">
-        <label>Staff Name </label>: {{staff.firstname}} {{staff.lastname}}
+        <label>Staff Name </label>: {{staff.fullname}}
+        <!-- staff.fullname = firstname + ' ' + staff.lastname -->
+        <!-- displayName = staff.lastname + ', ' + firstname -->
       </div>
     	<img ng-src="img/Staff-Male-1.jpeg" style="width: 150px; height: 150px; float: left; margin: 5px">
       <ion-list>
         <h4>{{staff.fullname}}</h4>
-    <!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
-        <!--ion-item>
+        <ion-item>
+          <label>Staff's ID </label>: {{staff.id}}
+        </ion-item>
+        <!-- ion-item>
           <label>Gender :</label> Male {{staff.gender}}
-        </ion-item-->
+        </ion-item -->
+        <ion-item>
+          <label>Office's ID </label>: {{staff.officeId}}
+        <ion-item>
+          <label>Office's Name </label>: {{staff.officeName}}
+        </ion-item>
     	  <ion-item>
           <label>Joining Date</label>: {{staff.joiningDt}}
-          <!-- staff.dob ? {{staff.dob}} : {{Dec 1st, 1980}} -->
         </ion-item>
         <ion-item>
           <label class="icon ion-android-call" title="Mobile">
           </label> {{staff.mobileNo || "9876543210"}}
         </ion-item>
       </ion-list>
-  <div class="item item-divider">
-	    <label style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
-	    : </label>{{staff.email?staff.email:" personal@kmayra.org" }}
-  </div>
-
+      <div class="item item-divider">
+	       <label style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> : 
+         </label>{{staff.email?staff.email:" personal@kmayra.org" }}
+      </div>
     </div>
     <div class="list card">
-	<div class="item item-divider">
-	  <label>In Charge of </label> : {{staff.sector? staff.sector: Byrathi}} Byrathi
-	</div>
+    	<div class="item item-divider">
+	       <label>In Charge of </label> : {{staff.sector? staff.sector: Byrathi}} Byrathi
+	    </div>
 
       <ion-item>
-	<label>Total Members </label>: {{TotalMembers? TotalMembers : 25}}
+          <label>Active Officer </label>: {{isActive}}
       </ion-item>
       <ion-item>
-	<label>	Loans </label> : <i class="icon ion-social-bitcoin"></i> {{client.TotalLoans?client.TotalLoans:350}}
-
+          <label>Loan Officer </label>: {{isLoanOfficer}}
       </ion-item>
       <ion-item>
-	<label>Total Savings </label>: <i class="icon ion-social-bitcoin"></i> {{client.TotalSavings?client.TotalSavings:250}}
+      	<label>Total Members </label>: 
+          <span style="padding-left:2em">
+            <div style="margin-top:10px" class="icon ion-ios-people">
+            </div>
+          </span>
+          {{TotalMembers? TotalMembers : 25}}
+      </ion-item>
+      <ion-item>
+	       <label> Total Loans </label> : <i class="icon ion-social-bitcoin"></i>
+         {{client.TotalLoans?client.TotalLoans:350}}
+      </ion-item>
+      <ion-item>
+          <label>Total Savings </label>: <i class="icon ion-social-bitcoin"></i>
+          {{client.TotalSavings?client.TotalSavings:250}}
       </ion-item>
     </div>
 
