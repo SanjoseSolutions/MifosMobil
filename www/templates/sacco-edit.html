@@ -10,14 +10,9 @@
       </ion-list-item>
 
       <label class="item item-input item-select">
-        <div class="input-label">
-          Parent Office :
-        </div>
-        <select>
-          <option>Head Office</option>
-          <option>Likasi</option>
-          <option>Wakanda</option>
-          <option selected>Undefined</option>
+        <div class="input-label">Parent Union: </div>
+        <select ng-repeat="office in offices">
+          <option value="office.id">{{office.name}}</option>
         </select>
       </label>
 

@@ -4,10 +4,10 @@
       <ion-item class="item-divider">Clients' List</ion-item>
       <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="client in clients" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
         <img ng-src="{{client.face}}">
-        <h2 style="padding-left:10px;">{{client.displayName}}</h2>
+        <h2 style="padding-left:10px;">#{{client.id}}: {{client.displayName}}</h2>
         <p  style="padding-left:10px;"> <!-- {{client.fullname}} -->
-	Loans	: {{client.TotalLoans}} 40 |
-	Savings	: {{client.TotalSavings}} 25
+	Loans: {{client.TotalLoans || 40}} |
+	Savings: {{client.TotalSavings || 25}}
 	</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 

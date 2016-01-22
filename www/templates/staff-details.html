@@ -14,8 +14,6 @@ label {
 <ion-view view-title="Staff {{staff.fullname}}">
   <ion-content class="padding"> <!-- style="background-color:grey;" -->
 
-    <img src="img/kmayra.png" width="190" height="40" title="K-Mayra" alt="K-Mayra Logo" />
-
     <!--div class="list">
       <span>John Wayne</span>
       <span class="account-status">
@@ -38,22 +36,20 @@ label {
       <ion-list>
         <h4>{{staff.fullname}}</h4>
         <ion-item>
-          <label>Staff's ID </label>: {{staff.id}}
-        </ion-item>
-        <!-- ion-item>
-          <label>Gender :</label> Male {{staff.gender}}
-        </ion-item -->
-        <ion-item>
-          <label>Office's ID </label>: {{staff.officeId}}
-        <ion-item>
-          <label>Office's Name </label>: {{staff.officeName}}
-        </ion-item>
-    	  <ion-item>
-          <label>Joining Date</label>: {{staff.joiningDt}}
+          <label>Staff ID:</label>{{staff.id}}
         </ion-item>
         <ion-item>
           <label class="icon ion-android-call" title="Mobile">
           </label> {{staff.mobileNo || "9876543210"}}
+        </ion-item>
+        <!-- ion-item>
+          <label>Gender :</label> Male {{staff.gender}}
+        </ion-item -->
+    	  <ion-item>
+          <label>Joining Date</label>: {{staff.joiningDt}}
+        </ion-item>
+        <ion-item>
+          <label>Office's Name </label>: {{staff.officeName}}
         </ion-item>
       </ion-list>
       <div class="item item-divider">
@@ -63,7 +59,7 @@ label {
     </div>
     <div class="list card">
     	<div class="item item-divider">
-	       <label>In Charge of </label> : {{staff.sector? staff.sector: Byrathi}} Byrathi
+	       <label>In Charge of </label> : {{staff.officeName}}
 	    </div>
 
       <ion-item>

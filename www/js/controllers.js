@@ -29,8 +29,22 @@ angular.module('starter.controllers', [])
   $scope.session = Session.get();
 } )
 
-.controller('DashCtrl', function($scope) {
+.controller('DashCtrl', function($scope, baseUrl, authHttp) {
   console.log("DashCtrl invoked");
+  authHttp.get(baseUrl + '/offices').then(function(response) {
+    var data = response.data;
+    var offices = [];
+    for(var i = 0; i < data.length; ++i) {
+      console.log("Got office: " + JSON.stringify(data[i]));
+      if (data[i].parentId == 1) {
+        offices.push( {
+          "id": data[i].id,
+          "name": data[i].name
+        } );
+      }
+    }
+    $scope.offices = offices;
+  } );
 })
 
 .controller('StaffCtrl', function($scope, Staff) {
@@ -47,6 +61,7 @@ angular.module('starter.controllers', [])
   Staff.get($stateParams.staffId, function(staff) {
     console.log("Joining date array: " + JSON.stringify(staff.joiningDate));
     staff.joiningDt = DateFmt.localDate(staff.joiningDate);
+    staff.fullname = staff.firstname + " " + staff.lastname;
     console.log("Joining date local: " + staff.joiningDt);
     $scope.staff = staff;
   } );
