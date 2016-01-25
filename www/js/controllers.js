@@ -29,10 +29,9 @@ angular.module('starter.controllers', [])
   $scope.session = Session.get();
 } )
 
-.controller('DashCtrl', function($scope, baseUrl, authHttp) {
+.controller('DashCtrl', function($scope, Office) {
   console.log("DashCtrl invoked");
-  authHttp.get(baseUrl + '/offices').then(function(response) {
-    var data = response.data;
+  Office.query(function(data) {
     var offices = [];
     for(var i = 0; i < data.length; ++i) {
       console.log("Got office: " + JSON.stringify(data[i]));
@@ -46,6 +45,44 @@ angular.module('starter.controllers', [])
     $scope.offices = offices;
   } );
 })
+
+.controller('SACCOListCtrl', function($scope, Office) {
+  console.log("SACCOListCtrl called");
+  Office.query(function(data) {
+    var sus = [];
+    var po = new Object();
+    var saccos = [];
+    for(var i = 0; i < data.length; ++i) {
+      if (data[i].parentId == 1) {
+        sus.push( {
+          "id": data[i].id,
+          "name": data[i].name
+        } );
+        po[data[i].id] = data[i].parentId;
+      } else {
+        var parentId = data[i].parentId;
+        var gpId = po[parentId];
+        if (gpId != null && gpId == 1) {
+          saccos.push( {
+            "id": data[i].id,
+            "name": data[i].name
+          } );
+        }
+      }
+    }
+    console.log("Got SACCOs: " + saccos.length + " SUs: " + sus.length);
+    $scope.data = { "saccos": saccos };
+  } );
+} )
+
+.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateFmt) {
+  console.log("Sacco view ctrl invoked for " + $stateParams.saccoId);
+  Office.get($stateParams.saccoId, function(office) {
+    console.log("Got SACCO" + JSON.stringify(office));
+    office.openingDt = DateFmt.localDate(office.openingDate);
+    $scope.data = { sacco: office };
+  } );
+} )
 
 .controller('StaffCtrl', function($scope, Staff) {
   Staff.query(function(staff) {

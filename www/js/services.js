@@ -115,7 +115,7 @@ angular.module('starter.services', [])
       localStorage.setItem('session', JSON.stringify(session));
       localStorage.setItem('roles', role_names.join(","));
 
-      $state.go('tab.dash');
+      $state.go('tab.sacco-list');
     } );
   };
 
@@ -175,6 +175,23 @@ angular.module('starter.services', [])
     localDate: function(a_date) {
       var dt = new Date(a_date[0] + "-" + a_date[1] + "-" + a_date[2]);
       return dt.toLocaleDateString();
+    }
+  };
+} )
+
+.factory('Office', function(authHttp, baseUrl) {
+  return {
+    get: function(id, fn_office) {
+      authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
+        var odata = response.data;
+        fn_office(odata);
+      } );
+    },
+    query: function(fn_offices) {
+      authHttp.get(baseUrl + '/offices').then(function(response) {
+        var odata = response.data;
+        fn_offices(odata);
+      } );
     }
   };
 } )
