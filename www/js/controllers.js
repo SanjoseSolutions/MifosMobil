@@ -122,7 +122,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages) {
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
   Clients.get($stateParams.clientId, function(client) {
@@ -134,7 +134,7 @@ angular.module('starter.controllers', [])
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );
-  DataTables.get('Client_Fields', clientId).then(function(cfields) {
+  DataTables.get('Client_Fields', clientId, function(cfields) {
     for(var fld in cfields) {
       console.log("Client field: " + fld + " = '" + cfields[fld] + "'")
       $scope.client.$fld = cfields[fld]; // or $scope.client[fld] = cfields[fld]

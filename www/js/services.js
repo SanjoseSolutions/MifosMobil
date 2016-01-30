@@ -178,7 +178,7 @@ angular.module('starter.services', [])
   return session;
 } ] )
 
-.factory('DataTables', function(authHttp) {
+.factory('DataTables', function(authHttp, baseUrl) {
   return {
     get_meta: function(name, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name).then(function(response) {
