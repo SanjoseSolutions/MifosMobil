@@ -1,12 +1,32 @@
-<ion-view view-title="Staff">
-  <ion-content class="padding">
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
-    <div class="list card">
-      <span>John Wayne</span>
-      <span class="account-status">
-        <span>Savings $10</span>
-        <span>Loans $40</span>
-      </span>
-    </div>
+<ion-view view-title="Staffs">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-divider">Staff's Member</ion-item>
+      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="client in clients" type="item-text-wrap" href="#/tab/staffs/{{staff.id}}">
+	<img ng-src="{{
+		staff.gender == 'Female'?
+		(staff.face? staff.face : img/Staff-Female-3.png):
+		(staff.gender == 'Male'?
+			staff.face? staff.face : img/Staff-Male-1.jpeg)
+		}}">
+        <h2 style="padding-left:10px;" class="item-icon-right">{{staff.name}}
+	    <i class="icon ion-ios-people" style="font-size:1.2rem">35</i>
+	</h2>
+        <p  style="padding-left:10px;">
+	<!--{{staff.fullname}} -->
+	<br />
+	&Sigma; Members : {{TotalMembers}} 25
+	| &Sigma; L	: {{client.TotalLoans}} 80
+	| &Sigma; S	: {{client.TotalSavings}} 50
+	</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+
+        <ion-option-button class="button-assertive" ng-click="remove(client)">
+          Delete
+        </ion-option-button>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>
+
+

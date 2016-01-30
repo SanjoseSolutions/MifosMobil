@@ -1,7 +1,7 @@
 {
-  "name": "mifosmobil",
-  "version": "1.1.1",
-  "description": "MifosMobil: An Ionic project",
+  "name": "k-Mayra",
+  "version": "0.9",
+  "description": "k-Mayra: Bank on your Mobile",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^2.0.4",

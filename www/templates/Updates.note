@@ -1,0 +1,40 @@
+
+
+# Jan 15th, 2016
+New Templates to be done:
+1. SACCO view
+2. Client's details Edit [available from Tab-Client & Client-details]
+3. View Savings Details
+4. View Loans Details
+5. Staff TotalMembers/Savings/Loans
+
+Correction:
+A: In file: sacco-edit : "SACCO Name" instead of "First Name and Last name"
+
+B: Update this folder : /MifosMobil/www/img
+with adequat Placeholder images for male and female
+
+# Jan 18th, 2016
+OK	1. 
+OK	2. 
+OK	3. Acc No | Saving Acc | Balance | Actions
+OK	4. Acc No | Loan Acc | Orig Loan | Loan Balance | Amount Paid | Type | Actions
+OK	5.
+
+
+Corrections
+A: OK
+B: OK
+
+# Jan 20th, 2016
+
+Update / creation of templates:
+tab-staff.html
+staff-details.html 
+Updates.note
+
+Small changes on files:
+> ../img/* [Folder]
+> tab-clients
+> client-detail
+> tab-account

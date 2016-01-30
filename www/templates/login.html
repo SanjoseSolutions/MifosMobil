@@ -1,10 +1,37 @@
 <ion-view view-title="Login">
   <ion-content>
-    <ion-list>
-      <label for="username">Username</label>
-      <input type="text" name="username" id="username" />
-      <label for="password">Password</label>
-      <input type="password" name="password" id="password" />
-    </ion-list>
+    <ion-card>
+      <ion-list>
+        <ion-item>
+          <ion-label for="username">Username : </ion-label>
+          <input type="text" name="username" id="username" ng-model="cred.username" placeholder="Your k-Mayra username" />
+        </ion-item>
+
+        <ion-item>
+          <ion-label for="password">Password : </ion-label>
+          <input type="password" ng-model="cred.password" id="password" placeholder="Your password" />
+        </ion-item>
+
+        <ion-item>
+          <ion-checkbox ng-model="cred.client">I am a Client</ion-checkbox>
+        </ion-item>
+
+        <ion-item>
+          <button class="button button-block button-calm" ng-click="login(cred)">Login</button>
+        </ion-item>
+
+        <div class="item">Forgot your password?<br>
+        <button class="button button-calm"
+            ng-click="resetPassword()">
+            Reset Password
+        </button></div>
+        <div class="item">
+        <button class="button button-clear button-calm button-outline"
+                ng-click="registerUser()">
+            Register
+        </button>
+        </div>
+      </ion-list>
+    </ion-card>
   </ion-content>
 </ion-view>

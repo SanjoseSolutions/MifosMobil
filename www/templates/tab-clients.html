@@ -1,11 +1,14 @@
 <ion-view view-title="Clients">
   <ion-content>
     <ion-list>
-      <ion-item class="item-calm">Clients List</ion-item>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="client in clients" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
-	<img src="/img/placeholder-male.jpg">
-        <h2>{{client.displayName}}</h2>
-        <p>{{client.accountNo}}</p>
+      <ion-item class="item-divider">Clients' List</ion-item>
+      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="client in clients" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
+        <img ng-src="{{client.face}}">
+        <h2 style="padding-left:10px;">{{client.displayName}}</h2>
+        <p  style="padding-left:10px;"> <!-- {{client.fullname}} -->
+	Loans	: {{client.TotalLoans}} 40 |
+	Savings	: {{client.TotalSavings}} 25
+	</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-assertive" ng-click="remove(client)">
