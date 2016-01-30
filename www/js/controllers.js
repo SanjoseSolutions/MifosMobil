@@ -136,7 +136,7 @@ angular.module('starter.controllers', [])
   } );
   DataTables.get('Client_Fields', clientId).then(function(cfields) {
     for(var fld in cfields) {
-      console.log("Client field: " + fld " = '" + cfields[fld] + "'")
+      console.log("Client field: " + fld + " = '" + cfields[fld] + "'")
       $scope.client.$fld = cfields[fld]; // or $scope.client[fld] = cfields[fld]
     }
   } );

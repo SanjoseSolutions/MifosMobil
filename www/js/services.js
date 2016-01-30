@@ -185,14 +185,14 @@ angular.module('starter.services', [])
         var data = response.data;
         console.log("DTABLE METADATA:" + JSON.stringify(data));
         fn_dtable(data);
-      }
+      } );
     },
     get: function(name, id, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         console.log("Datatable DATA:" + JSON.stringify(data));
         fn_dtable(data);
-      }
+      } );
     }
   };
 } )
