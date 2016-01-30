@@ -11,54 +11,44 @@ label {
 }
 </style>
 
-<ion-view view-title="Sacco Details">
+<ion-view view-title="Details: {{data.sacco.name}}">
   <ion-content class="padding">
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
-
-    <!-- div class="list card" style="clear:both; height:160px">
-	<div class="item item-divider">
-    Staff Name : {{Staff.Name}}
-  </div>
-    	<img ng-src="img/Staff-Male-1.jpeg" style="width: 150px; height: 150px; float: left; margin: 5px">
-	<ion-list>
-    	<h4>{{Staff.fullname}}</h4>
-	<# !--ion-item class="item item-positive">PERSONAL INFO :</ion-item --#>
-  	  <ion-item>
-	    <label>Gender :</label> Male {{client.Gender}}
-	  </ion-item>
-    	  <ion-item>
-	    <label>D.O.B</label>: Jan 15th, 1975	
-	  </ion-item>
-	  <ion-item>
-	    <label class="icon ion-android-call" title="Mobile">
-	    </label> {{client.mobileNo ? client.mobileNo : "9876543210"}}
-	    <# !-- {{client.mobile ? client.mobile : "9876543210"}} -- #>
-	  </ion-item>
-	</ion-list>
-  <div class="item item-divider">
-	    <label class="icon ion-ios-email-outline" title="Email">
-	    : </label>{{client.email?client.email:" personal@email.com" }}
-  </div>
-
-    </div -->
-
     <div class="list card">
       <div class="item item-divider">
-	<label>SACCO's Name</label> : {{Sacco.Name? Sacco.Name: Lisungi}} Lisungi
+        <label>SACCO's Name:</label> {{data.sacco.name}}
       </div>
       <ion-item>
-	<label>Full Address </label>:<br /> {{Sacco.fullAddress? Sacco.fullAddress : 25}}
+      	<label>Parent Office:</label> {{data.sacco.parentName}}
       </ion-item>
       <ion-item>
-	<label style="font-size:18px;">Location</label> <br>
-	<label>Latitude</label> Sacco.lat : | <label>Longitude</label> Sacco.long
+        <label>Date Established:</label> {{data.sacco.openingDt}}
       </ion-item>
       <ion-item>
-	<label>Date Established</label> : dd/mm/yy
+        <label>Date of Joining Union:</label> {{data.sacco.joiningDt || data.sacco.openingDt}}
       </ion-item>
       <ion-item>
-	<label>Date of Joining Union</label> : dd/mm/yy
+        <label style="font-size:18px;">Location</label> <br>
+        <label>Latitude:</label> {{ data.sacco.lat }} <label>Longitude</label> {{ data.sacco.long }}
       </ion-item>
+      <ion-item class="item item-divider">
+        <label>Office Full Address </label>{{data.sacco.address}}
+      </ion-item>
+      <ion-item>
+        <label>Country: </label> {{"Ethiopia"}}
+      </ion-item>
+      <ion-item>
+          <label>Region: </label> {{}}
+        </ion-item>
+      <ion-item>
+          <label>Zone: </label> {{}}
+        </ion-item>
+      <ion-item>
+        <label>Wereda: </label> {{}}
+      </ion-item>
+      <ion-item>
+        <label>Kebele: </label> {{}}
+      </ion-item>
+
     </div>
 
   </ion-content>

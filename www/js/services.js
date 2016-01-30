@@ -102,48 +102,45 @@ angular.module('starter.services', [])
       authHttp.setAuthHeader(b64key);
 
       var roles = data.roles;
+      var role_names = [];
       var role = 'Client';
       for(var i = 0; i < roles.length; ++i) {
         var r = roles[i];
-        console.log("Got role: " + JSON.stringify(r));
-        if (r.name == 'Super User') {
-          role = 'Admin';
-          session.isAdmin = true;
-          break;
+        var rname = r.name;
+        if (rname == 'Super User') {
+          rname = 'Admin';
         }
-        if (r.name == 'Staff') {
-          role = 'Staff';
-          session.isStaff = true;
+        if (rname != 'Client') {
+          role = rname;
         }
+        role_names.push(rname);
       }
       session.role = role;
       console.log("Role is="+role);
       if ('Client' == role) {
         session.isClient = true;
       }
-      localStorage.setItem('session', session);
+      localStorage.setItem('session', JSON.stringify(session));
+      localStorage.setItem('roles', role_names.join(","));
 
-      $state.go('tab.dash');
+      $state.go('tab.sacco-list');
     } );
+  };
+
+  session.showByRole = function(r) {
+    if (session.role == r) {
+      return 'ng-show';
+    }
+    return 'ng-hide';
   };
 
   session.hasRole = function(r) {
     console.log("Session::hasRole called for :" + r);
-    var saved_session = localStorage.getItem('session');
-    if (saved_session) {
-      session.role = saved_session.role;
+    var roles = localStorage.getItem('roles');
+    if (roles.indexOf(r) >= 0) {
+      return true;
     }
-    console.log("Got role:"+session.role);
-    if (null == session.role) {
-      return 'ng-hide';
-    }
-    if ('Super User' == session.role) {
-      return 'ng-show';
-    }
-    if ('Staff' == r || 'Client' == r) {
-      return (r == session.role) ? 'ng-show' : 'ng-hide';
-    }
-    return 'ng-hide';
+    return false;
   };
 
   session.getRole = function() {
@@ -153,6 +150,10 @@ angular.module('starter.services', [])
   session.logout = function() {
     console.log("Logout attempt");
     localStorage.removeItem('username');
+    localStorage.removeItem('session');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('auth');
+    localStorage.removeItem('clients');
     authHttp.clearAuthHeader();
     $state.go('login');
   };
@@ -168,6 +169,10 @@ angular.module('starter.services', [])
 
   session.isAuthenticated = function() {
     return (session.username() != null && session.username() != '');
+  };
+
+  session.get = function() {
+    return JSON.parse(localStorage.getItem('session'));
   };
 
   return session;
@@ -191,25 +196,50 @@ angular.module('starter.services', [])
     }
   };
 } )
+.factory('DateFmt', function() {
+  return {
+    localDate: function(a_date) {
+      var dt = new Date(a_date[0] + "-" + a_date[1] + "-" + a_date[2]);
+      return dt.toLocaleDateString();
+    }
+  };
+} )
+
+.factory('Office', function(authHttp, baseUrl) {
+  return {
+    get: function(id, fn_office) {
+      authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
+        var odata = response.data;
+        fn_office(odata);
+      } );
+    },
+    query: function(fn_offices) {
+      authHttp.get(baseUrl + '/offices').then(function(response) {
+        var odata = response.data;
+        fn_offices(odata);
+      } );
+    }
+  };
+} )
+
 
 .factory('Staff', function(authHttp, baseUrl) {
   var staff = [];
   return {
-    query: function(fn_staff) {
+    query: function(fn_staff){
       authHttp.get(baseUrl + '/staff').then(function(response) {
-        var data = response.data;
-        console.log("Staff DATA:" + JSON.stringify(data));
-        fn_staff(data);
-      }
+        var staff = response.data;
+        console.log("Response data: " + JSON.stringify(staff));
+        fn_staff(staff);
+      } );
     },
-    remove: function(staff) {
-    },
+    remove: function(staff){},
     get: function(id, fn_staff) {
       authHttp.get(baseUrl + '/staff/' + id).then(function(response) {
-        var data = response.data;
-        console.log("Staff DATA:" + JSON.stringify(data));
-        fn_staff(data);
-      }
+        var sdata = response.data;
+        console.log("Got staff: " + JSON.stringify(sdata));
+        fn_staff(sdata);
+      } );
     }
   }
 } )

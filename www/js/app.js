@@ -44,7 +44,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     templateUrl: 'templates/tabs.html',
     controller: 'TabsCtrl'
   })
-
 // Each tab has its own nav history stack:
 
   .state('tab.dash', {
@@ -56,7 +55,33 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   })
-
+  .state('tab.sacco-list', {
+    url: '/saccos',
+    views: {
+      'tab-saccos': {
+        templateUrl: 'templates/tab-saccos.html',
+        controller: 'SACCOListCtrl'
+      }
+    }
+  } )
+  .state('tab.sacco-view', {
+    url: '/saccos/:saccoId',
+    views: {
+      'tab-saccos': {
+        templateUrl: 'templates/sacco-view.html',
+        controller: 'SACCOViewCtrl'
+      }
+    }
+  } )
+  .state('tab.sacco-reg', {
+    url: '/sacco-register',
+    views: {
+      'tab-saccos': {
+        templateUrl: 'templates/sacco-edit.html',
+        controllor: 'DashCtrl'
+      }
+    }
+  } )
   .state('tab.staff', {
     url: '/staff',
     views: {
@@ -66,6 +91,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   })
+  .state('tab.staff-detail', {
+    url: '/staff/:staffId',
+    views: {
+      'tab-staff': {
+        templateUrl: 'templates/staff-details.html',
+        controller: 'StaffDetailCtrl'
+      }
+    }
+  } )
   .state('tab.clients', {
     url: '/clients',
     views: {

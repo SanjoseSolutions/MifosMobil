@@ -26,23 +26,85 @@ angular.module('starter.controllers', [])
 } )
 
 .controller('TabsCtrl', function($scope, Session) {
-  $scope.session = Session;
+  $scope.session = Session.get();
 } )
 
-.controller('DashCtrl', function($scope) {
+.controller('DashCtrl', function($scope, Office) {
   console.log("DashCtrl invoked");
-  console.log("Role: " + $scope.session.getRole());
+  Office.query(function(data) {
+    var offices = [];
+    for(var i = 0; i < data.length; ++i) {
+      console.log("Got office: " + JSON.stringify(data[i]));
+      if (data[i].parentId == 1) {
+        offices.push( {
+          "id": data[i].id,
+          "name": data[i].name
+        } );
+      }
+    }
+    $scope.offices = offices;
+  } );
 })
 
+.controller('SACCOListCtrl', function($scope, Office) {
+  console.log("SACCOListCtrl called");
+  Office.query(function(data) {
+    var sus = [];
+    var po = new Object();
+    var saccos = [];
+    for(var i = 0; i < data.length; ++i) {
+      if (data[i].parentId == 1) {
+        sus.push( {
+          "id": data[i].id,
+          "name": data[i].name
+        } );
+        po[data[i].id] = data[i].parentId;
+      } else {
+        var parentId = data[i].parentId;
+        var gpId = po[parentId];
+        if (gpId != null && gpId == 1) {
+          saccos.push( {
+            "id": data[i].id,
+            "name": data[i].name
+          } );
+        }
+      }
+    }
+    console.log("Got SACCOs: " + saccos.length + " SUs: " + sus.length);
+    $scope.data = { "saccos": saccos };
+  } );
+} )
+
+.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateFmt) {
+  console.log("Sacco view ctrl invoked for " + $stateParams.saccoId);
+  Office.get($stateParams.saccoId, function(office) {
+    console.log("Got SACCO" + JSON.stringify(office));
+    office.openingDt = DateFmt.localDate(office.openingDate);
+    $scope.data = { sacco: office };
+  } );
+} )
+
 .controller('StaffCtrl', function($scope, Staff) {
-  $scope.staff = Staff.query();
+  Staff.query(function(staff) {
+    $scope.staff = staff;
+  } );
   $scope.remove = function(staff) {
     Staff.remove(staff);
   };
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
+.controller('StaffDetailCtrl', function($scope, $stateParams, Staff, DateFmt) {
+  console.log("StaffDetailCtrl called");
+  Staff.get($stateParams.staffId, function(staff) {
+    console.log("Joining date array: " + JSON.stringify(staff.joiningDate));
+    staff.joiningDt = DateFmt.localDate(staff.joiningDate);
+    staff.fullname = staff.firstname + " " + staff.lastname;
+    console.log("Joining date local: " + staff.joiningDt);
+    $scope.staff = staff;
+  } );
+} )
 
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
   Clients.query(function(clients) {
     for(var i = 0; i < clients.length; ++i) {
       if (Settings.showClientListFaces) {
@@ -66,8 +128,7 @@ angular.module('starter.controllers', [])
   Clients.get($stateParams.clientId, function(client) {
     console.log("Got client:"+JSON.stringify(client));
     $scope.client = client;
-    var dob = client.dateOfBirth;
-    $scope.client.dob = (new Date(dob[0] + "-" + dob[1] + "-" + dob[2])).toLocaleDateString();
+    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg"
   } );
   ClientImages.getB64(clientId, function(img_data) {
@@ -83,8 +144,6 @@ angular.module('starter.controllers', [])
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {
   console.log("AccountCtrl invoked");
-  var username = Session.username();
-  console.log("Username:"+username);
-  $scope.session = { username: username };
+  $scope.session = Session;
   $scope.logout = function() { Session.logout(); }
 });
