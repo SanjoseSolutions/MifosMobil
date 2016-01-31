@@ -50,13 +50,16 @@ label {
 	       <!-- {{client.email ? client.email : "extremelysimple@kmayra.org" }} -->
       </ion-item>
       <ion-item>
-        <label>Occupation:</label>{{client.Occupation || "Trader"}}
+        <label>Education:</label>{{client.Education || "Unspecified"}}
       </ion-item>
       <ion-item>
-    	   <label>Location:</label> Sector 137
+        <label>Fathers Name:</label>{{client["Fathers Name"] || "Unspecified"}}
       </ion-item>
       <ion-item>
-	       <label>Address</label>	:<br /> # 45, Av. de la Rue, Bourguignon, France {{client.FullAddress}}
+        <label>Grandfathers Name:</label>{{client["Grandfathers Name"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+	       <label>Address</label>	:<br /> {{client.Address || "Unspecified" }}
       </ion-item>
     </div>
 

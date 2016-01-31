@@ -134,10 +134,10 @@ angular.module('starter.controllers', [])
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );
-  DataTables.get('Client_Fields', clientId, function(cfields) {
+  DataTables.get('Client_Fields', clientId, function(cdata) {
+    var cfields = cdata[0];
     for(var fld in cfields) {
-      console.log("Client field: " + fld + " = '" + cfields[fld] + "'")
-      $scope.client.$fld = cfields[fld]; // or $scope.client[fld] = cfields[fld]
+      $scope.client[fld] = cfields[fld]; // or $scope.client[fld] = cfields[fld]
     }
   } );
 })
