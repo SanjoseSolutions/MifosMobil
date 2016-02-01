@@ -25,16 +25,28 @@ label {
 
     </div -->
 
+    <ion-list>
+      <ion-item>
+      <!-- a href="#/tab/... /edit" -->
+        <button class="button-block ion-edit"
+            ng-click="#">
+            Edit
+        </button>
+      <!-- /a -->
+      </ion-item>
+    </ion-list>
+
     <!-- {{client.face}} -->
-    <div class="list card" style="clear:both; height:200px">
+    <div class="list card" style="clear:both; height:230px">
       <div class="item item-divider">
         <label>Staff Name </label>: {{staff.fullname}}
         <!-- staff.fullname = firstname + ' ' + staff.lastname -->
         <!-- displayName = staff.lastname + ', ' + firstname -->
       </div>
-    	<img ng-src="img/Staff-Male-1.jpeg" style="width: 150px; height: 150px; float: left; margin: 5px">
+    	<img ng-src="img/Staff-Male-1.jpeg"
+        style="width: 150px; height: 150px; float: left; margin-horizontal: 5px">
       <ion-list style="margin-left: 10px">
-        <h4>{{staff.fullname}}</h4>
+        <!-- h4>{{staff.fullname}}</h4 -->
         <ion-item>
           <label>Staff ID:</label>{{staff.id}}
         </ion-item>
@@ -49,7 +61,10 @@ label {
           <label>Joining Date</label>: {{staff.joiningDt}}
         </ion-item>
         <ion-item>
-          <label>Office's Name </label>: {{staff.officeName}}
+          <label>Office's Name </label>:
+        </ion-item>
+        <ion-item>
+          {{staff.officeName ? staff.officeName : "Unspecified" }}
         </ion-item>
       </ion-list>
       <div class="item item-divider">
@@ -57,6 +72,13 @@ label {
          </label>{{staff.email?staff.email:" personal@kmayra.org" }}
       </div>
     </div>
+
+    <!-- ion-list -->
+    <div class="item item-divider">
+         <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> </span>: 
+         <label style="font-size:0.9rem">{{staff.email?staff.email:" personal@kmayra.org" }} </label>
+    </div>
+    
     <div class="list card">
     	<div class="item item-divider">
 	       <label>In Charge of </label> : {{staff.officeName}}
@@ -72,17 +94,20 @@ label {
       	<label>Total Members </label>: 
           <span style="padding-left:2em">
             <div style="margin-top:10px" class="icon ion-ios-people">
+            {{TotalMembers? TotalMembers : 25}}
             </div>
           </span>
-          {{TotalMembers? TotalMembers : 25}}
+
       </ion-item>
       <ion-item>
 	       <label> Total Loans </label> : <i class="icon ion-social-bitcoin"></i>
          {{client.TotalLoans?client.TotalLoans:350}}
+         <button ng-click="#"> Transactions </button>
       </ion-item>
       <ion-item>
           <label>Total Savings </label>: <i class="icon ion-social-bitcoin"></i>
           {{client.TotalSavings?client.TotalSavings:250}}
+          <button ng-click="#"> Transactions </button>
       </ion-item>
     </div>
 

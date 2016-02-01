@@ -13,6 +13,19 @@ label {
 
 <ion-view view-title="Details: {{data.sacco.name}}">
   <ion-content class="padding">
+
+    <ion-list>
+      <ion-item>
+      <!-- a href="#/tab/... /edit" -->
+        <button class="button-block ion-edit"
+            ng-click="#">
+            Edit
+        </button>
+      <!-- /a -->
+      </ion-item>
+    </ion-list>
+
+
     <div class="list card">
       <div class="item item-divider">
         <label>SACCO's Name:</label> {{data.sacco.name}}
