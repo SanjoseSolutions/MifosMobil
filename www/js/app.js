@@ -118,6 +118,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   })
+  .state('tab.client-edit', {
+    url: '/clients/:clientId/edit',
+    views: {
+      'tab-client-edit': {
+        templateUrl: 'templates/client-edit.html',
+        controller: 'ClientEditCtrl'
+      }
+    }
+  } )
 
   .state('tab.account', {
     url: '/account',

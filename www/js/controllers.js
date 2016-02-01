@@ -144,10 +144,29 @@ angular.module('starter.controllers', [])
   DataTables.get('Client_Fields', clientId, function(cdata) {
     var cfields = cdata[0];
     for(var fld in cfields) {
-      $scope.client[fld] = cfields[fld]; // or $scope.client[fld] = cfields[fld]
+      $scope.client[fld] = cfields[fld];
     }
   } );
 })
+
+.controller('ClientEditCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
+  var clientId = $stateParams.clientId;
+  console.log("Looking to edit client:"+clientId);
+  Clients.get($stateParams.clientId, function(client) {
+    $scope.client = client;
+    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
+    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
+  } );
+  ClientImages.getB64(clientId, function(img_data) {
+    $scope.client.face = img_data;
+  } );
+  DataTables.get('Client_Fields', clientId, function(cdata) {
+    var cfields = cdata[0];
+    for(var fld in cfields) {
+      $scope.client[fld] = cfields[fld];
+    }
+  } );
+} )
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {
   console.log("AccountCtrl invoked");
