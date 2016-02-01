@@ -75,12 +75,19 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateFmt) {
-  console.log("Sacco view ctrl invoked for " + $stateParams.saccoId);
-  Office.get($stateParams.saccoId, function(office) {
+.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateFmt, DataTables) {
+  var saccoId = $stateParams.saccoId;
+  console.log("Sacco view ctrl invoked for " + saccoId);
+  Office.get(saccoId, function(office) {
     console.log("Got SACCO" + JSON.stringify(office));
     office.openingDt = DateFmt.localDate(office.openingDate);
     $scope.data = { sacco: office };
+  } );
+  DataTables.get('SACCO_Fields', saccoId, function(sdata) {
+    var sfields = sdata[0];
+    for(var fld in sfields) {
+      $scope.data.sacco[fld] = sfields[fld];
+    }
   } );
 } )
 
@@ -129,7 +136,7 @@ angular.module('starter.controllers', [])
     console.log("Got client:"+JSON.stringify(client));
     $scope.client = client;
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg"
+    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
   } );
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
