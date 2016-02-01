@@ -9,8 +9,8 @@ label {
  	color: #558;
 }
 .item, ion-item {
-	margin: 2px;
-	padding: 2px 5px;
+	margin: 0px;
+	padding: 2px 3px;
 	border: none;
 /*	font-style:italic;	*/
 	font-family:corsiva;
@@ -20,25 +20,11 @@ label {
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
 
-    <ion-list>
-      <ion-item>
-      <!-- a href="#/tab/clients/{{client.id}}/edit" -->
-        <button class="button-block ion-edit"
-            ng-click="#">
-            Edit
-        </button>
-      <!-- /a -->
-      </ion-item>
-    </ion-list>
-
-
     <div class="list card" style="clear:both; height:160px">
-
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
 	     <h4>{{client.fullname}}</h4>
       </div -->
-
     	<img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
       <ion-list>
         <h4>{{client.displayName}}</h4>
@@ -86,6 +72,11 @@ label {
          <br /> {{client.Address || "Unspecified" }}
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
+      <ion-item>
+        <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
+          <i class="ion-edit"> Edit Info</i>
+        </a>
+      </ion-item>
     </div>
 
     <ion-item class="item-divider">
@@ -109,13 +100,13 @@ label {
 	    </ion-item>
     </div>
 
-    <ion-item>
+    <!-- ion-item>
       <a href="#/tab/clients/{{client.id}}/edit">
         <button class="ion-ios-compose-outline">
           Edit
         </button>
       </a>
-    </ion-item>
+    </ion-item -->
 
     </ion-list>
 
