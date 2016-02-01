@@ -3,7 +3,7 @@
 
     <div class="list">
       <ion-list-item class="item item-input-inset">
-        <span class="input-label">SACCO Name</span>
+        <span class="input-label">Sacco Name</span>
 	      <label class="item-input-wrapper">
       	   <input type="text" placeholder="Enter the SACCO's Name">
         </label>
@@ -14,6 +14,13 @@
         <select ng-repeat="office in offices">
           <option value="office.id">{{office.name}}</option>
         </select>
+        
+        <!-- select>  
+          <option value="HQ">Head Office</option>
+          <option value="Likasi">Likasi</option>
+          <option value="Wakanda">Wakanda</option>
+          <option value="Undefined" selected>Undefined</option>
+        </select -->
       </label>
 
       <div class="item item-input-inset">

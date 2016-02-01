@@ -58,7 +58,7 @@ label {
           <label>Gender :</label> Male {{staff.gender}}
         </ion-item -->
     	  <ion-item>
-          <label>Joining Date</label>: {{staff.joiningDt}}
+          <label>Joining Date</label>: {{staff.joiningDt || "Unspecified"}}
         </ion-item>
         <ion-item>
           <label>Office's Name </label>:
@@ -67,13 +67,15 @@ label {
           {{staff.officeName ? staff.officeName : "Unspecified" }}
         </ion-item>
       </ion-list>
+
       <div class="item item-divider">
 	       <label style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> : 
          </label>{{staff.email?staff.email:" personal@kmayra.org" }}
       </div>
-    </div>
 
+    </div>
     <!-- ion-list -->
+
     <div class="item item-divider">
          <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> </span>: 
          <label style="font-size:0.9rem">{{staff.email?staff.email:" personal@kmayra.org" }} </label>
@@ -81,7 +83,7 @@ label {
     
     <div class="list card">
     	<div class="item item-divider">
-	       <label>In Charge of </label> : {{staff.officeName}}
+	       <label>In Charge of </label> : {{staff.officeName || "Byrathi"}}
 	    </div>
 
       <ion-item>
@@ -97,7 +99,6 @@ label {
             {{TotalMembers? TotalMembers : 25}}
             </div>
           </span>
-
       </ion-item>
       <ion-item>
 	       <label> Total Loans </label> : <i class="icon ion-social-bitcoin"></i>

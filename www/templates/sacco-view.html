@@ -28,7 +28,7 @@ label {
 
     <div class="list card">
       <div class="item item-divider">
-        <label>SACCO's Name:</label> {{data.sacco.name}}
+        <label>SACCO's Name:</label> {{data.sacco.name || "Lisungi"}}
       </div>
       <ion-item>
       	<label>Parent Office:</label> {{data.sacco.parentName}}
@@ -40,7 +40,7 @@ label {
         <label>Date of Joining Union:</label> {{data.sacco.joiningDt || data.sacco.openingDt}}
       </ion-item>
       <ion-item>
-        <label style="font-size:18px;">Location</label> <br>
+        <label style="font-size:18px;">Location</label> <br />
         <label>Latitude:</label> {{ data.sacco.Latitude }} <label>Longitude</label> {{ data.sacco.Longitude }}
       </ion-item>
       <ion-item class="item item-divider">
