@@ -3,7 +3,7 @@
 
     <div class="list">
       <ion-list-item class="item item-input-inset">
-        <span class="input-label">SACCO Name</span>
+        <span class="input-label">Sacco Name</span>
 	      <label class="item-input-wrapper">
       	   <input type="text" placeholder="Enter the SACCO's Name">
         </label>
@@ -14,6 +14,13 @@
         <select ng-repeat="office in offices">
           <option value="office.id">{{office.name}}</option>
         </select>
+        
+        <!-- select>  
+          <option value="HQ">Head Office</option>
+          <option value="Likasi">Likasi</option>
+          <option value="Wakanda">Wakanda</option>
+          <option value="Undefined" selected>Undefined</option>
+        </select -->
       </label>
 
       <div class="item item-input-inset">
@@ -72,31 +79,33 @@
       <div class="item item-input-inset">
         <span class="input-label">Region :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Region" placeholder="Enter Region's Name">
+          <input type="text" name="Region" placeholder="Enter Region's Name">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Zone :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Zone" placeholder="Enter Zone's Name">
+          <input type="text" name="Zone" placeholder="Enter Zone's Name">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Wereda :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Wereda" placeholder="Enter Wereda's Name">
+          <input type="text" name="Wereda" placeholder="Enter Wereda's Name">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Kebele :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Kebele" placeholder="Enter Kebele's Name">
+          <input type="text" name="Kebele" placeholder="Enter Kebele's Name">
         </label>
       </div>
 
+  <ion-list-item class="padding">
 	<button class="button button-block button-positive"
 		ng-click="saveNewSacco(sacco)"><h4>Save</h4>
 	</button>
+  </ion-list-item>
 
     </div> <!-- End of List -->
 

@@ -19,6 +19,19 @@ label {
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
+
+    <ion-list>
+      <ion-item>
+      <!-- a href="#/tab/clients/{{client.id}}/edit" -->
+        <button class="button-block ion-edit"
+            ng-click="#">
+            Edit
+        </button>
+      <!-- /a -->
+      </ion-item>
+    </ion-list>
+
+
     <div class="list card" style="clear:both; height:160px">
 
       <!-- TRYING TO PUT THE NAME AS AN HEADER
@@ -44,44 +57,63 @@ label {
     </div>
 
     <div class="list card">
-      <ion-item>
-	       <label class="icon ion-ios-email-outline" title="Email">
-	       </label>  {{client.email || client.firstname + "@kmayra.org" }}
-	       <!-- {{client.email ? client.email : "extremelysimple@kmayra.org" }} -->
+      <ion-item class="item-icon">
+	       <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
+         </label>  {{client.email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
       <ion-item>
-        <label>Education:</label>{{client.Education || "Unspecified"}}
+        <label> Education:
+        </label>{{client.Education || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label>Fathers Name:</label>{{client["Fathers Name"] || "Unspecified"}}
+        <label>Occupation:
+        </label>{{client.Occupation || "Trader"}}
       </ion-item>
       <ion-item>
-        <label>Grandfathers Name:</label>{{client["Grandfathers Name"] || "Unspecified"}}
+        <label> Fathers Name:
+        </label>{{client["Fathers Name"] || "Unspecified"}}
       </ion-item>
       <ion-item>
-	       <label>Address</label>	:<br /> {{client.Address || "Unspecified" }}
+        <label> Grandfathers Name:
+        </label>{{client["Grandfathers Name"] || "Unspecified"}}
+      </ion-item>
+      <!--ion-item>
+        <label>Location:
+        </label> Sector 137
+      </ion-item -->
+      <ion-item>
+	       <label> Client's Address : </label>
+         <br /> {{client.Address || "Unspecified" }}
+         <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
     </div>
 
     <ion-item class="item-divider">
-	    <h4 class="positive"> Account Summary </h4>
+      <!-- h4 class="positive"--> Account Summary <!-- /h4 -->
     </ion-item>
 
     <div class="list card">
       <ion-item>
-	       <label>Account No</label>: -#- <!-- {{client.accNo ? client.accNo: # }} -->	
+	       <label> Account No
+         </label>: -#- <!-- {{client.accNo ? client.accNo: # }} -->	
       </ion-item>
       <ion-item>
-	       <label>	Loans </label> : <i class="icon ion-social-bitcoin"></i> {{client.TotalLoans}} 40
+	       <label> Loans </label> :
+         <i class="icon ion-social-bitcoin"></i>
+         {{client.TotalLoans || "40" }}
       </ion-item>
       <ion-item>
-	       <label> Savings </label>: <i class="icon ion-social-bitcoin"></i> {{client.TotalSavings}} 25
+	       <label> Savings </label>:
+         <i class="icon ion-social-bitcoin"></i>
+         {{client.TotalSavings || "25"}}
 	    </ion-item>
     </div>
 
     <ion-item>
       <a href="#/tab/clients/{{client.id}}/edit">
-        <button class="ion-ios-compose-outline">Edit</button>
+        <button class="ion-ios-compose-outline">
+          Edit
+        </button>
       </a>
     </ion-item>
 
