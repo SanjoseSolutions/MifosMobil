@@ -369,13 +369,14 @@ angular.module('starter.services', [])
 .factory('LoanAccounts', function(authHttp, baseUrl) {
   return {
     get: function(accountNo, fn_account) {
-      authHttp.get(baseUrl + '/loanaccounts/' + accountNo)
+      authHttp.get(baseUrl + '/loans/' + accountNo)
         .then(function(response) {
           fn_account(response.data);
         } );
     },
     query: function(fn_accounts) {
-      authHttp.get(baseUrl + '/loanaccounts')
+      console.log("LoanAccounts query called");
+      authHttp.get(baseUrl + '/loans')
         .then(function(response) {
           var data = response.data;
           fn_accounts(data.pageItems);
