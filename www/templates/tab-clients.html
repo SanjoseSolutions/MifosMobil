@@ -7,7 +7,7 @@
         <h2 style="padding-left:10px;">#{{client.id}}: {{client.displayName}}</h2>
         <p style="padding-left:10px;"> <!-- {{client.fullname}} -->
         	Loans: {{client.TotalLoans || 40}} |
-	        Savings: {{client.TotalSavings || 25}}
+	        Savings: {{clientSavings[client.id] || 0}}
 	      </p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
