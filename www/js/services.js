@@ -337,5 +337,25 @@ angular.module('starter.services', [])
       } );
     }
   };
+} )
+
+.factory('SavingsAccounts', function(authHttp, baseUrl) {
+  return {
+    get: function(accountNo, fn_sac) {
+      authHttp.get(baseUrl + '/savingsaccounts/' + accountNo)
+        .then(function(response) {
+          fn_sac(response.data);
+        } );
+    },
+    query: function(fn_accts) {
+      console.log("SavingsAccounts.query called");
+      authHttp.get(baseUrl + '/savingsaccounts')
+        .then(function(response) {
+          var data = response.data;
+          console.log("Got " + data.totalFilteredRecords + " savings accounts.");
+          fn_accts(data.pageItems);
+        } );
+    }
+  };
 } );
 

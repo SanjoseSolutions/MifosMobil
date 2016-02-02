@@ -111,7 +111,20 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts) {
+
+  SavingsAccounts.query(function(data) {
+    var client_savings = new Object;
+    for(var i = 0; i < data.length; ++i) {
+      var clientId = data[i].clientId;
+      console.log("Client #" + clientId + " account [" + i + "]");
+      var summary = data[i].summary;
+      var balance = summary.accountBalance;
+      client_savings[clientId] = balance || 0;
+    }
+    $scope.clientSavings = client_savings;
+  } );
+
   Clients.query(function(clients) {
     for(var i = 0; i < clients.length; ++i) {
       if (Settings.showClientListFaces) {
