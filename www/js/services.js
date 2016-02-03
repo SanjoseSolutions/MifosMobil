@@ -222,6 +222,27 @@ angular.module('starter.services', [])
   };
 } )
 
+.factory('SACCO', function(Office) {
+  return {
+    query_sacco_unions: function(fn_sunions) {
+      Office.query(function(data) {
+        var sunions = []; 
+        for(var i = 0; i < data.length; ++i) {
+          var office = data[i];
+          console.log("Got office: " + office.id);
+          if (data[i].parentId == 1) {
+            sunions.push( {
+              "id": data[i].id,
+              "name": data[i].name
+            } );
+          }   
+        }
+        console.log("No. of SUs: " + sunions.length);
+        fn_sunions(sunions);
+      } );
+    }
+  };
+} )
 
 .factory('Staff', function(authHttp, baseUrl) {
   var staff = [];

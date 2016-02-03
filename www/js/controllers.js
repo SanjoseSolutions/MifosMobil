@@ -4,7 +4,7 @@
  *  - MainCtrl: common to entire app
  *  - AnonCtrl: Login page (for anonymous users)
  *  - TabsCtrl: Tabs for authenticated users
- *  - DashCtrl: Dashboard controller
+ *  - SACCOEditCtrl: SACCO Edit controller
  *  - SACCOListCtrl: 
  *  - SACCOViewCtrl: 
  *  - StaffCtrl: 
@@ -46,22 +46,25 @@ angular.module('starter.controllers', [])
   $scope.session = Session.get();
 } )
 
-.controller('DashCtrl', function($scope, Office) {
-  console.log("DashCtrl invoked");
-  Office.query(function(data) {
-    var offices = [];
-    for(var i = 0; i < data.length; ++i) {
-      console.log("Got office: " + JSON.stringify(data[i]));
-      if (data[i].parentId == 1) {
-        offices.push( {
-          "id": data[i].id,
-          "name": data[i].name
-        } );
-      }
-    }
-    $scope.offices = offices;
+.controller('SACCORegCtrl', function($scope, SACCO) {
+  console.log("SACCO Reg invoked");
+  SACCO.query_sacco_unions(function(data) {
+    $scope.data = {
+      offices: data,
+      op: "Register"
+    };
   } );
-})
+} )
+
+.controller('SACCOEditCtrl', function($scope, SACCO) {
+  console.log("SACCO Edit invoked");
+  SACCO.query_sacco_unions(function(data) {
+    $scope.data = {
+      offices: data,
+      op: "Edit"
+    };
+  } );
+} )
 
 .controller('SACCOListCtrl', function($scope, Office) {
   console.log("SACCOListCtrl called");

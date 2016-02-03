@@ -1,4 +1,4 @@
-<ion-view view-title="Register SACCO">
+<ion-view view-title="{{data.op}} SACCO">
   <ion-content>
 
     <div class="list">
@@ -11,7 +11,7 @@
 
       <label class="item item-input item-select">
         <div class="input-label">Parent Union: </div>
-        <select ng-repeat="office in offices">
+        <select ng-repeat="office in data.offices">
           <option value="office.id">{{office.name}}</option>
         </select>
         
@@ -73,31 +73,31 @@
       <div class="item item-input-inset">
         <span class="input-label">Country :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Country" placeholder="ex : Ethiopia">
+          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.country">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Region :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Region" placeholder="Enter Region's Name">
+          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="sacco.region">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Zone :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Zone" placeholder="Enter Zone's Name">
+          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="sacco.zone">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Wereda :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Wereda" placeholder="Enter Wereda's Name">
+          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="sacco.wereda">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Kebele :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Kebele" placeholder="Enter Kebele's Name">
+          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.kebele">
         </label>
       </div>
 
