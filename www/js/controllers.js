@@ -131,7 +131,7 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts) {
 
   SavingsAccounts.query(function(data) {
     var client_savings = new Object;
@@ -140,9 +140,25 @@ angular.module('starter.controllers', [])
       console.log("Client #" + clientId + " account [" + i + "]");
       var summary = data[i].summary;
       var balance = summary.accountBalance;
-      client_savings[clientId] = balance || 0;
+      var totalSavings = client_savings[clientId] || 0;
+      client_savings[clientId] = totalSavings + balance;
     }
     $scope.clientSavings = client_savings;
+  } );
+
+  LoanAccounts.query(function(data) {
+    var client_loans = new Object;
+    console.log("Got " + data.length + " loans");
+    for(var i = 0; i < data.length; ++i) {
+      var loan = data[i];
+      var clientId = loan.clientId;
+      var summary = loan.summary;
+      console.log("Loan summary: " + JSON.stringify(summary));
+      var loanAmt = summary.totalOutstanding;
+      var totalOutstanding = client_loans[clientId] || 0;
+      client_loans[clientId] = totalOutstanding + loanAmt;
+    }
+    $scope.clientOutstanding = client_loans;
   } );
 
   Clients.query(function(clients) {

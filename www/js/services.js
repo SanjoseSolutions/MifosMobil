@@ -302,6 +302,13 @@ angular.module('starter.services', [])
           fn_client(clients[i]);
         }
       }
+    },
+    get_accounts: function(id, fn_accts) {
+      authHttp.get(baseUrl + 'clients/' + id + '/accounts')
+        .then(function(response) {
+          var accounts = response.data;
+          fn_accts(accounts);
+        } );
     }
   };
 } )
@@ -375,6 +382,25 @@ angular.module('starter.services', [])
           var data = response.data;
           console.log("Got " + data.totalFilteredRecords + " savings accounts.");
           fn_accts(data.pageItems);
+        } );
+    }
+  };
+} )
+
+.factory('LoanAccounts', function(authHttp, baseUrl) {
+  return {
+    get: function(accountNo, fn_account) {
+      authHttp.get(baseUrl + '/loans/' + accountNo)
+        .then(function(response) {
+          fn_account(response.data);
+        } );
+    },
+    query: function(fn_accounts) {
+      console.log("LoanAccounts query called");
+      authHttp.get(baseUrl + '/loans')
+        .then(function(response) {
+          var data = response.data;
+          fn_accounts(data.pageItems);
         } );
     }
   };
