@@ -78,7 +78,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     views: {
       'tab-saccos': {
         templateUrl: 'templates/sacco-edit.html',
-        controllor: 'DashCtrl'
+        controller: 'SACCOEditCtrl'
       }
     }
   } )
