@@ -44,51 +44,36 @@ label {
 	         <label class="icon ion-android-call" title="Mobile">
 	         </label> {{client.mobileNo || "9876543210"}}
         </ion-item> 
+        <ion-item class="item-icon">
+           <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
+           </label>  {{client.email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
+        </ion-item>
 	    </ion-list> <!--ion-list-->
     </div>
 
     <div class="list card">
-      <ion-item class="item-icon">
-	       <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-         </label>  {{client.email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
+      <ion-item>
+        <h3>Next of Kin Details</h3>
       </ion-item>
       <ion-item>
-        <label> Relationship with Client : </label>
-        <select>
-          <option> Spouse </option>
-          <option> Father </option>
-          <option> Mother </option>
-          <option> Son </option>
-          <option> Daughter </option>
-          <option selected> Unspecified </option>
-        </select>
+        <label>Fullname</label>
+        {{nextOfKin.Fullname}}
       </ion-item>
       <ion-item>
-        <label>Occupation:
-        </label>{{client.Occupation || "Trader"}}
+        <label>Relationship with Client:</label> {{nextOfKin.Relationship}}
       </ion-item>
       <ion-item>
-        <label> Fathers Name:
-        </label>{{client["Fathers Name"] || "Unspecified"}}
+        <label>Fathers Name:</label> {{nextOfKin["Fathers Name"] || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label> Grandfathers Name:
-        </label>{{client["Grandfathers Name"] || "Unspecified"}}
+        <label>Grandfathers Name: </label>
+        {{nextOfKin["Grandfathers Name"] || "Unspecified"}}
       </ion-item>
       <!--ion-item>
-        <label>Location:
-        </label> Sector 137
-      </ion-item -->
-      <ion-item>
-	       <label> Next of Kin's Address : </label>
-         <br /> {{client.Address || "Unspecified" }}
-         <!-- "45, Av. de la Rue, Bourguignon, France" -->
-      </ion-item>
-      <ion-item>
-        <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
-          <i class="ion-edit"> Edit Info</i>
+        <a href="#/tab/clients/{{client.id}}/next-of-kin-edit" class="button button-block">
+          <i class="ion-edit">Edit Info</i>
         </a>
-      </ion-item>
+      </ion-item-->
     </div>
 
     <!-- ion-item class="item-divider">
