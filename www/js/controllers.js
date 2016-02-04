@@ -1,3 +1,20 @@
+/*  MifosMobil Controller file
+ *  Filename: www/js/controllers.js
+ *  This file has all Controllers:
+ *  - MainCtrl: common to entire app
+ *  - AnonCtrl: Login page (for anonymous users)
+ *  - TabsCtrl: Tabs for authenticated users
+ *  - SACCOEditCtrl: SACCO Edit controller
+ *  - SACCOListCtrl: 
+ *  - SACCOViewCtrl: 
+ *  - StaffCtrl: 
+ *  - StaffDetailCtrl: 
+ *  - ClientsCtrl: 
+ *  - ClientDetailCtrl: 
+ *  - ClientEditCtrl: 
+ *  - AccountCtrl: 
+ */
+
 angular.module('starter.controllers', [])
 
 .controller('MainCtrl', function($scope, Session) {
@@ -29,22 +46,25 @@ angular.module('starter.controllers', [])
   $scope.session = Session.get();
 } )
 
-.controller('DashCtrl', function($scope, Office) {
-  console.log("DashCtrl invoked");
-  Office.query(function(data) {
-    var offices = [];
-    for(var i = 0; i < data.length; ++i) {
-      console.log("Got office: " + JSON.stringify(data[i]));
-      if (data[i].parentId == 1) {
-        offices.push( {
-          "id": data[i].id,
-          "name": data[i].name
-        } );
-      }
-    }
-    $scope.offices = offices;
+.controller('SACCORegCtrl', function($scope, SACCO) {
+  console.log("SACCO Reg invoked");
+  SACCO.query_sacco_unions(function(data) {
+    $scope.data = {
+      offices: data,
+      op: "Register"
+    };
   } );
-})
+} )
+
+.controller('SACCOEditCtrl', function($scope, SACCO) {
+  console.log("SACCO Edit invoked");
+  SACCO.query_sacco_unions(function(data) {
+    $scope.data = {
+      offices: data,
+      op: "Edit"
+    };
+  } );
+} )
 
 .controller('SACCOListCtrl', function($scope, Office) {
   console.log("SACCOListCtrl called");
@@ -111,7 +131,7 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts) {
 
   SavingsAccounts.query(function(data) {
     var client_savings = new Object;
@@ -120,9 +140,25 @@ angular.module('starter.controllers', [])
       console.log("Client #" + clientId + " account [" + i + "]");
       var summary = data[i].summary;
       var balance = summary.accountBalance;
-      client_savings[clientId] = balance || 0;
+      var totalSavings = client_savings[clientId] || 0;
+      client_savings[clientId] = totalSavings + balance;
     }
     $scope.clientSavings = client_savings;
+  } );
+
+  LoanAccounts.query(function(data) {
+    var client_loans = new Object;
+    console.log("Got " + data.length + " loans");
+    for(var i = 0; i < data.length; ++i) {
+      var loan = data[i];
+      var clientId = loan.clientId;
+      var summary = loan.summary;
+      console.log("Loan summary: " + JSON.stringify(summary));
+      var loanAmt = summary.totalOutstanding;
+      var totalOutstanding = client_loans[clientId] || 0;
+      client_loans[clientId] = totalOutstanding + loanAmt;
+    }
+    $scope.clientOutstanding = client_loans;
   } );
 
   Clients.query(function(clients) {
