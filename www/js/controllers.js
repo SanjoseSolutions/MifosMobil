@@ -11,6 +11,7 @@
  *  - StaffDetailCtrl: 
  *  - ClientsCtrl: 
  *  - ClientDetailCtrl: 
+ *  - ClientNextOfKinCtrl:
  *  - ClientEditCtrl: 
  *  - AccountCtrl: 
  */
@@ -187,16 +188,61 @@ angular.module('starter.controllers', [])
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
   } );
+  Clients.get_accounts(clientId, function(accounts) {
+    var loanAccounts = accounts["loanAccounts"];
+    console.log("Loan accounts: " + JSON.stringify(loanAccounts));
+    var savingsAccounts = account["savingsAccounts"];
+    console.log("Savings accounts: " + JSON.stringify(savingsAccounts));
+  } );
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );
+  // ToDo client savings, loan summary needed
   DataTables.get('Client_Fields', clientId, function(cdata) {
     var cfields = cdata[0];
     for(var fld in cfields) {
       $scope.client[fld] = cfields[fld];
     }
   } );
+  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+    if (cdata.length == 0) {
+      return;
+    }
+    var cfields = cdata[0];
+    console.log("Next of kin data: " + JSON.stringify(cfields));
+    $scope.nextOfKin = cfields;
+  } );
 })
+
+.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Clients, DateFmt, DataTables) {
+  var clientId = $stateParams.clientId;
+  console.log("ClientNextOfKinCtrl invoked");
+  Clients.get(clientId, function(client) {
+    $scope.client = client;
+    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
+    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
+  } );
+  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+    if (cdata.length == 0) {
+      console.log("No data in client next of kin");
+    }
+    var cfields = cdata[0];
+    $scope.nextOfKin = cfields;
+    var rCode = cfields.Relationship_cd_Relationship;
+    cfields.Relationship = rCode;
+    console.log("Client next of kin data: " + JSON.stringify(cfields));
+  } );
+} )
+
+.controller('ClientNextOfKinEditCtrl', function($scope, $stateParams, DataTables) {
+  var clientId = $stateParams.clientId;
+  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+    if (cdata.length > 0) {
+      var cfields = cdata[0];
+      $scope.nextOfKin = cfields;
+    }
+  } );
+} )
 
 .controller('ClientEditCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
   var clientId = $stateParams.clientId;
