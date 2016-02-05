@@ -92,9 +92,11 @@ label {
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
       <ion-item>
-        <a href="#/tab/clients/{{client.id}}/next-of-kin" class="button button-block">
-          <i class="ion-search">Next-of-kin</i>
-        </a>
+        <label>Next of kin:</label>
+        <span>
+          {{nextOfKin.Fullname}}
+          <a class="ion-search" href="#/tab/clients/{{client.id}}/next-of-kin">View Details</a>
+        </span>
       </ion-item>
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
