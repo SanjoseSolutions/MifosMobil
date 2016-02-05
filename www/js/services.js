@@ -207,6 +207,15 @@ angular.module('starter.services', [])
 
 .factory('Office', function(authHttp, baseUrl) {
   return {
+    post: function(fields, fn_office) {
+      authHttp.post(baseUrl + '/offices', fields)
+      .then(function(response) {
+        console.log("Create office success. Got: " + JSON.stringify(response.data));
+        if (fn_office !== null) {
+          fn_office(response.data);
+        }
+      } );
+    },
     get: function(id, fn_office) {
       authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
         var odata = response.data;

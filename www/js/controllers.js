@@ -173,3 +173,4 @@ angular.module('starter.controllers', [])
   $scope.session = Session;
   $scope.logout = function() { Session.logout(); }
 });
+
