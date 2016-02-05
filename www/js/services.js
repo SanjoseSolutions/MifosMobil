@@ -231,6 +231,27 @@ angular.module('starter.services', [])
   };
 } )
 
+.factory('SACCO', function(Office) {
+  return {
+    query_sacco_unions: function(fn_sunions) {
+      Office.query(function(data) {
+        var sunions = []; 
+        for(var i = 0; i < data.length; ++i) {
+          var office = data[i];
+          console.log("Got office: " + office.id);
+          if (data[i].parentId == 1) {
+            sunions.push( {
+              "id": data[i].id,
+              "name": data[i].name
+            } );
+          }   
+        }
+        console.log("No. of SUs: " + sunions.length);
+        fn_sunions(sunions);
+      } );
+    }
+  };
+} )
 
 .factory('Staff', function(authHttp, baseUrl) {
   var staff = [];
@@ -290,6 +311,13 @@ angular.module('starter.services', [])
           fn_client(clients[i]);
         }
       }
+    },
+    get_accounts: function(id, fn_accts) {
+      authHttp.get(baseUrl + 'clients/' + id + '/accounts')
+        .then(function(response) {
+          var accounts = response.data;
+          fn_accts(accounts);
+        } );
     }
   };
 } )
@@ -344,6 +372,45 @@ angular.module('starter.services', [])
         console.log("Image for client " + id + " received[b64]. Size: " + response.data.length);
         fn_img(response.data);
       } );
+    }
+  };
+} )
+
+.factory('SavingsAccounts', function(authHttp, baseUrl) {
+  return {
+    get: function(accountNo, fn_sac) {
+      authHttp.get(baseUrl + '/savingsaccounts/' + accountNo)
+        .then(function(response) {
+          fn_sac(response.data);
+        } );
+    },
+    query: function(fn_accts) {
+      console.log("SavingsAccounts.query called");
+      authHttp.get(baseUrl + '/savingsaccounts')
+        .then(function(response) {
+          var data = response.data;
+          console.log("Got " + data.totalFilteredRecords + " savings accounts.");
+          fn_accts(data.pageItems);
+        } );
+    }
+  };
+} )
+
+.factory('LoanAccounts', function(authHttp, baseUrl) {
+  return {
+    get: function(accountNo, fn_account) {
+      authHttp.get(baseUrl + '/loans/' + accountNo)
+        .then(function(response) {
+          fn_account(response.data);
+        } );
+    },
+    query: function(fn_accounts) {
+      console.log("LoanAccounts query called");
+      authHttp.get(baseUrl + '/loans')
+        .then(function(response) {
+          var data = response.data;
+          fn_accounts(data.pageItems);
+        } );
     }
   };
 } );

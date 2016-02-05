@@ -7,12 +7,14 @@
       <ion-list>
         <ion-item>
           <ion-label for="username">Username : </ion-label>
-          <input type="text" name="username" id="username" ng-model="cred.username" placeholder="Your k-Mayra username" />
+          <input type="text" name="username" id="username" ng-model="cred.username"
+            placeholder="Your k-Mayra username" />
         </ion-item>
 
         <ion-item>
           <ion-label for="password">Password : </ion-label>
-          <input type="password" ng-model="cred.password" id="password" placeholder="Your password" />
+          <input type="password" name="password" id="password" ng-model="cred.password"
+            placeholder="Your password" />
         </ion-item>
 
         <ion-item>
@@ -20,14 +22,17 @@
         </ion-item>
 
         <ion-item>
-          <button class="button button-block button-calm" ng-click="login(cred)">Login</button>
+          <button class="button button-block button-calm" ng-click="login(cred)">
+            Login Now
+          </button>
         </ion-item>
 
         <div class="item">Forgot your password?<br>
-        <button class="button button-calm button-outline button-block"
+          <button class="button button-calm button-outline button-block"
             ng-click="resetPassword()">
             Reset Password
-        </button></div>
+          </button>
+        </div>
       </ion-list>
     </ion-card>
   </ion-content>

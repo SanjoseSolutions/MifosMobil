@@ -4,7 +4,7 @@ label {
 }
 .item, ion-item {
 	margin: 2px;
-	padding: 2px 5px;
+	padding: 2px 3px;
 	border: none;
 /*	font-style:italic;	*/
 	font-family:corsiva;
@@ -34,7 +34,7 @@ label {
       </ion-item>
     </ion-list-->
 
-    <div class="list card" style="clear:both; height:230px">
+    <div class="list card" style="clear:both; height:285px">
       <div class="item item-divider">
         <label>Staff Name </label>: {{staff.fullname}}
         <!-- staff.fullname = firstname + ' ' + staff.lastname -->
@@ -64,11 +64,17 @@ label {
           {{staff.officeName ? staff.officeName : "Unspecified" }}
         </ion-item>
       </ion-list>
-
       <div class="item item-divider">
 	       <label style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> : 
          </label>{{staff.email?staff.email:" personal@kmayra.org" }}
       </div>
+
+      <ion-item>
+        <a href="#/tab/clients/{{staff.id}}/edit"
+          class="button button-block">
+          <i class="ion-edit"> Edit Info</i>
+        </a>
+      </ion-item>
 
     </div>
     <!-- ion-list -->

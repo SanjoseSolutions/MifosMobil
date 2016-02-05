@@ -1,3 +1,21 @@
+/*  MifosMobil Controller file
+ *  Filename: www/js/controllers.js
+ *  This file has all Controllers:
+ *  - MainCtrl: common to entire app
+ *  - AnonCtrl: Login page (for anonymous users)
+ *  - TabsCtrl: Tabs for authenticated users
+ *  - SACCOEditCtrl: SACCO Edit controller
+ *  - SACCOListCtrl: 
+ *  - SACCOViewCtrl: 
+ *  - StaffCtrl: 
+ *  - StaffDetailCtrl: 
+ *  - ClientsCtrl: 
+ *  - ClientDetailCtrl: 
+ *  - ClientNextOfKinCtrl:
+ *  - ClientEditCtrl: 
+ *  - AccountCtrl: 
+ */
+
 angular.module('starter.controllers', [])
 
 .controller('MainCtrl', function($scope, Session) {
@@ -29,22 +47,25 @@ angular.module('starter.controllers', [])
   $scope.session = Session.get();
 } )
 
-.controller('DashCtrl', function($scope, Office) {
-  console.log("DashCtrl invoked");
-  Office.query(function(data) {
-    var offices = [];
-    for(var i = 0; i < data.length; ++i) {
-      console.log("Got office: " + JSON.stringify(data[i]));
-      if (data[i].parentId == 1) {
-        offices.push( {
-          "id": data[i].id,
-          "name": data[i].name
-        } );
-      }
-    }
-    $scope.offices = offices;
+.controller('SACCORegCtrl', function($scope, SACCO) {
+  console.log("SACCO Reg invoked");
+  SACCO.query_sacco_unions(function(data) {
+    $scope.data = {
+      offices: data,
+      op: "Register"
+    };
   } );
-})
+} )
+
+.controller('SACCOEditCtrl', function($scope, SACCO) {
+  console.log("SACCO Edit invoked");
+  SACCO.query_sacco_unions(function(data) {
+    $scope.data = {
+      offices: data,
+      op: "Edit"
+    };
+  } );
+} )
 
 .controller('SACCOListCtrl', function($scope, Office) {
   console.log("SACCOListCtrl called");
@@ -111,7 +132,36 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts) {
+
+  SavingsAccounts.query(function(data) {
+    var client_savings = new Object;
+    for(var i = 0; i < data.length; ++i) {
+      var clientId = data[i].clientId;
+      console.log("Client #" + clientId + " account [" + i + "]");
+      var summary = data[i].summary;
+      var balance = summary.accountBalance;
+      var totalSavings = client_savings[clientId] || 0;
+      client_savings[clientId] = totalSavings + balance;
+    }
+    $scope.clientSavings = client_savings;
+  } );
+
+  LoanAccounts.query(function(data) {
+    var client_loans = new Object;
+    console.log("Got " + data.length + " loans");
+    for(var i = 0; i < data.length; ++i) {
+      var loan = data[i];
+      var clientId = loan.clientId;
+      var summary = loan.summary;
+      console.log("Loan summary: " + JSON.stringify(summary));
+      var loanAmt = summary.totalOutstanding;
+      var totalOutstanding = client_loans[clientId] || 0;
+      client_loans[clientId] = totalOutstanding + loanAmt;
+    }
+    $scope.clientOutstanding = client_loans;
+  } );
+
   Clients.query(function(clients) {
     for(var i = 0; i < clients.length; ++i) {
       if (Settings.showClientListFaces) {
@@ -138,16 +188,61 @@ angular.module('starter.controllers', [])
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
   } );
+  Clients.get_accounts(clientId, function(accounts) {
+    var loanAccounts = accounts["loanAccounts"];
+    console.log("Loan accounts: " + JSON.stringify(loanAccounts));
+    var savingsAccounts = account["savingsAccounts"];
+    console.log("Savings accounts: " + JSON.stringify(savingsAccounts));
+  } );
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );
+  // ToDo client savings, loan summary needed
   DataTables.get('Client_Fields', clientId, function(cdata) {
     var cfields = cdata[0];
     for(var fld in cfields) {
       $scope.client[fld] = cfields[fld];
     }
   } );
+  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+    if (cdata.length == 0) {
+      return;
+    }
+    var cfields = cdata[0];
+    console.log("Next of kin data: " + JSON.stringify(cfields));
+    $scope.nextOfKin = cfields;
+  } );
 })
+
+.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Clients, DateFmt, DataTables) {
+  var clientId = $stateParams.clientId;
+  console.log("ClientNextOfKinCtrl invoked");
+  Clients.get(clientId, function(client) {
+    $scope.client = client;
+    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
+    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
+  } );
+  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+    if (cdata.length == 0) {
+      console.log("No data in client next of kin");
+    }
+    var cfields = cdata[0];
+    $scope.nextOfKin = cfields;
+    var rCode = cfields.Relationship_cd_Relationship;
+    cfields.Relationship = rCode;
+    console.log("Client next of kin data: " + JSON.stringify(cfields));
+  } );
+} )
+
+.controller('ClientNextOfKinEditCtrl', function($scope, $stateParams, DataTables) {
+  var clientId = $stateParams.clientId;
+  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+    if (cdata.length > 0) {
+      var cfields = cdata[0];
+      $scope.nextOfKin = cfields;
+    }
+  } );
+} )
 
 .controller('ClientEditCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
   var clientId = $stateParams.clientId;

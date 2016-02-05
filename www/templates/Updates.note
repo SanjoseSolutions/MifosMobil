@@ -1,3 +1,17 @@
+## Feb 4th, 2016
+ Father's Name
+ Grand Father's Name
+ Relationship : DropDown Menu: Father / Son / ...
+ Phone : 
+
+
+## Feb 2nd, 2016
+1] Few minor changes
+- Simple update of GitIgnore file
+- Adding the ion-university Icon in the Client's details template
+- Changing the background color of the content from White to #916537
+
+
 ## Feb 1st, 2016
 1] Adding the Edit button on top of the below templates
 - Sacco-view
