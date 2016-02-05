@@ -290,16 +290,22 @@ angular.module('starter.services', [])
   } ];
 
   return {
+    clear: function() { localStorage.setItem('clients', "[]") },
     query: function(process_clients) {
-      authHttp.get(baseUrl + '/clients').then(function(response) {
-        var data = response.data;
-        if (data.totalFilteredRecords) {
-          var clients = data.pageItems;
-          localStorage.setItem('clients', JSON.stringify(clients));
-          console.log("Got " + clients.length + " clients");
-          process_clients(clients);
-        }
-      } );
+      clients = JSON.parse(localStorage.getItem('clients'));
+      if (clients != null && clients.length) {
+        process_clients(clients);
+      } else {
+        authHttp.get(baseUrl + '/clients').then(function(response) {
+          var data = response.data;
+          if (data.totalFilteredRecords) {
+            var clients = data.pageItems;
+            localStorage.setItem('clients', JSON.stringify(clients));
+            console.log("Got " + clients.length + " clients");
+            process_clients(clients);
+          }
+        } );
+      }
     },
     remove: function(id) {
       clients.splice(clients.indexOf(clients), 1);
