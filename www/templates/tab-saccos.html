@@ -1,18 +1,37 @@
+<style>
+ion-item.sacco-item .item-content {
+  padding: 5px 10px;
+}
+span.sacco-icon {
+  font-size: 200%;
+  padding: 0 10px;
+  float: left;
+  height: 60px;
+}
+.sacco-data {
+  display: inline;
+}
+.sacco-item h2 {
+  font-size: 105%;
+  font-family: corsiva serif;
+}
+</style>
 <ion-view view-title="SACCOs">
   <ion-content>
     <ion-list>
       <ion-item class="item-divider"><span>SACCO List </span>
-        <a href="#/tab/sacco-register" class="ion-plus-circled"
+        <a href="#/tab/sacco-register" class="ion-wand"
           title="Register SACCO" style="float: right; font-size: 25px">
         </a>
       </ion-item>
-      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right"
-          ng-repeat="sacco in data.saccos" type="item-text-wrap"
-          href="#/tab/saccos/{{sacco.id}}">
-            <h2 style="padding-left:10px;">#{{sacco.id}}: {{sacco.name}}</h2>
-            <ion-option-button class="button-assertive" ng-click="remove(sacco)">
-              Delete
-            </ion-option-button>
+      <ion-item class="item-remove-animate item-avatar sacco-item"
+            ng-repeat="sacco in data.saccos" type="item-text-wrap"
+            href="#/tab/saccos/{{sacco.id}}">        
+          <span class="sacco-icon ion-briefcase"></span>
+          <h2 class="sacco-icon">#{{sacco.id}}: {{sacco.name}}</h2>
+          <ion-option-button class="button-assertive" ng-click="remove(sacco)">
+            Delete
+          </ion-option-button>
       </ion-item>
     </ion-list>
   </ion-content>
