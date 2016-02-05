@@ -169,7 +169,7 @@ angular.module('starter.controllers', [])
           clients[i].face = img_data;
         } );
       } else {
-        clients[i].face = "img/placeholder-" + clients[i].gender.name + ".jpg";
+        clients[i].face = "img/placeholder-" + clients[i].gender.name.toLowerCase() + ".jpg";
       }
     }
     $scope.clients = clients;
@@ -186,7 +186,7 @@ angular.module('starter.controllers', [])
     console.log("Got client:"+JSON.stringify(client));
     $scope.client = client;
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
+    $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   Clients.get_accounts(clientId, function(accounts) {
     var loanAccounts = accounts["loanAccounts"];
@@ -220,7 +220,7 @@ angular.module('starter.controllers', [])
   Clients.get(clientId, function(client) {
     $scope.client = client;
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
+    $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   DataTables.get('Client_NextOfKin', clientId, function(cdata) {
     if (cdata.length == 0) {
@@ -251,7 +251,7 @@ angular.module('starter.controllers', [])
     console.log("Got client: " + JSON.stringify(client));
     $scope.client = client;
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
+    $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
