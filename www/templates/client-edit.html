@@ -6,28 +6,28 @@
   </button>
   </ion-header-bar>
   <ion-content class="padding">
-
-    <div class="list">
+    <ion-list>
       <div class="item item-input-inset">
-    	<div class="row">
-	     <div class="col col-50">
-	     <label class="item-input-wrapper">
-	       <input type="text" size="13" placeholder="Your First Name">
-	       <!--input type="text" placeholder="Email2" -->
-	     </label>
-	     </div>
-	     <div class="col col-50">
-	     <label class="item-input-wrapper">
-	      <input type="text" size="13" placeholder="Your Last Name">
-	     </label>
-	     </div>
-	    </div>
+        <span class="input-label">First Name:</span>
+        <label class="item-input-wrapper">
+          <input type="tel" size="50" placeholder="Enter First Name" ng-model="client.firstname">
+        </label>
       </div>
-      <ion-list style="padding:0;margin:0;">
-       <ion-item class="item item-divider" style="font-size:16px; text-align:left">Gender :</ion-item>
-       <ion-radio ng-model="gender" ng-value="'M'">Male</ion-radio>
-       <ion-radio ng-model="gender" ng-value="'F'">Female</ion-radio>
-      </ion-list>
+      <div class="item item-input-inset">
+        <span class="input-label">Last Name:</span>
+        <label class="item-input-wrapper">
+          <input type="tel" size="50" placeholder="Enter Last Name" ng-model="client.lastname">
+        </label>
+      </div>
+      <ion-item style="padding:0;margin:0;">
+         <span class="input-label" style="font-size:16px; text-align:left">Gender:</span>
+         <label class="item-input-wrapper">
+           <select ng-model="client.gender">
+             <option ng-value="Male">Male</option>
+             <option ng-value="Female">Female</option>
+           </select>
+         </label>
+      </ion-item>
       <div class="item item-divider item-input-inset">
         <span class="input-label">Date of Birth:</span>
         <label class="item-input-wrapper">
@@ -37,17 +37,17 @@
       <div class="item item-input-inset">
         <span class="input-label">Mobile Number:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="15" placeholder="Ex :00919620568920 ">
+          <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobile">
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Email :</span>
+        <span class="input-label">Email:</span>
         <label class="item-input-wrapper">
-          <input type="email" name="email" placeholder="Enter your Email">
+          <input type="email" name="email" placeholder="Your Email Address" ng-model="client.Email">
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Confirm :</span>
+        <span class="input-label">Confirm:</span>
         <label class="item-input-wrapper">
           <input type="email" name="emailConf" placeholder="Your Email">
         </label>
@@ -55,8 +55,11 @@
 
       <div class="item item-input-inset">
         <span class="input-label">Occupation:</span>
+        <span>{{client.clientClassification.name}}</span>
         <label class="item-input-wrapper">
-          <input type="text" size="15" placeholder="Farmer ...">
+          <select ng-model="client.Occupation">
+            <option ng-repeat="o in data.occupations" value="{{o.id}}">{{o.name}}</option>
+          </select>
         </label>
       </div>
       <div class="item item-input-inset">
@@ -66,24 +69,24 @@
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Full Address:</span>
+        <span class="input-label">Address:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="15" placeholder="# 267, Library Street, CA">
+          <input type="tel" size="15" placeholder="Full address" ng-model="client.Address">
         </label>
       </div>
 
-      <div class="item item-input-inset">
-        <span class="input-label">Username :</span>
+      <!--div class="item item-input-inset">
+        <span class="input-label">Username:</span>
         <label class="item-input-wrapper">
           <input type="text" placeholder="Ex: Maximus">
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Password :</span>
+        <span class="input-label">Password:</span>
         <label class="item-input-wrapper">
           <input type="password" size="25" placeholder="New Password ... Remember it">
         </label>
-      </div>
+      </div-->
     </div> <!-- End of List -->
 
 	<button class="button button-block button-positive"

@@ -54,6 +54,8 @@ angular.module('starter.services', [])
   angular.forEach(['post', 'put'], function(method) {
     authHttp[method] = function(url, data, config) {
       config = config || {};
+      config.headers = config.headers || {};
+      config.headers["X-Mifos-Platform-TenantId"] = Settings.tenant;
       return $http[method](url, data, config);
     };
   } );
@@ -274,7 +276,7 @@ angular.module('starter.services', [])
   }
 } )
 
-.factory('Clients', function(authHttp, baseUrl) {
+.factory('Clients', function(authHttp, baseUrl, Settings) {
   var clients = [ {
     id: 1,
     name: 'Ben Wallace',
@@ -311,6 +313,19 @@ angular.module('starter.services', [])
           fn_client(clients[i]);
         }
       }
+    },
+    save: function(client, fn_client) {
+      authHttp.post(baseUrl + '/clients', client).then(function(response) {
+        console.log("Created client resp: "+JSON.stringify(response.data));
+      } );
+    },
+    update: function(client, fn_client) {
+      var id = client.id;
+      authHttp.put(baseUrl + '/clients/' + id, client, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        console.log("Update client. Response: " + JSON.stringify(response.data));
+      } );
     },
     get_accounts: function(id, fn_accts) {
       authHttp.get(baseUrl + 'clients/' + id + '/accounts')

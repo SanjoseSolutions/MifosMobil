@@ -247,7 +247,8 @@ angular.module('starter.controllers', [])
 .controller('ClientEditCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
-  Clients.get($stateParams.clientId, function(client) {
+  Clients.get(clientId, function(client) {
+    console.log("Got client: " + JSON.stringify(client));
     $scope.client = client;
     $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name + ".jpg";
@@ -261,6 +262,12 @@ angular.module('starter.controllers', [])
       $scope.client[fld] = cfields[fld];
     }
   } );
+  $scope.saveClient = function(client) {
+    console.log("Called saveClient: " + JSON.stringify(client));
+    Clients.update(client, function(eclient) {
+      console.log("Save client success");
+    } );
+  };
 } )
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {
