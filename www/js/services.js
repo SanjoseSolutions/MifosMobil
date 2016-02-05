@@ -319,12 +319,13 @@ angular.module('starter.services', [])
         console.log("Created client resp: "+JSON.stringify(response.data));
       } );
     },
-    update: function(client, fn_client) {
-      var id = client.id;
+    update: function(id, client, fn_client) {
       authHttp.put(baseUrl + '/clients/' + id, client, {
         "params": { "tenantIdentifier": Settings.tenant }
       } ).then(function(response) {
         console.log("Update client. Response: " + JSON.stringify(response.data));
+      }, function(response) {
+        console.log("Update failed!. Response status:" + response.status + "; " + JSON.stringify(response.data));
       } );
     },
     get_accounts: function(id, fn_accts) {

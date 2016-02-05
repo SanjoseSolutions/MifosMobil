@@ -263,8 +263,14 @@ angular.module('starter.controllers', [])
     }
   } );
   $scope.saveClient = function(client) {
-    console.log("Called saveClient: " + JSON.stringify(client));
-    Clients.update(client, function(eclient) {
+    var cfields = new Object();
+    var keys = ["firstname", "lastname", "mobileNo"];
+    for(var i = 0; i < keys.length; ++i) {
+      var fld = keys[i];
+      cfields[fld] = client[fld];
+    }
+    console.log("Called saveClient: " + JSON.stringify(cfields));
+    Clients.update(client.id, cfields, function(eclient) {
       console.log("Save client success");
     } );
   };
