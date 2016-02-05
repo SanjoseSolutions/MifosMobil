@@ -1,10 +1,16 @@
+<style>
+.fullname {
+  padding-left: 5px;
+  margin-left: 5px;
+}
+</style>
 <ion-view view-title="Staffs">
   <ion-content>
     <ion-list>
       <ion-item class="item-divider">Staff Members</ion-item>
       <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="s in staff" type="item-text-wrap" href="#/tab/staff/{{s.id}}">
         <img ng-src="{{'img/staff-placeholder-Male.jpg'}}">
-        <div>
+        <div class="fullname">
         <h2>{{s.firstname}} {{s.lastname}}</h2>
         </div>
         <div>
@@ -24,5 +30,4 @@
     </ion-list>
   </ion-content>
 </ion-view>
-
 
