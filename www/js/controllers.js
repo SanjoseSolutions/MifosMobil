@@ -182,6 +182,7 @@ angular.module('starter.controllers', [])
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
+  $scope.client = {};
   Clients.get($stateParams.clientId, function(client) {
     console.log("Got client:"+JSON.stringify(client));
     $scope.client = client;
@@ -189,10 +190,18 @@ angular.module('starter.controllers', [])
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   Clients.get_accounts(clientId, function(accounts) {
-    var loanAccounts = accounts["loanAccounts"];
-    console.log("Loan accounts: " + JSON.stringify(loanAccounts));
     var savingsAccounts = account["savingsAccounts"];
-    console.log("Savings accounts: " + JSON.stringify(savingsAccounts));
+    var totalSavings = savingsAccount.reduce(function(sum, account) {
+      return sum + account.accountBalance;
+    }, 0);
+    console.log("Total Savings: " + totalSavings);
+    $scope.client.TotalSavings = totalSavings;
+    var loanAccounts = accounts["loanAccounts"];
+    var totalLoans = loanAccounts.reduce(function(sum, account) {
+      return sum + account.loanBalance;
+    } );
+    console.log("Total Loans Bal: " + totalLoans);
+    $scope.client.TotalLoans = totalLoans;
   } );
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
