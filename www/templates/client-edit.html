@@ -19,19 +19,18 @@
           <input type="tel" size="50" placeholder="Enter Last Name" ng-model="client.lastname">
         </label>
       </div>
-      <ion-item style="padding:0;margin:0;">
-         <span class="input-label" style="font-size:16px; text-align:left">Gender:</span>
-         <label class="item-input-wrapper">
-           <select ng-model="client.gender">
-             <option ng-value="Male">Male</option>
-             <option ng-value="Female">Female</option>
-           </select>
-         </label>
-      </ion-item>
+      <div class="item item-input-inset">
+        <span class="input-label">Gender:</span>
+        <label class="item-input-wrapper">
+          <select ng-model="client.genderName">
+            <option ng-repeat="g in codes.genders" value="{{g.id}}">{{g.name}}</option>
+          </select>
+        </label>
+      </div>
       <div class="item item-divider item-input-inset">
         <span class="input-label">Date of Birth:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="15" placeholder="dd/mm/yy">
+          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dob">
         </label>
       </div>
       <div class="item item-input-inset">
@@ -58,7 +57,7 @@
         <span>{{client.clientClassification.name}}</span>
         <label class="item-input-wrapper">
           <select ng-model="client.Occupation">
-            <option ng-repeat="o in data.occupations" value="{{o.id}}">{{o.name}}</option>
+            <option ng-repeat="o in codes.occupations" value="{{o.id}}">{{o.name}}</option>
           </select>
         </label>
       </div>
@@ -75,19 +74,7 @@
         </label>
       </div>
 
-      <!--div class="item item-input-inset">
-        <span class="input-label">Username:</span>
-        <label class="item-input-wrapper">
-          <input type="text" placeholder="Ex: Maximus">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Password:</span>
-        <label class="item-input-wrapper">
-          <input type="password" size="25" placeholder="New Password ... Remember it">
-        </label>
-      </div-->
-    </div> <!-- End of List -->
+    </ion-list> <!-- End of List -->
 
 	<button class="button button-block button-positive"
 		ng-click="saveClient(client)"><h4>Save</h4>

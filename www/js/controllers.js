@@ -189,7 +189,7 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables, Codes) {
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
   $scope.client = {};
@@ -294,16 +294,39 @@ angular.module('starter.controllers', [])
       console.log("Save client success");
     } );
   };
+  var gcode = Codes.getId("Gender");
+  $scope.codes = {};
+  Codes.getValues(gcode, function(gcodes) {
+    $scope.codes.genders = gcodes;
+  } );
+  var ocode = Codes.getId("ClientClassification");
+  Codes.getValues(ocode, function(ocodes) {
+    $scope.codes.occupations = ocodes;
+  } );
 } )
 
-.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateFmt, DataTables) {
+.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateFmt, DataTables, Codes) {
   console.log("Looking to register client");
   $scope.data = { "op": "Register" };
-  $scope.createClient = function(client) {
+  $scope.saveClient = function(client) {
+    var keys = ["firstname", "lastname", "mobileNo"];
+    for(var i = 0; i < keys.length; ++i) {
+      var fld = keys[i];
+      cfields[fld] = client[fld];
+    }
     Clients.save(client, function(new_client) {
       console.log("Client created:" + JSON.stringify(new_client));
     } );
   };
+  var gcode = Codes.getId("Gender");
+  $scope.codes = {};
+  Codes.getValues(gcode, function(gcodes) {
+    $scope.codes.genders = gcodes;
+  } );
+  var ocode = Codes.getId("ClientClassification");
+  Codes.getValues(ocode, function(ocodes) {
+    $scope.codes.occupations = ocodes;
+  } );
 } )
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {

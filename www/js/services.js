@@ -450,5 +450,31 @@ angular.module('starter.services', [])
     }
   };
 } )
+
+.factory('Codes', function(authHttp, baseUrl) {
+  var codeNames = {
+    "Gender": 4,
+    "ClientClassification": 17,
+    "Relationship": 26
+  };
+  return {
+    getId: function(codeNm) {
+      var cid = codeNames[codeNm];
+      if (cid != null) {
+        return cid;
+      }
+      return 0;
+    },
+    getValues: function(code, fn_codevalues) {
+      authHttp.get(baseUrl + '/codes/' + code + '/codevalues')
+        .then(function(response) {
+          console.log("Got code response");
+          fn_codevalues(response.data);
+        }, function(response) {
+          console.log("Failed to get codes:" + response.status);
+        } );
+    }
+  };
+} )
 ;
 
