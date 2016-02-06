@@ -279,17 +279,7 @@ angular.module('starter.services', [])
 } )
 
 .factory('Clients', function(authHttp, baseUrl, Settings) {
-  var clients = [ {
-    id: 1,
-    name: 'Ben Wallace',
-    fullname: 'Benjamin Wallace',
-    face: 'img/ben.png'
-  }, {
-    id: 2,
-    name: 'M. Mirnyi',
-    fullname: 'Max Mirnyi',
-    face: 'img/max.png'
-  } ];
+  var clients = [];
 
   return {
     clear: function() { localStorage.setItem('clients', "[]") },

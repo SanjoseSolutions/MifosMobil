@@ -77,8 +77,9 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('SACCOListCtrl', function($scope, Office) {
+.controller('SACCOListCtrl', function($scope, Office, Clients) {
   console.log("SACCOListCtrl called");
+  Clients.query(function(clients) {} );
   Office.query(function(data) {
     var sus = [];
     var po = new Object();
@@ -263,7 +264,8 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('ClientEditCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
+.controller('ClientEditCtrl', function($scope, $stateParams,
+      Clients, ClientImages, DateFmt, DataTables, Codes) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
