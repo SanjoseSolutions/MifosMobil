@@ -77,7 +77,7 @@ angular.module('starter.services', [])
     }
   };
 
-  session.login = function(auth) {
+  session.login = function(auth, fn_fail) {
     var uri = baseUrl + '/authentication';
     console.log("auth:"+JSON.stringify(auth));
     if (auth.client) {
@@ -126,6 +126,8 @@ angular.module('starter.services', [])
       localStorage.setItem('roles', role_names.join(","));
 
       $state.go('tab.sacco-list');
+    }, function(response) {
+      fn_fail(response);
     } );
   };
 

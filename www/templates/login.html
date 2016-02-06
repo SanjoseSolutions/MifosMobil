@@ -1,3 +1,11 @@
+<style>
+.ion-error {
+  color: red;
+  border: 1px solid #ff2222;
+  padding: 3px 5px;
+  background-color: #ffdddd;
+}
+</style>
 <ion-view view-title="Login">
   <ion-content>
 
@@ -5,6 +13,9 @@
 
     <ion-card>
       <ion-list>
+        <ion-item ng-show="message">
+          <span class="ion-{{message.type}}">{{message.text}}</span>
+        </ion-item>
         <ion-item>
           <ion-label for="username">Username : </ion-label>
           <input type="text" name="username" id="username" ng-model="cred.username"

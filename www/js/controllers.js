@@ -39,7 +39,17 @@ angular.module('starter.controllers', [])
   console.log("Anon Controller invoked");
   $scope.login = function(auth) {
     console.log("Anon scope Login called..");
-    Session.login(auth);
+    Session.login(auth, function(response) {
+      console.log("Login failed. Got:"+response.status);
+      var msg = "";
+      if (401 == response.status) {
+        msg = " Incorrect username/password";
+      }
+      $scope.message = {
+        "type": "error",
+        "text": "Login failed." + msg
+      };
+    } );
   }
 } )
 
