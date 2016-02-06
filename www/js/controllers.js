@@ -256,6 +256,7 @@ angular.module('starter.controllers', [])
 .controller('ClientEditCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
+  $scope.data = { "op": "Edit" };
   Clients.get(clientId, function(client) {
     console.log("Got client: " + JSON.stringify(client));
     $scope.client = client;
@@ -285,9 +286,20 @@ angular.module('starter.controllers', [])
   };
 } )
 
+.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateFmt, DataTables) {
+  console.log("Looking to register client");
+  $scope.data = { "op": "Register" };
+  $scope.createClient = function(client) {
+    Clients.save(client, function(new_client) {
+      console.log("Client created:" + JSON.stringify(new_client));
+    } );
+  };
+} )
+
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {
   console.log("AccountCtrl invoked");
   $scope.session = Session;
   $scope.logout = function() { Session.logout(); }
-});
+} )
+;
 

@@ -338,6 +338,7 @@ angular.module('starter.services', [])
       authHttp.get(baseUrl + 'clients/' + id + '/accounts')
         .then(function(response) {
           var accounts = response.data;
+          accounts.share_count = parseInt(Math.random()*11);
           fn_accts(accounts);
         } );
     }
@@ -435,5 +436,17 @@ angular.module('starter.services', [])
         } );
     }
   };
-} );
+} )
+
+.factory('Shares', function(authHttp, baseUrl) {
+  return {
+    get: function(clientId, fn_shares) {
+      console.log("Shares called for:"+clientId);
+    },
+    query: function(fn_shares) {
+      console.log("Shares called");
+    }
+  };
+} )
+;
 

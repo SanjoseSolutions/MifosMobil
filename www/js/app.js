@@ -127,6 +127,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   } )
+  .state('tab.client-reg', {
+    url: '/client-register',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/client-edit.html',
+        controller: 'ClientRegCtrl'
+      }
+    }
+  } )
   .state('tab.client-next-of-kin', {
     url: '/clients/:clientId/next-of-kin',
     views: {
