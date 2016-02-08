@@ -74,7 +74,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     }
   } )
   .state('tab.sacco-edit', {
-    url: '/sacco-edit',
+    url: '/saccos/:saccoId/edit',
     views: {
       'tab-saccos': {
         templateUrl: 'templates/sacco-edit.html',

@@ -98,21 +98,72 @@ angular.module('starter.controllers', [])
   };
 } )
 
-.controller('SACCOEditCtrl', function($scope, SACCO) {
-  console.log("SACCO Edit invoked");
+.controller('SACCOEditCtrl', function($scope, $stateParams, Office,
+    SACCO, DataTables, DateUtil) {
+  var officeId = $stateParams.saccoId;
+  console.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
     $scope.data = {
       offices: data,
       op: "Edit"
     };
   } );
+  Office.get(officeId, function(office) {
+    console.log("OFFICe:" + JSON.stringify(office));
+    $scope.office = office;
+    $scope.office["openingDate"] = new Date(DateUtil.isoDate(office["openingDate"]));
+  } );
+  DataTables.get('SACCO_Fields', officeId, function(sdata) {
+    $scope.sdata = sdata;
+    var sfields = sdata[0];
+    if (sfields != null) {
+      console.log("SACCO FIELDS:" + JSON.stringify(sfields));
+      sfields["joiningDate"] = new Date(DateUtil.isoDate(sfields["joiningDate"]));
+    }
+    $scope.sacco = sfields || {};
+  } );
   $scope.saveSacco = function(office, sacco) {
-    Office.update(office, function(eOffice) {
+    var sfs = Office.saveFields;
+    var ofields = new Object();
+    for(var i = 0; i < sfs.length; ++i) {
+      var fld = sfs[i];
+      ofields[fld] = office[fld];
+    }
+    ofields.dateFormat = "yyyy-MM-dd";
+    ofields.locale = "en";
+    var fld = "openingDate";
+    var val = ofields[fld];
+    if (val != null) {
+      val = val.toISOString().substring(0, 10);
+      ofields[fld] = val;
+    }
+    Office.update(officeId, ofields, function(eOffice) {
+      var msg = "Successfully edited SACCO:"+officeId;
+      var fld = "joiningDate";
+      var val = sacco[fld];
+      if (val != null) {
+        val = val.toISOString().substring(0, 10);
+        sacco[fld] = val;
+      }
+      if ($scope.sdata.length) {
+        DataTables.update('SACCO_Fields', officeId, sacco, function(fields) {
+          msg = msg + ", SACCO_Fields.";
+        }, function(response) {
+          console.log("SACCO FIELDS fail. " + JSON.stringify(response.data));
+        } );
+      } else {
+        DataTables.save('SACCO_Fields', officeId, sacco, function(fields) {
+          msg = msg + ", created SACCO_Fileds.";
+        }, function(response) {
+          console.log("SACCO Fields fail." + JSON.stringify(response.data));
+        } );
+      }
       $scope.message = {
         "type": "info",
-        "text": "Successfully edited SACCO"
+        "text": msg
       };
     }, function(response) {
+      console.log("SACCO edit fail: " + JSON.stringify(response.data));
       $scope.message = {
         "type": "error",
         "text": "Failed to create SACCO. Got " + response.code
@@ -162,8 +213,10 @@ angular.module('starter.controllers', [])
   } );
   DataTables.get('SACCO_Fields', saccoId, function(sdata) {
     var sfields = sdata[0];
-    sfields["joiningDt"] = DateUtil.localDate(sfields["joiningDate"]);
-    $scope.data.fields = sfields;
+    if (sfields != null) {
+      sfields["joiningDt"] = DateUtil.localDate(sfields["joiningDate"]);
+      $scope.data.fields = sfields;
+    }
   } );
 } )
 

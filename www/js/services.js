@@ -177,7 +177,7 @@ angular.module('starter.services', [])
   return session;
 } ] )
 
-.factory('DataTables', function(authHttp, baseUrl) {
+.factory('DataTables', function(authHttp, baseUrl, Settings) {
   return {
     get_meta: function(name, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name).then(function(response) {
@@ -189,8 +189,29 @@ angular.module('starter.services', [])
     get: function(name, id, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
-        console.log("Datatable DATA:" + JSON.stringify(data));
         fn_dtable(data);
+      } );
+    },
+    update: function(name, id, fields, fn_fields, fn_fail) {
+      authHttp.put(baseUrl + '/datatables/' + name + '/' + id, fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        fn_office(response.data);
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
+    save: function(name, fields, fn_fields, fn_fail) {
+      authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        console.log("Create " + name + " success. Got: "
+          + JSON.stringify(response.data));
+        if (fn_fields !== null) {
+          fn_fields(response.data);
+        }
+      }, function(response) {
+        fn_fail(response);
       } );
     }
   };
@@ -294,7 +315,6 @@ angular.module('starter.services', [])
         var sunions = []; 
         for(var i = 0; i < data.length; ++i) {
           var office = data[i];
-          console.log("Got office: " + office.id);
           if (data[i].parentId == 1) {
             sunions.push( {
               "id": data[i].id,
