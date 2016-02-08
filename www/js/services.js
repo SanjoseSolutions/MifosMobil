@@ -217,9 +217,18 @@ angular.module('starter.services', [])
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl) {
+.factory('Office', function(authHttp, baseUrl, Settings) {
   return {
-    post: function(fields, fn_office, fn_fail) {
+    dateFields: ["joiningDate", "openingDate"],
+    saveFields: ["openingDate", "name", "parentId"],
+    prepareForm: function(office) {
+      var sfs = this.saveFields;
+      for(var i = 0; i < sfs.length; ++i) {
+        var k = sfs[i];
+        oField[k] = office[k];
+      }
+    },
+    save: function(fields, fn_office, fn_fail) {
       authHttp.post(baseUrl + '/offices', fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       } ).then(function(response) {

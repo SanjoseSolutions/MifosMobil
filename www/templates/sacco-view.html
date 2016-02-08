@@ -1,40 +1,30 @@
 <style>
 label {
- 	color: #558;
+  color: #558;
 }
 .item, ion-item {
-	margin: 2px;
-	padding: 2px 5px;
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
+  margin: 2px;
+  padding: 2px 5px;
+  border: none;
+/*  font-style:italic;  */
+  font-family:corsiva;
 }
 </style>
 
 <ion-view view-title="Details: {{data.sacco.name}}">
   <ion-content class="padding">
-    <!-- ion-list>
-      <ion-item>
-      <!-- a href="#/tab/... /edit" >
-        <button class="button-block ion-edit"
-            ng-click="#">
-            Edit
-        </button>
-      <!-- /a >
-      </ion-item>
-    </ion-list -->
     <div class="list card">
       <div class="item item-divider">
-        <label>SACCO's Name:</label> {{data.sacco.name || "Lisungi"}}
+        <label>SACCO's Name:</label> {{data.office.name || "Lisungi"}}
       </div>
       <ion-item>
-      	<label>Parent Office:</label> {{data.sacco.parentName}}
+        <label>Parent Office:</label> {{data.office.parentName}}
       </ion-item>
       <ion-item>
-        <label>Date Established:</label> {{data.sacco.openingDt}}
+        <label>Date Established:</label> {{data.office.openingDt}}
       </ion-item>
       <ion-item>
-        <label>Date of Joining Union:</label> {{data.sacco.joiningDt || data.sacco.openingDt}}
+        <label>Date of Joining Union:</label> {{data.sacco.joiningDt}}
       </ion-item>
       <ion-item>
         <label style="font-size:18px;">Location</label> <br />
@@ -60,9 +50,9 @@ label {
       </ion-item>
 
       <ion-item>
-        <a href="#/tab/clients/{{data.sacco.id}}/edit"
+        <a href="#/tab/sacco/{{data.office.id}}/edit"
           class="button button-block">
-          <i class="ion-edit"> Edit Info</i>
+          <i class="ion-edit">Edit Info</i>
         </a>
       </ion-item>
 

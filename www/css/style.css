@@ -27,3 +27,18 @@ ion-content {
 	background-color:#CDBA96;
 }
 */
+
+.ion-error {
+  color: red;
+  border: 1px solid #ff2222;
+  padding: 3px 5px;
+  background-color: #ffdddd;
+}
+
+.ion-info {
+  color: green;
+  border: 1px solid #22ff22;
+  padding: 3px 5px;
+  background-color: #ddffdd;
+}
+

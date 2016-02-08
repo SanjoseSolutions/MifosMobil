@@ -8,15 +8,14 @@
 
       <ion-list-item class="item item-input-inset">
         <span class="input-label">Sacco Name</span>
-	      <label class="item-input-wrapper">
-      	   <input type="text" placeholder="Enter the SACCO's Name">
+        <label class="item-input-wrapper">
+           <input type="text" placeholder="Enter the SACCO's Name" ng-model="office.name">
         </label>
       </ion-list-item>
 
       <label class="item item-input item-select">
         <div class="input-label">Parent Union: </div>
-        <select ng-repeat="office in data.offices">
-          <option value="office.id">{{office.name}}</option>
+        <select ng-options="office.id as office.name for office in data.offices" ng-model="office.parentId">
         </select>
         
         <!-- select>  
@@ -30,13 +29,13 @@
       <div class="item item-input-inset">
         <span class="input-label">Date Established:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="10" name="DOEstab" placeholder="ex: dd/mm/yy">
+          <input type="date" size="10" name="DOEstab" placeholder="ex: dd/mm/yy" ng-model="office.openingDate">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Date of Joining Union:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="9" name="DOJU" placeholder="ex: dd/mm/yy">
+          <input type="date" size="9" name="DOJU" placeholder="ex: dd/mm/yy" ng-model="sacco.joiningDate">
         </label>
       </div>
 
@@ -106,9 +105,9 @@
       </div>
 
   <ion-list-item class="padding">
-	<button class="button button-block button-positive"
-		ng-click="saveSacco(sacco)"><h4>Save</h4>
-	</button>
+  <button class="button button-block button-positive"
+    ng-click="saveSacco(office, sacco)"><h4>Save</h4>
+  </button>
   </ion-list-item>
 
     </div> <!-- End of List -->

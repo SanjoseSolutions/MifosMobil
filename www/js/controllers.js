@@ -57,7 +57,7 @@ angular.module('starter.controllers', [])
   $scope.session = Session.get();
 } )
 
-.controller('SACCORegCtrl', function($scope, SACCO) {
+.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables) {
   console.log("SACCO Reg invoked");
   SACCO.query_sacco_unions(function(data) {
     $scope.data = {
@@ -65,8 +65,36 @@ angular.module('starter.controllers', [])
       op: "Register"
     };
   } );
-  $scope.saveSacco = function(sacco) {
-    Office.update(sacco);
+  $scope.saveSacco = function(office, sacco) {
+    var sfs = Office.saveFields;
+    var ofields = new Object();
+    for(var i = 0; i < sfs.length; ++i) {
+      var fld = sfs[i];
+      ofields[fld] = office[fld];
+    }
+    ofields.dateFormat = "yyyy-MM-dd";
+    ofields.locale = "en";
+    var df = Office.dateFields;
+    for(var i = 0; i < df.length; ++i) {
+      var fld = df[i];
+      var val = ofields[fld];
+      if (val != null) {
+        val = val.toISOString().substring(0, 10);
+        ofields[fld] = val;
+      }
+    }
+    Office.save(ofields, function(new_office) {
+      $scope.message = {
+        "type": "info",
+        "text": "Successfully created SACCO: " + new_office.id
+      };
+    }, function(response) {
+      $scope.message = {
+        "type": "error",
+        "text": "Failed to create SACCO. Got " + response.code
+      };
+      console.log("SACCO create failed: " + JSON.stringify(response));
+    } );
   };
 } )
 
@@ -78,8 +106,18 @@ angular.module('starter.controllers', [])
       op: "Edit"
     };
   } );
-  $scope.saveSacco = function(sacco) {
-    Office.update(sacco);
+  $scope.saveSacco = function(office, sacco) {
+    Office.update(office, function(eOffice) {
+      $scope.message = {
+        "type": "info",
+        "text": "Successfully edited SACCO"
+      };
+    }, function(response) {
+      $scope.message = {
+        "type": "error",
+        "text": "Failed to create SACCO. Got " + response.code
+      };
+    } );
   };
 } )
 
@@ -116,16 +154,16 @@ angular.module('starter.controllers', [])
 .controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateUtil, DataTables) {
   var saccoId = $stateParams.saccoId;
   console.log("Sacco view ctrl invoked for " + saccoId);
+  $scope.data = {};
   Office.get(saccoId, function(office) {
     console.log("Got SACCO" + JSON.stringify(office));
     office.openingDt = DateUtil.localDate(office.openingDate);
-    $scope.data = { sacco: office };
+    $scope.data.office = office;
   } );
   DataTables.get('SACCO_Fields', saccoId, function(sdata) {
     var sfields = sdata[0];
-    for(var fld in sfields) {
-      $scope.data.sacco[fld] = sfields[fld];
-    }
+    sfields["joiningDt"] = DateUtil.localDate(sfields["joiningDate"]);
+    $scope.data.fields = sfields;
   } );
 } )
 
@@ -371,7 +409,7 @@ angular.module('starter.controllers', [])
     Clients.save(cfields, function(new_client) {
       console.log("Client created:" + JSON.stringify(new_client));
       $scope.message = {
-        "type": "success",
+        "type": "info",
         "text": "Client created with id #" + new_client.id
       };
     }, function(response) {
