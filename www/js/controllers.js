@@ -196,7 +196,8 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateUtil, DataTables, Codes) {
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
+    ClientImages, DateUtil, DataTables, Codes, SACCO) {
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
   $scope.client = {};
@@ -208,13 +209,13 @@ angular.module('starter.controllers', [])
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   Clients.get_accounts(clientId, function(accounts) {
-    var savingsAccounts = accounts["savingsAccounts"];
+    var savingsAccounts = accounts["savingsAccounts"] || [];
     var totalSavings = savingsAccounts.reduce(function(sum, account) {
       return sum + account.accountBalance;
     }, 0);
     console.log("Total Savings: " + totalSavings);
     $scope.client.TotalSavings = totalSavings;
-    var loanAccounts = accounts["loanAccounts"];
+    var loanAccounts = accounts["loanAccounts"] || [];
     console.log("Loan Accounts:" + JSON.stringify(loanAccounts));
     var totalLoans = loanAccounts.reduce(function(sum, account) {
       return sum + account.loanBalance;
@@ -273,16 +274,21 @@ angular.module('starter.controllers', [])
 } )
 
 .controller('ClientEditCtrl', function($scope, $stateParams,
-      Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper) {
+      Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
   Clients.get(clientId, function(client) {
-    var rClient = FormHelper.prepare_entity(client);
+    var rClient = Clients.prepareForm(client);
     console.log("Got client: " + JSON.stringify(client));
     console.log("rClient:" + JSON.stringify(rClient));
-    $scope.client = client;
-    $scope.client.dob = DateUtil.localDate(client.dateOfBirth);
+    $scope.client = rClient;
+
+    var df = Clients.dateFields();
+    for(var i = 0; i < df.length; ++i) {
+      var fld = df[i];
+      $scope.client[fld] = new Date(DateUtil.isoDate(client[fld]));
+    }
     DataTables.get('Client_Fields', clientId, function(cdata) {
       var cfields = cdata[0];
       for(var fld in cfields) {
@@ -320,6 +326,9 @@ angular.module('starter.controllers', [])
   Codes.getValues(ocode, function(ocodes) {
     $scope.codes.occupations = ocodes;
   } );
+  SACCO.query(function(saccos) {
+    $scope.codes.offices = saccos;
+  }, function(sus) {} );
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO) {
@@ -327,11 +336,6 @@ angular.module('starter.controllers', [])
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     var keys = ["firstname", "lastname", "mobileNo"];
-/*    var cfields = new Object();
-    for(var i = 0; i < keys.length; ++i) {
-      var fld = keys[i];
-      cfields[fld] = client[fld];
-    } */
     var dateFields = [ "dateOfBirth" ];
     var cfields = new Object();
     var sf = Clients.saveFields();

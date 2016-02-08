@@ -324,13 +324,15 @@ angular.module('starter.services', [])
 .factory('FormHelper', function() {
   return {
     prepare_entity: function(entity) {
+      var new_ent;
+      console.log("Received entity.");
       for(var k in entity) {
         var v = entity[k];
         if ('Object' === typeof(v)) {
           entity[k+"Id"] = v.id;
         }
       }
-      return entity;
+      return new_ent;
     }
   };
 } )
@@ -345,6 +347,31 @@ angular.module('starter.services', [])
     saveFields: function() {
       return [ "dateOfBirth", "activationDate", "firstname", "lastname",
         "genderId", "mobileNo", "clientClassification", "officeId" ];
+    },
+    codeFields: function() {
+      return {
+        "genderId": function(client) {
+          return client.gender.id;
+        },
+        "clientClassificationId": function(client) {
+          return client.clientClassification.id;
+        }
+      }
+    },
+    prepareForm: function(client) {
+      var rClient = new Object();
+      var sfs = this.saveFields();
+      var cfs = this.codeFields();
+      for(var i = 0; i < sfs.length; ++i) {
+        var k = sfs[i];
+        var fn = cfs[k];
+        if (fn) {
+          rClient[k] = fn(client);
+        } else {
+          rClient[k] = client[k];
+        }
+      }
+      return rClient;
     },
     clear: function() {
       localStorage.setItem('clients', "[]")
@@ -373,7 +400,6 @@ angular.module('starter.services', [])
       clients = JSON.parse(localStorage.getItem('clients'));
       for (var i = 0; i < clients.length; i++) {
         var c = clients[i];
-        console.log("Client id:" + c.id + "/" + c["id"] + "::" + JSON.stringify(c));
         if (clients[i]["id"] === parseInt(id)) {
           fn_client(clients[i]);
         }
