@@ -73,12 +73,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   } )
+  .state('tab.sacco-edit', {
+    url: '/sacco-edit',
+    views: {
+      'tab-saccos': {
+        templateUrl: 'templates/sacco-edit.html',
+        controller: 'SACCOEditCtrl'
+      }
+    }
+  } )
   .state('tab.sacco-reg', {
     url: '/sacco-register',
     views: {
       'tab-saccos': {
         templateUrl: 'templates/sacco-edit.html',
-        controller: 'SACCOEditCtrl'
+        controller: 'SACCORegCtrl'
       }
     }
   } )

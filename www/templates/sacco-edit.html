@@ -2,6 +2,10 @@
   <ion-content>
 
     <div class="list">
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
+
       <ion-list-item class="item item-input-inset">
         <span class="input-label">Sacco Name</span>
 	      <label class="item-input-wrapper">
@@ -103,7 +107,7 @@
 
   <ion-list-item class="padding">
 	<button class="button button-block button-positive"
-		ng-click="saveNewSacco(sacco)"><h4>Save</h4>
+		ng-click="saveSacco(sacco)"><h4>Save</h4>
 	</button>
   </ion-list-item>
 

@@ -61,20 +61,20 @@ label {
           <label>Office's Name </label>:
         </ion-item>
         <ion-item>
-          {{staff.officeName ? staff.officeName : "Unspecified" }}
+          {{staff.officeName || "Unspecified" }}
         </ion-item>
       </ion-list>
-      <div class="item item-divider">
+      <!--div class="item item-divider">
 	       <label style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> : 
          </label>{{staff.email?staff.email:" personal@kmayra.org" }}
-      </div>
+      </div-->
 
-      <ion-item>
+      <!--ion-item>
         <a href="#/tab/clients/{{staff.id}}/edit"
           class="button button-block">
           <i class="ion-edit"> Edit Info</i>
         </a>
-      </ion-item>
+      </ion-item-->
 
     </div>
     <!-- ion-list -->

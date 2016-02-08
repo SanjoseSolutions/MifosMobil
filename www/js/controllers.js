@@ -65,6 +65,9 @@ angular.module('starter.controllers', [])
       op: "Register"
     };
   } );
+  $scope.saveSacco = function(sacco) {
+    Office.update(sacco);
+  };
 } )
 
 .controller('SACCOEditCtrl', function($scope, SACCO) {
@@ -75,6 +78,9 @@ angular.module('starter.controllers', [])
       op: "Edit"
     };
   } );
+  $scope.saveSacco = function(sacco) {
+    Office.update(sacco);
+  };
 } )
 
 .controller('SACCOListCtrl', function($scope, Office, Clients) {
@@ -107,12 +113,12 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateFmt, DataTables) {
+.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateUtil, DataTables) {
   var saccoId = $stateParams.saccoId;
   console.log("Sacco view ctrl invoked for " + saccoId);
   Office.get(saccoId, function(office) {
     console.log("Got SACCO" + JSON.stringify(office));
-    office.openingDt = DateFmt.localDate(office.openingDate);
+    office.openingDt = DateUtil.localDate(office.openingDate);
     $scope.data = { sacco: office };
   } );
   DataTables.get('SACCO_Fields', saccoId, function(sdata) {
@@ -132,11 +138,11 @@ angular.module('starter.controllers', [])
   };
 } )
 
-.controller('StaffDetailCtrl', function($scope, $stateParams, Staff, DateFmt) {
+.controller('StaffDetailCtrl', function($scope, $stateParams, Staff, DateUtil) {
   console.log("StaffDetailCtrl called");
   Staff.get($stateParams.staffId, function(staff) {
     console.log("Joining date array: " + JSON.stringify(staff.joiningDate));
-    staff.joiningDt = DateFmt.localDate(staff.joiningDate);
+    staff.joiningDt = DateUtil.localDate(staff.joiningDate);
     staff.fullname = staff.firstname + " " + staff.lastname;
     console.log("Joining date local: " + staff.joiningDt);
     $scope.staff = staff;
@@ -190,27 +196,29 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateFmt, DataTables, Codes) {
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, ClientImages, DateUtil, DataTables, Codes) {
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
   $scope.client = {};
   Clients.get($stateParams.clientId, function(client) {
     console.log("Got client:"+JSON.stringify(client));
+    client["NumShares"] = parseInt(Math.random()*10);
     $scope.client = client;
-    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
+    $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   Clients.get_accounts(clientId, function(accounts) {
-    var savingsAccounts = account["savingsAccounts"];
-    var totalSavings = savingsAccount.reduce(function(sum, account) {
+    var savingsAccounts = accounts["savingsAccounts"];
+    var totalSavings = savingsAccounts.reduce(function(sum, account) {
       return sum + account.accountBalance;
     }, 0);
     console.log("Total Savings: " + totalSavings);
     $scope.client.TotalSavings = totalSavings;
     var loanAccounts = accounts["loanAccounts"];
+    console.log("Loan Accounts:" + JSON.stringify(loanAccounts));
     var totalLoans = loanAccounts.reduce(function(sum, account) {
       return sum + account.loanBalance;
-    } );
+    }, 0);
     console.log("Total Loans Bal: " + totalLoans);
     $scope.client.TotalLoans = totalLoans;
   } );
@@ -234,12 +242,12 @@ angular.module('starter.controllers', [])
   } );
 })
 
-.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Clients, DateFmt, DataTables) {
+.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Clients, DateUtil, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("ClientNextOfKinCtrl invoked");
   Clients.get(clientId, function(client) {
     $scope.client = client;
-    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
+    $scope.client.dateOfBirth = DateUtil.isoDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
   DataTables.get('Client_NextOfKin', clientId, function(cdata) {
@@ -265,31 +273,38 @@ angular.module('starter.controllers', [])
 } )
 
 .controller('ClientEditCtrl', function($scope, $stateParams,
-      Clients, ClientImages, DateFmt, DataTables, Codes) {
+      Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
   Clients.get(clientId, function(client) {
+    var rClient = FormHelper.prepare_entity(client);
     console.log("Got client: " + JSON.stringify(client));
+    console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = client;
-    $scope.client.dob = DateFmt.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
-  } );
-  ClientImages.getB64(clientId, function(img_data) {
-    $scope.client.face = img_data;
-  } );
-  DataTables.get('Client_Fields', clientId, function(cdata) {
-    var cfields = cdata[0];
-    for(var fld in cfields) {
-      $scope.client[fld] = cfields[fld];
-    }
+    $scope.client.dob = DateUtil.localDate(client.dateOfBirth);
+    DataTables.get('Client_Fields', clientId, function(cdata) {
+      var cfields = cdata[0];
+      for(var fld in cfields) {
+        $scope.client[fld] = cfields[fld];
+      }
+    } );
   } );
   $scope.saveClient = function(client) {
     var cfields = new Object();
-    var keys = ["firstname", "lastname", "mobileNo"];
-    for(var i = 0; i < keys.length; ++i) {
-      var fld = keys[i];
-      cfields[fld] = client[fld];
+    var sf = Clients.saveFields();
+    for(var i = 0; i < sf.length; ++i) {
+      var fld = sf[i];
+      var val = client[fld];
+      if ('Object' === typeof(val)) {
+        if (val["id"]) {
+          val = val.id;
+        } else {
+          console.log("Client Hash field without id:"+fld);
+          val = "";
+        }
+      }
+      cfields[fld] = val;
     }
     console.log("Called saveClient: " + JSON.stringify(cfields));
     Clients.update(client.id, cfields, function(eclient) {
@@ -307,17 +322,60 @@ angular.module('starter.controllers', [])
   } );
 } )
 
-.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateFmt, DataTables, Codes) {
+.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO) {
   console.log("Looking to register client");
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     var keys = ["firstname", "lastname", "mobileNo"];
+/*    var cfields = new Object();
     for(var i = 0; i < keys.length; ++i) {
       var fld = keys[i];
       cfields[fld] = client[fld];
+    } */
+    var dateFields = [ "dateOfBirth" ];
+    var cfields = new Object();
+    var sf = Clients.saveFields();
+    for(var i = 0; i < sf.length; ++i) {
+      var fld = sf[i];
+      var val = client[fld];
+      console.log("Client " + fld + " ISA " + typeof(val));
+      if ('Object' === typeof(val)) {
+        if (val["id"]) {
+          val = val.id;
+        } else {
+          console.log("Client Hash field without id:"+fld);
+          val = "";
+        }
+        cfields[fld+"Id"] = val;
+      } else {
+        cfields[fld] = val;
+      }
     }
-    Clients.save(client, function(new_client) {
+    var df = Clients.dateFields();
+    for(var i = 0; i < df.length; ++i) {
+      var fld = df[i];
+      var val = cfields[fld];
+      if (val != null) {
+        val = val.toISOString().substring(0, 10);
+        cfields[fld] = val;
+        console.log("Client date field " + fld + " = " + val);
+      }
+    }
+    cfields["dateFormat"] = "yyyy-MM-dd";
+    cfields["locale"] = "en";
+    cfields["active"] = true;
+    Clients.save(cfields, function(new_client) {
       console.log("Client created:" + JSON.stringify(new_client));
+      $scope.message = {
+        "type": "success",
+        "text": "Client created with id #" + new_client.id
+      };
+    }, function(response) {
+      $scope.message = {
+        "type": "error",
+        "text": "Client creation failed. Report issue to admin code:"+response.code
+          + " . Possible cause " + JSON.stringify(response.data)
+      };
     } );
   };
   var gcode = Codes.getId("Gender");
@@ -329,6 +387,9 @@ angular.module('starter.controllers', [])
   Codes.getValues(ocode, function(ocodes) {
     $scope.codes.occupations = ocodes;
   } );
+  SACCO.query(function(saccos) {
+    $scope.codes.offices = saccos;
+  }, function(sus) {} );
 } )
 
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {

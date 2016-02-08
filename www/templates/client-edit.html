@@ -7,6 +7,9 @@
   </ion-header-bar>
   <ion-content class="padding">
     <ion-list>
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
       <div class="item item-input-inset">
         <span class="input-label">First Name:</span>
         <label class="item-input-wrapper">
@@ -22,7 +25,7 @@
       <div class="item item-input-inset">
         <span class="input-label">Gender:</span>
         <label class="item-input-wrapper">
-          <select ng-model="client.genderName">
+          <select ng-model="client.genderId">
             <option ng-repeat="g in codes.genders" value="{{g.id}}">{{g.name}}</option>
           </select>
         </label>
@@ -30,13 +33,27 @@
       <div class="item item-divider item-input-inset">
         <span class="input-label">Date of Birth:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dob">
+          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
+        </label>
+      </div>
+      <div class="item item-divider item-input-inset">
+        <span class="input-label">Activation Date:</span>
+        <label class="item-input-wrapper">
+          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Mobile:</span>
         <label class="item-input-wrapper">
           <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobileNo">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Office:</span>
+        <label class="item-input-wrapper">
+          <select ng-model="client.officeId">
+            <option ng-repeat="o in codes.offices" value="{{o.id}}">{{o.name}}</option>
+          </select>
         </label>
       </div>
       <div class="item item-input-inset">
@@ -56,7 +73,7 @@
         <span class="input-label">Occupation:</span>
         <span>{{client.clientClassification.name}}</span>
         <label class="item-input-wrapper">
-          <select ng-model="client.Occupation">
+          <select ng-model="client.clientClassification">
             <option ng-repeat="o in codes.occupations" value="{{o.id}}">{{o.name}}</option>
           </select>
         </label>

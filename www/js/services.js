@@ -40,11 +40,6 @@ angular.module('starter.services', [])
   /* Custom headers: GET, HEAD, DELETE */
   angular.forEach(['get', 'delete', 'head'], function (method) {
     authHttp[method] = function(url, config) {
-			var b64key = localStorage.getItem("b64key");
-			console.log("Got b64key:"+b64key);
-			if (b64key != null) {
-				authHttp.setAuthHeader(b64key);
-			}
       config = config || {};
       return $http[method](url, config);
     };
@@ -200,10 +195,23 @@ angular.module('starter.services', [])
     }
   };
 } )
-.factory('DateFmt', function() {
+.factory('DateUtil', function() {
   return {
+    isoDate: function(a_date) {
+      var dd = a_date[2];
+      var mm = a_date[1];
+      var preproc = function(i) {
+        return i > 9 ? i : "0" + i;
+      }
+      dd = preproc(dd);
+      mm = preproc(mm);
+      var dt = a_date[0] + "-" + mm + "-" + dd;
+      return dt;
+    },
     localDate: function(a_date) {
-      var dt = new Date(a_date[0] + "-" + a_date[1] + "-" + a_date[2]);
+      var dd = a_date[2];
+      var mm = a_date[1];
+      var dt = new Date(a_date[0] + "-" + mm + "-" + dd);
       return dt.toLocaleDateString();
     }
   };
@@ -211,13 +219,25 @@ angular.module('starter.services', [])
 
 .factory('Office', function(authHttp, baseUrl) {
   return {
-    post: function(fields, fn_office) {
-      authHttp.post(baseUrl + '/offices', fields)
-      .then(function(response) {
+    post: function(fields, fn_office, fn_fail) {
+      authHttp.post(baseUrl + '/offices', fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
         console.log("Create office success. Got: " + JSON.stringify(response.data));
         if (fn_office !== null) {
           fn_office(response.data);
         }
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
+    update: function(id, fields, fn_office, fn_fail) {
+      authHttp.put(baseUrl + '/offices/' + id, fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        fn_office(response.data);
+      }, function(response) {
+        fn_fail(response);
       } );
     },
     get: function(id, fn_office) {
@@ -237,6 +257,29 @@ angular.module('starter.services', [])
 
 .factory('SACCO', function(Office) {
   return {
+    query_saccos: function(fn_saccos) {
+    },
+    query: function(fn_saccos, fn_sus) {
+      Office.query(function(data) {
+        var sus = [];
+        var po = new Object();
+        var saccos = [];
+        for(var i = 0; i < data.length; ++i) {
+          if (data[i].parentId == 1) {
+            sus.push(data[i]);
+            po[data[i].id] = data[i].parentId;
+          } else {
+            var parentId = data[i].parentId;
+            var gpId = po[parentId];
+            if (gpId != null && gpId == 1) {
+              saccos.push(data[i]);
+            }
+          }
+        }
+        fn_saccos(saccos);
+        fn_sus(sus);
+      } );
+    },
     query_sacco_unions: function(fn_sunions) {
       Office.query(function(data) {
         var sunions = []; 
@@ -278,17 +321,41 @@ angular.module('starter.services', [])
   }
 } )
 
+.factory('FormHelper', function() {
+  return {
+    prepare_entity: function(entity) {
+      for(var k in entity) {
+        var v = entity[k];
+        if ('Object' === typeof(v)) {
+          entity[k+"Id"] = v.id;
+        }
+      }
+      return entity;
+    }
+  };
+} )
+
 .factory('Clients', function(authHttp, baseUrl, Settings) {
   var clients = [];
 
   return {
-    clear: function() { localStorage.setItem('clients', "[]") },
+    dateFields: function() {
+      return ["dateOfBirth", "activationDate"];
+    },
+    saveFields: function() {
+      return [ "dateOfBirth", "activationDate", "firstname", "lastname",
+        "genderId", "mobileNo", "clientClassification", "officeId" ];
+    },
+    clear: function() {
+      localStorage.setItem('clients', "[]")
+    },
     query: function(process_clients) {
       clients = JSON.parse(localStorage.getItem('clients'));
       if (clients != null && clients.length) {
         process_clients(clients);
       } else {
-        authHttp.get(baseUrl + '/clients').then(function(response) {
+        authHttp.get(baseUrl + '/clients')
+        .then(function(response) {
           var data = response.data;
           if (data.totalFilteredRecords) {
             var clients = data.pageItems;
@@ -312,22 +379,28 @@ angular.module('starter.services', [])
         }
       }
     },
-    save: function(client, fn_client) {
-      authHttp.post(baseUrl + '/clients', client).then(function(response) {
+    save: function(client, fn_client, fn_fail) {
+      authHttp.post(baseUrl + '/clients', client, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
         console.log("Created client resp: "+JSON.stringify(response.data));
+      }, function(response) {
+        console.log("Client create failed:"+JSON.stringify(response));
+        fn_fail(response);
       } );
     },
-    update: function(id, client, fn_client) {
+    update: function(id, client, fn_client, fn_fail) {
       authHttp.put(baseUrl + '/clients/' + id, client, {
         "params": { "tenantIdentifier": Settings.tenant }
       } ).then(function(response) {
         console.log("Update client. Response: " + JSON.stringify(response.data));
       }, function(response) {
         console.log("Update failed!. Response status:" + response.status + "; " + JSON.stringify(response.data));
+        fn_fail(response);
       } );
     },
     get_accounts: function(id, fn_accts) {
-      authHttp.get(baseUrl + 'clients/' + id + '/accounts')
+      authHttp.get(baseUrl + '/clients/' + id + '/accounts')
         .then(function(response) {
           var accounts = response.data;
           accounts.share_count = parseInt(Math.random()*11);
