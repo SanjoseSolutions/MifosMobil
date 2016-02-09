@@ -1,10 +1,12 @@
 ## Feb 4th, 2016
- Father's Name
- Grand Father's Name
- Relationship : DropDown Menu: Father / Son / ...
- Phone : 
+
+Creation of : client-next-of-kin.html template
 
 
+<ul>
+<li> </li>
+<li> </li>
+</ul>
 
 We provide multiple services such as:
 OK	Audit & Assurance:
@@ -12,11 +14,11 @@ OK		Statutory Audits
 OK    	Internal Audits
 OK    	Trusts, Societies, Non-Profit & NGO Audits
 OK    	Special Assignments
-    Taxation:
-        Direct Taxation
-        Indirect Taxation
-    Company Law Services
-    Inception Services
+OK    Taxation:
+OK        Direct Taxation
+OK        Indirect Taxation
+OK    Company Law Services
+OK    Inception Services
     Consulting Services
     Outsourcing Services
     Property Related
