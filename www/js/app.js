@@ -73,12 +73,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   } )
+  .state('tab.sacco-edit', {
+    url: '/saccos/:saccoId/edit',
+    views: {
+      'tab-saccos': {
+        templateUrl: 'templates/sacco-edit.html',
+        controller: 'SACCOEditCtrl'
+      }
+    }
+  } )
   .state('tab.sacco-reg', {
     url: '/sacco-register',
     views: {
       'tab-saccos': {
         templateUrl: 'templates/sacco-edit.html',
-        controller: 'SACCOEditCtrl'
+        controller: 'SACCORegCtrl'
       }
     }
   } )
@@ -121,9 +130,36 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   .state('tab.client-edit', {
     url: '/clients/:clientId/edit',
     views: {
-      'tab-client-edit': {
+      'tab-clients': {
         templateUrl: 'templates/client-edit.html',
         controller: 'ClientEditCtrl'
+      }
+    }
+  } )
+  .state('tab.client-reg', {
+    url: '/client-register',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/client-edit.html',
+        controller: 'ClientRegCtrl'
+      }
+    }
+  } )
+  .state('tab.client-next-of-kin', {
+    url: '/clients/:clientId/next-of-kin',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/client-next-of-kin.html',
+        controller: 'ClientNextOfKinCtrl'
+      }
+    }
+  } )
+  .state('tab.client-next-of-kin-edit', {
+    url: '/clients/:clientId/next-of-kin-edit',
+    views: {
+      'tab-client-next-of-kin-edit': {
+        templateUrl: 'templates/client-next-of-kin-edit.html',
+        controller: 'ClientNextOfKinCtrlEdit'
       }
     }
   } )

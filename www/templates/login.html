@@ -5,6 +5,9 @@
 
     <ion-card>
       <ion-list>
+        <ion-item ng-show="message">
+          <span class="ion-{{message.type}}">{{message.text}}</span>
+        </ion-item>
         <ion-item>
           <ion-label for="username">Username : </ion-label>
           <input type="text" name="username" id="username" ng-model="cred.username"
@@ -17,22 +20,22 @@
             placeholder="Your password" />
         </ion-item>
 
-        <ion-item>
+        <!--ion-item>
           <ion-checkbox ng-model="cred.client">I am a Client</ion-checkbox>
-        </ion-item>
+        </ion-item-->
 
         <ion-item>
           <button class="button button-block button-calm" ng-click="login(cred)">
-            Login Now
+            Login <span class="ion-log-in">
           </button>
         </ion-item>
 
-        <div class="item">Forgot your password?<br>
+        <!--div class="item">Forgot your password?<br>
           <button class="button button-calm button-outline button-block"
             ng-click="resetPassword()">
             Reset Password
           </button>
-        </div>
+        </div-->
       </ion-list>
     </ion-card>
   </ion-content>

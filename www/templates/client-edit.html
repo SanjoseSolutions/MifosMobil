@@ -1,4 +1,4 @@
-<ion-view view-title="Edit Client's Details">
+<ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
 	<button class="button button-icon" ng-click="newTask()">Edit
@@ -6,58 +6,62 @@
   </button>
   </ion-header-bar>
   <ion-content class="padding">
-    <!-- ion-list>
-    <ion-toggle  ng-model="settings.enableFriends">
-        Enable Friends
-    </ion-toggle>
-    </ion-list -->
-
-    <div class="list">
+    <ion-list>
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
       <div class="item item-input-inset">
-    	<div class="row">
-	     <div class="col col-50">
-	     <label class="item-input-wrapper">
-	       <input type="text" size="13" placeholder="Your First Name">
-	       <!--input type="text" placeholder="Email2" -->
-	     </label>
-	     </div>
-	     <div class="col col-50">
-	     <label class="item-input-wrapper">
-	      <input type="text" size="13" placeholder="Your Last Name">
-	     </label>
-	     </div>
-	    </div>
+        <span class="input-label">First Name:</span>
+        <label class="item-input-wrapper">
+          <input type="tel" size="50" placeholder="Enter First Name" ng-model="client.firstname">
+        </label>
       </div>
-    <ion-list style="padding:0;margin:0;">
-	   <ion-item class="item item-divider" style="font-size:16px; text-align:left">Gender :</ion-item>
-	   <ion-radio ng-model="gender" ng-value="'M'">Male</ion-radio>
-	   <ion-radio ng-model="gender" ng-value="'F'">Female</ion-radio>
-    <!--ion-item>
-    	<label> Gender : 	</label>
-    	<input type="radio" name="M">Male</input>
-    	<input type="radio" name="F">Female</input>
-    </ion-item -->
-      </ion-list>
-      <div class="item item-divider item-input-inset">
+      <div class="item item-input-inset">
+        <span class="input-label">Last Name:</span>
+        <label class="item-input-wrapper">
+          <input type="tel" size="50" placeholder="Enter Last Name" ng-model="client.lastname">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Gender:</span>
+        <label class="item-input-wrapper">
+          <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders">
+          </select>
+        </label>
+      </div>
+      <div class="item item-input-inset">
         <span class="input-label">Date of Birth:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="15" placeholder="dd/mm/yy">
+          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Mobile Number:</span>
+        <span class="input-label">Activation Date:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="15" placeholder="Ex :00919620568920 ">
+          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Email :</span>
+        <span class="input-label">Mobile:</span>
         <label class="item-input-wrapper">
-          <input type="email" name="email" placeholder="Enter your Email">
+          <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobileNo">
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Confirm :</span>
+        <span class="input-label">Office:</span>
+        <label class="item-input-wrapper">
+          <select ng-model="client.officeId" ng-options="o.id as o.name for o in codes.offices">
+          </select>
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Email:</span>
+        <label class="item-input-wrapper">
+          <input type="email" name="email" placeholder="Your Email Address" ng-model="client.Email">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Confirm:</span>
         <label class="item-input-wrapper">
           <input type="email" name="emailConf" placeholder="Your Email">
         </label>
@@ -66,7 +70,9 @@
       <div class="item item-input-inset">
         <span class="input-label">Occupation:</span>
         <label class="item-input-wrapper">
-          <input type="text" size="15" placeholder="Farmer ...">
+          <select ng-model="client.clientClassificationId"
+            ng-options="o.id as o.name for o in codes.occupations">
+          </select>
         </label>
       </div>
       <div class="item item-input-inset">
@@ -76,30 +82,16 @@
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Full Address:</span>
+        <span class="input-label">Address:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="15" placeholder="# 267, Library Street, CA">
+          <input type="tel" size="15" placeholder="Full address" ng-model="client.Address">
         </label>
       </div>
 
-
-
-      <div class="item item-input-inset">
-        <span class="input-label">Username :</span>
-        <label class="item-input-wrapper">
-          <input type="text" placeholder="Ex: Maximus">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Password :</span>
-        <label class="item-input-wrapper">
-          <input type="password" size="25" placeholder="New Password ... Remember it">
-        </label>
-      </div>
-    </div> <!-- End of List -->
+    </ion-list> <!-- End of List -->
 
 	<button class="button button-block button-positive"
-		ng-click="saveNewSacco(sacco)"><h4>Save</h4>
+		ng-click="saveClient(client)"><h4>Save</h4>
 	</button>
 
   </ion-content>

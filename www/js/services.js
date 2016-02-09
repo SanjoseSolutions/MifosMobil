@@ -40,11 +40,6 @@ angular.module('starter.services', [])
   /* Custom headers: GET, HEAD, DELETE */
   angular.forEach(['get', 'delete', 'head'], function (method) {
     authHttp[method] = function(url, config) {
-			var b64key = localStorage.getItem("b64key");
-			console.log("Got b64key:"+b64key);
-			if (b64key != null) {
-				authHttp.setAuthHeader(b64key);
-			}
       config = config || {};
       return $http[method](url, config);
     };
@@ -54,6 +49,8 @@ angular.module('starter.services', [])
   angular.forEach(['post', 'put'], function(method) {
     authHttp[method] = function(url, data, config) {
       config = config || {};
+      config.headers = config.headers || {};
+      config.headers["X-Mifos-Platform-TenantId"] = Settings.tenant;
       return $http[method](url, data, config);
     };
   } );
@@ -75,7 +72,7 @@ angular.module('starter.services', [])
     }
   };
 
-  session.login = function(auth) {
+  session.login = function(auth, fn_fail) {
     var uri = baseUrl + '/authentication';
     console.log("auth:"+JSON.stringify(auth));
     if (auth.client) {
@@ -124,6 +121,8 @@ angular.module('starter.services', [])
       localStorage.setItem('roles', role_names.join(","));
 
       $state.go('tab.sacco-list');
+    }, function(response) {
+      fn_fail(response);
     } );
   };
 
@@ -178,7 +177,7 @@ angular.module('starter.services', [])
   return session;
 } ] )
 
-.factory('DataTables', function(authHttp, baseUrl) {
+.factory('DataTables', function(authHttp, baseUrl, Settings) {
   return {
     get_meta: function(name, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name).then(function(response) {
@@ -190,23 +189,87 @@ angular.module('starter.services', [])
     get: function(name, id, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
-        console.log("Datatable DATA:" + JSON.stringify(data));
         fn_dtable(data);
+      } );
+    },
+    update: function(name, id, fields, fn_fields, fn_fail) {
+      authHttp.put(baseUrl + '/datatables/' + name + '/' + id, fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        fn_office(response.data);
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
+    save: function(name, fields, fn_fields, fn_fail) {
+      authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        console.log("Create " + name + " success. Got: "
+          + JSON.stringify(response.data));
+        if (fn_fields !== null) {
+          fn_fields(response.data);
+        }
+      }, function(response) {
+        fn_fail(response);
       } );
     }
   };
 } )
-.factory('DateFmt', function() {
+.factory('DateUtil', function() {
   return {
+    isoDate: function(a_date) {
+      var dd = a_date[2];
+      var mm = a_date[1];
+      var preproc = function(i) {
+        return i > 9 ? i : "0" + i;
+      }
+      dd = preproc(dd);
+      mm = preproc(mm);
+      var dt = a_date[0] + "-" + mm + "-" + dd;
+      return dt;
+    },
     localDate: function(a_date) {
-      var dt = new Date(a_date[0] + "-" + a_date[1] + "-" + a_date[2]);
+      var dd = a_date[2];
+      var mm = a_date[1];
+      var dt = new Date(a_date[0] + "-" + mm + "-" + dd);
       return dt.toLocaleDateString();
     }
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl) {
+.factory('Office', function(authHttp, baseUrl, Settings) {
   return {
+    dateFields: ["joiningDate", "openingDate"],
+    saveFields: ["openingDate", "name", "parentId"],
+    prepareForm: function(office) {
+      var sfs = this.saveFields;
+      for(var i = 0; i < sfs.length; ++i) {
+        var k = sfs[i];
+        oField[k] = office[k];
+      }
+    },
+    save: function(fields, fn_office, fn_fail) {
+      authHttp.post(baseUrl + '/offices', fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        console.log("Create office success. Got: " + JSON.stringify(response.data));
+        if (fn_office !== null) {
+          fn_office(response.data);
+        }
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
+    update: function(id, fields, fn_office, fn_fail) {
+      authHttp.put(baseUrl + '/offices/' + id, fields, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        fn_office(response.data);
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
     get: function(id, fn_office) {
       authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
         var odata = response.data;
@@ -224,12 +287,34 @@ angular.module('starter.services', [])
 
 .factory('SACCO', function(Office) {
   return {
+    query_saccos: function(fn_saccos) {
+    },
+    query: function(fn_saccos, fn_sus) {
+      Office.query(function(data) {
+        var sus = [];
+        var po = new Object();
+        var saccos = [];
+        for(var i = 0; i < data.length; ++i) {
+          if (data[i].parentId == 1) {
+            sus.push(data[i]);
+            po[data[i].id] = data[i].parentId;
+          } else {
+            var parentId = data[i].parentId;
+            var gpId = po[parentId];
+            if (gpId != null && gpId == 1) {
+              saccos.push(data[i]);
+            }
+          }
+        }
+        fn_saccos(saccos);
+        fn_sus(sus);
+      } );
+    },
     query_sacco_unions: function(fn_sunions) {
       Office.query(function(data) {
         var sunions = []; 
         for(var i = 0; i < data.length; ++i) {
           var office = data[i];
-          console.log("Got office: " + office.id);
           if (data[i].parentId == 1) {
             sunions.push( {
               "id": data[i].id,
@@ -265,30 +350,77 @@ angular.module('starter.services', [])
   }
 } )
 
-.factory('Clients', function(authHttp, baseUrl) {
-  var clients = [ {
-    id: 1,
-    name: 'Ben Wallace',
-    fullname: 'Benjamin Wallace',
-    face: 'img/ben.png'
-  }, {
-    id: 2,
-    name: 'M. Mirnyi',
-    fullname: 'Max Mirnyi',
-    face: 'img/max.png'
-  } ];
+.factory('FormHelper', function() {
+  return {
+    prepare_entity: function(entity) {
+      var new_ent;
+      console.log("Received entity.");
+      for(var k in entity) {
+        var v = entity[k];
+        if ('Object' === typeof(v)) {
+          entity[k+"Id"] = v.id;
+        }
+      }
+      return new_ent;
+    }
+  };
+} )
+
+.factory('Clients', function(authHttp, baseUrl, Settings) {
+  var clients = [];
 
   return {
-    query: function(process_clients) {
-      authHttp.get(baseUrl + '/clients').then(function(response) {
-        var data = response.data;
-        if (data.totalFilteredRecords) {
-          var clients = data.pageItems;
-          localStorage.setItem('clients', JSON.stringify(clients));
-          console.log("Got " + clients.length + " clients");
-          process_clients(clients);
+    dateFields: function() {
+      return ["dateOfBirth", "activationDate"];
+    },
+    saveFields: function() {
+      return [ "dateOfBirth", "activationDate", "firstname", "lastname",
+        "genderId", "mobileNo", "clientClassification", "officeId" ];
+    },
+    codeFields: function() {
+      return {
+        "genderId": function(client) {
+          return client.gender.id;
+        },
+        "clientClassificationId": function(client) {
+          return client.clientClassification.id;
         }
-      } );
+      }
+    },
+    prepareForm: function(client) {
+      var rClient = new Object();
+      var sfs = this.saveFields();
+      var cfs = this.codeFields();
+      for(var i = 0; i < sfs.length; ++i) {
+        var k = sfs[i];
+        var fn = cfs[k];
+        if (fn) {
+          rClient[k] = fn(client);
+        } else {
+          rClient[k] = client[k];
+        }
+      }
+      return rClient;
+    },
+    clear: function() {
+      localStorage.setItem('clients', "[]")
+    },
+    query: function(process_clients) {
+      clients = JSON.parse(localStorage.getItem('clients'));
+      if (clients != null && clients.length) {
+        process_clients(clients);
+      } else {
+        authHttp.get(baseUrl + '/clients')
+        .then(function(response) {
+          var data = response.data;
+          if (data.totalFilteredRecords) {
+            var clients = data.pageItems;
+            localStorage.setItem('clients', JSON.stringify(clients));
+            console.log("Got " + clients.length + " clients");
+            process_clients(clients);
+          }
+        } );
+      }
     },
     remove: function(id) {
       clients.splice(clients.indexOf(clients), 1);
@@ -297,16 +429,36 @@ angular.module('starter.services', [])
       clients = JSON.parse(localStorage.getItem('clients'));
       for (var i = 0; i < clients.length; i++) {
         var c = clients[i];
-        console.log("Client id:" + c.id + "/" + c["id"] + "::" + JSON.stringify(c));
         if (clients[i]["id"] === parseInt(id)) {
           fn_client(clients[i]);
         }
       }
     },
+    save: function(client, fn_client, fn_fail) {
+      authHttp.post(baseUrl + '/clients', client, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        console.log("Created client resp: "+JSON.stringify(response.data));
+      }, function(response) {
+        console.log("Client create failed:"+JSON.stringify(response));
+        fn_fail(response);
+      } );
+    },
+    update: function(id, client, fn_client, fn_fail) {
+      authHttp.put(baseUrl + '/clients/' + id, client, {
+        "params": { "tenantIdentifier": Settings.tenant }
+      } ).then(function(response) {
+        console.log("Update client. Response: " + JSON.stringify(response.data));
+      }, function(response) {
+        console.log("Update failed!. Response status:" + response.status + "; " + JSON.stringify(response.data));
+        fn_fail(response);
+      } );
+    },
     get_accounts: function(id, fn_accts) {
-      authHttp.get(baseUrl + 'clients/' + id + '/accounts')
+      authHttp.get(baseUrl + '/clients/' + id + '/accounts')
         .then(function(response) {
           var accounts = response.data;
+          accounts.share_count = parseInt(Math.random()*11);
           fn_accts(accounts);
         } );
     }
@@ -404,5 +556,43 @@ angular.module('starter.services', [])
         } );
     }
   };
-} );
+} )
+
+.factory('Shares', function(authHttp, baseUrl) {
+  return {
+    get: function(clientId, fn_shares) {
+      console.log("Shares called for:"+clientId);
+    },
+    query: function(fn_shares) {
+      console.log("Shares called");
+    }
+  };
+} )
+
+.factory('Codes', function(authHttp, baseUrl) {
+  var codeNames = {
+    "Gender": 4,
+    "ClientClassification": 17,
+    "Relationship": 26
+  };
+  return {
+    getId: function(codeNm) {
+      var cid = codeNames[codeNm];
+      if (cid != null) {
+        return cid;
+      }
+      return 0;
+    },
+    getValues: function(code, fn_codevalues) {
+      authHttp.get(baseUrl + '/codes/' + code + '/codevalues')
+        .then(function(response) {
+          console.log("Got code response");
+          fn_codevalues(response.data);
+        }, function(response) {
+          console.log("Failed to get codes:" + response.status);
+        } );
+    }
+  };
+} )
+;
 
