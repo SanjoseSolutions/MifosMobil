@@ -41,3 +41,10 @@ ion-content {
   padding: 3px 5px;
   background-color: #ddffdd;
 }
+
+.ion-warn {
+  color: #994400;
+  border: 1px solid #ff8822;
+  background-color: #ffdd99;
+  padding: 3px 5px;
+}
