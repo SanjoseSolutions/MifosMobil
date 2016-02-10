@@ -58,7 +58,48 @@ angular.module('starter.services', [])
   return authHttp;
 } ] )
 
-.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', function(baseUrl, authHttp, $http, $state) {
+.factory('Roles', function() {
+  return {
+    roleList: function() {
+      return [ 'Super User', 'Admin', 'Management', 'Staff', 'Client' ];
+    },
+    roleHash: function() {
+      return {
+        'Super user': 4,
+        'Admin': 4,
+        'Management': 3,
+        'Staff': 2,
+        'Client': 1
+      };
+    },
+    setRoles: function(roles) {
+      var roleList = this.roleList();
+      var roleVal = 0;
+      var roleHash = this.roleHash();
+      for(var i = 0; i < roles.length; ++i) {
+        var rName = roles[i].name;
+        console.log("Got role:"+rName);
+        var rVal = roleHash[rName];
+        console.log('rVal='+rVal);
+        if (rVal > roleVal) {
+          roleVal = rVal;
+        }
+      }
+      console.log("roleVal="+roleVal);
+      var roleNames = [];
+      for(var i = 5 - roleVal; i < 5; ++i) {
+        roleNames.push(roleList[i]);
+      }
+      var rolesStr = roleNames.join(",");
+      console.log("Role String: " + rolesStr);
+      localStorage.setItem('roles', rolesStr);
+      return roleNames;
+    }
+  };
+} )
+
+.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles',
+    function(baseUrl, authHttp, $http, $state, Roles) {
   var session = { isOnline: true, role: null };
   session.takeOnline = function() {
     if (!session.isOnline) {
@@ -94,60 +135,69 @@ angular.module('starter.services', [])
       console.log("Response: " + JSON.stringify(data));
       localStorage.setItem('auth', data);
 
+      var roles = Roles.setRoles(data.roles);
+      var role = roles[0];
+      var roleList = Roles.roleList();
+      var roleFound = false;
+      session.rolestat = new Object();
+      for(var i = 1; i < roleList.length; ++i) {
+        if (role == roleList[i]) {
+          roleFound = true;
+        }
+        var rFlag = "is" + roleList[i];
+        console.log("Role " + rFlag + " :: " + roleFound);
+        session.rolestat[rFlag] = roleFound;
+      }
+      var roleTabs = {
+        'Admin': 'sacco-list',
+        'Management': 'staff',
+        'Staff': 'clients'
+      };
+      var homeTab = 'tab.' + roleTabs[role];
+      console.log("Home tab:"+homeTab);
+      
       var b64key = data.base64EncodedAuthenticationKey;
       console.log("B64 Auth Key:" + b64key);
       authHttp.setAuthHeader(b64key);
 
-      var roles = data.roles;
-      var role_names = [];
-      var role = 'Client';
-      for(var i = 0; i < roles.length; ++i) {
-        var r = roles[i];
-        var rname = r.name;
-        if (rname == 'Super User') {
-          rname = 'Admin';
-        }
-        if (rname != 'Client') {
-          role = rname;
-        }
-        role_names.push(rname);
-      }
-      session.role = role;
-      console.log("Role is="+role);
-      if ('Client' == role) {
-        session.isClient = true;
-      }
       localStorage.setItem('session', JSON.stringify(session));
-      localStorage.setItem('roles', role_names.join(","));
 
-      $state.go('tab.sacco-list');
+      $state.go(homeTab);
     }, function(response) {
       fn_fail(response);
     } );
   };
 
-  session.showByRole = function(r) {
-    if (session.role == r) {
-      return 'ng-show';
-    }
-    return 'ng-hide';
-  };
-
   session.hasRole = function(r) {
     console.log("Session::hasRole called for :" + r);
     var roles = localStorage.getItem('roles');
+    console.log("Roles:"+roles+",role:"+r);
     if (roles.indexOf(r) >= 0) {
       return true;
     }
     return false;
   };
 
-  session.getRole = function() {
-    return session.role;
+  session.showByRole = function(r) {
+    console.log("Called showByRole:"+r);
+    if (session.hasRole(r)) {
+      return "ng-show";
+    }
+    return "ng-hide";
+  };
+
+  session.clearRoles = function() {
+    console.log("Clear roles called");
+    var rs = session.rolestat;
+    for(var k in rs) {
+      console.log("Clearing rolestat[" + k + "]");
+      session.rolestat[k] = false;
+    }
   };
 
   session.logout = function() {
     console.log("Logout attempt");
+    session.clearRoles();
     localStorage.removeItem('username');
     localStorage.removeItem('session');
     localStorage.removeItem('roles');

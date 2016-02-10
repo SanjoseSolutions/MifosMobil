@@ -23,7 +23,6 @@ angular.module('starter.controllers', [])
   $scope = {
     session: Session
   };
-  console.log("Role: " + $scope.session.getRole());
   console.log("Is authenticated: " + $scope.session.isAuthenticated() );
 } )
 
