@@ -1,0 +1,55 @@
+<style>
+label {
+ 	color: #558;
+}
+.center {
+  text-align: center;
+}
+.item, ion-item {
+	margin: 2px;
+	padding: 2px 5px;
+	border: none;
+/*	font-style:italic;	*/
+	font-family:corsiva;
+
+
+/*    
+Acc No | Loan Acc | Orig Loan | Loan Balance | Amount Paid | Type | Actions
+
+Acc No | Saving Acc | Balance | Actions
+*/
+
+}
+</style>
+
+<ion-view view-title="Client Saving Account Details">
+  <ion-content class="padding">
+    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
+    <div class="list card">
+      <ion-item>
+        <label> Account No :</label> {{"Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Account Type :</label> {{"Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Account Balace :</label> {{"Unspecified"}}
+      </ion-item>
+      <ion-item class="item-divider">
+        <p class="center"> ACTIONS </p>
+      </ion-item>
+      <ion-item>
+        <p class="center">
+          <a href="" class="button button-positive"> Deposit </a>
+          <a href="" class="button button-calm"> Withdraw </a>
+        </p>
+      </ion-item>
+      <ion-item>
+        <button class="button button-block button-dark" ng-click="login(cred)">
+          View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
+        </button>
+      </ion-item>
+    </div>
+
+  </ion-content>
+</ion-view>

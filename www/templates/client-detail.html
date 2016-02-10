@@ -24,29 +24,27 @@ label {
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
-
     <div class="list card" style="clear:both; height:160px">
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
 	     <h4>{{client.fullname}}</h4>
       </div -->
-    	<img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
+      <img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
       <ion-list>
         <h4>{{client.displayName}}</h4>
-	       <!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
-  	    <ion-item>
-	         <label>Gender :</label>{{client.gender.name}}
+      	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
+      	<ion-item>
+	        <label>Gender :</label>{{client.gender.name}}
 	      </ion-item>
-    	  <ion-item>
-	         <label>D.O.B</label>: {{client.dateOfBirth}}
-	      </ion-item>
-	      <ion-item>
-	         <label class="icon ion-android-call" title="Mobile">
-	         </label> {{client.mobileNo || "9876543210"}}
+        <ion-item>
+          <label>D.O.B</label>: {{client.dateOfBirth}}
+        </ion-item>
+        <ion-item>
+          <label class="icon ion-android-call" title="Mobile">
+	        </label> {{client.mobileNo || "9876543210"}}
         </ion-item> 
-	    </ion-list> <!--ion-list-->
+      </ion-list>
     </div>
-
     <div class="list card">
       <!-- SIMPLE TEST Don't mind
         ion-item>
@@ -63,8 +61,9 @@ label {
 
 
       <ion-item class="item-icon">
-	       <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-         </label>  {{client.Email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
+        <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
+        </label>  {{client.Email || client.firstname + "@kmayra.org" }}
+        <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
       <ion-item>
         <label> Education:
@@ -87,8 +86,8 @@ label {
         </label> Sector 137
       </ion-item -->
       <ion-item>
-	       <label> Client's Address : </label>
-         <br /> {{client.Address || "Unspecified" }}
+        <label> Client's Address : </label>
+        <br /> {{client.Address || "Unspecified" }}
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
       <ion-item>
