@@ -1,0 +1,139 @@
+<style>
+
+/* Taking Care of the Table Summary */
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    font-size: 0.8rem
+}
+table#SavSum th{
+  border: 1px solid white;
+  background-color: black;
+  font-style: bold;
+  color: white;
+}
+table#SavSum caption   {
+    display: table-caption;
+    caption-side: top;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: times;
+    text-align: center;
+}
+/*table {
+    border-spacing: 10px;
+}
+*/
+th, caption, td {
+    text-align: center;
+}
+th {
+  font-family: times;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 5px;
+}
+td {
+  text-align: center;
+}
+tr:nth-child(even) {background: #f1f1c1}  /* #CCC} */
+tr:nth-child(odd) {background: #FFF}
+
+/* tbody Default Styling
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+*/
+
+/* Done with the table */
+
+label {
+ 	color: #558;
+}
+.item, ion-item {
+	margin: 2px;
+	padding: 2px 5px;
+	border: none;
+/*	font-style:italic;	*/
+	font-family:corsiva;
+
+
+/*    
+Acc No | Loan Acc | Orig Loan | Loan Balance | Amount Paid | Type | Actions
+
+Acc No | Saving Acc | Balance | Actions
+*/
+
+}
+</style>
+
+<ion-view view-title="Client Loans Details">
+  <ion-content class="padding">
+    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
+    <!--
+    div class="list card">
+      <ion-item class="item item-divider">
+	     <label>Client </label> : {{client.name}}
+      </ion-item>
+      <ion-item>
+	     <label>Acc No | Loan Acc | Orig Loan | Loan Balance | Amount Paid | Type | Actions</label>
+      </ion-item>
+      <ion-item ng-repeat="">
+	     >> {{AccNo}} | {{LoanAcc}} | {{OrigLoan}} | {{LoanBalance}} | {{AmntPaid}} | {{Type}} | {{Actions}}
+      </ion-item>
+    </div -->
+
+    <!-- Table -->
+    <table id="SavSum" border="1" style="width:100%">
+    <caption> 2016 Transactions </caption>
+    <thead>
+    <tr>
+      <th title="SI NO"> # </th>
+      <th title="Date : Year 2016"> Date </th>
+      <th title="Account Type"> Type </th>
+      <th> Amount </th>
+      <th> Balance </th>
+    </tr>
+    </thead>
+    <!-- tfoot>
+    <tr>
+      <td>Short Report :</td>
+      <td>$180 Actual Balance</td>
+    </tr>
+    </tfoot -->
+    <tbody>
+    <tr>
+      <td> 001 </td>
+      <td> Jan 23 </td>
+      <td>  Basic </td>
+      <td> <span class="icon ion-bitcoin"></span> - 300 </td>
+      <td> -300 </td>
+    </tr>
+    <tr>
+      <td> 002 </td>
+      <td> Feb 03 </td>
+      <td> Basic </td>
+      <td> - 50 </td>
+      <td> _ </td>
+    </tr>
+    <tr>
+      <td> 003 </td>
+      <td> Feb 14 </td>
+      <td> Basic </td>
+      <td> + 70 </td>
+      <td> _ </td>
+    </tr>
+    <tr>
+      <td> 004 </td>
+      <td> Feb 21 </td>
+      <td> Basic </td>
+      <td> + 150 </td>
+      <td> _ </td>
+    </tr>
+    </tbody>
+    </table>
+    <!-- Report made on : -->
+  </ion-content>
+</ion-view>

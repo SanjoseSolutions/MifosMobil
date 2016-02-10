@@ -32,8 +32,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $stateProvider
 
   .state('login', {
-    url: '/login',
-    templateUrl: 'templates/login.html',
+    url: '/login',                 /* Simply Testing : NO Major change here */
+    templateUrl: 'templates/login.html',  /* <--- 'templates/login.html' */
     controller: 'AnonCtrl'
   } )
 
@@ -178,4 +178,3 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $urlRouterProvider.otherwise('/login');
 
 });
-
