@@ -1,8 +1,7 @@
 <ion-view view-title="Login">
   <ion-content>
-
+    <form name="loginForm" novalidate>
     <img src="img/kmayra.png" width="188" height="60" title="k-Mayra" alt="k-Mayra Logo" />
-
     <ion-card>
       <ion-list>
         <ion-item ng-show="message">
@@ -11,13 +10,13 @@
         <ion-item>
           <ion-label for="username">Username : </ion-label>
           <input type="text" name="username" id="username" ng-model="cred.username"
-            placeholder="Your k-Mayra username" />
+            placeholder="Your k-Mayra username" ng-minlength="5" required />
         </ion-item>
 
         <ion-item>
           <ion-label for="password">Password : </ion-label>
           <input type="password" name="password" id="password" ng-model="cred.password"
-            placeholder="Your password" />
+            placeholder="Your password" ng-minlength="8" required />
         </ion-item>
 
         <!--ion-item>
@@ -25,18 +24,20 @@
         </ion-item-->
 
         <ion-item>
-          <button class="button button-block button-calm" ng-click="login(cred)">
+          <div ng-hide="loginForm.username.$pristine">
+            <span class="ion-warn" ng-show="loginForm.username.$error.required">Username is required</span>
+            <span class="ion-warn" ng-show="loginForm.username.$error.minlength">Username must be at least 5 characters</span>
+          </div>
+          <div ng-hide="loginForm.password.$pristine">
+            <span class="ion-warn" ng-show="loginForm.password.$error.required">Password is required</span>
+            <span class="ion-warn" ng-show="loginForm.password.$error.minlength">Password must be at least 8 characters</span>
+          </div>
+          <button class="button button-block button-calm" ng-click="login(cred)" ng-disabled="loginForm.$invalid">
             Login <span class="ion-log-in"></span>
           </button>
         </ion-item>
-
-        <!--div class="item">Forgot your password?<br>
-          <button class="button button-calm button-outline button-block"
-            ng-click="resetPassword()">
-            Reset Password
-          </button>
-        </div-->
       </ion-list>
     </ion-card>
+    </form>
   </ion-content>
 </ion-view>

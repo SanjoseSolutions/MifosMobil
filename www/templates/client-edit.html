@@ -6,6 +6,7 @@
   </button>
   </ion-header-bar>
   <ion-content class="padding">
+    <form name="clientEditForm" novalidate>
     <ion-list>
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
@@ -13,13 +14,13 @@
       <div class="item item-input-inset">
         <span class="input-label">First Name:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="50" placeholder="Enter First Name" ng-model="client.firstname">
+          <input type="text" name="firstName" id="firstName" size="50" placeholder="Enter First Name" ng-model="client.firstname" ng-minlength="3" required />
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Last Name:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="50" placeholder="Enter Last Name" ng-model="client.lastname">
+          <input type="text" name="lastName" id="lastName" size="50" placeholder="Enter Last Name" ng-model="client.lastname" ng-minlength="3" required />
         </label>
       </div>
       <div class="item item-input-inset">
@@ -87,12 +88,21 @@
           <input type="tel" size="15" placeholder="Full address" ng-model="client.Address">
         </label>
       </div>
-
-    </ion-list> <!-- End of List -->
-
-	<button class="button button-block button-positive"
-		ng-click="saveClient(client)"><h4>Save</h4>
-	</button>
-
+      <ion-item>
+        <div ng-hide="clientEditForm.firstName.$pristine">
+          <span class="ion-warn" ng-show="clientEditForm.firstName.$error.required">First Name is required</span>
+          <span class="ion-warn" ng-show="clientEditForm.firstName.$warn.minlength">First Name must be at least 3 characters</span>
+        </div>
+        <div ng-hide="clientEditForm.lastName.$pristine">
+          <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.required">Last Name is required</span>
+          <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.minlength">Last Name must be at least 3 characters</span>
+        </div>
+    	  <button class="button button-block button-positive"
+    		  ng-click="saveClient(client)" ng-disabled="loginForm.$invalid">
+          <h4>Save</h4>
+    	  </button>
+      </ion-item>
+      </ion-list> <!-- End of List -->
+    </form>  
   </ion-content>
 </ion-view>
