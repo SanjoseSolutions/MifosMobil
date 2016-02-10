@@ -145,6 +145,8 @@ angular.module('starter.controllers', [])
         val = val.toISOString().substring(0, 10);
         sacco[fld] = val;
       }
+      sacco.locale = "en";
+      sacco.dateFormat = "yyyy-MM-dd";
       if ($scope.sdata.length) {
         DataTables.update('SACCO_Fields', officeId, sacco, function(fields) {
           msg = msg + ", SACCO_Fields.";
@@ -215,7 +217,7 @@ angular.module('starter.controllers', [])
     var sfields = sdata[0];
     if (sfields != null) {
       sfields["joiningDt"] = DateUtil.localDate(sfields["joiningDate"]);
-      $scope.data.fields = sfields;
+      $scope.data.sacco = sfields;
     }
   } );
 } )

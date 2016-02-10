@@ -201,7 +201,7 @@ angular.module('starter.services', [])
         fn_fail(response);
       } );
     },
-    save: function(name, fields, fn_fields, fn_fail) {
+    save: function(name, id, fields, fn_fields, fn_fail) {
       authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       } ).then(function(response) {
