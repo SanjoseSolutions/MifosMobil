@@ -16,7 +16,7 @@
  *  - AccountCtrl: 
  */
 
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ngCordova'])
 
 .controller('MainCtrl', function($scope, Session) {
   console.log("MainCtrl invoked");
@@ -33,16 +33,26 @@ angular.module('starter.controllers', [])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($scope, Session) {
+.controller('AnonCtrl', function($scope, Session, $cordovaNetwork) {
   $scope.cred = {};
   console.log("Anon Controller invoked");
   $scope.login = function(auth) {
+    if (window.Connection && $cordovaNetwork.isOffline()) {
+      $scope.message = {
+        "type": "warn",
+        "text": "No connection to Internet"
+      };
+      return;
+    }
     console.log("Anon scope Login called..");
+    $scope.message = null;
     Session.login(auth, function(response) {
       console.log("Login failed. Got:"+response.status);
       var msg = "";
       if (401 == response.status) {
         msg = " Incorrect username/password";
+      } else {
+        msg = "Received " + response.status
       }
       $scope.message = {
         "type": "error",
@@ -52,8 +62,26 @@ angular.module('starter.controllers', [])
   }
 } )
 
-.controller('TabsCtrl', function($scope, Session) {
+.controller('TabsCtrl', function($scope, Session, Roles) {
   $scope.session = Session.get();
+  $scope.$on('$ionicView.enter', function(e) {
+    var rolestat = new Object();
+    var roles = Roles.getRoles();
+    console.log("Roles:" + roles.join(','));
+    var role = roles[0];
+    var roleList = Roles.roleList();
+    var roleFound = false;
+    rolestat = new Object();
+    for(var i = 1; i < roleList.length; ++i) {
+      if (role == roleList[i]) {
+        roleFound = true;
+      }
+      var rFlag = "is" + roleList[i];
+      rolestat[rFlag] = roleFound;
+    }
+    rolestat.showAccount = true;
+    $scope.rolestat = rolestat;
+  } );
 } )
 
 .controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables) {
@@ -303,18 +331,34 @@ angular.module('starter.controllers', [])
   } );
   Clients.get_accounts(clientId, function(accounts) {
     var savingsAccounts = accounts["savingsAccounts"] || [];
+    var sacs = savingsAccounts.map(function(sac) {
+      return {
+        "id": sac.id,
+        "accountNo": sac.accountNo,
+        "accountBalance": sac.accountBalance
+      };
+    } );
     var totalSavings = savingsAccounts.reduce(function(sum, account) {
       return sum + account.accountBalance;
     }, 0);
     console.log("Total Savings: " + totalSavings);
+    $scope.client.savingsAccounts = sacs;
     $scope.client.TotalSavings = totalSavings;
     var loanAccounts = accounts["loanAccounts"] || [];
     console.log("Loan Accounts:" + JSON.stringify(loanAccounts));
+    var lacs = loanAccounts.map(function(lac) {
+      return {
+        "id": lac.id,
+        "accountNo": lac.accountNo,
+        "loanBalance": lac.loanBalance
+      };
+    } );
     var totalLoans = loanAccounts.reduce(function(sum, account) {
       return sum + account.loanBalance;
     }, 0);
     console.log("Total Loans Bal: " + totalLoans);
     $scope.client.TotalLoans = totalLoans;
+    $scope.client.loanAccounts = lacs;
   } );
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
@@ -335,6 +379,25 @@ angular.module('starter.controllers', [])
     $scope.nextOfKin = cfields;
   } );
 })
+
+.controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts) {
+  var id = $stateParams.id;
+  console.log("SavingsAccountsCtrl for " + id);
+  $scope.data = {};
+  SavingsAccounts.get(id, function(sac) {
+    $scope.data.accountNo = sac.accountNo;
+    $scope.data.productName = sac.savingsProductName;
+    var summary = sac.summary;
+    $scope.data.accountBalance = summary ? summary.accountBalance : 0;
+  } );
+} )
+
+.controller('SATransCtrl', function($scope, $stateParams, SavingsAccounts) {
+  var id = $stateParams.id;
+  SavingsAccounts.get(id, function(sac) {
+    $scope.data.accountNo = sac.accountNo;
+  } );
+} )
 
 .controller('ClientNextOfKinCtrl', function($scope, $stateParams, Clients, DateUtil, DataTables) {
   var clientId = $stateParams.clientId;

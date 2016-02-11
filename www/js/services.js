@@ -16,6 +16,38 @@ angular.module('starter.services', [])
   };
 } )
 
+.factory('Cache', function() {
+  var index = {};
+  return {
+    'get': function(key) {
+      return localStorage.getItem(key);
+    },
+    'getObject': function(key) {
+      var str = localStorage.getItem(key);
+      return JSON.parse(str);
+    },
+    'set': function(key, val) {
+      localStorage.setItem(key, val);
+      index[key] = 1;
+    },
+    'setObject': function(key, obj) {
+      var str = JSON.stringify(obj);
+      localStorage.setItem(key, str);
+      index[key] = 1;
+    },
+    'remove': function(key) {
+      localStorage.removeItem(key);
+      delete index[key];
+    },
+    'clear': function() {
+      for(k in index) {
+        localStorage.removeItem(key);
+      }
+      index = {};
+    }
+  };
+} )
+
 .factory('baseUrl', function(Settings) {
   return Settings.baseUrl;
 } )
@@ -94,6 +126,11 @@ angular.module('starter.services', [])
       console.log("Role String: " + rolesStr);
       localStorage.setItem('roles', rolesStr);
       return roleNames;
+    },
+    getRoles: function() {
+      var rolesStr = localStorage.getItem('roles');
+      var roles = rolesStr.split(',');
+      return roles;
     }
   };
 } )
@@ -136,23 +173,12 @@ angular.module('starter.services', [])
       localStorage.setItem('auth', data);
 
       var roles = Roles.setRoles(data.roles);
-      var role = roles[0];
-      var roleList = Roles.roleList();
-      var roleFound = false;
-      session.rolestat = new Object();
-      for(var i = 1; i < roleList.length; ++i) {
-        if (role == roleList[i]) {
-          roleFound = true;
-        }
-        var rFlag = "is" + roleList[i];
-        console.log("Role " + rFlag + " :: " + roleFound);
-        session.rolestat[rFlag] = roleFound;
-      }
       var roleTabs = {
         'Admin': 'sacco-list',
         'Management': 'staff',
         'Staff': 'clients'
       };
+      var role = roles[0];
       var homeTab = 'tab.' + roleTabs[role];
       console.log("Home tab:"+homeTab);
       
@@ -290,8 +316,13 @@ angular.module('starter.services', [])
 
 .factory('Office', function(authHttp, baseUrl, Settings) {
   return {
-    dateFields: ["joiningDate", "openingDate"],
-    saveFields: ["openingDate", "name", "parentId"],
+    dateFields: function() {
+      return ["joiningDate"];
+    }, // "openingDate"],
+    saveFields: function() {
+      return ["openingDate", "name", "parentId"];
+    },
+    codeFields: function() { return []; },
     prepareForm: function(office) {
       var sfs = this.saveFields;
       for(var i = 0; i < sfs.length; ++i) {
