@@ -58,11 +58,10 @@ angular.module('starter.controllers', [])
 
 .controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables) {
   console.log("SACCO Reg invoked");
+  $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
-    $scope.data = {
-      offices: data,
-      op: "Register"
-    };
+    $scope.data.offices = data;
+    $scope.data.op = "Register";
   } );
   $scope.saveSacco = function(office, sacco) {
     var sfs = Office.saveFields;

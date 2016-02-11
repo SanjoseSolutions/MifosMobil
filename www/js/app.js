@@ -32,8 +32,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $stateProvider
 
   .state('login', {
-    url: '/login',                 /* Simply Testing : NO Major change here */
-    templateUrl: 'templates/login.html',  /* <--- 'templates/login.html' */
+    url: '/login',
+    templateUrl: 'templates/login.html',
     controller: 'AnonCtrl'
   } )
 
