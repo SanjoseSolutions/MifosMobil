@@ -277,7 +277,9 @@ angular.module('starter.controllers', [])
           clients[i].face = img_data;
         } );
       } else {
-        clients[i].face = "img/placeholder-" + clients[i].gender.name.toLowerCase() + ".jpg";
+        var gname = clients[i].gender.name;
+        var glname = gname ? gname.toLowerCase() : 'male';
+        clients[i].face = "img/placeholder-" + glname + ".jpg";
       }
     }
     $scope.clients = clients;
