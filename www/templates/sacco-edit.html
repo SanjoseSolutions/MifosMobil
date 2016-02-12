@@ -1,7 +1,23 @@
 <ion-view view-title="{{data.op}} SACCO">
   <ion-content>
+  <form name="saccoForm" novalidate>
 
     <div class="list">
+      <ion-item>
+        <div ng-hide="saccoForm.name.$pristine">
+          <span class="ion-warn" ng-show="saccoForm.name.$error.required">
+            SACCO Name is required</span>
+          <span class="ion-warn" ng-show="saccoForm.name.$error.minlength">
+            SACCO Name must be at least 3 characters</span>
+        </div>
+        <div ng-show="saccoForm.parentId.$error.required">
+          <span class="ion-warn">SACCO Parent Union is required</span>
+        </div>
+        <div ng-hide="saccoForm.openingDate.$pristine">
+          <span class="ion-warn" ng-show="saccoForm.openingDate.$invalid">SACCO Date Established must be valid date</span>
+          <span class="ion-warn" ng-show="saccoForm.openingDate.$error.required">SACCO Date Established is required</span>
+        </div>
+      </ion-item>
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
@@ -9,44 +25,31 @@
       <ion-list-item class="item item-input-inset">
         <span class="input-label">Sacco Name</span>
         <label class="item-input-wrapper">
-           <input type="text" placeholder="Enter the SACCO's Name" ng-model="office.name">
+           <input type="text" name="name" placeholder="Enter the SACCO's Name" ng-model="office.name" required ng-minlength="3">
         </label>
       </ion-list-item>
 
       <label class="item item-input item-select">
         <div class="input-label">Parent Union: </div>
-        <select ng-options="office.id as office.name for office in data.offices" ng-model="office.parentId">
+        <select name="parentId" ng-options="office.id as office.name
+          for office in data.offices" ng-model="office.parentId" required>
         </select>
-        
-        <!-- select>  
-          <option value="HQ">Head Office</option>
-          <option value="Likasi">Likasi</option>
-          <option value="Wakanda">Wakanda</option>
-          <option value="Undefined" selected>Undefined</option>
-        </select -->
       </label>
 
       <div class="item item-input-inset">
         <span class="input-label">Date Established:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="10" name="DOEstab" placeholder="ex: dd/mm/yyyy" ng-model="office.openingDate">
+          <input name="openingDate" type="date" size="10" name="DOEstab"
+            placeholder="ex: dd/mm/yyyy" ng-model="office.openingDate" required>
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Date of Joining Union:</span>
         <label class="item-input-wrapper">
-          <input type="date" size="9" name="DOJU" placeholder="ex: dd/mm/yyyy" ng-model="sacco.joiningDate">
+          <input type="date" size="9" name="joiningDate"
+            placeholder="ex: dd/mm/yyyy" ng-model="sacco.joiningDate">
         </label>
       </div>
-
-<!-- Original Model Before Ccustomization below#>
-<div class="list">
-  <label class="item item-input item-stacked-label">
-    <span class="input-label">Location</span>
-    <input type="text" placeholder="Latitude ...">
-    <input type="text" placeholder="Longitude ...">
-  </label>
-</div -->
 
       <div class="item item-input-inset">
         <label class="item item-input item-stacked-label">
@@ -68,9 +71,6 @@
 
       <div class="item item-divider"> <!-- input-inset -->
         <span class="input-label">Office Full Address:</span>
-        <!--label class="item-input-wrapper">
-          <input type="text" placeholder="ex: No 237, Commercial Street, C.A.">
-        </label -->
       </div>
 
       <div class="item item-input-inset">
@@ -104,13 +104,17 @@
         </label>
       </div>
 
-  <ion-list-item class="padding">
-  <button class="button button-block button-positive"
-    ng-click="saveSacco(office, sacco)"><h4>Save</h4>
-  </button>
-  </ion-list-item>
+      <ion-list-item class="padding">
+        <span ng-show="message"class="ion-{{message.type}}">{{message.text}}</span>
+        <button class="button button-block button-positive"
+            ng-click="saveSacco(office, sacco)" ng-disabled="saccoForm.$invalid">
+          <h4>Save</h4>
+        </button>
+      </ion-list-item>
 
     </div> <!-- End of List -->
 
+  </form>
   </ion-content>
 </ion-view>
+

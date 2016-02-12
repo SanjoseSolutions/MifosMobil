@@ -24,19 +24,18 @@ Acc No | Saving Acc | Balance | Actions
 
 <ion-view view-title="Client Saving Account Details">
   <ion-content class="padding">
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
     <div class="list card">
       <ion-item>
-        <label> Account No :</label> {{"Unspecified"}}
+        <label>Account No:</label> {{data.accountNo || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label> Account Type :</label> {{"Unspecified"}}
+        <label>Account Type:</label> {{data.productName || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label> Account Balace :</label> {{"Unspecified"}}
+        <label>Account Balance:</label> {{data.accountBalance || "Unspecified"}}
       </ion-item>
       <ion-item class="item-divider">
-        <p class="center"> ACTIONS </p>
+        <p class="center">ACTIONS</p>
       </ion-item>
       <ion-item>
         <p class="center">
@@ -45,9 +44,9 @@ Acc No | Saving Acc | Balance | Actions
         </p>
       </ion-item>
       <ion-item>
-        <button class="button button-block button-dark" ng-click="login(cred)">
+        <a class="button button-block button-dark" href="#/savingsAccount/{{data.accountNo}}/transactions">
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
-        </button>
+        </a>
       </ion-item>
     </div>
 

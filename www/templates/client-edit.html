@@ -96,6 +96,9 @@
           <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.required">Last Name is required</span>
           <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.minlength">Last Name must be at least 3 characters</span>
         </div>
+        <ion-item ng-show="message">
+          <span class="ion-{{message.type}}">{{message.text}}</span>
+        </ion-item>
     	  <button class="button button-block button-positive" 
     		  ng-click="saveClient(client)" ng-disabled="clientEditForm.$invalid">
           <h4>Save</h4>
