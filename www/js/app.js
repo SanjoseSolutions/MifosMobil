@@ -23,6 +23,30 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   });
 })
 
+/*
+
+ .controller('NameOfTheCtrl',function($scope, $ionicPopup) { //, $timeout) {  
+   // A confirm dialog 'PopupCtrl'
+
+   $scope.ConfirmLogOut = function() {
+     var confirmPopup = $ionicPopup.confirm({
+       title: 'Confirm Logout',
+       template: '<strong>No Data Access</strong> if you Logout.\n Do You confirm ?'
+     });
+     confirmPopup.then(function(res) {
+       if(res) {
+        // "logout()" Can be Called here
+         console.log('Logout Confirmed !');
+       } else {
+         console.log('Logout Cancelled !');
+       }
+     });
+   };
+});
+
+*/
+
+
 .config(function($stateProvider, $urlRouterProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states
