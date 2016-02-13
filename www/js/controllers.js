@@ -555,26 +555,21 @@ angular.module('starter.controllers', ['ngCordova'])
 .controller('AccountCtrl', function($scope, authHttp, baseUrl, Session, $ionicPopup) {
   console.log("AccountCtrl invoked");
   $scope.session = Session;
-  // $scope.logout = function() { 
-  // >>>>>> Session.logout();
-    $scope.ConfirmLogOut = function() {
-     var confirmPopup = $ionicPopup.confirm({
-       title: 'Confirm Logout',
-       template: 'You will <strong>loose Access to Data</strong>\n if you Logout.\n Do You confirm ?'
-     });
-     confirmPopup.then(function(res) {
-       if(res) {
+  $scope.ConfirmLogOut = function() {
+    var confirmPopup = $ionicPopup.confirm({
+      title: 'Confirm Logout',
+      template: 'You will <strong>loose Access to Data</strong>\n if you Logout.\n Do You confirm ?'
+    });
+    confirmPopup.then(function(res) {
+      if(res) {
         // "logout()" Can be Called here
         Session.logout();
-         console.log('Logout Confirmed !');
-       } else {
-         console.log('Logout Cancelled !');
-       }
-     });
-   };
-
-
+        console.log('Logout Confirmed !');
+      } else {
+        console.log('Logout Cancelled !');
+      }
+    });
+  };
 
 } )
 ;
-
