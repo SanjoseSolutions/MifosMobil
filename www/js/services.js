@@ -18,6 +18,7 @@ angular.module('starter.services', [])
 
 .factory('Cache', function() {
   var index = {};
+  var lastSync = null;
   return {
     'get': function(key) {
       return localStorage.getItem(key);
@@ -44,6 +45,11 @@ angular.module('starter.services', [])
         localStorage.removeItem(key);
       }
       index = {};
+      lastSync = new Date();
+    },
+    'lastSyncSince': function() {
+      console.log("Cache.lastSyncSince called");
+      return lastSync ? lastSync.toLocaleString() : "Never";
     }
   };
 } )
@@ -136,18 +142,31 @@ angular.module('starter.services', [])
 } )
 
 .factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles',
-    function(baseUrl, authHttp, $http, $state, Roles) {
-  var session = { isOnline: true, role: null };
+    'Cache', function(baseUrl, authHttp, $http, $state, Roles, Cache) {
+
+  var session = { isOnline: true, role: null, loginTime: null };
   session.takeOnline = function() {
     if (!session.isOnline) {
       session.isOnline = true;
     }
   };
 
+  session.lastSyncSince = function() {
+    return Cache.lastSyncSince();
+  };
+
   session.takeOffline = function() {
     if (session.isOnline) {
       session.isOnline = false;
     }
+  };
+
+  session.status = function() {
+    return session.isOnline ? "Online" : "Offline";
+  };
+
+  session.loggedInTime = function() {
+    return session.loginTime ? session.loginTime.toLocaleString() : "Never";
   };
 
   session.login = function(auth, fn_fail) {
@@ -165,6 +184,7 @@ angular.module('starter.services', [])
       'Accept': 'application/json'
     } ).then(function(response) {
 
+      session.loginTime = new Date();
       console.log("Login successful");
       localStorage.setItem('username', auth.username);
 
