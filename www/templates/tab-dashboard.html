@@ -11,6 +11,13 @@ function ConfirmLogOut() {
 }
 </script -->
 
+<style type="text/css">
+table#SavSum tr>td {
+  padding: 3px;
+}
+
+</style>
+
 
 <ion-view view-title="Dashboard">
   <ion-content>
@@ -38,23 +45,64 @@ function ConfirmLogOut() {
           </ion-label>
         </ion-item>
         <ion-item>
-          Your role: <strong>{{session.role}}</strong>
-          <div ng-show="rolestat.isAdmin">
-            Total SACCOs: {{num_saccos}}
-          </div>
-          <div ng-show="rolestat.isManagement">
-            Your Staff: {{num_staff}}
-          </div>
-          <div ng-show="rolestat.isStaff">
-            Your Clients: {{num_clients}}
-          </div>
+          Your role: <strong>{{session.role}}</strong>     
+          <!-- Table Summary -->
+          <table id="SavSum" border="1" style="width:100%">
+          <caption> Your Session Summary </caption>
+          <!-- thead> 
+          <tr> <th title="SI NO"> # </th> </tr>
+          </thead -->
+          <!-- tfoot>
+          <tr> td>Short Report :</td>  </tr>
+          </tfoot -->
+          <tbody>
+          <tr>
+            <td>
+              <div ng-show="rolestat.isAdmin"> Total SACCOs </div>
+            </td>
+            <td> : {{num_saccos}} </td>
+            <td> 
+              <a href="#/tab/saccos" class="button button-small noVertPadd">
+                View
+                <span class="icon ion-ios-briefcase-outline"> </span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div ng-show="rolestat.isManagement"> Your Staff </div>
+            </td>
+            <td> : {{num_staff}} </td>
+            <td> 
+              <a href="#/tab/staff" class="button button-small noVertPadd">
+                View
+                <span class="icon ion-happy-outline"> </span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div ng-show="rolestat.isStaff"> Your Clients</div>
+            </td>
+            <td> : {{num_clients}} </td>
+            <td> 
+              <a href="#/tab/clients" class="button button-small noVertPadd">
+                View
+                <span class="ion-ios-people-outline"> </span>
+              </a>
+            </td>
+          </tr>
+          </tbody>
+          </table>
         </ion-item>
         <ion-item>
           You're {{session.status()}}. 
-          <div ng-hide="session.isOnline">Last synced: {{session.lastSyncSince()}}
-          <button class="button-calm button button-clear button-outline">
+          <div ng-hide="session.isOnline">
+            Last synced: {{session.lastSyncSince()}}
+            <br />
+            <button class="button-calm button button-clear button-outline">
             Sync <span class="ion-ios-loop"></span>
-          </button>
+            </button>
           </div>
         </ion-item>
         <ion-item>

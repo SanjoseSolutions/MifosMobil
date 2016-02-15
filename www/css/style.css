@@ -52,3 +52,7 @@ ion-content {
 .centered {
   text-align: center;
 }
+
+.noVertPadd {
+  padding: 0px 3px;
+}
