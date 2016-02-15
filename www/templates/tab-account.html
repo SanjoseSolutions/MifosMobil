@@ -39,6 +39,9 @@ function ConfirmLogOut() {
         </ion-item>
         <ion-item>
           Your role: <strong>{{session.role}}</strong>
+          <div ng-show="rolestat.isAdmin">
+            Total SACCOs: {{num_saccos}}
+          </div>
           <div ng-show="rolestat.isManagement">
             Your Staff: {{num_staff}}
           </div>

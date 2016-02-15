@@ -369,7 +369,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl, Settings) {
+.factory('Office', function(authHttp, baseUrl, Settings, Cache) {
   return {
     dateFields: function() {
       return ["joiningDate"];
@@ -418,8 +418,14 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
     query: function(fn_offices) {
+      offices = Cache.getObject('offices') || [];
+      if (offices.length) {
+        fn_offices(offices);
+        return;
+      }
       authHttp.get(baseUrl + '/offices').then(function(response) {
         var odata = response.data.sort(function(a, b) { return a.id - b.id } );
+        Cache.setObject('offices', odata);
         fn_offices(odata);
       } );
     }

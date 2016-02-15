@@ -583,6 +583,7 @@ angular.module('starter.controllers', ['ngCordova'])
   var role = session.role;
   switch (role) {
     case "Admin":
+      $scope.num_saccos = Cache.getObject('offices').length;
     case "Management":
       Staff.query(function(staff) {
         $scope.num_staff = staff.length;
