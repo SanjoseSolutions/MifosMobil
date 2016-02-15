@@ -91,6 +91,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   } )
+
   .state('tab.staff', {
     url: '/staff',
     views: {
@@ -109,6 +110,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   } )
+
   .state('tab.clients', {
     url: '/clients',
     views: {
@@ -145,7 +147,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   } )
-
   .state('tab.client-edit', {
     url: '/clients/:clientId/edit',
     views: {
