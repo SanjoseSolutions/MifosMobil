@@ -11,75 +11,77 @@
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
-      <div class="item item-input-inset">
-        <span class="input-label">First Name:</span>
-        <label class="item-input-wrapper">
-          <input type="text" name="firstName" id="firstName" size="50" placeholder="Enter First Name"
-              ng-model="client.firstname" ng-minlength="3" required />
-              <!--pattern=".*[A-Za-z].*"-->
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Last Name:</span>
-        <label class="item-input-wrapper">
-          <input type="text" name="lastName" id="lastName" size="50" placeholder="Enter Last Name"
-              ng-model="client.lastname" ng-minlength="3" required />
-              <!--pattern=".*[A-Za-z].*"-->
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Gender:</span>
-        <label class="item-input-wrapper">
-          <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders">
-          </select>
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Date of Birth:</span>
-        <label class="item-input-wrapper">
-          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Activation Date:</span>
-        <label class="item-input-wrapper">
-          <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Mobile:</span>
-        <label class="item-input-wrapper">
-          <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobileNo">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Office:</span>
-        <label class="item-input-wrapper">
-          <select ng-model="client.officeId" ng-options="o.id as o.name for o in codes.offices">
-          </select>
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Email:</span>
-        <label class="item-input-wrapper">
-          <input type="email" name="email" placeholder="Your Email Address" ng-model="client.Email">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Confirm:</span>
-        <label class="item-input-wrapper">
-          <input type="email" name="emailConf" placeholder="Your Email">
-        </label>
-      </div>
+      <div class="list card">
+        <div class="item item-input-inset">
+          <span class="input-label">First Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="firstName" id="firstName" size="50" placeholder="Enter First Name"
+                ng-model="client.firstname" ng-minlength="3" required />
+                <!--pattern=".*[A-Za-z].*"-->
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Last Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="lastName" id="lastName" size="50" placeholder="Enter Last Name"
+                ng-model="client.lastname" ng-minlength="3" required />
+                <!--pattern=".*[A-Za-z].*"-->
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Gender:</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders">
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Date of Birth:</span>
+          <label class="item-input-wrapper">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Activation Date:</span>
+          <label class="item-input-wrapper">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Mobile:</span>
+          <label class="item-input-wrapper">
+            <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobileNo">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Office:</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.officeId" ng-options="o.id as o.name for o in codes.offices">
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Email:</span>
+          <label class="item-input-wrapper">
+            <input type="email" name="email" placeholder="Your Email Address" ng-model="client.Email">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Confirm:</span>
+          <label class="item-input-wrapper">
+            <input type="email" name="emailConf" placeholder="Your Email">
+          </label>
+        </div>
 
-      <div class="item item-input-inset">
-        <span class="input-label">Occupation:</span>
-        <label class="item-input-wrapper">
-          <select ng-model="client.clientClassificationId" ng-options="o.id as o.name for o in codes.occupations">
-          </select>
-        </label>
-      </div>
-      <div class="item item-input-inset">
+        <div class="item item-input-inset">
+          <span class="input-label">Occupation:</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.clientClassificationId" ng-options="o.id as o.name for o in codes.occupations">
+            </select>
+          </label>
+        </div>
+
+      <!-- div class="item item-input-inset">
         <span class="input-label">Sector:</span>
         <label class="item-input-wrapper">
           <input type="text" size="15" placeholder="Byrathi">
@@ -90,9 +92,10 @@
         <label class="item-input-wrapper">
           <input type="text" size="15" placeholder="Full address" ng-model="client.Address">
         </label>
-      </div>
+      </div  -->
 
       <!-- /ion-list -->
+      </div>
 
       <!-- Here 
       div id="xtraFlds" class="list card"> <!--  ng-show="extraFields" -->
