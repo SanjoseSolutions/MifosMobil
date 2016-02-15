@@ -69,19 +69,24 @@ Acc No | Saving Acc | Balance | Actions
 }
 </style>
 
-<ion-view view-title="Client Saving Details">
+<ion-view view-title="Saving Account Transactions">
   <ion-content class="padding">
+
+    <div>
+      <ion-label>Savings Account #:</ion-label>
+      <span>{{data.accountNo}}</span>
+    </div>
 
     <!-- Table -->
     <table id="SavSum" border="1" style="width:100%">
-    <caption> 2016 Transactions </caption>
+    <caption>Transactions</caption>
     <thead>
     <tr>
-      <th title="SI NO"> # </th>
-      <th title="Date : Year 2016"> Date </th>
+      <th title="Sl No"> # </th>
+      <th title="Date">Date</th>
       <th title="Account Type"> Type </th>
-      <th> Amount </th>
-      <th> Balance </th>
+      <th>Amount</th>
+      <th>Balance</th>
     </tr>
     </thead>
     <!-- tfoot>
@@ -91,33 +96,12 @@ Acc No | Saving Acc | Balance | Actions
     </tr>
     </tfoot -->
     <tbody>
-    <tr>
-      <td> 001 </td>
-      <td> Jan 17 </td>
-      <td>  Basic </td>
-      <td> <span class="icon ion-bitcoin"></span> + 500 </td>
-      <td> 500 </td>
-    </tr>
-    <tr>
-      <td> 002 </td>
-      <td> Feb 07 </td>
-      <td> Basic </td>
-      <td> - 150 </td>
-      <td> _ </td>
-    </tr>
-    <tr>
-      <td> 003 </td>
-      <td> Feb 10 </td>
-      <td> Basic </td>
-      <td> - 70 </td>
-      <td> _ </td>
-    </tr>
-    <tr>
-      <td> 004 </td>
-      <td> Feb 11 </td>
-      <td> Basic </td>
-      <td> + 125 </td>
-      <td> _ </td>
+    <tr ng-repeat="trans in data.transactions">
+      <td>{{trans.id}}</td>
+      <td>{{trans.date[0]}}-{{trans.date[1]}}-{{trans.date[2]}}</td>
+      <td>{{trans.transactionType.value}}</td>
+      <td><span class="icon ion-bitcoin"></span>{{trans.amount}}</td>
+      <td><span class="icon ion-bitcoin"></span>{{trans.runningBalance}}</td>
     </tr>
     </tbody>
     </table>

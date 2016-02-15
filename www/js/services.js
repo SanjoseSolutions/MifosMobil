@@ -233,7 +233,7 @@ angular.module('starter.services', ['ngCordova'] )
 
       var data = response.data;
       console.log("Response: " + JSON.stringify(data));
-      Cache.set('auth', data);
+      Cache.setObject('auth', data);
 
       var roles = Roles.setRoles(data.roles);
       var role = roles[0];
@@ -710,7 +710,7 @@ angular.module('starter.services', ['ngCordova'] )
 .factory('SavingsAccounts', function(authHttp, baseUrl) {
   return {
     get: function(accountNo, fn_sac) {
-      authHttp.get(baseUrl + '/savingsaccounts/' + accountNo)
+      authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
         .then(function(response) {
           fn_sac(response.data);
         } );

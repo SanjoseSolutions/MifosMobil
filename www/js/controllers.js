@@ -408,7 +408,7 @@ angular.module('starter.controllers', ['ngCordova'])
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts) {
   var id = $stateParams.id;
   console.log("SavingsAccountsCtrl for " + id);
-  $scope.data = {};
+  $scope.data = {id: id};
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
     $scope.data.productName = sac.savingsProductName;
@@ -419,8 +419,11 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('SATransCtrl', function($scope, $stateParams, SavingsAccounts) {
   var id = $stateParams.id;
+  console.log("SATransCtrl called with: " + id);
+  $scope.data = {id: id};
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
+    $scope.data.transactions = sac.transactions;
   } );
 } )
 

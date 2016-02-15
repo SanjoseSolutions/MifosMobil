@@ -143,7 +143,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/savingsAccount/:id/transactions',
     views: {
       'tab-clients': {
-        templateUrl: 'templates/savings-details.html',
+        templateUrl: 'templates/savings-transactions-summary.html',
         controller: 'SATransCtrl'
       }
     }
