@@ -91,6 +91,153 @@
           <input type="text" size="15" placeholder="Full address" ng-model="client.Address">
         </label>
       </div>
+
+      <!-- /ion-list -->
+
+      <!-- Here 
+      div id="xtraFlds" class="list card"> <!--  ng-show="extraFields" -->
+      <div class="item item-divider"> <!-- input-inset -->
+        <span class="input-label">Full Address:
+          <button class="button button-small button-positive" ng-click="toggleExtraFields()"
+              title="Click for more Fields">
+            <i class="icon ion-plus-circled"></i>
+          </button>
+        </span>
+      </div>
+
+      <div id="xtraFlds" class="list card" ng-show="extraFields">
+      <div class="item item-input-inset">
+        <span class="input-label">Country :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.Country">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Region :</span>
+        <label class="item-input-wrapper">
+          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="sacco.Region">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Zone :</span>
+        <label class="item-input-wrapper">
+          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="sacco.Zone">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Wereda :</span>
+        <label class="item-input-wrapper">
+          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="sacco.Wereda">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Kebele :</span>
+        <label class="item-input-wrapper">
+          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+        </label>
+      </div>
+      <!-- Family Member Size -->
+      <div class="item item-divider"> 
+          <span class="input-label">Family Size </span>
+      </div>
+
+      <div class="item row">
+      <div class="col">
+        <label class="item-input item-select">
+          <div class="input-label"> Male </div>
+          <select>
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+          </select>
+        </label>
+      </div>
+      <div class="col">
+        <label class="item-input item-select">
+          <div class="input-label"> Female </div>
+          <select>
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+          </select>
+        </label>
+      </div>
+      </div>
+
+      <!-- To Be ignored
+
+      <div class="item item-input-inset">
+        <span class="input-label">Family Members :</span>
+        <label class="item item-input">
+          <span class="input-label">Male 1</span>
+          <input type="tel">
+        </label>
+      </div>
+
+      <div class="item item-input-inset">
+        <span class="input-label">Family Members :</span>
+        <label class="item-input-inset"> Male 2:
+          <input type="number" name="nMale" size="2" ng-maxlength="2">
+          <# placeholder="Enter Region's Name" ng-model="sacco.Region">
+        </label>
+        <label class="item-input-inset"> Female :
+          <input type="number" name="nFemale" size="3">
+        </label>
+      </div-->
+
+      </div>
+
+      <div class="item item-divider"> <!-- input-inset -->
+          <span class="input-label">Next of Kin Details:
+            <button class="button button-small button-positive" ng-click="toggleNextOfKin()"
+              title="Click for more Fields">
+             <i class="icon ion-plus-circled"></i>
+            </button>
+          </span>
+      </div>
+
+      <div id="nxtOfKin" class="list card" ng-show="nextOfKin"> <!-- ng-click="toggleNextOfKin" -->
+        <!-- div class="item item-input-inset">
+          <span class="input-label">Full Name :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Relationship with the Client:</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Father's Name :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Grand Father's Name :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+          </label>
+        </div -->
+        <label class="item item-input">
+          <input type="text" placeholder="Next of Kin Full Name">
+        </label>
+        <label class="item item-input">
+          <input type="text" placeholder="Relationship with the Client">
+        </label>
+        <label class="item item-input">
+          <input type="text" placeholder="Father's Name">
+        </label>
+        <label class="item item-input">
+          <input type="text" placeholder="Grand Father's Name">
+        </label>
+
+      </div>
+
       <ion-item>
         <div ng-hide="clientEditForm.firstName.$pristine">
           <span class="ion-warn" ng-show="clientEditForm.firstName.$warn.required">First Name is required</span>
@@ -103,11 +250,14 @@
         <ion-item ng-show="message">
           <span class="ion-{{message.type}}">{{message.text}}</span>
         </ion-item>
+
     	  <button class="button button-block button-positive" 
     		  ng-click="saveClient(client)" ng-disabled="clientEditForm.$invalid">
           <h4>Save</h4>
     	  </button>
+
       </ion-item>
+
       </ion-list> <!-- End of List -->
     </form>  
   </ion-content>

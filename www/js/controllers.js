@@ -471,6 +471,16 @@ angular.module('starter.controllers', ['ngCordova'])
       }
     } );
   } );
+
+  $scope.toggleExtraFields = function() {
+    $scope.extraFields = $scope.extraFields ? false : true;
+    console.log("AddressExtraFields Display: " + $scope.extraFields);
+  }
+  $scope.toggleNextOfKin = function() {
+    $scope.nextOfKin = $scope.nextOfKin ? false : true;
+    console.log("NextOfKin Display : " + $scope.nextOfKin);
+  }
+
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client);
     console.log("Going to save client: " + JSON.stringify(cfields));
@@ -576,6 +586,7 @@ angular.module('starter.controllers', ['ngCordova'])
     case "Management":
       Staff.query(function(staff) {
         $scope.num_staff = staff.length;
+        console.log("Staff length set:" +staff.length);
       } );
     case "Staff":
       $scope.num_clients = Cache.getObject('clients').length;
@@ -599,4 +610,3 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 ;
-
