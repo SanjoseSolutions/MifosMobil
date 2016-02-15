@@ -185,12 +185,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     }
   } )
 
-  .state('tab.account', {
-    url: '/account',
+  .state('tab.dashboard', {
+    url: '/dashboard',
     views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
+      'tab-dashboard': {
+        templateUrl: 'templates/tab-dashboard.html',
+        controller: 'DashboardCtrl'
       }
     }
   });

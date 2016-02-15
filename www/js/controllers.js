@@ -13,7 +13,7 @@
  *  - ClientDetailCtrl: 
  *  - ClientNextOfKinCtrl:
  *  - ClientEditCtrl: 
- *  - AccountCtrl: 
+ *  - DashboardCtrl: 
  */
 
 angular.module('starter.controllers', ['ngCordova'])
@@ -576,9 +576,9 @@ angular.module('starter.controllers', ['ngCordova'])
   }, function(sus) {} );
 } )
 
-.controller('AccountCtrl', function($scope, authHttp, baseUrl, Cache,
+.controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
     Session, Staff, $ionicPopup) {
-  console.log("AccountCtrl invoked");
+  console.log("DashboardCtrl invoked");
   var session = Session;
   var role = session.role;
   switch (role) {
