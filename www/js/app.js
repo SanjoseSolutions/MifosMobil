@@ -148,6 +148,24 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   } )
+  .state('tab.client-loan', {
+    url: '/loan/:id',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/loan-details.html',
+        controller: 'LoanAccountCtrl'
+      }
+    }
+  } )
+  .state('tab.client-loan-trans', {
+    url: '/loan/:id/transactions',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/loan-transactions-summary.html',
+        controller: 'LoanTransCtrl'
+      }
+    }
+  } )
   .state('tab.client-edit', {
     url: '/clients/:clientId/edit',
     views: {

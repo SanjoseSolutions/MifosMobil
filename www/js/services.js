@@ -730,7 +730,7 @@ angular.module('starter.services', ['ngCordova'] )
 .factory('LoanAccounts', function(authHttp, baseUrl) {
   return {
     get: function(accountNo, fn_account) {
-      authHttp.get(baseUrl + '/loans/' + accountNo)
+      authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
         .then(function(response) {
           fn_account(response.data);
         } );

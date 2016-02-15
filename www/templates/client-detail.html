@@ -110,18 +110,13 @@ label {
 
     <div class="list card">
       <ion-item>
-	       <label>Loans:</label>
-         <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalLoans || "40" }}
-      </ion-item>
-      <ion-item>
-	       <label>Savings:</label>
+	       <label>Savings Accounts:</label>
          <table style="width:95%">
          <tbody>
           <tr ng-repeat="sac in client.savingsAccounts">
+            <td width="30%"><strong>{{sac.productName}}</strong></td>
             <td><a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></td>
             <td><span class="icon ion-social-bitcoin">{{sac.accountBalance}}</span></td>
-            <td><a href="#/tab/savingsAccount/{{sac.id}}">Account</a></td>
             <td><a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></td>
           </tr>
          </tbody>
@@ -129,6 +124,21 @@ label {
          <!--i class="icon ion-social-bitcoin">
          {{client.TotalSavings || "25"}}</i-->
 	    </ion-item>
+      <ion-item>
+	       <label>Loans:</label>
+         <i class="icon ion-social-bitcoin"></i>
+         {{client.TotalLoans || "40" }}
+         <table style="width:95%">
+         <tbody>
+          <tr ng-repeat="lac in client.loanAccounts">
+            <td width="30%"><strong>{{lac.productName}}</strong></td>
+            <td><a href="#/tab/loan/{{lac.id}}">{{lac.accountNo}}</a></td>
+            <td><span class="icon ion-social-bitcoin">{{lac.loanBalance}}</span></td>
+            <td><a href="#/tab/loan/{{lac.id}}/transactions">Transactions</a></td>
+          </tr>
+         </tbody>
+         </table>
+      </ion-item>
       <ion-item>
         <label>Share Holdings:</label>
         {{client.NumShares || "0"}}

@@ -13,13 +13,13 @@ table, th, td {
     border-collapse: collapse;
     font-size: 0.8rem
 }
-table#SavSum th{
+table#LoanSum th{
   border: 1px solid white;
   background-color: black;
   font-style: bold;
   color: white;
 }
-table#SavSum caption   {
+table#LoanSum caption   {
     display: table-caption;
     caption-side: top;
     font-size: 1.2rem;
@@ -78,7 +78,6 @@ Acc No | Saving Acc | Balance | Actions
 
 <ion-view view-title="Client Loans Details">
   <ion-content class="padding">
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
     <!--
     div class="list card">
       <ion-item class="item item-divider">
@@ -93,8 +92,8 @@ Acc No | Saving Acc | Balance | Actions
     </div -->
 
     <!-- Table -->
-    <table id="SavSum" border="1" style="width:100%">
-    <caption> 2016 Transactions </caption>
+    <table id="LoanSum" border="1" style="width:100%">
+    <caption> Transactions </caption>
     <thead>
     <tr>
       <th title="SI NO"> # </th>
@@ -110,34 +109,13 @@ Acc No | Saving Acc | Balance | Actions
       <td>$180 Actual Balance</td>
     </tr>
     </tfoot -->
-    <tbody>
+    <tbody ng-repeat="trans in data.transactions">
     <tr>
-      <td> 001 </td>
-      <td> Jan 23 </td>
-      <td>  Basic </td>
-      <td> <span class="icon ion-bitcoin"></span> - 300 </td>
-      <td> -300 </td>
-    </tr>
-    <tr>
-      <td> 002 </td>
-      <td> Feb 03 </td>
-      <td> Basic </td>
-      <td> - 50 </td>
-      <td> _ </td>
-    </tr>
-    <tr>
-      <td> 003 </td>
-      <td> Feb 14 </td>
-      <td> Basic </td>
-      <td> + 70 </td>
-      <td> _ </td>
-    </tr>
-    <tr>
-      <td> 004 </td>
-      <td> Feb 21 </td>
-      <td> Basic </td>
-      <td> + 150 </td>
-      <td> _ </td>
+      <td>{{trans.id}}</td>
+      <td>{{trans.date[0]}}-{{trans.date[1]}}-{{trans.date[2]}}</td>
+      <td>{{trans.type.value}}</td>
+      <td><span class="icon ion-bitcoin"></span>{{trans.amount}}</td>
+      <td><span class="icon ion-bitcoin"></span>{{trans.outstandingLoanBalance}}</td>
     </tr>
     </tbody>
     </table>

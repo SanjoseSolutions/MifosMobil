@@ -360,6 +360,7 @@ angular.module('starter.controllers', ['ngCordova'])
       return {
         "id": sac.id,
         "accountNo": sac.accountNo,
+        "productName": sac.productName,
         "accountBalance": sac.accountBalance
       };
     } );
@@ -375,6 +376,7 @@ angular.module('starter.controllers', ['ngCordova'])
       return {
         "id": lac.id,
         "accountNo": lac.accountNo,
+        "productName": lac.productName,
         "loanBalance": lac.loanBalance
       };
     } );
@@ -424,6 +426,32 @@ angular.module('starter.controllers', ['ngCordova'])
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
     $scope.data.transactions = sac.transactions;
+  } );
+} )
+
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts) {
+  var id = $stateParams.id;
+  console.log("LoanAccountsCtrl for " + id);
+  $scope.data = {id: id};
+  LoanAccounts.get(id, function(lac) {
+    $scope.data.accountNo = lac.accountNo;
+    $scope.data.productName = lac.loanProductName;
+    $scope.data.principal = lac.principal;
+    var summary = lac.summary;
+    if (summary) {
+      $scope.data.totalOutstanding = summary.totalOutstanding;
+      $scope.data.totalRepayment = summary.totalRepayment;
+    }
+  } );
+} )
+
+.controller('LoanTransCtrl', function($scope, $stateParams, LoanAccounts) {
+  var id = $stateParams.id;
+  console.log("LoanTransCtrl called with: " + id);
+  $scope.data = {id: id};
+  LoanAccounts.get(id, function(lac) {
+    $scope.data.accountNo = lac.accountNo;
+    $scope.data.transactions = lac.transactions;
   } );
 } )
 
