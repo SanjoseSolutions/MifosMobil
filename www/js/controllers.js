@@ -566,10 +566,29 @@ angular.module('starter.controllers', ['ngCordova'])
   }, function(sus) {} );
 } )
 
-.controller('AccountCtrl', function($scope, authHttp, baseUrl, Session) {
+.controller('AccountCtrl', function($scope, authHttp, baseUrl, Session, $ionicPopup) {
   console.log("AccountCtrl invoked");
   $scope.session = Session;
-  $scope.logout = function() { Session.logout(); }
+  // $scope.logout = function() { 
+  // >>>>>> Session.logout();
+    $scope.ConfirmLogOut = function() {
+     var confirmPopup = $ionicPopup.confirm({
+       title: 'Confirm Logout',
+       template: 'You will <strong>lose access to Cached Data</strong>\n if you Logout.\n Are you sure?'
+     });
+     confirmPopup.then(function(res) {
+       if(res) {
+        // "logout()" Can be Called here
+         console.log('Logout Confirmed!');
+         Session.logout();
+       } else {
+         console.log('Logout Cancelled!');
+       }
+     });
+   };
+
+
+
 } )
 ;
 
