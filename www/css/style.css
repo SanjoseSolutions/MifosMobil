@@ -48,3 +48,7 @@ ion-content {
   background-color: #ffdd99;
   padding: 3px 5px;
 }
+
+.centered {
+  text-align: center;
+}
