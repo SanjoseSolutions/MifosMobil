@@ -36,6 +36,14 @@ function ConfirmLogOut() {
           <p>
             <ion-label>Welcome, <strong>{{session.username()}}</strong>!</ion-label>
           </p>
+
+          <p>
+            Logged in since {{session.loggedInTime()}}
+          </p>
+
+          <p>
+            {{session.status()}}. Last synced: {{session.lastSyncSince()}}
+          </p>
           
           <!-- button onclick="myFunction()">Try it</button -->
           <p id="demo"></p>
@@ -46,7 +54,7 @@ function ConfirmLogOut() {
           </button>
         </ion-item>
         <ion-item>
-          <center> Visite : <label> http://live.kmayra.org </label> </center>
+          <center> Visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
         </ion-item>
     <!-- WILL BE USED IN PHASE 2
     	 in one of the Templates
