@@ -5,8 +5,14 @@ navigation history that also transitions its views in and out.
 -->
 <ion-tabs class="tabs-icon-top tabs-color-active-positive">
 
-  <!-- Dashboard Tab -->
-  <ion-tab title="Home" icon-off="ion-ios-home-outline" icon-on="ion-ios-home" href="#/tab/sacco-list"
+  <!-- Home Tab -->
+  <ion-tab title="Home" icon-off="ion-ios-home-outline" icon-on="ion-ios-home" href="#/tab/account" ng-if="rolestat.showAccount">
+    <ion-nav-view name="tab-account"></ion-nav-view>
+  </ion-tab>
+
+  <!-- SACCOs Tab -->
+  <ion-tab title="SACCOs" href="#/tab/sacco-list"
+      icon-on="ion-ios-briefcase" icon-off="ion-ios-briefcase-outline" 
       ng-if="rolestat.isAdmin" ng-show="{{rolestat.isAdmin}}">
     <ion-nav-view name="tab-saccos"></ion-nav-view>
   </ion-tab>
@@ -21,11 +27,6 @@ navigation history that also transitions its views in and out.
   <ion-tab title="Clients" icon-off="ion-ios-people-outline" icon-on="ion-ios-people" href="#/tab/clients"
       ng-if="rolestat.isStaff" ng-show="{{rolestat.isStaff}}">
     <ion-nav-view name="tab-clients"></ion-nav-view>
-  </ion-tab>
-
-  <!-- Account Tab -->
-  <ion-tab title="Account" icon-on="ion-ios-gear" icon-off="ion-ios-gear-outline" href="#/tab/account" ng-if="rolestat.showAccount">
-    <ion-nav-view name="tab-account"></ion-nav-view>
   </ion-tab>
 
 </ion-tabs>

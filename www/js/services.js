@@ -242,6 +242,7 @@ angular.module('starter.services', ['ngCordova'] )
         'Staff': 'clients'
       };
       var role = roles[0];
+      session.role = role;
       var homeTab = 'tab.' + roleTabs[role];
       console.log("Home tab:"+homeTab);
       
@@ -481,15 +482,21 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Staff', function(authHttp, baseUrl) {
+.factory('Staff', function(authHttp, baseUrl, Cache) {
   var staff = [];
   return {
     query: function(fn_staff){
+      staff = Cache.getObject('staff') || [];
+      if (staff.length) {
+        fn_staff(staff);
+        return;
+      }
       authHttp.get(baseUrl + '/staff').then(function(response) {
-        var staff = response.data.sort(function(a, b) {
+        staff = response.data.sort(function(a, b) {
           return a.id - b.id;
         } );
-        console.log("Response data: " + JSON.stringify(staff));
+        console.log("Going to cache " + staff.length + "staff.");
+        Cache.setObject('staff', staff);
         fn_staff(staff);
       } );
     },
