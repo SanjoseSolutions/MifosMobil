@@ -35,10 +35,10 @@ function ConfirmLogOut() {
         <ion-item>
           <ion-label>
             Welcome, <strong>{{session.username()}}</strong>!
-            Your role: <strong>{{session.role}}</strong>
           </ion-label>
         </ion-item>
         <ion-item>
+          Your role: <strong>{{session.role}}</strong>
           <div ng-show="rolestat.isAdmin">
             Total SACCOs: {{num_saccos}}
           </div>
@@ -58,7 +58,9 @@ function ConfirmLogOut() {
           </div>
         </ion-item>
         <ion-item>
-          Logged in <em>@{{session.loggedInTime()}}</em>
+          Logged in <em>@ {{session.loggedInTime()}}</em>
+        </ion-item>
+        <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
             ng-click="ConfirmLogOut()">
               Logout<span class="ion-log-out"></span>
