@@ -452,6 +452,17 @@ angular.module('starter.controllers', ['ngCordova'])
       }
     } );
   } );
+
+  $scope.toggleNextOfKin = function() {
+    $scope.nextOfKin = $scope.nextOfKin ? false : true;
+    console.log("NextOfKin Display : " + $scope.nextOfKin);
+  }
+  $scope.toggleExtraFileds = function() {
+    $scope.extraFields = $scope.extraFields ? false : true;
+    console.log("AddressExtraFields Display: " + $scope.extraFields);
+  }
+
+
   $scope.saveClient = function(client) {
     var cfields = new Object();
     var sf = Clients.saveFields();
