@@ -6,7 +6,7 @@
  *    3. resources: Clients, Staff
  */
 
-angular.module('starter.services', [])
+angular.module('starter.services', ['ngCordova'] )
 
 .factory('Settings', function() {
   return {
@@ -23,25 +23,30 @@ angular.module('starter.services', [])
     'get': function(key) {
       return localStorage.getItem(key);
     },
-    'getObject': function(key) {
-      var str = localStorage.getItem(key);
-      return JSON.parse(str);
-    },
     'set': function(key, val) {
       localStorage.setItem(key, val);
       index[key] = 1;
     },
+    'getObject': function(key) {
+      var str = localStorage.getItem(key);
+      console.log("Got cache item:"+str);
+      return str ? JSON.parse(str) : null;
+    },
     'setObject': function(key, obj) {
       var str = JSON.stringify(obj);
+//      console.log("Cache setObject: " + key + "=" + str);
       localStorage.setItem(key, str);
       index[key] = 1;
     },
     'remove': function(key) {
+//      console.log("Clearing cache item: " + key);
       localStorage.removeItem(key);
       delete index[key];
     },
     'clear': function() {
-      for(k in index) {
+//      console.log("Cache clear called");
+      for(var key in index) {
+//        console.log("Clearing cache item: " + key);
         localStorage.removeItem(key);
       }
       index = {};
@@ -58,7 +63,9 @@ angular.module('starter.services', [])
   return Settings.baseUrl;
 } )
 
-.factory('authHttp', [ '$http', 'Settings', function($http, Settings) {
+.factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache',
+    function($http, Settings, $cordovaNetwork, Cache) {
+
   var authHttp = {};
 
   $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = Settings.tenant;
@@ -85,18 +92,51 @@ angular.module('starter.services', [])
 
   /* Custom headers: POST, PUT */
   angular.forEach(['post', 'put'], function(method) {
-    authHttp[method] = function(url, data, config) {
+    authHttp[method] = function(url, data, config, fn_success, fn_failure) {
       config = config || {};
       config.headers = config.headers || {};
       config.headers["X-Mifos-Platform-TenantId"] = Settings.tenant;
-      return $http[method](url, data, config);
+      if (window.Connection && $cordovaNetwork.isOffline()) {
+        var commands = Cache.getObject('commands');
+        commands.push( {
+          'method': method,
+          'url': url,
+          'data': data,
+          'config': config
+        } );
+        Cache.setObject('commands');
+        if ('put' == method) {
+          console.log("Offline put attempted");
+        } else {
+          console.log("Offline post attempted");
+        }
+        fn_success( {
+          'status': 202,
+          'data': data
+        } );
+      } else {
+        $http[method](url, data, config).then(fn_success, fn_failure);
+      }
     };
   } );
+
+  authHttp.runCommands = function() {
+    var commands = Cache.getObject('commands');
+    for(var i = 0; i < commands.length; ++i) {
+      var cmd = commands[i];
+      var method = cmd['method'];
+      var url = cmd['url'];
+      var data = cmd['data'];
+      var config = cmd['config'];
+      $http[method](url, data, config);
+    }
+    Cache.setObject('commands', []);
+  };
 
   return authHttp;
 } ] )
 
-.factory('Roles', function() {
+.factory('Roles', function(Cache) {
   return {
     roleList: function() {
       return [ 'Super User', 'Admin', 'Management', 'Staff', 'Client' ];
@@ -130,11 +170,11 @@ angular.module('starter.services', [])
       }
       var rolesStr = roleNames.join(",");
       console.log("Role String: " + rolesStr);
-      localStorage.setItem('roles', rolesStr);
+      Cache.set('roles', rolesStr);
       return roleNames;
     },
     getRoles: function() {
-      var rolesStr = localStorage.getItem('roles');
+      var rolesStr = Cache.get('roles');
       var roles = rolesStr.split(',');
       return roles;
     }
@@ -156,9 +196,11 @@ angular.module('starter.services', [])
   };
 
   session.takeOffline = function() {
-    if (session.isOnline) {
-      session.isOnline = false;
-    }
+    session.isOnline = false;
+  };
+
+  session.takeOnline = function() {
+    session.isOnline = true;
   };
 
   session.status = function() {
@@ -186,11 +228,12 @@ angular.module('starter.services', [])
 
       session.loginTime = new Date();
       console.log("Login successful");
-      localStorage.setItem('username', auth.username);
+      Cache.set('username', auth.username);
+      Cache.setObject('commands', []);
 
       var data = response.data;
       console.log("Response: " + JSON.stringify(data));
-      localStorage.setItem('auth', data);
+      Cache.set('auth', data);
 
       var roles = Roles.setRoles(data.roles);
       var roleTabs = {
@@ -199,6 +242,7 @@ angular.module('starter.services', [])
         'Staff': 'clients'
       };
       var role = roles[0];
+      session.role = role;
       var homeTab = 'tab.' + roleTabs[role];
       console.log("Home tab:"+homeTab);
       
@@ -206,7 +250,7 @@ angular.module('starter.services', [])
       console.log("B64 Auth Key:" + b64key);
       authHttp.setAuthHeader(b64key);
 
-      localStorage.setItem('session', JSON.stringify(session));
+      Cache.setObject('session', session);
 
       $state.go(homeTab);
     }, function(response) {
@@ -216,7 +260,7 @@ angular.module('starter.services', [])
 
   session.hasRole = function(r) {
     console.log("Session::hasRole called for :" + r);
-    var roles = localStorage.getItem('roles');
+    var roles = Cache.get('roles');
     console.log("Roles:"+roles+",role:"+r);
     if (roles.indexOf(r) >= 0) {
       return true;
@@ -232,34 +276,20 @@ angular.module('starter.services', [])
     return "ng-hide";
   };
 
-  session.clearRoles = function() {
-    console.log("Clear roles called");
-    var rs = session.rolestat;
-    for(var k in rs) {
-      console.log("Clearing rolestat[" + k + "]");
-      session.rolestat[k] = false;
-    }
-  };
-
   session.logout = function() {
     console.log("Logout attempt");
-    session.clearRoles();
-    localStorage.removeItem('username');
-    localStorage.removeItem('session');
-    localStorage.removeItem('roles');
-    localStorage.removeItem('auth');
-    localStorage.removeItem('clients');
     authHttp.clearAuthHeader();
+    Cache.clear();
     $state.go('login');
   };
 
   session.auth = function() {
-    var auth = localStorage.getItem('auth');
+    var auth = Cache.get('auth');
     return auth;
   };
 
   session.username = function() {
-    return localStorage.getItem('username');
+    return Cache.get('username');
   };
 
   session.isAuthenticated = function() {
@@ -267,7 +297,7 @@ angular.module('starter.services', [])
   };
 
   session.get = function() {
-    return JSON.parse(localStorage.getItem('session'));
+    return Cache.getObject('session');
   };
 
   return session;
@@ -291,7 +321,7 @@ angular.module('starter.services', [])
     update: function(name, id, fields, fn_fields, fn_fail) {
       authHttp.put(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
-      } ).then(function(response) {
+      }, function(response) {
         fn_office(response.data);
       }, function(response) {
         fn_fail(response);
@@ -300,9 +330,13 @@ angular.module('starter.services', [])
     save: function(name, id, fields, fn_fields, fn_fail) {
       authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
-      } ).then(function(response) {
-        console.log("Create " + name + " success. Got: "
-          + JSON.stringify(response.data));
+      }, function(response) {
+        if (202 == response.status) {
+          console.log("Request accepted (server offline)");
+        } else {
+          console.log("Create " + name + " success. Got: "
+            + JSON.stringify(response.data));
+        }
         if (fn_fields !== null) {
           fn_fields(response.data);
         }
@@ -312,6 +346,7 @@ angular.module('starter.services', [])
     }
   };
 } )
+
 .factory('DateUtil', function() {
   return {
     isoDate: function(a_date) {
@@ -350,10 +385,15 @@ angular.module('starter.services', [])
         oField[k] = office[k];
       }
     },
-    save: function(fields, fn_office, fn_fail) {
+    save: function(fields, fn_office, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/offices', fields, {
         "params": { "tenantIdentifier": Settings.tenant }
-      } ).then(function(response) {
+      }, function(response) {
+        if (202 == response.status) {
+          console.log("Create office request accepted");
+          fn_offline(response.data);
+          return;
+        }
         console.log("Create office success. Got: " + JSON.stringify(response.data));
         if (fn_office !== null) {
           fn_office(response.data);
@@ -365,7 +405,7 @@ angular.module('starter.services', [])
     update: function(id, fields, fn_office, fn_fail) {
       authHttp.put(baseUrl + '/offices/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
-      } ).then(function(response) {
+      }, function(response) {
         fn_office(response.data);
       }, function(response) {
         fn_fail(response);
@@ -379,9 +419,21 @@ angular.module('starter.services', [])
     },
     query: function(fn_offices) {
       authHttp.get(baseUrl + '/offices').then(function(response) {
-        var odata = response.data;
+        var odata = response.data.sort(function(a, b) { return a.id - b.id } );
         fn_offices(odata);
       } );
+    }
+  };
+} )
+
+.factory('SACCO_Fields', function(DataTables) {
+  return {
+    dateFields: function() { return ['joiningDate']; },
+    skipFields: function() { return []; },
+    saveFields: function() { return ['joiningDate', 'Country', 'Region', 'Zone', 'Wereda', 'Kebele']; },
+    codeFields: function() { return {}; },
+    get: function(officeId, fn_dtable) {
+      DataTables.get('SACCO_Fields', officeId, fn_dtable);
     }
   };
 } )
@@ -430,13 +482,21 @@ angular.module('starter.services', [])
   };
 } )
 
-.factory('Staff', function(authHttp, baseUrl) {
+.factory('Staff', function(authHttp, baseUrl, Cache) {
   var staff = [];
   return {
     query: function(fn_staff){
+      staff = Cache.getObject('staff') || [];
+      if (staff.length) {
+        fn_staff(staff);
+        return;
+      }
       authHttp.get(baseUrl + '/staff').then(function(response) {
-        var staff = response.data;
-        console.log("Response data: " + JSON.stringify(staff));
+        staff = response.data.sort(function(a, b) {
+          return a.id - b.id;
+        } );
+        console.log("Going to cache " + staff.length + "staff.");
+        Cache.setObject('staff', staff);
         fn_staff(staff);
       } );
     },
@@ -451,23 +511,63 @@ angular.module('starter.services', [])
   }
 } )
 
-.factory('FormHelper', function() {
+.factory('FormHelper', function(DateUtil) {
   return {
-    prepare_entity: function(entity) {
-      var new_ent;
-      console.log("Received entity.");
-      for(var k in entity) {
-        var v = entity[k];
-        if ('Object' === typeof(v)) {
-          entity[k+"Id"] = v.id;
+    prepareForm: function(type, object) {
+      console.log("Called FormHelper.prepareForm " + typeof(object));
+      var rObject = new Object();
+      var sfs = type.saveFields();
+      var cfs = type.codeFields();
+      var dfs = type.dateFields();
+      var dfHash = new Object();
+      for(var i = 0; i < dfs.length; ++i) {
+        dfHash[dfs[i]] = 1;
+      }
+      for(var i = 0; i < sfs.length; ++i) {
+        var k = sfs[i];
+        var fn = cfs[k];
+        var v = object[k];
+        if (fn) {
+          rObject[k] = fn(object);
+        } else if (dfHash[k]) { 
+          rObject[k] = new Date(DateUtil.isoDate(v));
+        } else {
+          rObject[k] = v;
         }
       }
-      return new_ent;
-    }
+      return rObject;
+    },
+    preSaveForm: function(type, object) {
+      console.log("Called FormHelper.preSaveForm with " + typeof(type) + ", " + typeof(object));
+      var sObject = new Object();
+      var skf = type.skipFields();
+      var svf = type.saveFields();
+      var dfs = type.dateFields();
+      var dfHash = new Object();
+      for(var i = 0; i < dfs.length; ++i) {
+        dfHash[dfs[i]] = 1;
+      }
+      for(var i = 0; i < svf.length; ++i) {
+        var k = svf[i];
+        if (skf[k]) {
+          console.log("Skipping field: " + k);
+          continue;
+        }
+        if (dfHash[k]) {
+          var dt = object[k];
+          sObject[k] = dt.toISOString().substr(0, 10);
+        } else {
+          sObject[k] = object[k];
+        }
+      }
+      sObject.dateFormat = "yyyy-MM-dd";
+      sObject.locale = "en";
+      return sObject;
+    },
   };
 } )
 
-.factory('Clients', function(authHttp, baseUrl, Settings) {
+.factory('Clients', function(authHttp, baseUrl, Settings, Cache) {
   var clients = [];
 
   return {
@@ -476,7 +576,10 @@ angular.module('starter.services', [])
     },
     saveFields: function() {
       return [ "dateOfBirth", "activationDate", "firstname", "lastname",
-        "genderId", "mobileNo", "clientClassification", "officeId" ];
+        "genderId", "mobileNo", "clientClassificationId", "officeId" ];
+    },
+    skipFields: function() {
+      return { "officeId": true }
     },
     codeFields: function() {
       return {
@@ -488,35 +591,19 @@ angular.module('starter.services', [])
         }
       }
     },
-    prepareForm: function(client) {
-      var rClient = new Object();
-      var sfs = this.saveFields();
-      var cfs = this.codeFields();
-      for(var i = 0; i < sfs.length; ++i) {
-        var k = sfs[i];
-        var fn = cfs[k];
-        if (fn) {
-          rClient[k] = fn(client);
-        } else {
-          rClient[k] = client[k];
-        }
-      }
-      return rClient;
-    },
-    clear: function() {
-      localStorage.setItem('clients', "[]")
-    },
     query: function(process_clients) {
-      clients = JSON.parse(localStorage.getItem('clients'));
+      clients = Cache.getObject('clients');
       if (clients != null && clients.length) {
+        console.log("Clients.query got cached clients: " + clients);
         process_clients(clients);
       } else {
+        console.log("Clients.query got no cached clients");
         authHttp.get(baseUrl + '/clients')
         .then(function(response) {
           var data = response.data;
           if (data.totalFilteredRecords) {
             var clients = data.pageItems;
-            localStorage.setItem('clients', JSON.stringify(clients));
+            Cache.setObject('clients', clients);
             console.log("Got " + clients.length + " clients");
             process_clients(clients);
           }
@@ -527,7 +614,7 @@ angular.module('starter.services', [])
       clients.splice(clients.indexOf(clients), 1);
     },
     get: function(id, fn_client) {
-      clients = JSON.parse(localStorage.getItem('clients'));
+      clients = Cache.getObject('clients');
       for (var i = 0; i < clients.length; i++) {
         var c = clients[i];
         if (clients[i]["id"] === parseInt(id)) {
@@ -538,7 +625,7 @@ angular.module('starter.services', [])
     save: function(client, fn_client, fn_fail) {
       authHttp.post(baseUrl + '/clients', client, {
         "params": { "tenantIdentifier": Settings.tenant }
-      } ).then(function(response) {
+      }, function(response) {
         console.log("Created client resp: "+JSON.stringify(response.data));
       }, function(response) {
         console.log("Client create failed:"+JSON.stringify(response));
@@ -548,8 +635,9 @@ angular.module('starter.services', [])
     update: function(id, client, fn_client, fn_fail) {
       authHttp.put(baseUrl + '/clients/' + id, client, {
         "params": { "tenantIdentifier": Settings.tenant }
-      } ).then(function(response) {
+      }, function(response) {
         console.log("Update client. Response: " + JSON.stringify(response.data));
+        fn_client(response.data);
       }, function(response) {
         console.log("Update failed!. Response status:" + response.status + "; " + JSON.stringify(response.data));
         fn_fail(response);
@@ -566,7 +654,7 @@ angular.module('starter.services', [])
   };
 } )
 
-.factory('SelfService', function(authHttp, baseUrl) {
+.factory('SelfService', function(authHttp, baseUrl, Cache) {
   return {
     query: function(fn_clients) {
       authHttp.get(baseUrl + '/self/clients').then(function(response) {
@@ -582,7 +670,7 @@ angular.module('starter.services', [])
       clients.splice(clients.indexOf(clients), 1);
     },
     get: function(id, fn_client) {
-      clients = JSON.parse(localStorage.getItem('clients'));
+      clients = Cache.getObject('clients');
       for (var i = 0; i < clients.length; i++) {
         var c = clients[i];
         if (clients[i]["id"] === parseInt(id)) {

@@ -92,19 +92,20 @@
         </label>
       </div>
 
-    <!-- /ion-list -->
+      <!-- /ion-list -->
 
       <!-- Here 
       div id="xtraFlds" class="list card"> <!--  ng-show="extraFields" -->
-        <div class="item item-divider"> <!-- input-inset -->
-          <span class="input-label">Full Address:
-            <button class="button button-small button-positive" ng-click="toggleExtraFileds()"
+      <div class="item item-divider"> <!-- input-inset -->
+        <span class="input-label">Full Address:
+          <button class="button button-small button-positive" ng-click="toggleExtraFields()"
               title="Click for more Fields">
-             <i class="icon ion-plus-circled"></i>
-            </button>
-          </span>
-        </div>
-      <div id="xtraFlds" class="list card"> <!--  ng-show="extraFields" -->
+            <i class="icon ion-plus-circled"></i>
+          </button>
+        </span>
+      </div>
+
+      <div id="xtraFlds" class="list card" ng-show="extraFields">
       <div class="item item-input-inset">
         <span class="input-label">Country :</span>
         <label class="item-input-wrapper">
@@ -137,7 +138,7 @@
       </div>
       <!-- Family Member Size -->
       <div class="item item-divider"> 
-          <span class="input-label">Family Members </span>
+          <span class="input-label">Family Size </span>
       </div>
 
       <div class="item row">
@@ -145,26 +146,27 @@
         <label class="item-input item-select">
           <div class="input-label"> Male </div>
           <select>
-            <option>Blue</option>
-            <option selected>Green</option>
-            <option>Red</option>
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
           </select>
         </label>
       </div>
       <div class="col">
-        <div class="item-input-inset">
-          <label class="item-input-wrapper">
-            <input type="text" size="5" placeholder="Email">
-          </label>
-          <button class="button button-small">
-            Submit
-          </button>
-        </div>
+        <label class="item-input item-select">
+          <div class="input-label"> Female </div>
+          <select>
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+          </select>
+        </label>
       </div>
       </div>
 
-
-
+      <!-- To Be ignored
 
       <div class="item item-input-inset">
         <span class="input-label">Family Members :</span>
@@ -178,12 +180,12 @@
         <span class="input-label">Family Members :</span>
         <label class="item-input-inset"> Male 2:
           <input type="number" name="nMale" size="2" ng-maxlength="2">
-          <!-- placeholder="Enter Region's Name" ng-model="sacco.Region" -->
+          <# placeholder="Enter Region's Name" ng-model="sacco.Region">
         </label>
         <label class="item-input-inset"> Female :
           <input type="number" name="nFemale" size="3">
         </label>
-      </div>
+      </div-->
 
       </div>
 
@@ -196,7 +198,7 @@
           </span>
       </div>
 
-      <div id="nxtOfKin" class="list card"> <!-- ng-show="nextOfKin" ng-click="toggleNextOfKin" -->
+      <div id="nxtOfKin" class="list card" ng-show="nextOfKin"> <!-- ng-click="toggleNextOfKin" -->
         <!-- div class="item item-input-inset">
           <span class="input-label">Full Name :</span>
           <label class="item-input-wrapper">

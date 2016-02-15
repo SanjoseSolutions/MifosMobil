@@ -18,13 +18,14 @@
 
 angular.module('starter.controllers', ['ngCordova'])
 
-.controller('MainCtrl', function($scope, Session) {
+.controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork',
+    function($rootScope, $scope, Session, $cordovaNetwork) {
   console.log("MainCtrl invoked");
   $scope = {
     session: Session
   };
   console.log("Is authenticated: " + $scope.session.isAuthenticated() );
-} )
+} ] )
 
 // With the new view caching in Ionic, Controllers are only called
 // when they are recreated or on app start, instead of every page change.
@@ -62,8 +63,19 @@ angular.module('starter.controllers', ['ngCordova'])
   }
 } )
 
-.controller('TabsCtrl', function($scope, Session, Roles) {
+.controller('TabsCtrl', function($scope, $rootScope, Session,
+    Roles, $cordovaNetwork, authHttp) {
+
   $scope.session = Session.get();
+  $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
+    Session.takeOffline();
+  } );
+
+  $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
+    Session.takeOnline();
+    authHttp.runCommands();
+  } );
+
   $scope.$on('$ionicView.enter', function(e) {
     var rolestat = new Object();
     var roles = Roles.getRoles();
@@ -113,6 +125,11 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.message = {
         "type": "info",
         "text": "Successfully created SACCO: " + new_office.id
+      };
+    }, function(office) {
+      $scope.message = {
+        "type": "info",
+        "text": "Accepted SACCO create request (offline)"
       };
     }, function(response) {
       $scope.message = {
@@ -189,6 +206,11 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.message = {
         "type": "info",
         "text": msg
+      };
+    }, function(data) {
+      $scope.message = {
+        "type": "info",
+        "text": "SACCO Edit request accepted"
       };
     }, function(response) {
       console.log("SACCO edit fail: " + JSON.stringify(response.data));
@@ -270,48 +292,51 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts) {
 
-  SavingsAccounts.query(function(data) {
-    var client_savings = new Object;
-    for(var i = 0; i < data.length; ++i) {
-      var clientId = data[i].clientId;
-      console.log("Client #" + clientId + " account [" + i + "]");
-      var summary = data[i].summary;
-      var balance = summary.accountBalance;
-      var totalSavings = client_savings[clientId] || 0;
-      client_savings[clientId] = totalSavings + balance;
-    }
-    $scope.clientSavings = client_savings;
-  } );
-
-  LoanAccounts.query(function(data) {
-    var client_loans = new Object;
-    console.log("Got " + data.length + " loans");
-    for(var i = 0; i < data.length; ++i) {
-      var loan = data[i];
-      var clientId = loan.clientId;
-      var summary = loan.summary;
-      console.log("Loan summary: " + JSON.stringify(summary));
-      var loanAmt = summary.totalOutstanding;
-      var totalOutstanding = client_loans[clientId] || 0;
-      client_loans[clientId] = totalOutstanding + loanAmt;
-    }
-    $scope.clientOutstanding = client_loans;
-  } );
-
-  Clients.query(function(clients) {
-    for(var i = 0; i < clients.length; ++i) {
-      if (Settings.showClientListFaces) {
-        ClientImages.getB64(clients[i].id, function(img_data) {
-          clients[i].face = img_data;
-        } );
-      } else {
-        var gname = clients[i].gender.name;
-        var glname = gname ? gname.toLowerCase() : 'male';
-        clients[i].face = "img/placeholder-" + glname + ".jpg";
+  $scope.$on('$ionicView.enter', function(e) {
+    SavingsAccounts.query(function(data) {
+      var client_savings = new Object;
+      for(var i = 0; i < data.length; ++i) {
+        var clientId = data[i].clientId;
+        console.log("Client #" + clientId + " account [" + i + "]");
+        var summary = data[i].summary;
+        var balance = summary.accountBalance;
+        var totalSavings = client_savings[clientId] || 0;
+        client_savings[clientId] = totalSavings + balance;
       }
-    }
-    $scope.clients = clients;
+      $scope.clientSavings = client_savings;
+    } );
+
+    LoanAccounts.query(function(data) {
+      var client_loans = new Object;
+      console.log("Got " + data.length + " loans");
+      for(var i = 0; i < data.length; ++i) {
+        var loan = data[i];
+        var clientId = loan.clientId;
+        var summary = loan.summary;
+        console.log("Loan summary: " + JSON.stringify(summary));
+        var loanAmt = summary.totalOutstanding;
+        var totalOutstanding = client_loans[clientId] || 0;
+        client_loans[clientId] = totalOutstanding + loanAmt;
+      }
+      $scope.clientOutstanding = client_loans;
+    } );
+
+    Clients.query(function(clients) {
+      for(var i = 0; i < clients.length; ++i) {
+        if (Settings.showClientListFaces) {
+          ClientImages.getB64(clients[i].id, function(img_data) {
+            clients[i].face = img_data;
+          } );
+        } else {
+          var gname = clients[i].gender.name;
+          var glname = gname ? gname.toLowerCase() : 'male';
+          clients[i].face = "img/placeholder-" + glname + ".jpg";
+        }
+      }
+      $scope.clients = clients;
+    } );
   } );
+
   $scope.remove = function(client) {
     Clients.remove(client);
   };
@@ -435,16 +460,10 @@ angular.module('starter.controllers', ['ngCordova'])
   console.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
   Clients.get(clientId, function(client) {
-    var rClient = Clients.prepareForm(client);
+    var rClient = FormHelper.prepareForm(Clients, client);
     console.log("Got client: " + JSON.stringify(client));
     console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
-
-    var df = Clients.dateFields();
-    for(var i = 0; i < df.length; ++i) {
-      var fld = df[i];
-      $scope.client[fld] = new Date(DateUtil.isoDate(client[fld]));
-    }
     DataTables.get('Client_Fields', clientId, function(cdata) {
       var cfields = cdata[0];
       for(var fld in cfields) {
@@ -453,35 +472,29 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
   } );
 
+  $scope.toggleExtraFields = function() {
+    $scope.extraFields = $scope.extraFields ? false : true;
+    console.log("AddressExtraFields Display: " + $scope.extraFields);
+  }
   $scope.toggleNextOfKin = function() {
     $scope.nextOfKin = $scope.nextOfKin ? false : true;
     console.log("NextOfKin Display : " + $scope.nextOfKin);
   }
-  $scope.toggleExtraFileds = function() {
-    $scope.extraFields = $scope.extraFields ? false : true;
-    console.log("AddressExtraFields Display: " + $scope.extraFields);
-  }
-
 
   $scope.saveClient = function(client) {
-    var cfields = new Object();
-    var sf = Clients.saveFields();
-    for(var i = 0; i < sf.length; ++i) {
-      var fld = sf[i];
-      var val = client[fld];
-      if ('Object' === typeof(val)) {
-        if (val["id"]) {
-          val = val.id;
-        } else {
-          console.log("Client Hash field without id:"+fld);
-          val = "";
-        }
-      }
-      cfields[fld] = val;
-    }
-    console.log("Called saveClient: " + JSON.stringify(cfields));
-    Clients.update(client.id, cfields, function(eclient) {
+    var cfields = FormHelper.preSaveForm(Clients, client);
+    console.log("Going to save client: " + JSON.stringify(cfields));
+    Clients.update(clientId, cfields, function(eclient) {
       console.log("Save client success");
+      $scope.message = {
+        "type": "info",
+        "text": "Client with id #" + eclient.clientId + " saved"
+      };
+    }, function(response) {
+      $scope.message = {
+        "type": "warn",
+        "text": "Client save failed"
+      };
     } );
   };
   var gcode = Codes.getId("Gender");
@@ -563,21 +576,35 @@ angular.module('starter.controllers', ['ngCordova'])
   }, function(sus) {} );
 } )
 
-.controller('AccountCtrl', function($scope, authHttp, baseUrl, Session, $ionicPopup) {
+.controller('AccountCtrl', function($scope, authHttp, baseUrl, Cache,
+    Session, Staff, $ionicPopup) {
   console.log("AccountCtrl invoked");
-  $scope.session = Session;
+  var session = Session;
+  var role = session.role;
+  switch (role) {
+    case "Admin":
+    case "Management":
+      Staff.query(function(staff) {
+        $scope.num_staff = staff.length;
+        console.log("Staff length set:" +staff.length);
+      } );
+    case "Staff":
+      $scope.num_clients = Cache.getObject('clients').length;
+  }
+  $scope.session = session;
   $scope.ConfirmLogOut = function() {
     var confirmPopup = $ionicPopup.confirm({
       title: 'Confirm Logout',
-      template: 'You will <strong>loose Access to Data</strong>\n if you Logout.\n Do You confirm ?'
+      template: 'You will <strong>lose access to Cached Data</strong>' +
+        ' if you Logout.\n Are you sure?'
     });
     confirmPopup.then(function(res) {
       if(res) {
         // "logout()" Can be Called here
+        console.log('Logout Confirmed!');
         Session.logout();
-        console.log('Logout Confirmed !');
       } else {
-        console.log('Logout Cancelled !');
+        console.log('Logout Cancelled!');
       }
     });
   };
