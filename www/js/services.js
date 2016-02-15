@@ -236,15 +236,8 @@ angular.module('starter.services', ['ngCordova'] )
       Cache.set('auth', data);
 
       var roles = Roles.setRoles(data.roles);
-      var roleTabs = {
-        'Admin': 'sacco-list',
-        'Management': 'staff',
-        'Staff': 'clients'
-      };
       var role = roles[0];
       session.role = role;
-      var homeTab = 'tab.' + roleTabs[role];
-      console.log("Home tab:"+homeTab);
       
       var b64key = data.base64EncodedAuthenticationKey;
       console.log("B64 Auth Key:" + b64key);
@@ -252,7 +245,7 @@ angular.module('starter.services', ['ngCordova'] )
 
       Cache.setObject('session', session);
 
-      $state.go(homeTab);
+      $state.go('tab.dashboard');
     }, function(response) {
       fn_fail(response);
     } );
