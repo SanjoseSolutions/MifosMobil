@@ -39,9 +39,12 @@ Acc No | Saving Acc | Balance | Actions
       </ion-item>
       <ion-item>
         <p class="center">
-          <a href="" class="button button-positive"> Deposit </a>
-          <a href="" class="button button-calm"> Withdraw </a>
+          <a href="" class="button button-positive" ng-click="makeDeposit()"> Deposit </a>
+          <a href="" class="button button-calm" ng-click="doWithdrawal()"> Withdraw </a>
         </p>
+      </ion-item>
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
       <ion-item>
         <a class="button button-block button-dark" href="#/savingsAccount/{{data.id}}/transactions">

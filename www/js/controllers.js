@@ -407,7 +407,8 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 })
 
-.controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts) {
+.controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
+    $ionicPopup) {
   var id = $stateParams.id;
   console.log("SavingsAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -417,6 +418,70 @@ angular.module('starter.controllers', ['ngCordova'])
     var summary = sac.summary;
     $scope.data.accountBalance = summary ? summary.accountBalance : 0;
   } );
+  $scope.makeDeposit = function() {
+    $scope.deposit = {};
+    $ionicPopup.show( {
+      title: 'Make a Deposit',
+      template: '<input type="text" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
+        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="deposit.transDate">',
+      scope: $scope,
+      buttons: [ {
+        text: 'Cancel'
+      }, {
+        text: 'Deposit',
+        onTap: function(res) {
+          var params = {
+            transactionAmount: $scope.deposit.transAmount,
+            transactionDate: $scope.deposit.transDate.toISOString().substr(0, 10),
+            locale: 'en',
+            dateFormat: 'yyyy-MM-dd'
+          };
+          console.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
+          SavingsAccounts.deposit(id, params, function(data) {
+            console.log("Deposit successful!");
+            $scope.message = {
+              type: 'info',
+              text: 'Deposit successful!'
+            };
+          }, function(res) {
+            console.log("Depsoit fail ("+ res.status+"): " + JSON.stringify(res.data));
+          } );
+        }
+      } ]
+    } );
+  };
+  $scope.doWithdrawal = function() {
+    $scope.withdrawal = {};
+    $ionicPopup.show( {
+      title: 'Make a Withdrawal',
+      template: '<input type="text" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
+        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="withdrawal.transDate">',
+      scope: $scope,
+      buttons: [ {
+        text: 'Cancel'
+      }, {
+        text: 'Withdraw',
+        onTap: function(res) {
+          var params = {
+            transactionAmount: $scope.withdrawal.transAmount,
+            transactionDate: $scope.withdrawal.transDate.toISOString().substr(0, 10),
+            locale: 'en',
+            dateFormat: 'yyyy-MM-dd'
+          };
+          console.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
+          SavingsAccounts.withdraw(id, params, function(data) {
+            console.log("Withdrawal successful!");
+            $scope.message = {
+              type: 'info',
+              text: 'Withdrawal successful!'
+            };
+          }, function(res) {
+            console.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
+          } );
+        }
+      } ]
+    } );
+  };
 } )
 
 .controller('SATransCtrl', function($scope, $stateParams, SavingsAccounts) {

@@ -723,7 +723,27 @@ angular.module('starter.services', ['ngCordova'] )
           console.log("Got " + data.totalFilteredRecords + " savings accounts.");
           fn_accts(data.pageItems);
         } );
-    }
+    },
+    withdraw: function(id, params, fn_res, fn_err) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=withdrawal',
+        params, {}, function(response) {
+          var data = response.data;
+          fn_res(data);
+        }, function(response) {
+          console.log("Failed to withdraw. Received " + response.status);
+          fn_err(response);
+        } );
+    },
+    deposit: function(id, params, fn_res, fn_err) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=deposit',
+        params, {}, function(response) {
+          var data = response.data;
+          fn_res(data);
+        }, function(response) {
+          console.log("Failed to deposit. Received " + response.status);
+          fn_err(response);
+        } );
+    },
   };
 } )
 
