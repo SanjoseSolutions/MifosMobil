@@ -29,31 +29,25 @@ angular.module('starter.services', ['ngCordova'] )
     },
     'getObject': function(key) {
       var str = localStorage.getItem(key);
-      console.log("Got cache item:"+str);
       return str ? JSON.parse(str) : null;
     },
     'setObject': function(key, obj) {
       var str = JSON.stringify(obj);
-//      console.log("Cache setObject: " + key + "=" + str);
       localStorage.setItem(key, str);
       index[key] = 1;
     },
     'remove': function(key) {
-//      console.log("Clearing cache item: " + key);
       localStorage.removeItem(key);
       delete index[key];
     },
     'clear': function() {
-//      console.log("Cache clear called");
       for(var key in index) {
-//        console.log("Clearing cache item: " + key);
         localStorage.removeItem(key);
       }
       index = {};
       lastSync = new Date();
     },
     'lastSyncSince': function() {
-      console.log("Cache.lastSyncSince called");
       return lastSync ? lastSync.toLocaleString() : "Never";
     }
   };
@@ -104,7 +98,7 @@ angular.module('starter.services', ['ngCordova'] )
           'data': data,
           'config': config
         } );
-        Cache.setObject('commands');
+        Cache.setObject('commands', commands);
         if ('put' == method) {
           console.log("Offline put attempted");
         } else {
@@ -566,8 +560,35 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Clients', function(authHttp, baseUrl, Settings, Cache) {
-  var clients = [];
+.factory('HashUtil', function() {
+  return {
+    isEmpty: function(obj) {
+      for(var k in obj) {
+        if (obj.hasOwnProperty(k)) {
+          return false;
+        }
+      }
+      return true;
+    },
+    copy: function(dest, src) {
+      for(var k in src) {
+        dest[k] = src[k];
+      }
+    },
+    nextKey: function(obj) {
+      var id = 1;
+      for(var k in obj) {
+        if ('T' == k.chatAt(0)) {
+          ++id;
+        }
+      }
+      return "T" + id.toString();
+    }
+  };
+} )
+
+.factory('Clients', function(authHttp, baseUrl, Settings, Cache, HashUtil) {
+  var clients = null;
 
   return {
     dateFields: function() {
@@ -591,52 +612,87 @@ angular.module('starter.services', ['ngCordova'] )
       }
     },
     query: function(process_clients) {
-      clients = Cache.getObject('clients');
-      if (clients != null && clients.length) {
-        console.log("Clients.query got cached clients: " + clients);
-        process_clients(clients);
+      clients = Cache.getObject('h_clients');
+      if (clients) {
+        console.log("Got cached clients: " + typeof(clients));
+        if (!HashUtil.isEmpty(clients)) {
+          console.log("Clients.query got cached clients");
+          var a_clients = [];
+          for(var id in clients) {
+            a_clients.push(clients[id]);
+          }
+          process_clients(a_clients);
+        }
       } else {
         console.log("Clients.query got no cached clients");
         authHttp.get(baseUrl + '/clients')
         .then(function(response) {
           var data = response.data;
           if (data.totalFilteredRecords) {
-            var clients = data.pageItems;
-            Cache.setObject('clients', clients);
-            console.log("Got " + clients.length + " clients");
-            process_clients(clients);
+            var a_clients = data.pageItems;
+            clients = {};
+            for(var i = 0; i < a_clients.length; ++i) {
+              var c = a_clients[i];
+              console.log("Setting client " + c.id + " = " + JSON.stringify(c));
+              clients[c.id] = c;
+            }
+            Cache.setObject('h_clients', clients);
+            console.log("Got " + a_clients.length + " clients");
+            process_clients(a_clients);
           }
         } );
       }
     },
     remove: function(id) {
-      clients.splice(clients.indexOf(clients), 1);
+      delete clients[id];
     },
     get: function(id, fn_client) {
-      clients = Cache.getObject('clients');
-      for (var i = 0; i < clients.length; i++) {
-        var c = clients[i];
-        if (clients[i]["id"] === parseInt(id)) {
-          fn_client(clients[i]);
-        }
+      clients = Cache.getObject('h_clients');
+      if (clients) {
+        console.log("Clients.get found cached " + typeof(clients));
+        console.log("DATA:" + JSON.stringify(clients));
+        var client = clients[id];
+        console.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
+        fn_client(client);
       }
     },
-    save: function(client, fn_client, fn_fail) {
+    save: function(client, fn_client, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/clients', client, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
-        console.log("Created client resp: "+JSON.stringify(response.data));
+        if (202 == response.code) {
+          var id = HashUtil.nextKey();
+          client["id"] = id;
+          clients = Cache.getObject('h_clients') || {};
+          clients[id] = client;
+          Cache.setObject('h_clients', clients);
+          fn_offline(client);
+        } else {
+          console.log("Created client resp: "+JSON.stringify(response.data));
+          var new_client = response.data;
+          fn_client(new_client);
+        }
       }, function(response) {
         console.log("Client create failed:"+JSON.stringify(response));
         fn_fail(response);
       } );
     },
-    update: function(id, client, fn_client, fn_fail) {
+    update: function(id, client, fn_client, fn_offline, fn_fail) {
       authHttp.put(baseUrl + '/clients/' + id, client, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
-        console.log("Update client. Response: " + JSON.stringify(response.data));
-        fn_client(response.data);
+        if (202 == response.code) {
+          clients = Cache.getObject('h_clients');
+          if (clients.hasOwnProperty(id)) {
+            var eClient = clients[id];
+            HashUtil.copy(eClient, client);
+            Cache.setObject('h_clients', clients);
+            fn_offline(eClient);
+          }
+        } else {
+          console.log("Update client. Response: " + JSON.stringify(response.data));
+          fn_client(response.data);
+        }
       }, function(response) {
         console.log("Update failed!. Response status:" + response.status + "; " + JSON.stringify(response.data));
         fn_fail(response);
@@ -669,12 +725,10 @@ angular.module('starter.services', ['ngCordova'] )
       clients.splice(clients.indexOf(clients), 1);
     },
     get: function(id, fn_client) {
-      clients = Cache.getObject('clients');
-      for (var i = 0; i < clients.length; i++) {
-        var c = clients[i];
-        if (clients[i]["id"] === parseInt(id)) {
-          fn_client(clients[i]);
-        }
+      clients = Cache.getObject('h_clients');
+      if (clients.hasOwnProperty(id)) {
+        var c = clients[id];
+        fn_client(c);
       }
     }
   };

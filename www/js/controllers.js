@@ -347,8 +347,7 @@ angular.module('starter.controllers', ['ngCordova'])
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
   $scope.client = {};
-  Clients.get($stateParams.clientId, function(client) {
-    console.log("Got client:"+JSON.stringify(client));
+  Clients.get(clientId, function(client) {
     client["NumShares"] = parseInt(Math.random()*10);
     $scope.client = client;
     $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
@@ -586,6 +585,11 @@ angular.module('starter.controllers', ['ngCordova'])
         "type": "info",
         "text": "Client with id #" + eclient.clientId + " saved"
       };
+    }, function(data) {
+      $scope.message = {
+        "type": "info",
+        "text": "Client edit request accepted"
+      };
     }, function(response) {
       $scope.message = {
         "type": "warn",
@@ -649,6 +653,11 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.message = {
         "type": "info",
         "text": "Client created with id #" + new_client.id
+      };
+    }, function(new_client) {
+      $scope.message = {
+        "type": "info",
+        "text": "Accepted Client create request (offline)"
       };
     }, function(response) {
       $scope.message = {
