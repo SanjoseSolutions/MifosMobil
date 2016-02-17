@@ -1,3 +1,9 @@
+<style>
+.rightbtn {
+  float: right;
+  width: 20%;
+}
+</style>
 <ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
@@ -63,15 +69,21 @@
         <div class="item item-input-inset">
           <span class="input-label">Email:</span>
           <label class="item-input-wrapper">
-            <input type="email" name="email" placeholder="Your Email Address" ng-model="client.Email">
+            <input type="email" name="email" placeholder="Client Email Address" ng-model="client.Client_Fields.Email">
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">Education:</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="email" placeholder="Client Education" ng-model="client.Client_Fields.Education">
+          </label>
+        </div>
+        <!--div class="item item-input-inset">
           <span class="input-label">Confirm:</span>
           <label class="item-input-wrapper">
             <input type="email" name="emailConf" placeholder="Your Email">
           </label>
-        </div>
+        </div-->
 
         <div class="item item-input-inset">
           <span class="input-label">Occupation:</span>
@@ -98,45 +110,44 @@
       </div>
 
       <!-- Here 
-      div id="xtraFlds" class="list card"> <!--  ng-show="extraFields" -->
+      div id="xtraFlds" class="list card"> ng-show="extraFields" -->
       <div class="item item-divider"> <!-- input-inset -->
-        <span class="input-label">Full Address:
-          <button class="button button-small button-positive" ng-click="toggleExtraFields()"
-              title="Click for more Fields">
-            <i class="icon ion-plus-circled"></i>
-          </button>
-        </span>
+        <label>Full Address:</label>
+        <button class="button button-small button-positive rightbtn" ng-click="toggleExtraFields()"
+            title="Click for more Fields">
+          <i class="icon ion-plus-circled"></i>
+        </button>
       </div>
 
       <div id="xtraFlds" class="list card" ng-show="extraFields">
       <div class="item item-input-inset">
         <span class="input-label">Country :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.Country">
+          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="client.Client_Fields.Country">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Region :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="sacco.Region">
+          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="client.Client_Fields.Region">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Zone :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="sacco.Zone">
+          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="client.Client_Fields.Zone">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Wereda :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="sacco.Wereda">
+          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="client.Client_Fields.Wereda">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Kebele :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="client.Client_Fields.Kebele">
         </label>
       </div>
       <!-- Family Member Size -->
@@ -192,12 +203,13 @@
 
       </div>
 
+      <hr>
+
       <div class="item item-divider"> <!-- input-inset -->
-          <span class="input-label">Next of Kin Details:
-            <button class="button button-small button-positive" ng-click="toggleNextOfKin()"
-              title="Click for more Fields">
-             <i class="icon ion-plus-circled"></i>
-            </button>
+          <label>Next of Kin Details:</label>
+          <span class="button button-small button-positive rightbtn" ng-click="toggleNextOfKin()"
+            title="Click for more Fields">
+           <i class="icon ion-plus-circled"></i>
           </span>
       </div>
 
@@ -227,16 +239,22 @@
           </label>
         </div -->
         <label class="item item-input">
-          <input type="text" placeholder="Next of Kin Full Name">
+          <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
         </label>
         <label class="item item-input">
-          <input type="text" placeholder="Relationship with the Client">
+          <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Number">
+        </label>
+        <label class="item item-input-inset">
+          <span class="input-label">Relationship:</span>
+          <select
+            ng-model="client.Client_NextOfKin.Relationship_cd_Relationship" ng-options="r.id as r.name for r in codes.Relationships">
+          </select>
         </label>
         <label class="item item-input">
-          <input type="text" placeholder="Father's Name">
+          <input type="text" placeholder="Father's Name" ng-model="client.Client_NextOfKin['Fathers Name']">
         </label>
         <label class="item item-input">
-          <input type="text" placeholder="Grand Father's Name">
+          <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
         </label>
 
       </div>

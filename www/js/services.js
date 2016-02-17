@@ -292,6 +292,19 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('DataTables', function(authHttp, baseUrl, Settings) {
   return {
+    decode: function(obj) {
+      var ret = new Object();
+      for(var f in obj) {
+        var m = f.match(/(.*)_cd_.*/);
+        var v;
+        if (m) {
+          ret[obj[m[1]]] = obj[f];
+        } else {
+          ret[f] = obj[f];
+        }
+      }
+      return ret;
+    },
     get_meta: function(name, fn_dtable) {
       authHttp.get(baseUrl + '/datatables/' + name).then(function(response) {
         var data = response.data;
@@ -583,6 +596,13 @@ angular.module('starter.services', ['ngCordova'] )
         }
       }
       return "T" + id.toString();
+    },
+    to_a: function(obj) {
+      var a = new Array();
+      for(var k in obj) {
+        a.push(obj[k]);
+      }
+      return a;
     }
   };
 } )
