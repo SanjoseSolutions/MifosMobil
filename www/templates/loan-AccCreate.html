@@ -1,0 +1,147 @@
+<ion-view view-title="Apply for Loan">
+  <ion-content ng-controller="LoansAccCreateCtrl">
+  <form name="loanAccCreateForm" novalidate>
+
+    <div class="list padding">
+
+      <ion-item>
+        <!-- div ng-hide="loanAccCreateForm.name.$pristine">
+          <span class="ion-warn" ng-show="loanAccCreateForm.name.$error.required">
+            SACCO Name is required
+          </span>
+          <span class="ion-warn" ng-show="loanAccCreateForm.name.$error.minlength">
+            SACCO Name must be at least 3 characters
+          </span>
+        </div -->
+        <div ng-show="loanAccCreateForm.productId.$error.required">
+          <span class="ion-warn">Product is required</span>
+        </div>
+        <div ng-hide="loanAccCreateForm.openingDate.$pristine">
+          <span ng-show="loanAccCreateForm.openingDate.$invalid"
+              class="ion-warn">
+
+            Submit Date must be Valid Date
+
+          </span>
+          <span ng-show="loanAccCreateForm.openingDate.$error.required"
+              class="ion-warn">
+            Submit Date is required
+          </span>
+        </div>
+      </ion-item>
+
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
+
+      <ion-item>
+        <label class="item item-input item-select">
+          <div class="input-label">Select Product : </div>
+          <select name="productId" ng-options="product.id as product.name
+            for product in data.products" ng-model="product.productId" required>
+          </select>
+        </label>
+      </ion-item>
+
+      <div class="item item-input-inset">
+        <span class="input-label">Date Submitted:</span>
+        <label class="item-input-wrapper">
+          <input name="openingDate" type="date" placeholder="ex: yyyy-mm-dd"
+            size="10" ng-model="product.openingDate" required>
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Loan Officer :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="20" ng-minlength="3" name="loanOfficer"
+            placeholder="Loan Officer's Name" ng-model="product.loanOfficer">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Loan Purpose :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="20" ng-minlength="3" name="loanPurpose"
+            placeholder="Reason of taking this Loan"
+            ng-model="product.loanPurpose">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Disbursement Date :</span>
+        <label class="item-input-wrapper">
+          <input name="openingDate" type="date" placeholder="ex: yyyy-mm-dd"
+            size="10" ng-model="product.openingDate" required>
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Principal Amount :</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" ng-minlength="3" name="initialDeposit"
+            placeholder="Enter the value" ng-model="data.initialDeposit">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Loan Term :</span>
+        <label class="item-input-wrapper">
+          <input type="tel" size="10" ng-minlength="3" name="initialDeposit"
+            placeholder="Enter the value" ng-model="data.initialDeposit">
+        </label> Months
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">No. of Repayments :</span>
+        <label class="item-input-wrapper">
+          <input type="tel" size="10" ng-minlength="3" name="initialDeposit"
+            placeholder="Enter the value" ng-model="data.initialDeposit">
+        </label>
+      </div>
+
+      <!-- div class="item item-input-inset">
+        <label class="item item-input item-stacked-label">
+          <span class="input-label">Location</span>
+          <div class="row">
+            <div class="col col-50">
+              <label class="item-input-wrapper">
+                <input type="text" size="13" placeholder="Latitude" ng-model="sacco.Latitude">
+              </label>
+            </div>
+            <div class="col col-50">
+              <label class="item-input-wrapper">
+                <input type="text" size="13" placeholder="Longitude" ng-model="sacco.Longitude">
+              </label>
+            </div>
+          </div>
+        </label>
+      </div> < End of item-input-inset -->
+
+      <ion-list-item class="padding">
+        <span ng-show="message"class="ion-{{message.type}}">
+          {{message.text}}
+        </span>
+        <button class="button button-block button-positive"
+            ng-click="loanApply()" ng-disabled="loanAccCreateForm.$invalid">
+          <h4>Save</h4>
+        </button>
+      </ion-list-item>
+
+    </div> <!-- End of List -->
+
+  </form>
+  <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
+  <script id="popup-template.html" type="text/ng-template">
+    <label> Product </label> : <br /><strong>Product Name</strong>
+    <br /><label> Submitted on</label> : Date
+    <br /><label> Loan Officer </label>: 
+    <br /><label> Loan Purpose </label>: 
+    <br /><label> Disbursement Date </label>: 
+    <br /><label> Principal Amount </label>: 
+    
+    
+
+    <br /><label class="text-center"><strong>Interest Details</strong></label>
+    <br /><label>Percentage </label> : %
+    <br /><label> Posting Period</label> : x
+
+    <br /><label> Charges</label> : y.
+  </script>
+  </ion-content>
+</ion-view>
+

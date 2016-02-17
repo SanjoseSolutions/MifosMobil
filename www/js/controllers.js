@@ -406,8 +406,70 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 })
 
+.controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
+    $ionicPopup, $timeout) {
+
+  $scope.savingCreate = function()  {
+    // TO DO :
+    // Check the parameters' list
+    // Insert the appropriate Code here
+    // ------>
+
+    // The Popup is called
+    $scope.data = $scope.product;
+
+    
+    var myPopup = $ionicPopup.show({
+      title: '<strong>Saving Account Creation</strong>',
+      /*
+      cssClass: '', // String, The custom CSS class name
+      subTitle: 'Please use normal things', */
+      /* This Url takes you to a script with the same ID Name in index.html */
+      templateUrl: 'popup-template.html',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled"; // false;
+          }
+        },
+        { text: '<b>Save</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data) {
+              //don't allow the user to close unless the user enters a 'wifi password'
+              e.preventDefault();
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data; // true;
+            }
+          }
+        }
+      ]
+    });
+
+    myPopup.then(function(res) {
+      console.log('Got text:' + '"' + res + '"');
+      console.log('Got text:' + '"' + res.fieldOfficer + '"');
+      console.log('Got text:' + '"' + $scope.data.initialDeposit + '"');
+      
+    });
+
+    $timeout(function() {
+      console.log("Popup TimeOut");
+      myPopup.close(); //close the popup after 15 seconds for some reason
+    }, 15000);
+  
+    // ------ ! -----
+  };
+
+} )
+
+
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup) {
+    $ionicPopup, $timeout) {
   var id = $stateParams.id;
   console.log("SavingsAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -491,6 +553,67 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.data.accountNo = sac.accountNo;
     $scope.data.transactions = sac.transactions;
   } );
+} )
+
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
+    $ionicPopup, $timeout) {
+
+  $scope.loanApply = function()  {
+    // TO DO :
+    // Check the parameters' list
+    // Insert the appropriate Code here
+    // ------>
+
+    // The Popup is called
+    $scope.data = $scope.product;
+
+    
+    var myPopup = $ionicPopup.show({
+      title: '<strong>Loan Application</strong>',
+      /*
+      cssClass: '', // String, The custom CSS class name
+      subTitle: 'Please use normal things', */
+      /* This Url takes you to a script with the same ID Name in index.html */
+      templateUrl: 'popup-template.html',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled"; // false;
+          }
+        },
+        { text: '<b>Save</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data) {
+              //don't allow the user to close unless the user enters a 'wifi password'
+              e.preventDefault();
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data; // true;
+            }
+          }
+        }
+      ]
+    });
+
+    myPopup.then(function(res) {
+      console.log('Got text:' + '"' + res + '"');
+      console.log('Got text:' + '"' + res.fieldOfficer + '"');
+      console.log('Got text:' + '"' + $scope.data.initialDeposit + '"');
+      
+    });
+
+    $timeout(function() {
+      console.log("Popup TimeOut");
+      myPopup.close(); //close the popup after 15 seconds for some reason
+    }, 15000);
+  
+    // ------ ! -----
+  };
+
 } )
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts) {

@@ -34,7 +34,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
   .state('login', {
     url: '/login',
-    templateUrl: 'templates/login.html',
+    templateUrl: 'templates/loan-AccCreate.html', // 'templates/login.html',
     controller: 'AnonCtrl'
   } )
 
