@@ -79,7 +79,6 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.$on('$ionicView.enter', function(e) {
     var rolestat = new Object();
     var roles = Roles.getRoles();
-    console.log("Roles:" + roles.join(','));
     var role = roles[0];
     var roleList = Roles.roleList();
     var roleFound = false;
@@ -560,9 +559,16 @@ angular.module('starter.controllers', ['ngCordova'])
     console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
     DataTables.get('Client_Fields', clientId, function(cdata) {
-      var cfields = cdata[0];
-      for(var fld in cfields) {
-        $scope.client[fld] = cfields[fld];
+      console.log("Client_Fields success");
+      if (cdata.length > 0) {
+        var cfields = cdata[0];
+        $scope.client.Client_Fields = cfields;
+      }
+    } );
+    DataTables.get('Client_NextOfKin', clientId, function(cdata) {
+      if (cdata.length > 0) {
+        var cfields = cdata[0];
+        $scope.client.Client_NextOfKin = cfields;
       }
     } );
   } );
@@ -609,6 +615,11 @@ angular.module('starter.controllers', ['ngCordova'])
   var ocode = Codes.getId("ClientClassification");
   Codes.getValues(ocode, function(ocodes) {
     $scope.codes.occupations = ocodes;
+  } );
+  var rcode = Codes.getId("Relationship");
+  Codes.getValues(rcode, function(rcodes) {
+    console.log("Relationship codes count:"+rcodes.length);
+    $scope.codes.Relationships = rcodes;
   } );
   SACCO.query(function(saccos) {
     $scope.codes.offices = saccos;
@@ -699,20 +710,24 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
-    Session, Staff, $ionicPopup) {
+    Session, Clients, Staff, Office, HashUtil, $ionicPopup) {
   console.log("DashboardCtrl invoked");
   var session = Session;
   var role = session.role;
   switch (role) {
     case "Admin":
-      $scope.num_saccos = Cache.getObject('offices').length;
+      Office.query(function(data) {
+        $scope.num_saccos = data.length;
+      } );
     case "Management":
       Staff.query(function(staff) {
         $scope.num_staff = staff.length;
         console.log("Staff length set:" +staff.length);
       } );
     case "Staff":
-      $scope.num_clients = Cache.getObject('clients').length;
+      Clients.query(function(clients) {
+        $scope.num_clients = clients.length;
+      } );
   }
   $scope.session = session;
   $scope.ConfirmLogOut = function() {
