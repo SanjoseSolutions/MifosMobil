@@ -475,11 +475,11 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     console.log("AddressExtraFields Display: " + $scope.extraFields);
-  }
+  };
   $scope.toggleNextOfKin = function() {
     $scope.nextOfKin = $scope.nextOfKin ? false : true;
     console.log("NextOfKin Display : " + $scope.nextOfKin);
-  }
+  };
 
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client);
@@ -512,6 +512,19 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO) {
+  // x
+  $scope.toggleExtraFields = function() {
+    $scope.extraFields = $scope.extraFields ? false : true;
+    $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
+    console.log("AddressExtraFields Display: " + $scope.extraFields);
+  };
+  $scope.toggleNextOfKin = function() {
+    $scope.nextOfKin = $scope.nextOfKin ? false : true;
+    $scope.extraFields = ($scope.extraFields === true) ? false : false;
+    console.log("NextOfKin Display : " + $scope.nextOfKin);
+  };
+  // y
+
   console.log("Looking to register client");
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
