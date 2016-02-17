@@ -1,3 +1,10 @@
+<style type="text/css">
+  .rightBtn {
+    text-align: right;
+
+  }
+</style>
+
 <ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
@@ -98,10 +105,11 @@
       </div>
 
       <!-- Here 
-      div id="xtraFlds" class="list card"> <!--  ng-show="extraFields" -->
+      div id="xtraFlds" class="list card"> <#  ng-show="extraFields" -->
       <div class="item item-divider"> <!-- input-inset -->
-        <span class="input-label">Full Address:
-          <button class="button button-small button-positive" ng-click="toggleExtraFields()"
+        <span class="input-label text-left">Full Address:
+          <button class="button button-small button-positive text-right"
+              ng-click="toggleExtraFields()"
               title="Click for more Fields">
             <i class="icon ion-plus-circled"></i>
           </button>
