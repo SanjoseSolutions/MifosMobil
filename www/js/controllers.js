@@ -33,7 +33,7 @@ angular.module('starter.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($scope, Session, $cordovaNetwork) {
+.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout) {
   $scope.cred = {};
   console.log("Anon Controller invoked");
   $scope.login = function(auth) {
@@ -52,15 +52,62 @@ angular.module('starter.controllers', ['ngCordova'])
       if (401 == response.status) {
         msg = " Incorrect username/password";
       } else {
-        msg = "Received " + response.status
+        msg = "Received: " + response.status
       }
       $scope.message = {
         "type": "error",
         "text": "Login failed." + msg
       };
     } );
-  }
-} )
+  };
+
+  $scope.resetPass = function() {
+    $scope.data = {};
+
+    // An elaborate, custom popup
+    var myPopup = $ionicPopup.show({
+      title: 'Enter your k-Mayra email ID',
+      template: '<input type="password" ng-model="data.email" placeholder=" Type it here ... ">',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled by User"; // false;
+          }
+        },
+        { text: '<b>Send</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data.email) {
+              console.log("Pressing Send button with an Empty Input");
+              //don't allow the user to close unless the user enters a 'wifi password'
+              e.preventDefault();
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data.email; // true;
+            }
+          }
+        }
+      ]
+    });
+    
+    myPopup.then(function(res) {
+      /*  TODO :
+        - Function to check for Valid Email
+        - Send the Email to the Server for Password Reset
+      */
+      console.log('Got Email ID: ' + '"' + res + '"');
+    });
+
+    $timeout(function() {
+      console.log('Automatically Closing the Popup');
+      myPopup.close(); //close the popup after 15 seconds for some reason
+    }, 15000);
+
+  };
+})
 
 .controller('TabsCtrl', function($scope, Session, Roles) {
   $scope.session = Session.get();
