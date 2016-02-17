@@ -472,14 +472,18 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
   } );
 
+  // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
+    $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
     console.log("AddressExtraFields Display: " + $scope.extraFields);
   };
   $scope.toggleNextOfKin = function() {
     $scope.nextOfKin = $scope.nextOfKin ? false : true;
+    $scope.extraFields = ($scope.extraFields === true) ? false : false;
     console.log("NextOfKin Display : " + $scope.nextOfKin);
   };
+  // y
 
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client);
