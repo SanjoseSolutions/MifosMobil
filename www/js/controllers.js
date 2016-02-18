@@ -417,7 +417,7 @@ angular.module('starter.controllers', ['ngCordova'])
     var myPopup = $ionicPopup.show({
       title: '<strong>Saving Account Creation</strong>',
       /* This Url takes you to a script with the same ID Name in index.html */
-      templateUrl: 'popup-template.html',
+      templateUrl: 'popup-template-html',
       scope: $scope, // null,
       buttons: [
         { text: 'Cancel',
@@ -554,7 +554,7 @@ angular.module('starter.controllers', ['ngCordova'])
     var myPopup = $ionicPopup.show({
       title: '<strong>Loan Application</strong>',
       /* This Url takes you to a script with the same ID Name in index.html */
-      templateUrl: 'popup-template.html',
+      templateUrl: 'popup-template-html',
       scope: $scope, // null,
       buttons: [
         { text: 'Cancel',
