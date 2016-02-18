@@ -130,6 +130,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
+  .state('tab.client-sav-new', {
+    url: '/clients/:id/savings-apply',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/saving-open.html',
+        controller: 'SavingsAccCreateCtrl'
+      }
+    }
+  } )
   .state('tab.client-savings', {
     url: '/savingsAccount/:id',
     views: {
@@ -145,6 +154,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       'tab-clients': {
         templateUrl: 'templates/savings-transactions-summary.html',
         controller: 'SATransCtrl'
+      }
+    }
+  } )
+  .state('tab.client-loan-new', {
+    url: '/clients/:id/loan-apply',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/loan-apply.html',
+        controller: 'LoansAccCreateCtrl'
       }
     }
   } )
