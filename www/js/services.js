@@ -322,7 +322,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.put(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
-        fn_office(response.data);
+        fn_fields(response.data);
       }, function(response) {
         fn_fail(response);
       } );
@@ -630,6 +630,9 @@ angular.module('starter.services', ['ngCordova'] )
           return client.clientClassification.id;
         }
       }
+    },
+    dataTables: function() {
+      return [ "Client_Fields", "Client_NextOfKin" ];
     },
     query: function(process_clients) {
       clients = Cache.getObject('h_clients');

@@ -67,6 +67,8 @@ angular.module('starter.controllers', ['ngCordova'])
     Roles, $cordovaNetwork, authHttp, Codes) {
 
   $scope.session = Session.get();
+  Codes.init();
+
   $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
     Session.takeOffline();
   } );
@@ -92,7 +94,6 @@ angular.module('starter.controllers', ['ngCordova'])
     }
     rolestat.showAccount = true;
     $scope.rolestat = rolestat;
-    Codes.init();
   } );
 } )
 
@@ -621,6 +622,26 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Client save failed"
       };
     } );
+    var cdts = Clients.dataTables();
+    for(var i = 0; i < cdts.length; ++i) {
+      var dt = cdts[i];
+      console.log("Got DATATABLE:" + dt);
+      DataTables.get(cdts[i], clientId, function(dtrows) {
+        if (dtrows.length == 0) {
+          DataTables.save(dt, clientId, client[dt], function(data) {
+            console.log("Added datatables data: " + JSON.stringify(data));
+          }, function(response) {
+            console.log("Failed to add datatables data: " + response.status);
+          } );
+        } else {
+          DataTables.update(dt, clientId, client[dt], function(data) {
+            console.log("Saved datatables data: " + JSON.stringify(data));
+          }, function(response) {
+            console.log("Failed to save datatables data: " + response.status);
+          } );
+        }
+      } );
+    }
   };
   $scope.codes = {};
   SACCO.query(function(saccos) {
@@ -684,6 +705,14 @@ angular.module('starter.controllers', ['ngCordova'])
         "type": "info",
         "text": "Client created with id #" + new_client.id
       };
+      var cdts = Clients.dataTables();
+      for(var i = 0; i < cdts.length; ++i) {
+        DataTables.save(cdts[i], new_client.id, client[cdts[i]], function(data) {
+          console.log("Saved datatables data: " + data);
+        }, function(response) {
+          console.log("Failed to save datatables data: " + response.status);
+        } );
+      }
     }, function(new_client) {
       $scope.message = {
         "type": "info",
