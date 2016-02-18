@@ -412,10 +412,7 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.savingCreate = function()  {
     // TO DO :
     // Check the parameters' list
-    // Insert the appropriate Code here
-    // ------>
 
-    // The Popup is called
     $scope.data = $scope.XYZ; 
     var myPopup = $ionicPopup.show({
       title: '<strong>Saving Account Creation</strong>',
@@ -447,7 +444,8 @@ angular.module('starter.controllers', ['ngCordova'])
 
     myPopup.then(function(res) {
       console.log('Received : ' + '"' + res + '"');
-      console.log('Received : ' + '"' + res.initialDeposit + '"');
+      // Insert the appropriate Code here
+      // to process the Received Data for Saving Account Creation
     });
 
     $timeout(function() {
@@ -551,18 +549,10 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.loanApply = function()  {
     // TO DO :
     // Check the parameters' list
-    // Insert the appropriate Code here
-    // ------>
-
-    // The Popup is called
-    $scope.data = $scope.product;
-
     
+    $scope.data = $scope.XYZ;
     var myPopup = $ionicPopup.show({
       title: '<strong>Loan Application</strong>',
-      /*
-      cssClass: '', // String, The custom CSS class name
-      subTitle: 'Please use normal things', */
       /* This Url takes you to a script with the same ID Name in index.html */
       templateUrl: 'popup-template.html',
       scope: $scope, // null,
@@ -578,7 +568,7 @@ angular.module('starter.controllers', ['ngCordova'])
           type: 'button-positive',
           onTap: function(e) {
             if (!$scope.data) {
-              //don't allow the user to close unless the user enters a 'wifi password'
+              //don't allow the user to close unless the user enters a value
               e.preventDefault();
             } else {
               // Returning a value will cause the promise to resolve with the given value.
@@ -590,20 +580,17 @@ angular.module('starter.controllers', ['ngCordova'])
     });
 
     myPopup.then(function(res) {
-      console.log('Got text:' + '"' + res + '"');
-      console.log('Got text:' + '"' + res.fieldOfficer + '"');
-      console.log('Got text:' + '"' + $scope.data.initialDeposit + '"');
-      
+      console.log('Received : ' + '"' + res + '"');
+      // Insert the appropriate Code here
+      // to process the Received Data for Saving Account Creation
     });
 
     $timeout(function() {
       console.log("Popup TimeOut");
       myPopup.close(); //close the popup after 15 seconds for some reason
     }, 15000);
-  
-    // ------ ! -----
-  };
 
+  };
 } )
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts) {
