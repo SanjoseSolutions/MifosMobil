@@ -416,14 +416,9 @@ angular.module('starter.controllers', ['ngCordova'])
     // ------>
 
     // The Popup is called
-    $scope.data = $scope.product;
-
-    
+    $scope.data = $scope.XYZ; 
     var myPopup = $ionicPopup.show({
       title: '<strong>Saving Account Creation</strong>',
-      /*
-      cssClass: '', // String, The custom CSS class name
-      subTitle: 'Please use normal things', */
       /* This Url takes you to a script with the same ID Name in index.html */
       templateUrl: 'popup-template.html',
       scope: $scope, // null,
@@ -439,8 +434,8 @@ angular.module('starter.controllers', ['ngCordova'])
           type: 'button-positive',
           onTap: function(e) {
             if (!$scope.data) {
-              //don't allow the user to close unless the user enters a 'wifi password'
               e.preventDefault();
+              //don't allow the user to close the popup if empty
             } else {
               // Returning a value will cause the promise to resolve with the given value.
               return $scope.data; // true;
@@ -451,22 +446,17 @@ angular.module('starter.controllers', ['ngCordova'])
     });
 
     myPopup.then(function(res) {
-      console.log('Got text:' + '"' + res + '"');
-      console.log('Got text:' + '"' + res.fieldOfficer + '"');
-      console.log('Got text:' + '"' + $scope.data.initialDeposit + '"');
-      
+      console.log('Received : ' + '"' + res + '"');
+      console.log('Received : ' + '"' + res.initialDeposit + '"');
     });
 
     $timeout(function() {
       console.log("Popup TimeOut");
-      myPopup.close(); //close the popup after 15 seconds for some reason
+      myPopup.close();
     }, 15000);
-  
-    // ------ ! -----
   };
 
 } )
-
 
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
     $ionicPopup, $timeout) {
