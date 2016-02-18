@@ -56,11 +56,11 @@ table#SavSum tr>td {
           <tr> td>Short Report :</td>  </tr>
           </tfoot -->
           <tbody>
-          <tr>
+          <tr ng-show="rolestat.isAdmin">
             <td>
-              <div ng-show="rolestat.isAdmin"> Total SACCOs </div>
+              <div> Total SACCOs: </div>
             </td>
-            <td> : {{num_saccos}} </td>
+            <td> {{num_saccos}} </td>
             <td> 
               <a href="#/tab/saccos" class="button button-small noVertPadd">
                 View
@@ -68,11 +68,11 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
-          <tr>
+          <tr ng-show="rolestat.isManagement">
             <td>
-              <div ng-show="rolestat.isManagement"> Your Staff </div>
+              <div> Your Staff: </div>
             </td>
-            <td> : {{num_staff}} </td>
+            <td> {{num_staff}} </td>
             <td> 
               <a href="#/tab/staff" class="button button-small noVertPadd">
                 View
@@ -80,11 +80,11 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
-          <tr>
+          <tr ng-show="rolestat.isStaff">
             <td>
-              <div ng-show="rolestat.isStaff"> Your Clients</div>
+              <div> Your Clients: </div>
             </td>
-            <td> : {{num_clients}} </td>
+            <td>{{num_clients}} </td>
             <td> 
               <a href="#/tab/clients" class="button button-small noVertPadd">
                 View
@@ -99,10 +99,6 @@ table#SavSum tr>td {
           You're {{session.status()}}. 
           <div ng-hide="session.isOnline">
             Last synced: {{session.lastSyncSince()}}
-            <br />
-            <button class="button-calm button button-clear button-outline">
-            Sync <span class="ion-ios-loop"></span>
-            </button>
           </div>
         </ion-item>
         <ion-item>

@@ -32,8 +32,16 @@
             <span class="ion-warn" ng-show="loginForm.password.$error.required">Password is required</span>
             <span class="ion-warn" ng-show="loginForm.password.$error.minlength">Password must be at least 8 characters</span>
           </div>
-          <button class="button button-block button-calm" ng-click="login(cred)" ng-disabled="loginForm.$invalid">
+          <button class="button button-block button-positive" ng-click="login(cred)"
+              ng-disabled="loginForm.$invalid">
             Login <span class="ion-log-in"></span>
+          </button>
+        </ion-item>
+        <ion-item class="text-center">
+          Forgot your password ?
+          <br />
+          <button class="button button-calm" ng-click="resetPass()">
+            Reset Password <span class="ion-ios-unlocked"></span>
           </button>
         </ion-item>
       </ion-list>
@@ -41,3 +49,5 @@
     </form>
   </ion-content>
 </ion-view>
+
+

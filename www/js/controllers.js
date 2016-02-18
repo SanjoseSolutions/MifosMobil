@@ -34,7 +34,7 @@ angular.module('starter.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($scope, Session, $cordovaNetwork) {
+.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout) {
   $scope.cred = {};
   console.log("Anon Controller invoked");
   $scope.login = function(auth) {
@@ -53,20 +53,69 @@ angular.module('starter.controllers', ['ngCordova'])
       if (401 == response.status) {
         msg = " Incorrect username/password";
       } else {
-        msg = "Received " + response.status
+        msg = "Received: " + response.status
       }
       $scope.message = {
         "type": "error",
         "text": "Login failed." + msg
       };
     } );
-  }
-} )
+  };
+
+  $scope.resetPass = function() {
+    $scope.data = {};
+
+    // An elaborate, custom popup
+    var myPopup = $ionicPopup.show({
+      title: 'Enter your k-Mayra email ID',
+      template: '<input type="password" ng-model="data.email" placeholder=" Type it here ... ">',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled by User"; // false;
+          }
+        },
+        { text: '<b>Send</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data.email) {
+              console.log("Pressing Send button with an Empty Input");
+              //don't allow the user to close unless the user enters a 'wifi password'
+              e.preventDefault();
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data.email; // true;
+            }
+          }
+        }
+      ]
+    });
+    
+    myPopup.then(function(res) {
+      /*  TODO :
+        - Function to check for Valid Email
+        - Send the Email to the Server for Password Reset
+      */
+      console.log('Got Email ID: ' + '"' + res + '"');
+    });
+
+    $timeout(function() {
+      console.log('Automatically Closing the Popup');
+      myPopup.close(); //close the popup after 15 seconds for some reason
+    }, 15000);
+
+  };
+})
 
 .controller('TabsCtrl', function($scope, $rootScope, Session,
-    Roles, $cordovaNetwork, authHttp) {
+    Roles, $cordovaNetwork, authHttp, Codes) {
 
   $scope.session = Session.get();
+  Codes.init();
+
   $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
     Session.takeOffline();
   } );
@@ -405,8 +454,58 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 })
 
+.controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
+    $ionicPopup, $timeout) {
+
+  $scope.savingCreate = function()  {
+    // TO DO :
+    // Check the parameters' list
+
+    $scope.data = $scope.XYZ; 
+    var myPopup = $ionicPopup.show({
+      title: '<strong>Saving Account Creation</strong>',
+      /* This Url takes you to a script with the same ID Name in index.html */
+      templateUrl: 'popup-template-html',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled"; // false;
+          }
+        },
+        { text: '<b>Save</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data) {
+              e.preventDefault();
+              //don't allow the user to close the popup if empty
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data; // true;
+            }
+          }
+        }
+      ]
+    });
+
+    myPopup.then(function(res) {
+      console.log('Received : ' + '"' + res + '"');
+      // Insert the appropriate Code here
+      // to process the Received Data for Saving Account Creation
+    });
+
+    $timeout(function() {
+      console.log("Popup TimeOut");
+      myPopup.close();
+    }, 15000);
+  };
+
+} )
+
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup) {
+    $ionicPopup, $timeout) {
   var id = $stateParams.id;
   console.log("SavingsAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -492,6 +591,56 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
+    $ionicPopup, $timeout) {
+
+  $scope.loanApply = function()  {
+    // TO DO :
+    // Check the parameters' list
+    
+    $scope.data = $scope.XYZ;
+    var myPopup = $ionicPopup.show({
+      title: '<strong>Loan Application</strong>',
+      /* This Url takes you to a script with the same ID Name in index.html */
+      templateUrl: 'popup-template-html',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled"; // false;
+          }
+        },
+        { text: '<b>Save</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data) {
+              //don't allow the user to close unless the user enters a value
+              e.preventDefault();
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data; // true;
+            }
+          }
+        }
+      ]
+    });
+
+    myPopup.then(function(res) {
+      console.log('Received : ' + '"' + res + '"');
+      // Insert the appropriate Code here
+      // to process the Received Data for Saving Account Creation
+    });
+
+    $timeout(function() {
+      console.log("Popup TimeOut");
+      myPopup.close(); //close the popup after 15 seconds for some reason
+    }, 15000);
+
+  };
+} )
+
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts) {
   var id = $stateParams.id;
   console.log("LoanAccountsCtrl for " + id);
@@ -553,6 +702,20 @@ angular.module('starter.controllers', ['ngCordova'])
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
+  $scope.$on('$ionicView.enter', function(e) {
+    Codes.getValues("Gender", function(gcodes) {
+      console.log("Got gender codes: " + JSON.stringify(gcodes))
+      $scope.codes.genders = gcodes;
+    } );
+    Codes.getValues("ClientClassification", function(ocodes) {
+      console.log("Got occupation codes: " + JSON.stringify(ocodes))
+      $scope.codes.occupations = ocodes;
+    } );
+    Codes.getValues("Relationship", function(rcodes) {
+      console.log("Relationship codes count:"+rcodes.length);
+      $scope.codes.Relationships = rcodes;
+    } );
+  } );
   Clients.get(clientId, function(client) {
     var rClient = FormHelper.prepareForm(Clients, client);
     console.log("Got client: " + JSON.stringify(client));
@@ -606,21 +769,28 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Client save failed"
       };
     } );
+    var cdts = Clients.dataTables();
+    for(var i = 0; i < cdts.length; ++i) {
+      var dt = cdts[i];
+      console.log("Got DATATABLE:" + dt);
+      DataTables.get(cdts[i], clientId, function(dtrows) {
+        if (dtrows.length == 0) {
+          DataTables.save(dt, clientId, client[dt], function(data) {
+            console.log("Added datatables data: " + JSON.stringify(data));
+          }, function(response) {
+            console.log("Failed to add datatables data: " + response.status);
+          } );
+        } else {
+          DataTables.update(dt, clientId, client[dt], function(data) {
+            console.log("Saved datatables data: " + JSON.stringify(data));
+          }, function(response) {
+            console.log("Failed to save datatables data: " + response.status);
+          } );
+        }
+      } );
+    }
   };
-  var gcode = Codes.getId("Gender");
   $scope.codes = {};
-  Codes.getValues(gcode, function(gcodes) {
-    $scope.codes.genders = gcodes;
-  } );
-  var ocode = Codes.getId("ClientClassification");
-  Codes.getValues(ocode, function(ocodes) {
-    $scope.codes.occupations = ocodes;
-  } );
-  var rcode = Codes.getId("Relationship");
-  Codes.getValues(rcode, function(rcodes) {
-    console.log("Relationship codes count:"+rcodes.length);
-    $scope.codes.Relationships = rcodes;
-  } );
   SACCO.query(function(saccos) {
     $scope.codes.offices = saccos;
   }, function(sus) {} );
@@ -682,6 +852,14 @@ angular.module('starter.controllers', ['ngCordova'])
         "type": "info",
         "text": "Client created with id #" + new_client.id
       };
+      var cdts = Clients.dataTables();
+      for(var i = 0; i < cdts.length; ++i) {
+        DataTables.save(cdts[i], new_client.id, client[cdts[i]], function(data) {
+          console.log("Saved datatables data: " + data);
+        }, function(response) {
+          console.log("Failed to save datatables data: " + response.status);
+        } );
+      }
     }, function(new_client) {
       $scope.message = {
         "type": "info",
@@ -695,13 +873,11 @@ angular.module('starter.controllers', ['ngCordova'])
       };
     } );
   };
-  var gcode = Codes.getId("Gender");
   $scope.codes = {};
-  Codes.getValues(gcode, function(gcodes) {
+  Codes.getValues("Gender", function(gcodes) {
     $scope.codes.genders = gcodes;
   } );
-  var ocode = Codes.getId("ClientClassification");
-  Codes.getValues(ocode, function(ocodes) {
+  Codes.getValues("ClientClassification", function(ocodes) {
     $scope.codes.occupations = ocodes;
   } );
   SACCO.query(function(saccos) {
