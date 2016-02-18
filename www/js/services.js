@@ -670,7 +670,6 @@ angular.module('starter.services', ['ngCordova'] )
       clients = Cache.getObject('h_clients');
       if (clients) {
         console.log("Clients.get found cached " + typeof(clients));
-        console.log("DATA:" + JSON.stringify(clients));
         var client = clients[id];
         console.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
         fn_client(client);
@@ -851,28 +850,62 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Codes', function(authHttp, baseUrl) {
+.factory('Codes', function(authHttp, baseUrl, Cache) {
   var codeNames = {
     "Gender": 4,
     "ClientClassification": 17,
     "Relationship": 26
   };
+
+  var codesObj = {
+    getValues: function(codename, fn_codevalues) {
+      var code = codeNames[codename];
+      var h_codevalues = Cache.getObject('h_codevalues') || {};
+      if (h_codevalues && h_codevalues.hasOwnProperty(code)) {
+        fn_codevalues(h_codevalues[code]);
+      } else {
+        authHttp.get(baseUrl + '/codes/' + code + '/codevalues')
+          .then(function(response) {
+            var codeValues = response.data;
+            console.log("Got code response: " + JSON.stringify(codeValues));
+            h_codevalues[code] = codeValues;
+            Cache.setObject('h_codevalues', h_codevalues);
+            fn_codevalues(codeValues);
+          }, function(response) {
+            console.log("Failed to get codes:" + response.status);
+          } );
+      }
+    }
+  };
+
   return {
+    getValues: function(codename, fn_codevalues) {
+      codesObj.getValues(codename, fn_codevalues);
+    },
+    init: function() {
+      authHttp.get(baseUrl + '/codes')
+        .then(function(response) {
+          var codes = response.data;
+          for(var i = 0; i < codes.length; ++i) {
+            var code = codes[i];
+            var cname = code.name;
+            if (codeNames.hasOwnProperty(cname)) {
+              var cid = code.id;
+              if (codeNames[cname] != cid) {
+                codeNames[cname] = cid;
+              }
+              var h_codevalues = {};
+              codesObj.getValues(cname, function(codeValues) {} );
+            }
+          }
+        } );
+    },
     getId: function(codeNm) {
       var cid = codeNames[codeNm];
       if (cid != null) {
         return cid;
       }
       return 0;
-    },
-    getValues: function(code, fn_codevalues) {
-      authHttp.get(baseUrl + '/codes/' + code + '/codevalues')
-        .then(function(response) {
-          console.log("Got code response");
-          fn_codevalues(response.data);
-        }, function(response) {
-          console.log("Failed to get codes:" + response.status);
-        } );
     }
   };
 } )
