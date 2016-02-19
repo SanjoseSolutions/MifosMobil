@@ -1,8 +1,19 @@
+<style type="text/css">
+  .Notice {
+    font-size: 0.9rem;
+    font-family: verdana;
+    font-style: italic;
+  }
+</style>
 <ion-view view-title="{{data.op}} SACCO">
   <ion-content>
   <form name="saccoForm" novalidate>
 
     <div class="list">
+      <div class="Notice">
+          <sup><i class="icon ion-asterisk assertive"></i></sup>
+          : Mandatory fields
+      </div>
       <ion-item>
         <div ng-hide="saccoForm.name.$pristine">
           <span class="ion-warn" ng-show="saccoForm.name.$error.required">
@@ -23,21 +34,30 @@
       </ion-item>
 
       <ion-list-item class="item item-input-inset">
-        <span class="input-label">Sacco Name</span>
+        <span class="input-label">
+          Sacco Name
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </span>
         <label class="item-input-wrapper">
            <input type="text" name="name" placeholder="Enter the SACCO's Name" ng-model="office.name" required ng-minlength="3">
         </label>
       </ion-list-item>
 
       <label class="item item-input item-select">
-        <div class="input-label">Parent Union: </div>
+        <div class="input-label">
+          Parent Union 
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </div>
         <select name="parentId" ng-options="office.id as office.name
           for office in data.offices" ng-model="office.parentId" required>
         </select>
       </label>
 
       <div class="item item-input-inset">
-        <span class="input-label">Date Established:</span>
+        <span class="input-label">
+          Date Established
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </span>
         <label class="item-input-wrapper">
           <input name="openingDate" type="date" size="10" name="DOEstab"
             placeholder="ex: dd/mm/yyyy" ng-model="office.openingDate" required>

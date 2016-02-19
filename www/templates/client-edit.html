@@ -1,9 +1,15 @@
-<style>
+<style type="text/css">
 .rightbtn {
   float: right;
   width: 20%;
 }
+.Notice {
+    font-size: 0.9rem;
+    font-family: verdana;
+    font-style: italic;
+}
 </style>
+
 <ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
@@ -14,12 +20,19 @@
   <ion-content class="padding">
     <form name="clientEditForm" novalidate>
     <ion-list>
+      <div class="Notice">
+          <sup><i class="icon ion-asterisk assertive"></i></sup>
+          : Mandatory fields
+      </div>
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
       <div class="list card">
         <div class="item item-input-inset">
-          <span class="input-label">First Name:</span>
+          <span class="input-label">
+            First Name
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
           <label class="item-input-wrapper">
             <input type="text" name="firstName" id="firstName" size="50" placeholder="Enter First Name"
                 ng-model="client.firstname" ng-minlength="3" required />
@@ -27,7 +40,10 @@
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Last Name:</span>
+          <span class="input-label">
+            Last Name
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
           <label class="item-input-wrapper">
             <input type="text" name="lastName" id="lastName" size="50" placeholder="Enter Last Name"
                 ng-model="client.lastname" ng-minlength="3" required />
@@ -48,7 +64,10 @@
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Activation Date:</span>
+          <span class="input-label">
+            Activation Date
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
           <label class="item-input-wrapper">
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
           </label>
@@ -60,7 +79,10 @@
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Office:</span>
+          <span class="input-label">
+            Office
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
           <label class="item-input-wrapper">
             <select ng-model="client.officeId" ng-options="o.id as o.name for o in codes.offices">
             </select>
@@ -109,7 +131,7 @@
       <!-- /ion-list -->
       </div>
 
-      <!-- Here 
+      <!-- Here   
       div id="xtraFlds" class="list card"> ng-show="extraFields" -->
       <div class="item item-divider"> <!-- input-inset -->
         <label>Full Address:</label>
