@@ -369,7 +369,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl, Settings, Cache) {
+.factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil) {
   return {
     dateFields: function() {
       return ["joiningDate"];
@@ -391,7 +391,13 @@ angular.module('starter.services', ['ngCordova'] )
       }, function(response) {
         if (202 == response.status) {
           console.log("Create office request accepted");
-          fn_offline(response.data);
+          var offices = Cache.getObject('h_offices');
+          var k = HashUtil.nextKey(offices);
+          var new_office = new Object();
+          HashUtil.copy(new_office, fields);
+          offices[k] = new_office;
+          Cache.setObject('h_offices', offices);
+          fn_offline(new_office);
           return;
         }
         console.log("Create office success. Got: " + JSON.stringify(response.data));
@@ -402,30 +408,45 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
-    update: function(id, fields, fn_office, fn_fail) {
+    update: function(id, fields, fn_office, fn_fail, fn_offline) {
       authHttp.put(baseUrl + '/offices/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
+        if (202 == response.status) {
+          if (fn_offline) {
+            var offices = Cache.getObject('h_offices');
+            if (offices[id]) {
+              HashUtil.copy(offices[id], fields);
+            }
+            Cache.setObject('h_offices', offices);
+            fn_offline(office);
+          }
+        }
         fn_office(response.data);
       }, function(response) {
         fn_fail(response);
       } );
     },
     get: function(id, fn_office) {
+      var offices = Cache.getObject('h_offices') || {};
+      if (office[id]) {
+        fn_office(office[id]);
+        return;
+      }
       authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
         var odata = response.data;
         fn_office(odata);
       } );
     },
     query: function(fn_offices) {
-      offices = Cache.getObject('offices') || [];
+      var offices = Cache.getObject('h_offices') || {};
       if (offices.length) {
         fn_offices(offices);
         return;
       }
       authHttp.get(baseUrl + '/offices').then(function(response) {
         var odata = response.data.sort(function(a, b) { return a.id - b.id } );
-        Cache.setObject('offices', odata);
+        Cache.setObject('h_offices', HashUtil.from_a(odata));
         fn_offices(odata);
       } );
     }
@@ -575,6 +596,13 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('HashUtil', function() {
   return {
+    from_a: function(a) {
+      var obj = new Object();
+      for(var i = 0; i < a.length; ++i) {
+        obj[a[i].id] = a[i];
+      }
+      return obj;
+    },
     isEmpty: function(obj) {
       for(var k in obj) {
         if (obj.hasOwnProperty(k)) {
