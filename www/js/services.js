@@ -430,8 +430,8 @@ angular.module('starter.services', ['ngCordova'] )
     },
     get: function(id, fn_office) {
       var offices = Cache.getObject('h_offices') || {};
-      if (office[id]) {
-        fn_office(office[id]);
+      if (offices[id]) {
+        fn_office(offices[id]);
         return;
       }
       authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
