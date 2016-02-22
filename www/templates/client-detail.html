@@ -111,6 +111,9 @@ label {
     <div class="list card">
       <ion-item>
 	       <label>Savings Accounts:</label>
+         <span ng-hide="client.savingsAccounts">(None)</span>
+          <a href="#/tab/clients/{{client.id}}/savings-apply" class="button">
+          Apply</a>
          <table style="width:95%">
          <tbody>
           <tr ng-repeat="sac in client.savingsAccounts">
@@ -126,8 +129,9 @@ label {
 	    </ion-item>
       <ion-item>
 	       <label>Loans:</label>
-         <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalLoans || "40" }}
+         <span ng-hide="client.loanAccounts.length">(None)</span>
+        <a href="#/tab/clients/{{client.id}}/loan-apply" class="button">
+          Apply</a>
          <table style="width:95%">
          <tbody>
           <tr ng-repeat="lac in client.loanAccounts">
