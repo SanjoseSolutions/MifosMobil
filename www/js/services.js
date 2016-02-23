@@ -99,11 +99,7 @@ angular.module('starter.services', ['ngCordova'] )
           'config': config
         } );
         Cache.setObject('commands', commands);
-        if ('put' == method) {
-          console.log("Offline put attempted");
-        } else {
-          console.log("Offline post attempted");
-        }
+        console.log("Offline " + method + " attempted");
         fn_success( {
           'status': 202,
           'data': data
@@ -175,8 +171,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles',
-    'Cache', function(baseUrl, authHttp, $http, $state, Roles, Cache) {
+.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles', 'Cache', 
+    'Codes', function(baseUrl, authHttp, $http, $state, Roles, Cache, Codes) {
 
   var session = { isOnline: true, role: null, loginTime: null };
   session.takeOnline = function() {
@@ -238,6 +234,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.setAuthHeader(b64key);
 
       Cache.setObject('session', session);
+      Codes.init();
 
       $state.go('tab.dashboard');
     }, function(response) {

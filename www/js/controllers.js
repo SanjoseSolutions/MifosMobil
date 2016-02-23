@@ -111,10 +111,9 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('TabsCtrl', function($scope, $rootScope, Session,
-    Roles, $cordovaNetwork, authHttp, Codes) {
+    Roles, $cordovaNetwork, authHttp) {
 
   $scope.session = Session.get();
-  Codes.init();
 
   $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
     Session.takeOffline();
