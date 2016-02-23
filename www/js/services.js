@@ -440,7 +440,8 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
     query: function(fn_offices) {
-      var offices = Cache.getObject('h_offices') || {};
+      var h_offices = Cache.getObject('h_offices') || {};
+      var offices = HashUtil.to_a(h_offices);
       if (offices.length) {
         fn_offices(offices);
         return;
@@ -468,9 +469,9 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('SACCO', function(Office) {
   return {
-    query: function(fn_saccos, fn_sus) {
+    query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
-        var sus = [];
+        var sunions = [];
         var po = new Object();
         var saccos = [];
         for(var i = 0; i < data.length; ++i) {
@@ -478,7 +479,7 @@ angular.module('starter.services', ['ngCordova'] )
             continue;
           }
           if (data[i].parentId == 1) {
-            sus.push(data[i]);
+            sunions.push(data[i]);
             po[data[i].id] = data[i].parentId;
           } else {
             var parentId = data[i].parentId;
@@ -489,8 +490,8 @@ angular.module('starter.services', ['ngCordova'] )
           }
         }
         fn_saccos(saccos);
-        if (fn_sus) {
-          fn_sus(sus);
+        if (fn_sunions) {
+          fn_sunions(sunions);
         }
       } );
     },
