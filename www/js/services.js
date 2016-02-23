@@ -874,11 +874,39 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('Shares', function(authHttp, baseUrl) {
   return {
+    url: baseUrl + '/account/share',
     get: function(clientId, fn_shares) {
       console.log("Shares called for:"+clientId);
     },
     query: function(fn_shares) {
       console.log("Shares called");
+    },
+    save: function(sfields, fn_shares, fn_offline, fn_fail) {
+      authHttp.post(this.url, sfields, {},
+        function(response) {
+          console.log("Successfully created share");
+          var share = response.data;
+          if (response.status == 202) {
+            fn_offline(response);
+            return;
+          }
+          fn_shares(share);
+        },
+        function(err_resp) {
+          console.log("Failed to create shares");
+        } );
+    },
+    update: function(id, sfields, fn_shares, fn_offline, fn_fail) {
+      authHttp.put(this.url + id, sfields, {}, function(response) {
+        if (202 == response.status) {
+          fn_offline(response);
+          return;
+        }
+        console.log("share update success");
+        fn_shares(response.data);
+      }, function(response) {
+        console.log("share update fail");
+      } );
     }
   };
 } )

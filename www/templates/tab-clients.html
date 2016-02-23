@@ -10,8 +10,8 @@
         <img ng-src="{{client.face}}">
         <h2 style="padding-left:10px;">#{{client.id}}: {{client.displayName}}</h2>
         <p style="padding-left:10px;"> <!-- {{client.fullname}} -->
-        	Loans: {{clientOutstanding[client.id] || 40}} |
-	        Savings: {{clientSavings[client.id] || 0}}
+          Loans: {{clientOutstanding[client.id] || "NONE"}} |
+          Savings: {{clientSavings[client.id] || "NONE"}}
 	      </p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
