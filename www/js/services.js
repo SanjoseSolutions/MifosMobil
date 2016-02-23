@@ -895,17 +895,16 @@ angular.module('starter.services', ['ngCordova'] )
 
   var codesObj = {
     getValues: function(codename, fn_codevalues) {
-      var code = codeNames[codename];
-      var h_codevalues = Cache.getObject('h_codevalues') || {};
-      if (h_codevalues && h_codevalues.hasOwnProperty(code)) {
-        fn_codevalues(h_codevalues[code]);
+      var codevalues = Cache.getObject('codevalues.' + codename) || {};
+      if (codevalues.length) {
+        fn_codevalues(codevalues);
       } else {
+        var code = codeNames[codename];
         authHttp.get(baseUrl + '/codes/' + code + '/codevalues')
           .then(function(response) {
             var codeValues = response.data;
             console.log("Got code response: " + JSON.stringify(codeValues));
-            h_codevalues[code] = codeValues;
-            Cache.setObject('h_codevalues', h_codevalues);
+            Cache.setObject('codevalues.' + codename, codeValues);
             fn_codevalues(codeValues);
           }, function(response) {
             console.log("Failed to get codes:" + response.status);
@@ -930,7 +929,6 @@ angular.module('starter.services', ['ngCordova'] )
               if (codeNames[cname] != cid) {
                 codeNames[cname] = cid;
               }
-              var h_codevalues = {};
               codesObj.getValues(cname, function(codeValues) {} );
             }
           }

@@ -880,6 +880,10 @@ angular.module('starter.controllers', ['ngCordova'])
   Codes.getValues("ClientClassification", function(ocodes) {
     $scope.codes.occupations = ocodes;
   } );
+  Codes.getValues("Relationship", function(rcodes) {
+    console.log("Relationship codes count:"+rcodes.length);
+    $scope.codes.Relationships = rcodes;
+  } );
   SACCO.query(function(saccos) {
     $scope.codes.offices = saccos;
   }, function(sus) {} );
