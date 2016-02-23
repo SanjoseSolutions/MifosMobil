@@ -3,7 +3,10 @@
   <form name="SavingAccCreateForm" novalidate>
 
     <div class="list padding">
-
+      <div class="Mandatory">
+          <sup><i class="icon ion-asterisk assertive"></i></sup>
+          : Mandatory fields
+      </div>
       <ion-item>
         <!-- div ng-hide="savingAccCreateForm.name.$pristine">
           <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.required">
@@ -34,7 +37,10 @@
 
       <ion-item>
         <label class="item item-input item-select">
-          <div class="input-label">Select Product : </div>
+          <div class="input-label">
+            Select Product
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </div>
           <select name="productID" required>
             <option selected>Basic Savings</option>
           </select>
