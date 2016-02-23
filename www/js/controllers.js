@@ -122,6 +122,7 @@ angular.module('starter.controllers', ['ngCordova'])
   $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
     Session.takeOnline();
     authHttp.runCommands();
+    // ToDo: add other synchronization code here
   } );
 
   $scope.$on('$ionicView.enter', function(e) {
