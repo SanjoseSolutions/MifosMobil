@@ -382,6 +382,9 @@ angular.module('starter.services', ['ngCordova'] )
         oField[k] = office[k];
       }
     },
+    dataTables: function() {
+      return [ "SACCO_Fields" ];
+    },
     save: function(fields, fn_office, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/offices', fields, {
         "params": { "tenantIdentifier": Settings.tenant }
@@ -464,7 +467,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', function(Office) {
+.factory('SACCO', function(Office, DataTables, DateUtil) {
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -507,7 +510,24 @@ angular.module('starter.services', ['ngCordova'] )
         console.log("No. of SUs: " + sunions.length);
         fn_sunions(sunions);
       } );
-    }
+    },
+    get_full: function(id, fn_office) {
+      Office.get(id, function(office) {
+        office.openingDt = DateUtil.localDate(office.openingDate);
+        var dts = Office.dataTables();
+        for(var i = 0; i < dts.length; ++i) {
+          var dt = dts[i];
+          DataTables.get(dt, id, function(fdata) {
+            if (fdata.length > 0) {
+              var fields = fdata[0];
+              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+              office[dt] = fields;
+            }
+          } );
+        }
+        fn_office(office);
+      } );
+    },
   };
 } )
 

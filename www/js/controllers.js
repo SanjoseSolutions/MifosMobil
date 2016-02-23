@@ -299,21 +299,12 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateUtil, DataTables) {
+.controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables) {
   var saccoId = $stateParams.saccoId;
   console.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
-  Office.get(saccoId, function(office) {
-    console.log("Got SACCO" + JSON.stringify(office));
-    office.openingDt = DateUtil.localDate(office.openingDate);
-    $scope.data.office = office;
-  } );
-  DataTables.get('SACCO_Fields', saccoId, function(sdata) {
-    var sfields = sdata[0];
-    if (sfields != null) {
-      sfields["joiningDt"] = DateUtil.localDate(sfields["joiningDate"]);
-      $scope.data.sacco = sfields;
-    }
+  SACCO.get_full(saccoId, function(sacco) {
+    $scope.data = sacco;
   } );
 } )
 
