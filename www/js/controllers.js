@@ -122,6 +122,7 @@ angular.module('starter.controllers', ['ngCordova'])
   $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
     Session.takeOnline();
     authHttp.runCommands();
+    // ToDo: add other synchronization code here
   } );
 
   $scope.$on('$ionicView.enter', function(e) {
@@ -631,7 +632,7 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts) {
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup) {
   var id = $stateParams.id;
   console.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -645,6 +646,38 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.data.totalRepayment = summary.totalRepayment;
     }
   } );
+  $scope.makeRepayment = function() {
+    $scope.repayment = {};
+    $ionicPopup.show( {
+      title: 'Make a Repayment',
+      template: '<input type="text" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
+        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
+      scope: $scope,
+      buttons: [ {
+        text: 'Cancel'
+      }, {
+        text: 'Repayment',
+        onTap: function(res) {
+          var params = {
+            transactionAmount: $scope.repayment.transAmount,
+            transactionDate: $scope.repayment.transDate.toISOString().substr(0, 10),
+            locale: 'en',
+            dateFormat: 'yyyy-MM-dd'
+          };
+          console.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
+          LoanAccounts.repayment(id, params, function(data) {
+            console.log("Repayment successful!");
+            $scope.message = {
+              type: 'info',
+              text: 'Repayment successful!'
+            };
+          }, function(res) {
+            console.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
+          } );
+        }
+      } ]
+    } );
+  };
 } )
 
 .controller('LoanTransCtrl', function($scope, $stateParams, LoanAccounts) {
