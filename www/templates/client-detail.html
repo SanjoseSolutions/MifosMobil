@@ -5,7 +5,9 @@
   The Friends service returns an array of friend data
 -->
 <style>
-
+.rightBtn {
+  float: right;
+}
 ion-content  {
 /* background-color:lightgrey;  */
 }
@@ -66,7 +68,7 @@ label {
         <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
       <ion-item>
-        <label> Education:
+        <label> Education <i class="icon ion-university"> </i>:
         </label>{{client.Education || "Unspecified"}}
       </ion-item>
       <ion-item>
@@ -86,7 +88,7 @@ label {
         </label> Sector 137
       </ion-item -->
       <ion-item>
-        <label> Client's Address : </label>
+        <label> Client's Address <i class="icon ion-ios-home"></i>  : </label>
         <br /> {{client.Address || "Unspecified" }}
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
@@ -112,7 +114,7 @@ label {
       <ion-item>
 	       <label>Savings Accounts:</label>
          <span ng-hide="client.savingsAccounts">(None)</span>
-          <a href="#/tab/clients/{{client.id}}/savings-apply" class="button">
+          <a href="#/tab/clients/{{client.id}}/savings-apply" class="button positive rightBtn">
           Apply</a>
          <table style="width:95%">
          <tbody>
@@ -128,10 +130,12 @@ label {
          {{client.TotalSavings || "25"}}</i-->
 	    </ion-item>
       <ion-item>
-	       <label>Loans:</label>
-         <span ng-hide="client.loanAccounts.length">(None)</span>
-        <a href="#/tab/clients/{{client.id}}/loan-apply" class="button">
-          Apply</a>
+	      <label>Loans:</label>
+        <span ng-hide="client.loanAccounts.length">(None)</span>
+        <a href="#/tab/clients/{{client.id}}/loan-apply"
+            class="button button-positive rightBtn">
+          Apply
+        </a>
          <table style="width:95%">
          <tbody>
           <tr ng-repeat="lac in client.loanAccounts">
@@ -146,6 +150,7 @@ label {
       <ion-item>
         <label>Share Holdings:</label>
         {{client.NumShares || "0"}}
+        <a href="#/tab/#" class="button positive rightBtn"> <strong> Buy </strong> </a>
       </ion-item>
     </div>
 
