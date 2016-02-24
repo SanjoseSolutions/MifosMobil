@@ -62,24 +62,24 @@ label {
 
       <ion-item class="item-icon">
         <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-        </label>  {{client.Email || client.firstname + "@kmayra.org" }}
+        </label>  {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }}
         <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
       <ion-item>
         <label> Education:
-        </label>{{client.Education || "Unspecified"}}
+        </label>{{client.Client_Fields.Education || "Unspecified"}}
       </ion-item>
       <ion-item>
         <label>Occupation:
-        </label>{{client.Occupation || "Trader"}}
+        </label>{{client.Client_Fields.Occupation || "Trader"}}
       </ion-item>
       <ion-item>
         <label> Fathers Name:
-        </label>{{client["Fathers Name"] || "Unspecified"}}
+        </label>{{client.Client_Fields["Fathers Name"] || "Unspecified"}}
       </ion-item>
       <ion-item>
         <label> Grandfathers Name:
-        </label>{{client["Grandfathers Name"] || "Unspecified"}}
+        </label>{{client.Client_Fields["Grandfathers Name"] || "Unspecified"}}
       </ion-item>
       <!--ion-item>
         <label>Location:
@@ -93,7 +93,7 @@ label {
       <ion-item>
         <label>Next of kin:</label>
         <span>
-          {{nextOfKin.Fullname}}
+          {{client.Client_NextOfKin.Fullname}}
           <a class="ion-search" href="#/tab/clients/{{client.id}}/next-of-kin">View Details</a>
         </span>
       </ion-item>

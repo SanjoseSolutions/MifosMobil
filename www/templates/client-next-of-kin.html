@@ -46,7 +46,7 @@ label {
         </ion-item> 
         <ion-item class="item-icon">
            <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-           </label>  {{client.email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
+           </label>  {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
         </ion-item>
 	    </ion-list> <!--ion-list-->
     </div>
@@ -57,53 +57,19 @@ label {
       </ion-item>
       <ion-item>
         <label>Fullname</label>
-        {{nextOfKin.Fullname}}
+        {{client.Client_NextOfKin.Fullname}}
       </ion-item>
       <ion-item>
-        <label>Relationship with Client:</label> {{nextOfKin.Relationship}}
+        <label>Relationship with Client:</label> {{client.Client_NextOfKin.Relationship}}
       </ion-item>
       <ion-item>
-        <label>Fathers Name:</label> {{nextOfKin["Fathers Name"] || "Unspecified"}}
+        <label>Fathers Name:</label> {{client.Client_NextOfKin["Fathers Name"] || "Unspecified"}}
       </ion-item>
       <ion-item>
         <label>Grandfathers Name: </label>
-        {{nextOfKin["Grandfathers Name"] || "Unspecified"}}
+        {{client.Client_NextOfKin["Grandfathers Name"] || "Unspecified"}}
       </ion-item>
-      <!--ion-item>
-        <a href="#/tab/clients/{{client.id}}/next-of-kin-edit" class="button button-block">
-          <i class="ion-edit">Edit Info</i>
-        </a>
-      </ion-item-->
     </div>
-
-    <!-- ion-item class="item-divider">
-      <!--  h4 class="positive" #> Account Summary <!-- /h4 #>
-    </ion-item>
-
-    <div class="list card">
-      <ion-item>
-	       <label> Account No
-         </label>: -#- <!-- {{client.accNo ? client.accNo: # }} #>	
-      </ion-item>
-      <ion-item>
-	       <label> Loans </label> :
-         <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalLoans || "40" }}
-      </ion-item>
-      <ion-item>
-	       <label> Savings </label>:
-         <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalSavings || "25"}}
-	    </ion-item>
-    </div>
-
-    <!-- ion-item>
-      <a href="#/tab/clients/{{client.id}}/edit">
-        <button class="ion-ios-compose-outline">
-          Edit
-        </button>
-      </a>
-    </ion-item -->
 
     </ion-list>
 
