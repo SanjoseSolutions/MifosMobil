@@ -658,7 +658,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('ClientNextOfKinEditCtrl', function($scope, $stateParams, DataTables) {
   var clientId = $stateParams.clientId;
-  DataTables.get_one('Client_NextOfKin', clientId, function(cfields) {
+  DataTables.get_one('Client_NextOfKin', clientId, function(cfields, dt) {
     $scope.nextOfKin = cfields;
   } );
 } )
@@ -687,11 +687,11 @@ angular.module('starter.controllers', ['ngCordova'])
     console.log("Got client: " + JSON.stringify(client));
     console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
-    DataTables.get_one('Client_Fields', clientId, function(cfields) {
+    DataTables.get_one('Client_Fields', clientId, function(cfields, dt) {
       console.log("Client_Fields success");
       $scope.client.Client_Fields = cfields;
     } );
-    DataTables.get_one('Client_NextOfKin', clientId, function(cfields) {
+    DataTables.get_one('Client_NextOfKin', clientId, function(cfields, dt) {
       $scope.client.Client_NextOfKin = cfields;
     } );
   } );

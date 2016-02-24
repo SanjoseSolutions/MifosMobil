@@ -321,13 +321,13 @@ angular.module('starter.services', ['ngCordova'] )
       if (fdata && fdata.length) {
         console.log("DATATABLE: " + k + " from Cache");
         var fields = fdata[0];
-        fn_dtrow(fields);
+        fn_dtrow(fields, name);
         return;
       }
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         if (data.length > 0) {
-          fn_dtrow(data[0]);
+          fn_dtrow(data[0], name);
         }
       } );
     },
@@ -861,12 +861,11 @@ angular.module('starter.services', ['ngCordova'] )
         for(var i = 0; i < dts.length; ++i) {
           var dt = dts[i];
           console.log("Client DataTable:" + dt + " for #" + id);
-          var set_dt = function(fields) {
+          DataTables.get_one(dt, id, function(fields, dt) {
             client[dt] = fields;
             console.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
-          };
-          DataTables.get_one(dt, id, set_dt);
+          } );
         }
         fn_customer(client);
       } );
@@ -879,7 +878,7 @@ angular.module('starter.services', ['ngCordova'] )
           var dts = Clients.dataTables();
           for(var j = 0; j < dts.length; ++j) {
             var dt = dts[j];
-            DataTables.get_one(dt, id, function(fields) {
+            DataTables.get_one(dt, id, function(fields, dt) {
               client[dt] = fields;
             } );
           }
