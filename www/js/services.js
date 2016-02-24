@@ -484,18 +484,6 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO_Fields', function(DataTables) {
-  return {
-    dateFields: function() { return ['joiningDate']; },
-    skipFields: function() { return []; },
-    saveFields: function() { return ['joiningDate', 'Country', 'Region', 'Zone', 'Wereda', 'Kebele']; },
-    codeFields: function() { return {}; },
-    get: function(officeId, fn_dtable) {
-      DataTables.get('SACCO_Fields', officeId, fn_dtable);
-    }
-  };
-} )
-
 .factory('SACCO', function(Office, Cache, DataTables, DateUtil, HashUtil) {
   return {
     query: function(fn_saccos, fn_sunions) {
@@ -554,13 +542,10 @@ angular.module('starter.services', ['ngCordova'] )
             office[dt] = fields;
             continue;
           }
-          DataTables.get(dt, id, function(fdata) {
-            if (fdata.length > 0) {
-              var fields = fdata[0];
-              office[dt] = fields;
-              var k = 'dt.'+dt+'.'+id;
-              Cache.setObject(k, fields);
-            }
+          DataTables.get_one(dt, id, function(fields, dt) {
+            office[dt] = fields;
+            var k = 'dt.'+dt+'.'+id;
+            Cache.setObject(k, fields);
           } );
         }
       };
@@ -577,7 +562,7 @@ angular.module('starter.services', ['ngCordova'] )
         for(var i = 0; i < odata.length; ++i) {
           get_dtables(odata[i]);
         }
-        fn_offices(odata);
+        fn_saccos(odata);
       } );
     },
     get_full: function(id, fn_office) {
@@ -587,14 +572,11 @@ angular.module('starter.services', ['ngCordova'] )
         var dts = Office.dataTables();
         for(var i = 0; i < dts.length; ++i) {
           var dt = dts[i];
-          DataTables.get(dt, id, function(fdata) {
-            if (fdata.length > 0) {
-              var fields = fdata[0];
-              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
-              fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
-              office[dt] = fields;
-              console.log("SACCO with " + dt + ": " + JSON.stringify(office));
-            }
+          DataTables.get_one(dt, id, function(fields, dt) {
+            fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+            fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+            office[dt] = fields;
+            console.log("SACCO with " + dt + ": " + JSON.stringify(office));
           } );
         }
         fn_office(office);
@@ -637,7 +619,7 @@ angular.module('starter.services', ['ngCordova'] )
     prepareForm: function(type, object) {
       console.log("Called FormHelper.prepareForm " + typeof(object));
       var rObject = new Object();
-      var sfs = type.saveFields();
+      var sfs = type.saveFields().concat(type.dataTables());
       var cfs = type.codeFields();
       var dfs = type.dateFields();
       var dfHash = new Object();

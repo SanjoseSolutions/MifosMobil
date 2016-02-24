@@ -203,7 +203,7 @@ angular.module('starter.controllers', ['ngCordova'])
     console.log("SACCO:" + JSON.stringify(sacco));
     $scope.sacco = sacco;
   } );
-  $scope.saveSacco = function(office, sacco) {
+  $scope.saveSacco = function(office) {
     var sfs = Office.saveFields;
     var ofields = new Object();
     for(var i = 0; i < sfs.length; ++i) {
@@ -221,6 +221,7 @@ angular.module('starter.controllers', ['ngCordova'])
     Office.update(officeId, ofields, function(eOffice) {
       var msg = "Successfully edited SACCO:"+officeId;
       var fld = "joiningDate";
+      var sacco = office.SACCO_Fields;
       var val = sacco[fld];
       if (val != null) {
         val = val.toISOString().substring(0, 10);
@@ -228,23 +229,33 @@ angular.module('starter.controllers', ['ngCordova'])
       }
       sacco.locale = "en";
       sacco.dateFormat = "yyyy-MM-dd";
-      if ($scope.sdata.length) {
-        DataTables.update('SACCO_Fields', officeId, sacco, function(fields) {
-          msg = msg + ", SACCO_Fields.";
-        }, function(response) {
-          console.log("SACCO FIELDS fail. " + JSON.stringify(response.data));
-        } );
-      } else {
-        DataTables.save('SACCO_Fields', officeId, sacco, function(fields) {
-          msg = msg + ", created SACCO_Fileds.";
-        }, function(response) {
-          console.log("SACCO Fields fail." + JSON.stringify(response.data));
-        } );
-      }
-      $scope.message = {
-        "type": "info",
-        "text": msg
-      };
+      DataTables.get_one('SACCO_Fields', officeId, function(sfields, dt) {
+        if (sfields) {
+          DataTables.update('SACCO_Fields', officeId, sacco, function(fields) {
+            msg = msg + ", SACCO_Fields.";
+          }, function(fields) {
+            msg = msg + ", SACCO_Fields.";
+            console.log("SACCO Fields offline. " + JSON.stringify(fields));
+          }, function(response) {
+            msg = msg + ", SACCO_Fields save failed.";
+            console.log("SACCO FIELDS fail. " + JSON.stringify(response.data));
+          } );
+        } else {
+          DataTables.save('SACCO_Fields', officeId, sacco, function(fields) {
+            msg = msg + ", created SACCO_Fields.";
+          }, function(fields) {
+            console.log("SACCO Fields offline. " + JSON.stringify(fields));
+            msg = msg + ", SACCO_Fields submitted.";
+          }, function(response) {
+            msg = msg + ", SACCO_Fields save failed.";
+            console.log("SACCO Fields fail." + JSON.stringify(response.data));
+          } );
+        }
+        $scope.message = {
+          "type": "info",
+          "text": msg
+        };
+      } );
     }, function(data) {
       $scope.message = {
         "type": "info",
@@ -663,11 +674,12 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('ClientEditCtrl', function($scope, $stateParams,
+.controller('ClientEditCtrl', function($scope, $stateParams, Customers,
       Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
+  $scope.codes = {};
   $scope.$on('$ionicView.enter', function(e) {
     Codes.getValues("Gender", function(gcodes) {
       console.log("Got gender codes: " + JSON.stringify(gcodes))
@@ -682,18 +694,20 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.codes.Relationships = rcodes;
     } );
   } );
-  Clients.get(clientId, function(client) {
+  Customers.get_full(clientId, function(client) {
     var rClient = FormHelper.prepareForm(Clients, client);
     console.log("Got client: " + JSON.stringify(client));
     console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
-    DataTables.get_one('Client_Fields', clientId, function(cfields, dt) {
-      console.log("Client_Fields success");
-      $scope.client.Client_Fields = cfields;
-    } );
-    DataTables.get_one('Client_NextOfKin', clientId, function(cfields, dt) {
-      $scope.client.Client_NextOfKin = cfields;
-    } );
+    SACCO.query(function(saccos) {
+      if (!saccos.length) {
+        saccos = [ {
+          id: client.officeId,
+          name: client.officeName
+        } ];
+      }
+      $scope.codes.offices = saccos;
+    }, function(sus) {} );
   } );
 
   // x
@@ -733,8 +747,8 @@ angular.module('starter.controllers', ['ngCordova'])
     for(var i = 0; i < cdts.length; ++i) {
       var dt = cdts[i];
       console.log("Got DATATABLE:" + dt);
-      DataTables.get(cdts[i], clientId, function(dtrows) {
-        if (dtrows.length == 0) {
+      DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
+        if (!dtrow) {
           DataTables.save(dt, clientId, client[dt], function(data) {
             console.log("Added datatables data: " + JSON.stringify(data));
           }, function(response) {
@@ -750,10 +764,6 @@ angular.module('starter.controllers', ['ngCordova'])
       } );
     }
   };
-  $scope.codes = {};
-  SACCO.query(function(saccos) {
-    $scope.codes.offices = saccos;
-  }, function(sus) {} );
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO) {
