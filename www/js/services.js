@@ -10,7 +10,7 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('Settings', function() {
   return {
-    'baseUrl': 'https://kifiya.openmf.org/mifosng-provider/api/v1',
+    'baseUrl': 'https://kifiya.openmf.org/fineract-provider/api/v1',
     'tenant': 'kifiya',
     'showClientListFaces': false
   };
@@ -62,7 +62,7 @@ angular.module('starter.services', ['ngCordova'] )
 
   var authHttp = {};
 
-  $http.defaults.headers.common['X-Mifos-Platform-TenantId'] = Settings.tenant;
+  $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
   $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 	$http.defaults.headers.common['Accept'] = '*/*';
 	$http.defaults.headers.common['Content-type'] = 'application/json';
@@ -89,7 +89,7 @@ angular.module('starter.services', ['ngCordova'] )
     authHttp[method] = function(url, data, config, fn_success, fn_failure) {
       config = config || {};
       config.headers = config.headers || {};
-      config.headers["X-Mifos-Platform-TenantId"] = Settings.tenant;
+      config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
       if (window.Connection && $cordovaNetwork.isOffline()) {
         var commands = Cache.getObject('commands');
         commands.push( {
