@@ -32,7 +32,7 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-           <input type="text" name="name" placeholder="Enter the SACCO's Name" ng-model="office.name" required ng-minlength="3">
+           <input type="text" name="name" placeholder="Enter the SACCO's Name" ng-model="sacco.name" required ng-minlength="3">
         </label>
       </ion-list-item>
 
@@ -41,8 +41,8 @@
           Parent Union 
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </div>
-        <select name="parentId" ng-options="office.id as office.name
-          for office in data.offices" ng-model="office.parentId" required>
+        <select name="parentId" ng-options="sacco.id as sacco.name
+          for sacco in data.sunions" ng-model="sacco.parentId" required>
         </select>
       </label>
 
@@ -53,14 +53,14 @@
         </span>
         <label class="item-input-wrapper">
           <input name="openingDate" type="date" size="10" name="DOEstab"
-            placeholder="ex: dd/mm/yyyy" ng-model="office.openingDate" required>
+            placeholder="ex: dd/mm/yyyy" ng-model="sacco.openingDate" required>
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Date of Joining Union:</span>
         <label class="item-input-wrapper">
           <input type="date" size="9" name="joiningDate"
-            placeholder="ex: dd/mm/yyyy" ng-model="sacco.joiningDate">
+            placeholder="ex: dd/mm/yyyy" ng-model="sacco.SACCO_Fields.joiningDate">
         </label>
       </div>
 
@@ -70,12 +70,12 @@
           <div class="row">
             <div class="col col-50">
               <label class="item-input-wrapper">
-                <input type="text" size="13" placeholder="Latitude" ng-model="sacco.Latitude">
+                <input type="text" size="13" placeholder="Latitude" ng-model="sacco.SACCO_Fields.Latitude">
               </label>
             </div>
             <div class="col col-50">
               <label class="item-input-wrapper">
-                <input type="text" size="13" placeholder="Longitude" ng-model="sacco.Longitude">
+                <input type="text" size="13" placeholder="Longitude" ng-model="sacco.SACCO_Fields.Longitude">
               </label>
             </div>
           </div>
@@ -89,38 +89,38 @@
       <div class="item item-input-inset">
         <span class="input-label">Country :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.Country">
+          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.SACCO_Fields.Country">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Region :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="sacco.Region">
+          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="sacco.SACCO_Fields.Region">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Zone :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="sacco.Zone">
+          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="sacco.SACCO_Fields.Zone">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Wereda :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="sacco.Wereda">
+          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="sacco.SACCO_Fields.Wereda">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Kebele :</span>
         <label class="item-input-wrapper">
-          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.SACCO_Fields.Kebele">
         </label>
       </div>
 
       <ion-list-item class="padding">
         <span ng-show="message"class="ion-{{message.type}}">{{message.text}}</span>
         <button class="button button-block button-positive"
-            ng-click="saveSacco(office, sacco)" ng-disabled="saccoForm.$invalid">
+            ng-click="saveSacco(sacco)" ng-disabled="saccoForm.$invalid">
           <h4>Save</h4>
         </button>
       </ion-list-item>

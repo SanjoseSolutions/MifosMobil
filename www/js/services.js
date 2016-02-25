@@ -287,7 +287,7 @@ angular.module('starter.services', ['ngCordova'] )
   return session;
 } ] )
 
-.factory('DataTables', function(authHttp, baseUrl, Settings) {
+.factory('DataTables', function(authHttp, baseUrl, Settings, Cache) {
   return {
     decode: function(obj) {
       var ret = new Object();
@@ -315,21 +315,47 @@ angular.module('starter.services', ['ngCordova'] )
         fn_dtable(data);
       } );
     },
-    update: function(name, id, fields, fn_fields, fn_fail) {
+    get_one: function(name, id, fn_dtrow) {
+      var k = 'dt.' + name + '.' + id;
+      var fdata = Cache.getObject(k);
+      if (fdata && fdata.length) {
+        console.log("DATATABLE: " + k + " from Cache");
+        var fields = fdata[0];
+        fn_dtrow(fields, name);
+        return;
+      }
+      authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
+        var data = response.data;
+        if (data.length > 0) {
+          fn_dtrow(data[0], name);
+        }
+      } );
+    },
+    update: function(name, id, fields, fn_fields, fn_offline, fn_fail) {
       authHttp.put(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
+        if (202 == response.status) {
+          var k = 'dt.' + name + '.' + id;
+          Cache.setObject(k, fields);
+          fn_offline(fields);
+          return;
+        }
         fn_fields(response.data);
       }, function(response) {
         fn_fail(response);
       } );
     },
-    save: function(name, id, fields, fn_fields, fn_fail) {
+    save: function(name, id, fields, fn_fields, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
         if (202 == response.status) {
+          var k = 'dt.' + name + '.' + id;
+          Cache.setObject(k, fields);
           console.log("Request accepted (server offline)");
+          fn_offline(fields);
+          return;
         } else {
           console.log("Create " + name + " success. Got: "
             + JSON.stringify(response.data));
@@ -346,7 +372,7 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('DateUtil', function() {
   return {
-    isoDate: function(a_date) {
+    isoDateStr: function(a_date) {
       var dd = a_date[2];
       var mm = a_date[1];
       var preproc = function(i) {
@@ -357,10 +383,13 @@ angular.module('starter.services', ['ngCordova'] )
       var dt = a_date[0] + "-" + mm + "-" + dd;
       return dt;
     },
+    isoDate: function(a_date) {
+      var dtStr = this.isoDateStr(a_date);
+      var dt = new Date(dtStr);
+      return dt;
+    },
     localDate: function(a_date) {
-      var dd = a_date[2];
-      var mm = a_date[1];
-      var dt = new Date(a_date[0] + "-" + mm + "-" + dd);
+      var dt = new Date(a_date.join("-"));
       return dt.toLocaleDateString();
     }
   };
@@ -381,6 +410,9 @@ angular.module('starter.services', ['ngCordova'] )
         var k = sfs[i];
         oField[k] = office[k];
       }
+    },
+    dataTables: function() {
+      return [ "SACCO_Fields" ];
     },
     save: function(fields, fn_office, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/offices', fields, {
@@ -464,7 +496,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', function(Office) {
+.factory('SACCO', function(Office, Cache, DataTables, DateUtil, HashUtil) {
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -507,7 +539,67 @@ angular.module('starter.services', ['ngCordova'] )
         console.log("No. of SUs: " + sunions.length);
         fn_sunions(sunions);
       } );
-    }
+    },
+    query_full: function(fn_saccos) {
+      var h_offices = Cache.getObject('h_offices') || {};
+      var offices = HashUtil.to_a(h_offices);
+      var get_dtables = function(office) {
+        var dts = Office.dataTables();
+        for(var i = 0; i < dts.length; ++i) {
+          var dt = dts[i];
+          var id = office.id;
+          var k = 'dt.'+dt+'.'+id;
+          var fields = Cache.getObject(k);
+          if (fields) {
+            office[dt] = fields;
+            continue;
+          }
+          DataTables.get(dt, id, function(fdata) {
+            if (fdata.length > 0) {
+              var fields = fdata[0];
+              office[dt] = fields;
+              var k = 'dt.'+dt+'.'+id;
+              Cache.setObject(k, fields);
+            }
+          } );
+        }
+      };
+      if (offices.length) {
+        for(var i = 0; i < offices.length; ++i) {
+          get_dtables(offices[i]);
+        }
+        fn_saccos(offices);
+        return;
+      }
+      authHttp.get(baseUrl + '/offices').then(function(response) {
+        var odata = response.data.sort(function(a, b) { return a.id - b.id } );
+        Cache.setObject('h_offices', HashUtil.from_a(odata));
+        for(var i = 0; i < odata.length; ++i) {
+          get_dtables(odata[i]);
+        }
+        fn_offices(odata);
+      } );
+    },
+    get_full: function(id, fn_office) {
+      Office.get(id, function(office) {
+        office.openingDt = DateUtil.localDate(office.openingDate);
+        office.openingDate = DateUtil.isoDate(office.openingDate);
+        var dts = Office.dataTables();
+        for(var i = 0; i < dts.length; ++i) {
+          var dt = dts[i];
+          DataTables.get(dt, id, function(fdata) {
+            if (fdata.length > 0) {
+              var fields = fdata[0];
+              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+              fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+              office[dt] = fields;
+              console.log("SACCO with " + dt + ": " + JSON.stringify(office));
+            }
+          } );
+        }
+        fn_office(office);
+      } );
+    },
   };
 } )
 
@@ -559,7 +651,7 @@ angular.module('starter.services', ['ngCordova'] )
         if (fn) {
           rObject[k] = fn(object);
         } else if (dfHash[k]) { 
-          rObject[k] = new Date(DateUtil.isoDate(v));
+          rObject[k] = DateUtil.isoDate(v);
         } else {
           rObject[k] = v;
         }
@@ -761,6 +853,42 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
+.factory('Customers', function(authHttp, baseUrl, Clients, DataTables) {
+  return {
+    get_full: function(id, fn_customer) {
+      Clients.get(id, function(client) {
+        var dts = Clients.dataTables();
+        for(var i = 0; i < dts.length; ++i) {
+          var dt = dts[i];
+          console.log("Client DataTable:" + dt + " for #" + id);
+          DataTables.get_one(dt, id, function(fields, dt) {
+            client[dt] = fields;
+            console.log("Client #" + id + " " + dt +
+              "::" + JSON.stringify(fields));
+          } );
+        }
+        fn_customer(client);
+      } );
+    },
+    query_full: function(fn_customers) {
+      Clients.query(function(clients) {
+        for(var i = 0; i < clients.length; ++i) {
+          var client = clients[i];
+          var id = client.id;
+          var dts = Clients.dataTables();
+          for(var j = 0; j < dts.length; ++j) {
+            var dt = dts[j];
+            DataTables.get_one(dt, id, function(fields, dt) {
+              client[dt] = fields;
+            } );
+          }
+        }
+        fn_customers(clients);
+      } );
+    }
+  };
+} )
+
 .factory('SelfService', function(authHttp, baseUrl, Cache) {
   return {
     query: function(fn_clients) {
@@ -874,11 +1002,39 @@ angular.module('starter.services', ['ngCordova'] )
 
 .factory('Shares', function(authHttp, baseUrl) {
   return {
+    url: baseUrl + '/account/share',
     get: function(clientId, fn_shares) {
       console.log("Shares called for:"+clientId);
     },
     query: function(fn_shares) {
       console.log("Shares called");
+    },
+    save: function(sfields, fn_shares, fn_offline, fn_fail) {
+      authHttp.post(this.url, sfields, {},
+        function(response) {
+          console.log("Successfully created share");
+          var share = response.data;
+          if (response.status == 202) {
+            fn_offline(response);
+            return;
+          }
+          fn_shares(share);
+        },
+        function(err_resp) {
+          console.log("Failed to create shares");
+        } );
+    },
+    update: function(id, sfields, fn_shares, fn_offline, fn_fail) {
+      authHttp.put(this.url + id, sfields, {}, function(response) {
+        if (202 == response.status) {
+          fn_offline(response);
+          return;
+        }
+        console.log("share update success");
+        fn_shares(response.data);
+      }, function(response) {
+        console.log("share update fail");
+      } );
     }
   };
 } )

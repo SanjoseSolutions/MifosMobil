@@ -195,23 +195,13 @@ angular.module('starter.controllers', ['ngCordova'])
   console.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
     $scope.data = {
-      offices: data,
+      sunions: data,
       op: "Edit"
     };
   } );
-  Office.get(officeId, function(office) {
-    console.log("OFFICe:" + JSON.stringify(office));
-    $scope.office = office;
-    $scope.office["openingDate"] = new Date(DateUtil.isoDate(office["openingDate"]));
-  } );
-  DataTables.get('SACCO_Fields', officeId, function(sdata) {
-    $scope.sdata = sdata;
-    var sfields = sdata[0];
-    if (sfields != null) {
-      console.log("SACCO FIELDS:" + JSON.stringify(sfields));
-      sfields["joiningDate"] = new Date(DateUtil.isoDate(sfields["joiningDate"]));
-    }
-    $scope.sacco = sfields || {};
+  SACCO.get_full(officeId, function(sacco) {
+    console.log("SACCO:" + JSON.stringify(sacco));
+    $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office, sacco) {
     var sfs = Office.saveFields;
@@ -270,51 +260,22 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('SACCOListCtrl', function($scope, Office, Clients) {
+.controller('SACCOListCtrl', function($scope, SACCO) {
   console.log("SACCOListCtrl called");
-  Clients.query(function(clients) {} );
-  Office.query(function(data) {
-    var sus = [];
-    var po = new Object();
-    var saccos = [];
-    for(var i = 0; i < data.length; ++i) {
-      if (data[i].parentId == 1) {
-        sus.push( {
-          "id": data[i].id,
-          "name": data[i].name
-        } );
-        po[data[i].id] = data[i].parentId;
-      } else {
-        var parentId = data[i].parentId;
-        var gpId = po[parentId];
-        if (gpId != null && gpId == 1) {
-          saccos.push( {
-            "id": data[i].id,
-            "name": data[i].name
-          } );
-        }
-      }
-    }
-    console.log("Got SACCOs: " + saccos.length + " SUs: " + sus.length);
+  SACCO.query(function(saccos) {
+    console.log("Got SACCOs: " + saccos.length);
     $scope.data = { "saccos": saccos };
+  }, function(sunions) {
+    console.log("Got SACCO Unions: " + sunions.length);
   } );
 } )
 
-.controller('SACCOViewCtrl', function($scope, $stateParams, Office, DateUtil, DataTables) {
+.controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables) {
   var saccoId = $stateParams.saccoId;
   console.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
-  Office.get(saccoId, function(office) {
-    console.log("Got SACCO" + JSON.stringify(office));
-    office.openingDt = DateUtil.localDate(office.openingDate);
-    $scope.data.office = office;
-  } );
-  DataTables.get('SACCO_Fields', saccoId, function(sdata) {
-    var sfields = sdata[0];
-    if (sfields != null) {
-      sfields["joiningDt"] = DateUtil.localDate(sfields["joiningDate"]);
-      $scope.data.sacco = sfields;
-    }
+  SACCO.get_full(saccoId, function(sacco) {
+    $scope.data = sacco;
   } );
 } )
 
@@ -391,11 +352,11 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
-    ClientImages, DateUtil, DataTables, Codes, SACCO) {
+    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO) {
   var clientId = $stateParams.clientId;
   console.log("Looking for client:"+clientId);
   $scope.client = {};
-  Clients.get(clientId, function(client) {
+  Customers.get_full(clientId, function(client) {
     client["NumShares"] = parseInt(Math.random()*10);
     $scope.client = client;
     $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
@@ -438,20 +399,6 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.client.face = img_data;
   } );
   // ToDo client savings, loan summary needed
-  DataTables.get('Client_Fields', clientId, function(cdata) {
-    var cfields = cdata[0];
-    for(var fld in cfields) {
-      $scope.client[fld] = cfields[fld];
-    }
-  } );
-  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
-    if (cdata.length == 0) {
-      return;
-    }
-    var cfields = cdata[0];
-    console.log("Next of kin data: " + JSON.stringify(cfields));
-    $scope.nextOfKin = cfields;
-  } );
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
@@ -641,7 +588,7 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts) {
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup) {
   var id = $stateParams.id;
   console.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -655,6 +602,38 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.data.totalRepayment = summary.totalRepayment;
     }
   } );
+  $scope.makeRepayment = function() {
+    $scope.repayment = {};
+    $ionicPopup.show( {
+      title: 'Make a Repayment',
+      template: '<input type="text" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
+        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
+      scope: $scope,
+      buttons: [ {
+        text: 'Cancel'
+      }, {
+        text: 'Repayment',
+        onTap: function(res) {
+          var params = {
+            transactionAmount: $scope.repayment.transAmount,
+            transactionDate: $scope.repayment.transDate.toISOString().substr(0, 10),
+            locale: 'en',
+            dateFormat: 'yyyy-MM-dd'
+          };
+          console.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
+          LoanAccounts.repayment(id, params, function(data) {
+            console.log("Repayment successful!");
+            $scope.message = {
+              type: 'info',
+              text: 'Repayment successful!'
+            };
+          }, function(res) {
+            console.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
+          } );
+        }
+      } ]
+    } );
+  };
 } )
 
 .controller('LoanTransCtrl', function($scope, $stateParams, LoanAccounts) {
@@ -667,7 +646,6 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-//
 .controller('SharesBuyCtrl',
     function($scope, $stateParams, /* SavingsAccounts,  */
      $ionicPopup, $timeout) {
@@ -727,33 +705,20 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 //
 
-.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Clients, DateUtil, DataTables) {
+.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Customers, DateUtil, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("ClientNextOfKinCtrl invoked");
-  Clients.get(clientId, function(client) {
+  Customers.get_full(clientId, function(client) {
     $scope.client = client;
-    $scope.client.dateOfBirth = DateUtil.isoDate(client.dateOfBirth);
+    $scope.client.dateOfBirth = DateUtil.isoDateStr(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
-  } );
-  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
-    if (cdata.length == 0) {
-      console.log("No data in client next of kin");
-    }
-    var cfields = cdata[0];
-    $scope.nextOfKin = cfields;
-    var rCode = cfields.Relationship_cd_Relationship;
-    cfields.Relationship = rCode;
-    console.log("Client next of kin data: " + JSON.stringify(cfields));
   } );
 } )
 
 .controller('ClientNextOfKinEditCtrl', function($scope, $stateParams, DataTables) {
   var clientId = $stateParams.clientId;
-  DataTables.get('Client_NextOfKin', clientId, function(cdata) {
-    if (cdata.length > 0) {
-      var cfields = cdata[0];
-      $scope.nextOfKin = cfields;
-    }
+  DataTables.get_one('Client_NextOfKin', clientId, function(cfields, dt) {
+    $scope.nextOfKin = cfields;
   } );
 } )
 
@@ -781,18 +746,12 @@ angular.module('starter.controllers', ['ngCordova'])
     console.log("Got client: " + JSON.stringify(client));
     console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
-    DataTables.get('Client_Fields', clientId, function(cdata) {
+    DataTables.get_one('Client_Fields', clientId, function(cfields, dt) {
       console.log("Client_Fields success");
-      if (cdata.length > 0) {
-        var cfields = cdata[0];
-        $scope.client.Client_Fields = cfields;
-      }
+      $scope.client.Client_Fields = cfields;
     } );
-    DataTables.get('Client_NextOfKin', clientId, function(cdata) {
-      if (cdata.length > 0) {
-        var cfields = cdata[0];
-        $scope.client.Client_NextOfKin = cfields;
-      }
+    DataTables.get_one('Client_NextOfKin', clientId, function(cfields, dt) {
+      $scope.client.Client_NextOfKin = cfields;
     } );
   } );
 
@@ -950,13 +909,13 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
-    Session, Clients, Staff, Office, HashUtil, $ionicPopup) {
+    Session, Customers, Staff, SACCO, HashUtil, $ionicPopup) {
   console.log("DashboardCtrl invoked");
   var session = Session;
   var role = session.role;
   switch (role) {
     case "Admin":
-      Office.query(function(data) {
+      SACCO.query_full(function(data) {
         $scope.num_saccos = data.length;
       } );
     case "Management":
@@ -965,7 +924,7 @@ angular.module('starter.controllers', ['ngCordova'])
         console.log("Staff length set:" +staff.length);
       } );
     case "Staff":
-      Clients.query(function(clients) {
+      Customers.query_full(function(clients) {
         $scope.num_clients = clients.length;
       } );
   }
