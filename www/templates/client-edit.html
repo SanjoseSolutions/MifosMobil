@@ -175,23 +175,17 @@
       <div class="item row">
       <div class="col">
         <label class="item-input item-select">
-          <div class="input-label"> Male </div>
-          <select>
-            <option>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
+          <div class="input-label">Males:</div>
+          <select ng-model="client.Client_Fields['Number of males']"
+            ng-options="i as i for i in [0,1,2,3]">
           </select>
         </label>
       </div>
       <div class="col">
         <label class="item-input item-select">
-          <div class="input-label"> Female </div>
-          <select>
-            <option>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
+          <div class="input-label">Females:</div>
+          <select ng-model="client.Client_Fields['Number of females']"
+            ng-options="i as i for i in [0,1,2,3]">
           </select>
         </label>
       </div>
@@ -259,7 +253,7 @@
           <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
         </label>
         <label class="item item-input">
-          <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Number">
+          <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Phone">
         </label>
         <label class="item item-input-inset">
           <span class="input-label">Relationship:</span>

@@ -733,7 +733,7 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('ClientEditCtrl', function($scope, $stateParams, Customers,
+.controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
       Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO) {
   var clientId = $stateParams.clientId;
   console.log("Looking to edit client:"+clientId);
@@ -789,6 +789,70 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client);
     console.log("Going to save client: " + JSON.stringify(cfields));
+    var cdts = Clients.dataTables();
+    for(var i = 0; i < cdts.length; ++i) {
+      var dt = cdts[i];
+      console.log("Got DATATABLE:" + dt);
+      DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
+        HashUtil.copy(client[dt], {
+          "locale": "en",
+          "dateFormat": "yyyy-MM-dd"
+        } );
+        if (!dtrow) {
+          DataTables.save(dt, clientId, client[dt], function(data) {
+            console.log("Added datatables data: " + JSON.stringify(data));
+            setTimeout(function() {
+              $scope.message = {
+                "type": "info",
+                "text": "Added client #" + clientId + " " + dt + "."
+              };
+            }, 1000);
+          }, function(response) {
+            setTimeout(function() {
+              $scope.message = {
+                "type": "info",
+                "text": "Accepted add client #" + clientId + " " + dt + "."
+              };
+            }, 1000);
+            console.log("Accepted to add datatables data: " + JSON.stringify(response));
+          }, function(response) {
+            setTimeout(function() {
+              $scope.message = {
+                "type": "warn",
+                "text": "Failed to add client #" + clientId + " " + dt + "."
+              };
+            }, 1000);
+            console.log("Failed to add datatables data: " + response.status);
+          } );
+        } else {
+          DataTables.update(dt, clientId, client[dt], function(data) {
+            setTimeout(function() {
+              $scope.message = {
+                "type": "info",
+                "text": "Saved client #" + clientId + " " + dt + "."
+              };
+            }, 1000);
+            console.log("Saved datatables data: " + JSON.stringify(data));
+          }, function(response) {
+            setTimeout(function() {
+              $scope.message = {
+                "type": "info",
+                "text": "Accepted save client #" + clientId + " " + dt + "."
+              };
+            }, 1000);
+            console.log("Accepted datatables for save");
+          }, function(response) {
+            setTimeout(function() {
+              $scope.message = {
+                "type": "info",
+                "text": "Failed to save client #" + clientId + " " + dt + "."
+              };
+            }, 1000);
+            console.log("Failed to save datatables data: " + response.status);
+          } );
+        }
+      } );
+    }
     Clients.update(clientId, cfields, function(eclient) {
       console.log("Save client success");
       $scope.message = {
@@ -806,26 +870,6 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Client save failed"
       };
     } );
-    var cdts = Clients.dataTables();
-    for(var i = 0; i < cdts.length; ++i) {
-      var dt = cdts[i];
-      console.log("Got DATATABLE:" + dt);
-      DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
-        if (!dtrow) {
-          DataTables.save(dt, clientId, client[dt], function(data) {
-            console.log("Added datatables data: " + JSON.stringify(data));
-          }, function(response) {
-            console.log("Failed to add datatables data: " + response.status);
-          } );
-        } else {
-          DataTables.update(dt, clientId, client[dt], function(data) {
-            console.log("Saved datatables data: " + JSON.stringify(data));
-          }, function(response) {
-            console.log("Failed to save datatables data: " + response.status);
-          } );
-        }
-      } );
-    }
   };
 } )
 
@@ -890,6 +934,8 @@ angular.module('starter.controllers', ['ngCordova'])
         DataTables.save(cdts[i], new_client.id, client[cdts[i]], function(data) {
           console.log("Saved datatables data: " + data);
         }, function(response) {
+          console.log("Accepted for offline: " + JSON.stringify(response));
+        }, function(response) {
           console.log("Failed to save datatables data: " + response.status);
         } );
       }
@@ -935,7 +981,6 @@ angular.module('starter.controllers', ['ngCordova'])
     case "Management":
       Staff.query(function(staff) {
         $scope.num_staff = staff.length;
-        console.log("Staff length set:" +staff.length);
       } );
     case "Staff":
       Customers.query_full(function(clients) {
