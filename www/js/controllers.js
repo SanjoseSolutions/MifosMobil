@@ -754,10 +754,14 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
   } );
   Customers.get_full(clientId, function(client) {
+    /*
     var rClient = FormHelper.prepareForm(Clients, client);
     console.log("Got client: " + JSON.stringify(client));
     console.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
+    */
+    FormHelper.prepareForm(Clients, client);
+    $scope.client = client;
     SACCO.query(function(saccos) {
       if (!saccos.length) {
         saccos = [ {

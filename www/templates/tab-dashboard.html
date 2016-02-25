@@ -56,7 +56,13 @@ table#SavSum tr>td {
           <tr> td>Short Report :</td>  </tr>
           </tfoot -->
           <tbody>
-          <tr ng-show="rolestat.isAdmin">
+          <tr ng-hide="num_saccos">
+            <td>Loading SACCOs..</td>
+            <td>&nbsp;</td>
+            <td><ion-spinner></ion-spinner>
+            </td>
+          </tr>
+          <tr ng-show="rolestat.isAdmin && num_saccos">
             <td>
               <div> Total SACCOs: </div>
             </td>
@@ -68,7 +74,13 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
-          <tr ng-show="rolestat.isManagement">
+          <tr ng-hide="num_staff">
+            <td>Loading Staff..</td>
+            <td>&nbsp;</td>
+            <td><ion-spinner></ion-spinner>
+            </td>
+          </tr>
+          <tr ng-show="rolestat.isManagement && num_staff">
             <td>
               <div> Your Staff: </div>
             </td>
@@ -80,7 +92,13 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
-          <tr ng-show="rolestat.isStaff">
+          <tr ng-hide="num_clients">
+            <td>Loading Clients</td>
+            <td>..</td>
+            <td><ion-spinner></ion-spinner>
+            </td>
+          </tr>
+          <tr ng-show="rolestat.isStaff && num_clients">
             <td>
               <div> Your Clients: </div>
             </td>
@@ -92,6 +110,11 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
+          <!-- FOR SAVINGS, LOANS, SHARES, etc
+            <tr>
+            <td colspan="2"></td>
+            <td><ion-spinner></ion-spinner></td>
+          </tr-->
           </tbody>
           </table>
         </ion-item>

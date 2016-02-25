@@ -617,8 +617,6 @@ angular.module('starter.services', ['ngCordova'] )
 .factory('FormHelper', function(DateUtil) {
   return {
     prepareForm: function(type, object) {
-      console.log("Called FormHelper.prepareForm " + typeof(object));
-      var rObject = new Object();
       var sfs = type.saveFields().concat(type.dataTables());
       var cfs = type.codeFields();
       var dfs = type.dateFields();
@@ -631,14 +629,13 @@ angular.module('starter.services', ['ngCordova'] )
         var fn = cfs[k];
         var v = object[k];
         if (fn) {
-          rObject[k] = fn(object);
+          object[k] = fn(object);
         } else if (dfHash[k]) { 
-          rObject[k] = DateUtil.isoDate(v);
+          object[k] = DateUtil.isoDate(v);
         } else {
-          rObject[k] = v;
+          object[k] = v;
         }
       }
-      return rObject;
     },
     preSaveForm: function(type, object) {
       console.log("Called FormHelper.preSaveForm with " + typeof(type) + ", " + typeof(object));
