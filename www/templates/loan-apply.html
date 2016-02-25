@@ -3,7 +3,10 @@
   <form name="loanAccCreateForm" novalidate>
 
     <div class="list padding">
-
+      <div class="Mandatory">
+          <sup><i class="icon ion-asterisk assertive"></i></sup>
+          : Mandatory fields
+      </div>
       <ion-item>
         <!-- div ng-hide="loanAccCreateForm.name.$pristine">
           <span class="ion-warn" ng-show="loanAccCreateForm.name.$error.required">
@@ -34,7 +37,9 @@
 
       <ion-item>
         <label class="item item-input item-select">
-          <div class="input-label">Select Product : </div>
+          <div class="input-label">Select Product 
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </div>
           <select name="productId" required>
             <option> Vehicle </option>
             <option> House </option>
@@ -73,7 +78,9 @@
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Principal Amount :</span>
+        <span class="input-label">Principal Amount
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </span>
         <label class="item-input-wrapper">
           <input type="tel" size="10" ng-minlength="3" name="principalAmount"
             placeholder="Enter the value" ng-model="XYZ.principalAmount">

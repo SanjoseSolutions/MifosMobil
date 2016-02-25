@@ -1,0 +1,77 @@
+<ion-view view-title="Buy Shares">
+  <ion-content ng-controller="SharesBuyCtrl">
+  <form name="SharesBuyForm" novalidate>
+
+    <div class="list padding">
+
+      <ion-item>
+        <!-- div ng-hide="savingAccCreateForm.name.$pristine">
+          <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.required">
+            SACCO Name is required
+          </span>
+          <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.minlength">
+            SACCO Name must be at least 3 characters
+          </span>
+        </div -->
+        <div ng-show="savingAccCreateForm.productId.$error.required">
+          <span class="ion-warn">No. of Shares is Required</span>
+        </div>
+      </ion-item>
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
+      <!-- ion-item>
+        <label class="item item-input item-select">
+          <div class="input-label">Select Product : </div>
+          <select name="productID" required>
+            <option selected>Basic Savings</option>
+          </select>
+        </label>
+      </ion-item -->
+
+      <div class="item item-input-inset">
+        <span class="input-label">No. of Shares :</span>
+        <label class="item-input-wrapper">
+          <input name="noOfShares" type="tel" placeholder=" ... "
+            size="15" ng-model="data.noOfShares" required>
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Price / Share :</span>
+        <label class="item-input-wrapper"> {{data.price}}
+          <!-- input type="text" size="20" ng-minlength="3" name="fieldOfficer"
+            placeholder="Field Officer's Name" ng-model="XYZ.fieldOfficer" -->
+        </label>
+        <i class="icon ion-social-bitcoin"> </i>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Amount :</span>
+        <label class="item-input-wrapper"> {{data.noOfShares * data.price}}
+          <!-- input type="text" size="10" ng-minlength="3" name="initialDeposit"
+            placeholder="Enter the value" ng-model="XYZ.initialDeposit" -->
+        </label> <i class="icon ion-social-bitcoin"> </i>
+      </div>
+
+      <ion-list-item class="padding">
+        <span ng-show="message"class="ion-{{message.type}}">
+          {{message.text}}
+        </span>
+        <button class="button button-block button-positive"
+            ng-click="sharesBuy()" ng-disabled="savingAccCreateForm.$invalid">
+          <h4>Save</h4>
+        </button>
+      </ion-list-item>
+
+    </div> <!-- End of List -->
+  </form>
+  <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
+  <script id="popup-template-html" type="text/ng-template">
+    <!-- label> Buy Shares </label> : < /* <strong>Product Name</strong */ -->
+    <br /><label> No. of Shares </label> : {{data.noOfShares}}
+    <br /><label> Price / Shares</label>
+            : {{data.price}}
+            <i class="icon ion-social-bitcoin"></i>
+    <br /><label> Amount </label> : {{data.amount}}
+  </script>
+  </ion-content>
+</ion-view>

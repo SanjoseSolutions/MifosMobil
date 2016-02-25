@@ -130,6 +130,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
+  .state('tab.client-shares-buy', {
+    url: '/clients/:id/shares-buy',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/shares-buy.html',
+        controller: 'SharesBuyCtrl'
+      }
+    }
+  } )
   .state('tab.client-sav-new', {
     url: '/clients/:id/savings-apply',
     views: {

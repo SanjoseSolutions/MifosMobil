@@ -657,6 +657,65 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
+.controller('SharesBuyCtrl',
+    function($scope, $stateParams, /* SavingsAccounts,  */
+     $ionicPopup, $timeout) {
+
+  $scope.data = {
+      price: 100,
+      noOfShares: 0,
+      amount: 0
+  }
+
+  $scope.sharesBuy = function()  {
+    // TO DO :
+    // Check the parameters' list
+
+    $scope.data.amount = $scope.data.noOfShares * $scope.data.price;
+
+    var myPopup = $ionicPopup.show({
+      title: '<strong>Shares Buy</strong>',
+      /* This Url takes you to a script with the same ID Name in index.html */
+      templateUrl: 'popup-template-html',
+      scope: $scope, // null,
+      buttons: [
+        { text: 'Cancel',
+          type: 'button-default', //'button-clear',
+          onTap: function(e) {
+            // e.preventDefault() will stop the popup from closing when tapped.
+            return "Popup Canceled"; // false;
+          }
+        },
+        { text: '<b>Buy</b>',
+          type: 'button-positive',
+          onTap: function(e) {
+            if (!$scope.data.noOfShares) {
+              e.preventDefault();
+              //don't allow the user to close the popup if empty
+            } else {
+              // Returning a value will cause the promise to resolve with the given value.
+              return $scope.data; // true;
+            }
+          }
+        }
+      ]
+    });
+
+    myPopup.then(function(res) {
+      console.log('Received : ' + '"' + res + '"');
+      // Insert the appropriate Code here
+      // to process the Received Data for Saving Account Creation
+    });
+
+    $timeout(function() {
+      console.log("Popup TimeOut");
+      myPopup.close();
+    }, 15000);
+  };
+
+} )
+//
+
 .controller('ClientNextOfKinCtrl', function($scope, $stateParams, Customers, DateUtil, DataTables) {
   var clientId = $stateParams.clientId;
   console.log("ClientNextOfKinCtrl invoked");

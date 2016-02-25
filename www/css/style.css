@@ -56,3 +56,9 @@ ion-content {
 .noVertPadd {
   padding: 0px 3px;
 }
+
+.Mandatory {
+    font-size: 0.9rem;
+    font-family: verdana;
+    font-style: italic;
+}
