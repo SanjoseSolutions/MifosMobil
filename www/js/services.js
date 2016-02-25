@@ -327,6 +327,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         if (data.length > 0) {
+          Cache.setObject(k, data);
           fn_dtrow(data[0], name);
         }
       } );
