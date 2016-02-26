@@ -315,10 +315,10 @@ angular.module('starter.services', ['ngCordova'] )
         fn_dtable(data);
       } );
     },
-    get_one: function(name, id, fn_dtrow) {
+    get_one: function(name, id, fn_dtrow, fn_fail) {
       var k = 'dt.' + name + '.' + id;
       var fdata = Cache.getObject(k);
-      if (fdata && fdata.length) {
+      if (fdata) {
         console.log("DATATABLE: " + k + " from Cache");
         var fields = fdata[0];
         fn_dtrow(fields, name);
@@ -328,9 +328,12 @@ angular.module('starter.services', ['ngCordova'] )
         var data = response.data;
         if (data.length > 0) {
           console.log("Caching " + k + "::" + JSON.stringify(data));
-          Cache.setObject(k, data);
           fn_dtrow(data[0], name);
         }
+        Cache.setObject(k, data);
+      }, function(response) {
+        if (fn_fail)
+          fn_fail(response);
       } );
     },
     update: function(name, id, fields, fn_fields, fn_offline, fn_fail) {
