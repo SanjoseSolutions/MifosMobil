@@ -1,5 +1,5 @@
 <style>
-label {
+label, .label {
  	color: #558;
 }
 .item, ion-item {
@@ -100,12 +100,10 @@ label {
           <label>Loan Officer </label>: {{isLoanOfficer}}
       </ion-item>
       <ion-item>
-      	<label>Total Members </label>: 
-          <span style="padding-left:2em">
-            <div style="margin-top:10px" class="icon ion-ios-people">
-            {{TotalMembers? TotalMembers : 25}}
-            </div>
-          </span>
+      	<label> Total Members </label> :
+        <span class="icon ion-ios-people">
+          {{TotalMembers? TotalMembers : 25}}  
+        </span>
       </ion-item>
       <ion-item>
 	       <label> Total Loans </label> : <i class="icon ion-social-bitcoin"></i>
