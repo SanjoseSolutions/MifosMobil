@@ -327,6 +327,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         if (data.length > 0) {
+          console.log("Caching " + k + "::" + JSON.stringify(data));
           Cache.setObject(k, data);
           fn_dtrow(data[0], name);
         }
@@ -420,7 +421,7 @@ angular.module('starter.services', ['ngCordova'] )
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
         if (202 == response.status) {
-          console.log("Create office request accepted");
+//          console.log("Create office request accepted");
           var offices = Cache.getObject('h_offices');
           var k = HashUtil.nextKey(offices);
           var new_office = new Object();
@@ -525,7 +526,7 @@ angular.module('starter.services', ['ngCordova'] )
             } );
           }   
         }
-        console.log("No. of SUs: " + sunions.length);
+//        console.log("No. of SUs: " + sunions.length);
         fn_sunions(sunions);
       } );
     },
@@ -938,21 +939,25 @@ angular.module('starter.services', ['ngCordova'] )
           fn_accts(data.pageItems);
         } );
     },
-    withdraw: function(id, params, fn_res, fn_err) {
+    withdraw: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=withdrawal',
         params, {}, function(response) {
           var data = response.data;
           fn_res(data);
         }, function(response) {
+          fn_offline(response);
+        }, function(response) {
           console.log("Failed to withdraw. Received " + response.status);
           fn_err(response);
         } );
     },
-    deposit: function(id, params, fn_res, fn_err) {
+    deposit: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=deposit',
         params, {}, function(response) {
           var data = response.data;
           fn_res(data);
+        }, function(response) {
+          fn_offline(response);
         }, function(response) {
           console.log("Failed to deposit. Received " + response.status);
           fn_err(response);
@@ -975,6 +980,18 @@ angular.module('starter.services', ['ngCordova'] )
         .then(function(response) {
           var data = response.data;
           fn_accounts(data.pageItems);
+        } );
+    },
+    repay: function(id, params, fn_res, fn_offline, fn_err) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=repayment')
+        .then(function(response) {
+          if (202 == response.status) {
+            fn_offline(response);
+            return;
+          }
+          fn_res(response.data);
+        }, function(response) {
+          fn_err(response);
         } );
     }
   };

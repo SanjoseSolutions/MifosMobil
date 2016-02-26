@@ -148,7 +148,7 @@ angular.module('starter.controllers', ['ngCordova'])
   console.log("SACCO Reg invoked");
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
-    $scope.data.offices = data;
+    $scope.data.sunions = data;
     $scope.data.op = "Register";
   } );
   $scope.saveSacco = function(office, sacco) {
@@ -499,6 +499,15 @@ angular.module('starter.controllers', ['ngCordova'])
               text: 'Deposit successful!'
             };
           }, function(res) {
+            $scope.message = {
+              type: 'info',
+              text: 'Deposit accepted..'
+            };
+          }, function(res) {
+            $scope.message = {
+              type: 'warn',
+              text: 'Deposit failed'
+            };
             console.log("Depsoit fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
@@ -531,6 +540,15 @@ angular.module('starter.controllers', ['ngCordova'])
               text: 'Withdrawal successful!'
             };
           }, function(res) {
+            $scope.message = {
+              type: 'info',
+              text: 'Withdraw accepted'
+            };
+          }, function(res) {
+            $scope.message = {
+              type: 'warn',
+              text: 'Withdraw failed'
+            };
             console.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
@@ -632,13 +650,22 @@ angular.module('starter.controllers', ['ngCordova'])
             dateFormat: 'yyyy-MM-dd'
           };
           console.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
-          LoanAccounts.repayment(id, params, function(data) {
+          LoanAccounts.repay(id, params, function(data) {
             console.log("Repayment successful!");
             $scope.message = {
               type: 'info',
               text: 'Repayment successful!'
             };
           }, function(res) {
+            $scope.message = {
+              type: 'info',
+              text: 'Repayment accepted..'
+            };
+          }, function(res) {
+            $scope.message = {
+              type: 'warn',
+              text: 'Repayment failed'
+            };
             console.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
