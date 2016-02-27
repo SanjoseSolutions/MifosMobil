@@ -697,11 +697,13 @@ angular.module('starter.services', ['ngCordova'] )
     nextKey: function(obj) {
       var id = 1;
       for(var k in obj) {
-        if ('T' == k.chatAt(0)) {
+        if ('T' == k.charAt(0)) {
           ++id;
         }
       }
-      return "T" + id.toString();
+      var nk = "T" + id.toString();
+      console.log("Got nextKey:" + nk);
+      return nk;
     },
     to_a: function(obj) {
       var a = new Array();
@@ -789,9 +791,9 @@ angular.module('starter.services', ['ngCordova'] )
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
         if (202 == response.code) {
-          var id = HashUtil.nextKey();
-          client["id"] = id;
           clients = Cache.getObject('h_clients') || {};
+          var id = HashUtil.nextKey(clients);
+          client["id"] = id;
           clients[id] = client;
           Cache.setObject('h_clients', clients);
           fn_offline(client);
