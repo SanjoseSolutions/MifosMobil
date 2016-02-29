@@ -1,4 +1,18 @@
-/*  MifosMobil Controller file
+/*  
+ *  Copyright 2016 SanJose Solutions, Bangalore
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *  Filename: www/js/controllers.js
  *  This file has all Controllers:
  *  - MainCtrl: common to entire app
@@ -994,7 +1008,7 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log("Client created:" + JSON.stringify(new_client));
       $scope.message = {
         "type": "info",
-        "text": "Client created with id #" + new_client.id
+        "text": "Client created with id #" + new_client.clientId
       };
       var cdts = Clients.dataTables();
       for(var i = 0; i < cdts.length; ++i) {
@@ -1012,10 +1026,13 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Accepted Client create request (offline)"
       };
     }, function(response) {
+      logger.warn("Client create fail(" + response.status + ") RESPONSE:"
+        + JSON.stringify(response.data));
       var errors = response.data.errors;
       var errmsg = errors ? errors.map(function(e) {
         e.defaultUserMessage
       } ).join("\n") : "";
+      logger.warn("ERROR: " + errmsg);
       $scope.message = {
         "type": "error",
         "text": "Client creation failed with code:"+response.status

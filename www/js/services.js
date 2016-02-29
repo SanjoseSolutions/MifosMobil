@@ -1,5 +1,21 @@
-/*  This is the services script - contains key app services
- *  Current services available (this should be kept up-to-date)
+/*
+ *  Copyright 2016 SanJose Solutions, Bangalore
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ *  Filename: www/js/services.js
+ *  This file has a set of services
+ *  Current services available (to be kept up-to-date)
  *    1. baseUrl: the base URL of Mifos X backend
  *    2. authHttp: HTTP + Authentication (wraps around http)
  *    3. Session: login, logout, username, authinfo
@@ -22,7 +38,7 @@ angular.module('starter.services', ['ngCordova'] )
   angular.forEach(['log', 'warn', 'info'], function(method) {
     logger[method] = function(msg) {
       var dt = new Date();
-      $rootScope.messages.push( {
+      $rootScope.messages.unshift( {
         time: dt.toISOString(),
         type: 'log',
         text: msg
