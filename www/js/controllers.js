@@ -210,6 +210,16 @@ angular.module('starter.controllers', ['ngCordova'])
         "type": "info",
         "text": "Successfully created SACCO #" + new_office.officeId
       };
+      var odts = Office.dataTables();
+      for(var i = 0; i < odts.length; ++i) {
+        DataTables.save(odts[i], new_office.officeId, client[cdts[i]], function(data) {
+          logger.log("Saved datatables data: " + data);
+        }, function(response) {
+          logger.log("Accepted for offline: " + JSON.stringify(response));
+        }, function(response) {
+          logger.log("Failed to save datatables data: " + response.status);
+        } );
+      }
     }, function(office) {
       $scope.message = {
         "type": "info",
@@ -969,7 +979,7 @@ angular.module('starter.controllers', ['ngCordova'])
       };
       var cdts = Clients.dataTables();
       for(var i = 0; i < cdts.length; ++i) {
-        DataTables.save(cdts[i], new_client.id, client[cdts[i]], function(data) {
+        DataTables.save(cdts[i], new_client.clientId, client[cdts[i]], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
