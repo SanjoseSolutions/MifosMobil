@@ -137,6 +137,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
   $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
     $rootScope.isOnline = false;
+    $scope.session.takeOffline();
     $ionicPopup.alert( {
       title: "Going Offline",
       template: "k-Mayra is going offline"
@@ -145,6 +146,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
   $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
     $rootScope.isOnline = true;
+    $scope.session.takeOnline();
     $rootScope.cmd_success = 0;
     $rootScope.msg = "";
     $rootScope.onlinePopup =
@@ -192,7 +194,7 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, logger) {
+.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil, logger) {
   logger.log("SACCO Reg invoked");
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
@@ -201,26 +203,12 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
   $scope.saveSacco = function(office, sacco) {
     var sfs = Office.saveFields;
-    var ofields = new Object();
-    for(var i = 0; i < sfs.length; ++i) {
-      var fld = sfs[i];
-      ofields[fld] = office[fld];
-    }
-    ofields.dateFormat = "yyyy-MM-dd";
-    ofields.locale = "en";
-    var df = Office.dateFields;
-    for(var i = 0; i < df.length; ++i) {
-      var fld = df[i];
-      var val = ofields[fld];
-      if (val != null) {
-        val = val.toISOString().substring(0, 10);
-        ofields[fld] = val;
-      }
-    }
+    ofields = FormHelper.preSaveForm(Office, office, false);
+    logger.log("SACCO data: " + JSON.stringify(ofields));
     Office.save(ofields, function(new_office) {
       $scope.message = {
         "type": "info",
-        "text": "Successfully created SACCO: " + new_office.id
+        "text": "Successfully created SACCO #" + new_office.officeId
       };
     }, function(office) {
       $scope.message = {
@@ -230,7 +218,7 @@ angular.module('starter.controllers', ['ngCordova'])
     }, function(response) {
       var errors = response.data.errors;
       var errmsg = errors ? errors.map(function(e) {
-        e.defaultUserMessage
+        return e.defaultUserMessage
       } ).join("\n") : "";
       $scope.message = {
         "type": "error",
@@ -317,7 +305,7 @@ angular.module('starter.controllers', ['ngCordova'])
     }, function(response) {
       var errors = response.data.errors;
       var errmsg = errors ? errors.map(function(e) {
-        e.defaultUserMessage
+        return e.defaultUserMessage
       } ).join("\n") : "";
       logger.log("SACCO edit fail: " + errmsg);
       $scope.message = {
@@ -919,7 +907,7 @@ angular.module('starter.controllers', ['ngCordova'])
           }, function(response) {
             var errors = response.data.errors;
             var errmsg = errors ? errors.map(function(e) {
-              e.defaultUserMessage
+              return e.defaultUserMessage
             } ).join("\n") : "";
             $scope.message = {
               "type": "info",
@@ -944,7 +932,7 @@ angular.module('starter.controllers', ['ngCordova'])
     }, function(response) {
       var errors = response.data.errors;
       var errmsg = errors ? errors.map(function(e) {
-        e.defaultUserMessage
+        return e.defaultUserMessage
       } ).join("\n") : "";
       $scope.message = {
         "type": "warn",
@@ -954,7 +942,7 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO, logger) {
+.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO, FormHelper, logger) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -971,38 +959,7 @@ angular.module('starter.controllers', ['ngCordova'])
   logger.log("Looking to register client");
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
-    var keys = ["firstname", "lastname", "mobileNo"];
-    var dateFields = [ "dateOfBirth" ];
-    var cfields = new Object();
-    var sf = Clients.saveFields();
-    for(var i = 0; i < sf.length; ++i) {
-      var fld = sf[i];
-      var val = client[fld];
-      logger.log("Client " + fld + " ISA " + typeof(val));
-      if ('Object' === typeof(val)) {
-        if (val["id"]) {
-          val = val.id;
-        } else {
-          logger.log("Client Hash field without id:"+fld);
-          val = "";
-        }
-        cfields[fld+"Id"] = val;
-      } else {
-        cfields[fld] = val;
-      }
-    }
-    var df = Clients.dateFields();
-    for(var i = 0; i < df.length; ++i) {
-      var fld = df[i];
-      var val = cfields[fld];
-      if (val != null) {
-        val = val.toISOString().substring(0, 10);
-        cfields[fld] = val;
-        logger.log("Client date field " + fld + " = " + val);
-      }
-    }
-    cfields["dateFormat"] = "yyyy-MM-dd";
-    cfields["locale"] = "en";
+    var cfields = FormHelper.preSaveForm(Clients, client, false);
     cfields["active"] = true;
     Clients.save(cfields, function(new_client) {
       logger.log("Client created:" + JSON.stringify(new_client));
@@ -1030,12 +987,12 @@ angular.module('starter.controllers', ['ngCordova'])
         + JSON.stringify(response.data));
       var errors = response.data.errors;
       var errmsg = errors ? errors.map(function(e) {
-        e.defaultUserMessage
+        return e.defaultUserMessage
       } ).join("\n") : "";
       logger.warn("ERROR: " + errmsg);
       $scope.message = {
         "type": "error",
-        "text": "Client creation failed with code:"+response.status
+        "text": "Client creation failed with code:"+response.status+"\n"
           + errmsg
       };
     } );

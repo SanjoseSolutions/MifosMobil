@@ -240,7 +240,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   session.status = function() {
-    return $rootScope.isOnline ? "Online" : "Offline";
+    return session.isOnline ? "Online" : "Offline";
   };
 
   session.loggedInTime = function() {
@@ -449,12 +449,13 @@ angular.module('starter.services', ['ngCordova'] )
 .factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
   return {
     dateFields: function() {
-      return ["joiningDate"];
+      return ["openingDate"];
     }, // "openingDate"],
     saveFields: function() {
       return ["openingDate", "name", "parentId"];
     },
     codeFields: function() { return []; },
+    skipFields: function() { return {} },
     prepareForm: function(office) {
       var sfs = this.saveFields;
       for(var i = 0; i < sfs.length; ++i) {
@@ -690,31 +691,37 @@ angular.module('starter.services', ['ngCordova'] )
         }
       }
     },
-    preSaveForm: function(type, object) {
-      logger.log("Called FormHelper.preSaveForm with " + typeof(type) + ", " + typeof(object));
+    preSaveForm: function(type, object, isUpdate) {
+      if (isUpdate == null) isUpdate = true;
+      logger.log("Called FormHelper.preSaveForm with " + JSON.stringify(object));
       var sObject = new Object();
       var skf = type.skipFields();
       var svf = type.saveFields();
       var dfs = type.dateFields();
       var dfHash = new Object();
-      for(var i = 0; i < dfs.length; ++i) {
-        dfHash[dfs[i]] = 1;
-      }
       for(var i = 0; i < svf.length; ++i) {
         var k = svf[i];
-        if (skf[k]) {
+        if (isUpdate && skf && skf[k]) {
           logger.log("Skipping field: " + k);
           continue;
         }
-        if (dfHash[k]) {
-          var dt = object[k];
-          sObject[k] = dt.toISOString().substr(0, 10);
-        } else {
-          sObject[k] = object[k];
-        }
+        sObject[k] = object[k];
       }
-      sObject.dateFormat = "yyyy-MM-dd";
-      sObject.locale = "en";
+      if (dfs.length) {
+        for(var i = 0; i < dfs.length; ++i) {
+          var df = dfs[i];
+          var v = sObject[df];
+          logger.log("Got date " + df + "=" + v);
+          if (v instanceof Date) {
+            v = v.toISOString();
+          }
+          v = v.substr(0, 10);
+          logger.log("Got date " + df + "=" + v);
+          sObject[df] = v;
+        }
+        sObject.dateFormat = "yyyy-MM-dd";
+        sObject.locale = "en";
+      }
       return sObject;
     },
   };
