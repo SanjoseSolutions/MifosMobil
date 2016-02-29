@@ -136,7 +136,7 @@ table#SavSum tr>td {
         </ion-item>
         <ion-item>
           You're {{session.status()}}. 
-          <div ng-hide="session.isOnline">
+          <div ng-hide="isOnline">
             Last synced: {{session.lastSyncSince()}}
           </div>
         </ion-item>
@@ -150,6 +150,9 @@ table#SavSum tr>td {
           </button>
         </ion-item>
         <ion-item>
+          <center>
+            <tt style="font-size:60%">{{msg}}</tt>
+          </center>
           <center><a href="#/tab/dashboard/logs">View Logs</a></center>
           <center>More visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
         </ion-item>
@@ -178,9 +181,6 @@ table#SavSum tr>td {
 	When a button is clicked a Modal pops up
 	</button>
 -->
-        <ion-item>
-          <tt style="font-size:60%">{{msg}}</tt>
-        </ion-item>
       </ion-list>
 
     </ion-card>

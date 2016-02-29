@@ -157,12 +157,12 @@ angular.module('starter.controllers', ['ngCordova'])
       $rootScope.cmd_success = 0;
       $rootScope.msg += "<br />Command count: " + n;
     }, function(method, url, data, response) {
-      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + JSON.stringify(data) +
-        "SUCCESS";
+      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
+        " bytes data SUCCESS";
       $rootScope.cmd_success++;
     }, function(method, url, data, response) {
-      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + JSON.stringify(data) +
-        "FAIL(" + response.status + ") : " + JSON.stringify(response.data);
+      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
+        " bytes data FAIL(" + response.status + ")";
     }, function() {
       $rootScope.msg += "<br />RESULT: {{cmd_success}} SUCCESS, {{cmd_count - cmd_success}} FAIL";
     } );

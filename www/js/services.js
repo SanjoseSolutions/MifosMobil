@@ -217,7 +217,8 @@ angular.module('starter.services', ['ngCordova'] )
 } )
 
 .factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles', 'Cache', 
-    'Codes', 'logger', function(baseUrl, authHttp, $http, $state, Roles, Cache, Codes, logger) {
+    'Codes', 'logger', '$rootScope', function(baseUrl, authHttp, $http, $state,
+    Roles, Cache, Codes, logger, $rootScope) {
 
   var session = { isOnline: true, role: null, loginTime: null };
   session.takeOnline = function() {
@@ -239,7 +240,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   session.status = function() {
-    return session.isOnline ? "Online" : "Offline";
+    return $rootScope.isOnline ? "Online" : "Offline";
   };
 
   session.loggedInTime = function() {
