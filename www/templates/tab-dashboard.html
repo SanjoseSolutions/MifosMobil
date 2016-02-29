@@ -56,7 +56,7 @@ table#SavSum tr>td {
           <tr> td>Short Report :</td>  </tr>
           </tfoot -->
           <tbody>
-          <tr ng-hide="num_saccos">
+          <tr ng-show="rolestat.isAdmin && !num_saccos">
             <td>Loading SACCOs..</td>
             <td>&nbsp;</td>
             <td><ion-spinner></ion-spinner>
@@ -72,9 +72,10 @@ table#SavSum tr>td {
                 View
                 <span class="icon ion-ios-briefcase-outline"> </span>
               </a>
+              <!--span>{{nextSACCO}}</span-->
             </td>
           </tr>
-          <tr ng-hide="num_staff">
+          <tr ng-show="rolestat.isManagement && !num_staff">
             <td>Loading Staff..</td>
             <td>&nbsp;</td>
             <td><ion-spinner></ion-spinner>
@@ -92,7 +93,7 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
-          <tr ng-hide="num_clients">
+          <tr ng-show="rolestat.isStaff && !num_clients">
             <td>Loading Clients</td>
             <td>..</td>
             <td><ion-spinner></ion-spinner>
@@ -108,6 +109,7 @@ table#SavSum tr>td {
                 View
                 <span class="ion-ios-people-outline"> </span>
               </a>
+              <!--span>{{nextClient}}</span-->
             </td>
           </tr>
           <!-- FOR SAVINGS, LOANS, SHARES, etc
@@ -134,7 +136,8 @@ table#SavSum tr>td {
           </button>
         </ion-item>
         <ion-item>
-          <center> Visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
+          <center><a href="#/tab/dashboard/logs">View Logs</a></center>
+          <center>More visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
         </ion-item>
     <!-- WILL BE USED IN PHASE 2
     	 in one of the Templates
@@ -161,6 +164,9 @@ table#SavSum tr>td {
 	When a button is clicked a Modal pops up
 	</button>
 -->
+        <ion-item>
+          <tt style="font-size:60%">{{msg}}</tt>
+        </ion-item>
       </ion-list>
 
     </ion-card>

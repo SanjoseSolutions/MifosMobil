@@ -1,0 +1,27 @@
+<style>
+.log {
+  border: 1px solid #446;
+}
+.info {
+  border: 1px solid #555;
+}
+.warn {
+  border: 1px solid #642;
+}
+</style>
+<ion-view view-title="Logs">
+<div ng-hide="log.messages">
+  No log messages!
+</div>
+<div ng-show="log.messages">
+  Log messages: {{log.messages.length}}
+</div>
+<div class="row {{message.type}}" ng-repeat="message in log.messages">
+<div class="col col-20">
+  {{message.time}}
+</div>
+<div class="col {{message.type}}">
+  {{message.text}} 
+</div>
+</div>
+</ion-view>

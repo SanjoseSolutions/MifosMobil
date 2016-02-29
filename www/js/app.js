@@ -230,6 +230,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     }
   } )
 
+  .state('tab.dashboard-logs', {
+    url: '/dashboard/logs',
+    views: {
+      'tab-dashboard': {
+        templateUrl: 'templates/logs.html',
+        controller: 'LogsCtrl'
+      }
+    }
+  } )
+
   .state('tab.dashboard', {
     url: '/dashboard',
     views: {
