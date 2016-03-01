@@ -53,7 +53,7 @@ angular.module('starter.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout, logger) {
+.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout, $state, logger) {
   $scope.cred = {};
   $scope.login = function(auth) {
     if (window.Connection && $cordovaNetwork.isOffline()) {
@@ -66,6 +66,9 @@ angular.module('starter.controllers', ['ngCordova'])
     logger.log("Anon scope Login called..");
     $scope.message = null;
     Session.login(auth, function(response) {
+      logger.log("Login successful");
+      $state.go('tab.dashboard');
+    }, function(response) {
       logger.log("Login failed. Got:"+response.status);
       var msg = "";
       if (401 == response.status) {
@@ -418,7 +421,7 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
-    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger) {
+    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera) {
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
   $scope.client = {};
@@ -426,7 +429,8 @@ angular.module('starter.controllers', ['ngCordova'])
     client["NumShares"] = parseInt(Math.random()*10);
     $scope.client = client;
     $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
+    var gname = client.gender.name || "male";
+    $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
   } );
   Clients.get_accounts(clientId, function(accounts) {
     var savingsAccounts = accounts["savingsAccounts"] || [];
@@ -461,10 +465,22 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.client.TotalLoans = totalLoans;
     $scope.client.loanAccounts = lacs;
   } );
+  $scope.getPhoto = function() {
+    logger.log('Getting camera');
+    Camera.getPicture( {
+      quality: 75,
+      targetWidth: 150,
+      targetHeight: 150,
+      saveToPhotoAlbum: false
+    } ).then(function(imageURI) {
+      $scope.client.face = imageURI;
+    }, function(err) {
+      logger.log(err);
+    } );
+  };
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );
-  // ToDo client savings, loan summary needed
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
@@ -1024,24 +1040,35 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
     Session, Customers, Staff, SACCO, HashUtil, $ionicPopup, logger) {
+
+  var session = null;
   $scope.$on('$ionicView.enter', function(e) {
-    var session = Session;
-    var role = session.role;
-    switch (role) {
-      case "Admin":
-        SACCO.query_full(function(data) {
-          $scope.num_saccos = data.length;
-        } );
-      case "Management":
-        Staff.query(function(staff) {
-          $scope.num_staff = staff.length;
-        } );
-      case "Staff":
-        Customers.query_full(function(clients) {
-          $scope.num_clients = clients.length;
-        } );
+    if (null == session) {
+      session = Session;
+      var loginPopup = $ionicPopup.alert( {
+        title: 'Logging In',
+        template: '<p>.<br>\n' +
+          '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
+          '<p>Login successful! Welcome ' + session.username() + '</p>',
+        scope: $scope
+      } );
+      var role = session.role;
+      switch (role) {
+        case "Admin":
+          SACCO.query_full(function(data) {
+            $scope.num_saccos = data.length;
+          } );
+        case "Management":
+          Staff.query(function(staff) {
+            $scope.num_staff = staff.length;
+          } );
+        case "Staff":
+          Customers.query_full(function(clients) {
+            $scope.num_clients = clients.length;
+          } );
+      }
+      $scope.session = session;
     }
-    $scope.session = session;
   } );
   /*
   var saccos = Cache.getObject('h_offices');

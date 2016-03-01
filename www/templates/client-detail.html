@@ -33,19 +33,37 @@ label {
 	margin: 0px;
 	padding: 2px 3px;
 	border: none;
-/*	font-style:italic;	*/
 	font-family:corsiva;
+}
+.client-photo {
+  height: 165px;
+  float: left;
+}
+.client-photo img {
+  margin: 2px 2px 15px 2px;
+}
+.client-photo .ion-camera {
+  font-size: 15px;
+  padding: 1px 3px;
+  height: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #778;
+  text-decoration: underline;
 }
 </style>
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
-    <div class="list card" style="clear:both; height:160px">
+    <div class="list card" style="clear:both; height:170px">
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
 	     <h4>{{client.fullname}}</h4>
       </div -->
-      <img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
+      <div class="client-photo">
+        <div class="ion-camera" ng-click="getPhoto()">&nbsp;Take Photo</div>
+        <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
+      </div>
       <ion-list>
         <h4>{{client.displayName}}</h4>
       	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->

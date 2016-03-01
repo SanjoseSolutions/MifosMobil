@@ -249,7 +249,7 @@ angular.module('starter.services', ['ngCordova'] )
     return session.loginTime ? session.loginTime.toLocaleString() : "Never";
   };
 
-  session.login = function(auth, fn_fail) {
+  session.login = function(auth, fn_success, fn_fail) {
     var uri = baseUrl + '/authentication';
     logger.log("auth:"+JSON.stringify(auth));
     if (auth.client) {
@@ -265,7 +265,6 @@ angular.module('starter.services', ['ngCordova'] )
     } ).then(function(response) {
 
       session.loginTime = new Date();
-      logger.log("Login successful");
       Cache.set('username', auth.username);
       Cache.setObject('commands', []);
 
@@ -278,13 +277,13 @@ angular.module('starter.services', ['ngCordova'] )
       session.role = role;
       
       var b64key = data.base64EncodedAuthenticationKey;
-      logger.log("B64 Auth Key:" + b64key);
       authHttp.setAuthHeader(b64key);
 
       Cache.setObject('session', session);
       Codes.init();
 
-      $state.go('tab.dashboard');
+      fn_success(response);
+
     }, function(response) {
       fn_fail(response);
     } );
@@ -1156,5 +1155,28 @@ angular.module('starter.services', ['ngCordova'] )
     }
   };
 } )
+
+.factory('Camera', ['$q', function($q) {
+
+  return {
+    getPicture: function(options) {
+      var q = $q.defer();
+
+      if (navigator.camera) {
+        navigator.camera.getPicture(function(result) {
+          // Do any magic you need
+          q.resolve(result);
+        }, function(err) {
+          q.reject(err);
+        }, options);
+      } else {
+        q.reject("Camera not available");
+      }
+
+      return q.promise;
+    }
+  }
+}])
+
 ;
 

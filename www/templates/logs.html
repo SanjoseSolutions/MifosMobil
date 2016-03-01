@@ -30,18 +30,17 @@ div.col {
 }
 </style>
 <ion-view view-title="Logs">
-<div ng-hide="log.messages">
-  No log messages!
-</div>
-<div ng-show="log.messages">
-  Log messages: {{log.messages.length}}
-</div>
-<div class="row {{message.type}}" ng-repeat="message in log.messages">
-<div class="col col-20">
-  {{message.time}}
-</div>
-<div class="col {{message.type}}">
-  {{message.text}} 
-</div>
-</div>
+  <div ng-hide="log.messages">
+    No log messages!
+  </div>
+  <ion-scroll zooming="true" direction="y" ng-show="log.messages">
+    <div class="row {{message.type}}" ng-repeat="message in log.messages">
+      <div class="col col-20">
+        {{message.time}}
+      </div>
+      <div class="col {{message.type}}">
+        {{message.text}} 
+      </div>
+    </div>
+  </ion-scroll>
 </ion-view>
