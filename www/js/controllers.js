@@ -34,7 +34,6 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork', 'logger',
     function($rootScope, $scope, Session, $cordovaNetwork, logger) {
-  logger.log("MainCtrl invoked");
   $scope = {
     session: Session
   };
@@ -56,7 +55,6 @@ angular.module('starter.controllers', ['ngCordova'])
 //});
 .controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout, logger) {
   $scope.cred = {};
-  logger.log("Anon Controller invoked");
   $scope.login = function(auth) {
     if (window.Connection && $cordovaNetwork.isOffline()) {
       $scope.message = {
@@ -131,7 +129,7 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('TabsCtrl', function($scope, $rootScope, Session,
-    Roles, $cordovaNetwork, authHttp, $ionicPopup) {
+    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup) {
 
   $scope.session = Session.get();
 
@@ -173,6 +171,8 @@ angular.module('starter.controllers', ['ngCordova'])
     }, 10000);
 
     // ToDo: add other synchronization code here
+
+    Cache.updateLastSync();
   } );
 
   $scope.$on('$ionicView.enter', function(e) {
@@ -195,7 +195,6 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil, logger) {
-  logger.log("SACCO Reg invoked");
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
     $scope.data.sunions = data;
@@ -801,7 +800,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('ClientNextOfKinCtrl', function($scope, $stateParams, Customers, DateUtil, DataTables, logger) {
   var clientId = $stateParams.clientId;
-  logger.log("ClientNextOfKinCtrl invoked");
+  logger.log("ClientNextOfKinCtrl invoked for client #" + clientId);
   Customers.get_full(clientId, function(client) {
     $scope.client = client;
     $scope.client.dateOfBirth = DateUtil.isoDateStr(client.dateOfBirth);
@@ -1025,24 +1024,25 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
     Session, Customers, Staff, SACCO, HashUtil, $ionicPopup, logger) {
-  logger.log("DashboardCtrl invoked");
-  var session = Session;
-  var role = session.role;
-  switch (role) {
-    case "Admin":
-      SACCO.query_full(function(data) {
-        $scope.num_saccos = data.length;
-      } );
-    case "Management":
-      Staff.query(function(staff) {
-        $scope.num_staff = staff.length;
-      } );
-    case "Staff":
-      Customers.query_full(function(clients) {
-        $scope.num_clients = clients.length;
-      } );
-  }
-  $scope.session = session;
+  $scope.$on('$ionicView.enter', function(e) {
+    var session = Session;
+    var role = session.role;
+    switch (role) {
+      case "Admin":
+        SACCO.query_full(function(data) {
+          $scope.num_saccos = data.length;
+        } );
+      case "Management":
+        Staff.query(function(staff) {
+          $scope.num_staff = staff.length;
+        } );
+      case "Staff":
+        Customers.query_full(function(clients) {
+          $scope.num_clients = clients.length;
+        } );
+    }
+    $scope.session = session;
+  } );
   /*
   var saccos = Cache.getObject('h_offices');
   $scope.nextSACCO = HashUtil.nextKey(saccos);

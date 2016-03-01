@@ -78,6 +78,8 @@ angular.module('starter.services', ['ngCordova'] )
         localStorage.removeItem(key);
       }
       index = {};
+    },
+    'updateLastSync': function() {
       lastSync = new Date();
     },
     'lastSyncSince': function() {
