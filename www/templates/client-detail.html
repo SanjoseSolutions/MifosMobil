@@ -1,4 +1,18 @@
 <!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
   This template loads for the 'tab.friend-detail' state (app.js)
   'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
   The FriendsCtrl pulls data from the Friends service (service.js)
@@ -19,19 +33,37 @@ label {
 	margin: 0px;
 	padding: 2px 3px;
 	border: none;
-/*	font-style:italic;	*/
 	font-family:corsiva;
+}
+.client-photo {
+  height: 165px;
+  float: left;
+}
+.client-photo img {
+  margin: 2px 2px 15px 2px;
+}
+.client-photo .ion-camera {
+  font-size: 15px;
+  padding: 1px 3px;
+  height: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #778;
+  text-decoration: underline;
 }
 </style>
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
-    <div class="list card" style="clear:both; height:160px">
+    <div class="list card" style="clear:both; height:170px">
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
 	     <h4>{{client.fullname}}</h4>
       </div -->
-      <img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
+      <div class="client-photo">
+        <div class="ion-camera" ng-click="getPhoto()">&nbsp;Take Photo</div>
+        <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
+      </div>
       <ion-list>
         <h4>{{client.displayName}}</h4>
       	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->

@@ -1,3 +1,17 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <!-- script>
 function ConfirmLogOut() {
     var x;
@@ -44,10 +58,10 @@ table#SavSum tr>td {
             Welcome, <strong>{{session.username()}}</strong>!
           </ion-label>
         </ion-item>
-        <ion-item>
+        <ion-item ng-show="num_clients && num_saccos && num_staff">
           Your role: <strong>{{session.role}}</strong>     
           <!-- Table Summary -->
-          <table id="SavSum" border="1" style="width:100%">
+          <table border="1" style="width:100%">
           <caption> Your Session Summary </caption>
           <!-- thead> 
           <tr> <th title="SI NO"> # </th> </tr>
@@ -56,7 +70,7 @@ table#SavSum tr>td {
           <tr> td>Short Report :</td>  </tr>
           </tfoot -->
           <tbody>
-          <tr ng-hide="num_saccos">
+          <tr ng-show="rolestat.isAdmin && !num_saccos">
             <td>Loading SACCOs..</td>
             <td>&nbsp;</td>
             <td><ion-spinner></ion-spinner>
@@ -72,9 +86,10 @@ table#SavSum tr>td {
                 View
                 <span class="icon ion-ios-briefcase-outline"> </span>
               </a>
+              <!--span>{{nextSACCO}}</span-->
             </td>
           </tr>
-          <tr ng-hide="num_staff">
+          <tr ng-show="rolestat.isManagement && !num_staff">
             <td>Loading Staff..</td>
             <td>&nbsp;</td>
             <td><ion-spinner></ion-spinner>
@@ -92,7 +107,7 @@ table#SavSum tr>td {
               </a>
             </td>
           </tr>
-          <tr ng-hide="num_clients">
+          <tr ng-show="rolestat.isStaff && !num_clients">
             <td>Loading Clients</td>
             <td>..</td>
             <td><ion-spinner></ion-spinner>
@@ -108,6 +123,7 @@ table#SavSum tr>td {
                 View
                 <span class="ion-ios-people-outline"> </span>
               </a>
+              <!--span>{{nextClient}}</span-->
             </td>
           </tr>
           <!-- FOR SAVINGS, LOANS, SHARES, etc
@@ -120,7 +136,7 @@ table#SavSum tr>td {
         </ion-item>
         <ion-item>
           You're {{session.status()}}. 
-          <div ng-hide="session.isOnline">
+          <div ng-hide="isOnline">
             Last synced: {{session.lastSyncSince()}}
           </div>
         </ion-item>
@@ -134,7 +150,11 @@ table#SavSum tr>td {
           </button>
         </ion-item>
         <ion-item>
-          <center> Visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
+          <center ng-show="msg">
+            <tt style="font-size:60%">{{msg}}</tt>
+          </center>
+          <center><a href="#/tab/dashboard/logs">View Logs</a></center>
+          <center>More visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
         </ion-item>
     <!-- WILL BE USED IN PHASE 2
     	 in one of the Templates

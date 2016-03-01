@@ -1,4 +1,18 @@
-/*  MifosMobil Controller file
+/*  
+ *  Copyright 2016 SanJose Solutions, Bangalore
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *  Filename: www/js/controllers.js
  *  This file has all Controllers:
  *  - MainCtrl: common to entire app
@@ -18,13 +32,18 @@
 
 angular.module('starter.controllers', ['ngCordova'])
 
-.controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork',
-    function($rootScope, $scope, Session, $cordovaNetwork) {
-  console.log("MainCtrl invoked");
+.controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork', 'logger',
+    function($rootScope, $scope, Session, $cordovaNetwork, logger) {
   $scope = {
     session: Session
   };
-  console.log("Is authenticated: " + $scope.session.isAuthenticated() );
+  logger.log("Is authenticated: " + $scope.session.isAuthenticated() );
+} ] )
+
+.controller('LogsCtrl', [ '$rootScope', '$scope', function($rootScope, $scope) {
+  $scope.log = {
+    messages: $rootScope.messages
+  };
 } ] )
 
 // With the new view caching in Ionic, Controllers are only called
@@ -34,9 +53,8 @@ angular.module('starter.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout) {
+.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout, $state, logger) {
   $scope.cred = {};
-  console.log("Anon Controller invoked");
   $scope.login = function(auth) {
     if (window.Connection && $cordovaNetwork.isOffline()) {
       $scope.message = {
@@ -45,10 +63,13 @@ angular.module('starter.controllers', ['ngCordova'])
       };
       return;
     }
-    console.log("Anon scope Login called..");
+    logger.log("Anon scope Login called..");
     $scope.message = null;
     Session.login(auth, function(response) {
-      console.log("Login failed. Got:"+response.status);
+      logger.log("Login successful");
+      $state.go('tab.dashboard');
+    }, function(response) {
+      logger.log("Login failed. Got:"+response.status);
       var msg = "";
       if (401 == response.status) {
         msg = " Incorrect username/password";
@@ -82,7 +103,7 @@ angular.module('starter.controllers', ['ngCordova'])
           type: 'button-positive',
           onTap: function(e) {
             if (!$scope.data.email) {
-              console.log("Pressing Send button with an Empty Input");
+              logger.log("Pressing Send button with an Empty Input");
               //don't allow the user to close unless the user enters a 'wifi password'
               e.preventDefault();
             } else {
@@ -99,11 +120,11 @@ angular.module('starter.controllers', ['ngCordova'])
         - Function to check for Valid Email
         - Send the Email to the Server for Password Reset
       */
-      console.log('Got Email ID: ' + '"' + res + '"');
+      logger.log('Got Email ID: ' + '"' + res + '"');
     });
 
     $timeout(function() {
-      console.log('Automatically Closing the Popup');
+      logger.log('Automatically Closing the Popup');
       myPopup.close(); //close the popup after 15 seconds for some reason
     }, 15000);
 
@@ -111,18 +132,50 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('TabsCtrl', function($scope, $rootScope, Session,
-    Roles, $cordovaNetwork, authHttp) {
+    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup) {
 
   $scope.session = Session.get();
 
   $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
-    Session.takeOffline();
+    $rootScope.isOnline = false;
+    $scope.session.takeOffline();
+    $ionicPopup.alert( {
+      title: "Going Offline",
+      template: "k-Mayra is going offline"
+    } );
   } );
 
   $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
-    Session.takeOnline();
-    authHttp.runCommands();
+    $rootScope.isOnline = true;
+    $scope.session.takeOnline();
+    $rootScope.cmd_success = 0;
+    $rootScope.msg = "";
+    $rootScope.onlinePopup =
+      $ionicPopup.confirm( {
+        title: "Going online",
+        template: "k-Mayra is going online..{{msg}}"
+      } );
+    authHttp.runCommands(function(n) {
+      $rootScope.cmd_count = n;
+      $rootScope.cmd_success = 0;
+      $rootScope.msg += "<br />Command count: " + n;
+    }, function(method, url, data, response) {
+      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
+        " bytes data SUCCESS";
+      $rootScope.cmd_success++;
+    }, function(method, url, data, response) {
+      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
+        " bytes data FAIL(" + response.status + ")";
+    }, function() {
+      $rootScope.msg += "<br />RESULT: {{cmd_success}} SUCCESS, {{cmd_count - cmd_success}} FAIL";
+    } );
+    setTimeout(function() {
+      $rootScope.onlinePopup.close();
+    }, 10000);
+
     // ToDo: add other synchronization code here
+
+    Cache.updateLastSync();
   } );
 
   $scope.$on('$ionicView.enter', function(e) {
@@ -144,8 +197,7 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables) {
-  console.log("SACCO Reg invoked");
+.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil, logger) {
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
     $scope.data.sunions = data;
@@ -153,46 +205,47 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
   $scope.saveSacco = function(office, sacco) {
     var sfs = Office.saveFields;
-    var ofields = new Object();
-    for(var i = 0; i < sfs.length; ++i) {
-      var fld = sfs[i];
-      ofields[fld] = office[fld];
-    }
-    ofields.dateFormat = "yyyy-MM-dd";
-    ofields.locale = "en";
-    var df = Office.dateFields;
-    for(var i = 0; i < df.length; ++i) {
-      var fld = df[i];
-      var val = ofields[fld];
-      if (val != null) {
-        val = val.toISOString().substring(0, 10);
-        ofields[fld] = val;
-      }
-    }
+    ofields = FormHelper.preSaveForm(Office, office, false);
+    logger.log("SACCO data: " + JSON.stringify(ofields));
     Office.save(ofields, function(new_office) {
       $scope.message = {
         "type": "info",
-        "text": "Successfully created SACCO: " + new_office.id
+        "text": "Successfully created SACCO #" + new_office.officeId
       };
+      var odts = Office.dataTables();
+      for(var i = 0; i < odts.length; ++i) {
+        DataTables.save(odts[i], new_office.officeId, client[cdts[i]], function(data) {
+          logger.log("Saved datatables data: " + data);
+        }, function(response) {
+          logger.log("Accepted for offline: " + JSON.stringify(response));
+        }, function(response) {
+          logger.log("Failed to save datatables data: " + response.status);
+        } );
+      }
     }, function(office) {
       $scope.message = {
         "type": "info",
-        "text": "Accepted SACCO create request (offline)"
+        "text": "Accepted SACCO create request (offline): temp id:" + office.id
       };
     }, function(response) {
+      var errors = response.data.errors;
+      var errmsg = errors ? errors.map(function(e) {
+        return e.defaultUserMessage
+      } ).join("\n") : "";
       $scope.message = {
         "type": "error",
         "text": "Failed to create SACCO. Got " + response.code
+          + ": " + errmsg
       };
-      console.log("SACCO create failed: " + JSON.stringify(response));
+      logger.log("SACCO create failed: " + JSON.stringify(response));
     } );
   };
 } )
 
 .controller('SACCOEditCtrl', function($scope, $stateParams, Office,
-    SACCO, DataTables, DateUtil) {
+    SACCO, DataTables, DateUtil, logger) {
   var officeId = $stateParams.saccoId;
-  console.log("SACCO Edit invoked: " + officeId);
+  logger.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
     $scope.data = {
       sunions: data,
@@ -200,7 +253,7 @@ angular.module('starter.controllers', ['ngCordova'])
     };
   } );
   SACCO.get_full(officeId, function(sacco) {
-    console.log("SACCO:" + JSON.stringify(sacco));
+    logger.log("SACCO:" + JSON.stringify(sacco));
     $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office) {
@@ -235,20 +288,20 @@ angular.module('starter.controllers', ['ngCordova'])
             msg = msg + ", SACCO_Fields.";
           }, function(fields) {
             msg = msg + ", SACCO_Fields.";
-            console.log("SACCO Fields offline. " + JSON.stringify(fields));
+            logger.log("SACCO Fields offline. " + JSON.stringify(fields));
           }, function(response) {
             msg = msg + ", SACCO_Fields save failed.";
-            console.log("SACCO FIELDS fail. " + JSON.stringify(response.data));
+            logger.log("SACCO FIELDS fail. " + JSON.stringify(response.data));
           } );
         } else {
           DataTables.save('SACCO_Fields', officeId, sacco, function(fields) {
             msg = msg + ", created SACCO_Fields.";
           }, function(fields) {
-            console.log("SACCO Fields offline. " + JSON.stringify(fields));
+            logger.log("SACCO Fields offline. " + JSON.stringify(fields));
             msg = msg + ", SACCO_Fields submitted.";
           }, function(response) {
             msg = msg + ", SACCO_Fields save failed.";
-            console.log("SACCO Fields fail." + JSON.stringify(response.data));
+            logger.log("SACCO Fields fail." + JSON.stringify(response.data));
           } );
         }
         $scope.message = {
@@ -256,34 +309,39 @@ angular.module('starter.controllers', ['ngCordova'])
           "text": msg
         };
       } );
-    }, function(data) {
+    }, function(office) {
       $scope.message = {
         "type": "info",
-        "text": "SACCO Edit request accepted"
+        "text": "Edit SACCO #" + office.id + " request accepted"
       };
     }, function(response) {
-      console.log("SACCO edit fail: " + JSON.stringify(response.data));
+      var errors = response.data.errors;
+      var errmsg = errors ? errors.map(function(e) {
+        return e.defaultUserMessage
+      } ).join("\n") : "";
+      logger.log("SACCO edit fail: " + errmsg);
       $scope.message = {
         "type": "error",
-        "text": "Failed to create SACCO. Got " + response.code
+        "text": "Failed to create SACCO. Got " + response.code +
+          ": " + errmsg
       };
     } );
   };
 } )
 
-.controller('SACCOListCtrl', function($scope, SACCO) {
-  console.log("SACCOListCtrl called");
+.controller('SACCOListCtrl', function($scope, SACCO, logger) {
+  logger.log("SACCOListCtrl called");
   SACCO.query(function(saccos) {
-    console.log("Got SACCOs: " + saccos.length);
+    logger.log("Got SACCOs: " + saccos.length);
     $scope.data = { "saccos": saccos };
   }, function(sunions) {
-    console.log("Got SACCO Unions: " + sunions.length);
+    logger.log("Got SACCO Unions: " + sunions.length);
   } );
 } )
 
-.controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables) {
+.controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
   var saccoId = $stateParams.saccoId;
-  console.log("Sacco view ctrl invoked for " + saccoId);
+  logger.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
   SACCO.get_full(saccoId, function(sacco) {
     $scope.data = sacco;
@@ -299,25 +357,25 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('StaffDetailCtrl', function($scope, $stateParams, Staff, DateUtil) {
-  console.log("StaffDetailCtrl called");
+.controller('StaffDetailCtrl', function($scope, $stateParams, Staff, DateUtil, logger) {
+  logger.log("StaffDetailCtrl called");
   Staff.get($stateParams.staffId, function(staff) {
-    console.log("Joining date array: " + JSON.stringify(staff.joiningDate));
+    logger.log("Joining date array: " + JSON.stringify(staff.joiningDate));
     staff.joiningDt = DateUtil.localDate(staff.joiningDate);
     staff.fullname = staff.firstname + " " + staff.lastname;
-    console.log("Joining date local: " + staff.joiningDt);
+    logger.log("Joining date local: " + staff.joiningDt);
     $scope.staff = staff;
   } );
 } )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts, logger) {
 
   $scope.$on('$ionicView.enter', function(e) {
     SavingsAccounts.query(function(data) {
       var client_savings = new Object;
       for(var i = 0; i < data.length; ++i) {
         var clientId = data[i].clientId;
-        console.log("Client #" + clientId + " account [" + i + "]");
+        logger.log("Client #" + clientId + " account [" + i + "]");
         var summary = data[i].summary;
         var balance = summary.accountBalance;
         var totalSavings = client_savings[clientId] || 0;
@@ -328,12 +386,12 @@ angular.module('starter.controllers', ['ngCordova'])
 
     LoanAccounts.query(function(data) {
       var client_loans = new Object;
-      console.log("Got " + data.length + " loans");
+      logger.log("Got " + data.length + " loans");
       for(var i = 0; i < data.length; ++i) {
         var loan = data[i];
         var clientId = loan.clientId;
         var summary = loan.summary;
-        console.log("Loan summary: " + JSON.stringify(summary));
+        logger.log("Loan summary: " + JSON.stringify(summary));
         var loanAmt = summary.totalOutstanding;
         var totalOutstanding = client_loans[clientId] || 0;
         client_loans[clientId] = totalOutstanding + loanAmt;
@@ -363,15 +421,16 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
-    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO) {
+    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera) {
   var clientId = $stateParams.clientId;
-  console.log("Looking for client:"+clientId);
+  logger.log("Looking for client:"+clientId);
   $scope.client = {};
   Customers.get_full(clientId, function(client) {
     client["NumShares"] = parseInt(Math.random()*10);
     $scope.client = client;
     $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
-    $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
+    var gname = client.gender.name || "male";
+    $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
   } );
   Clients.get_accounts(clientId, function(accounts) {
     var savingsAccounts = accounts["savingsAccounts"] || [];
@@ -386,11 +445,11 @@ angular.module('starter.controllers', ['ngCordova'])
     var totalSavings = savingsAccounts.reduce(function(sum, account) {
       return sum + account.accountBalance;
     }, 0);
-    console.log("Total Savings: " + totalSavings);
+    logger.log("Total Savings: " + totalSavings);
     $scope.client.savingsAccounts = sacs;
     $scope.client.TotalSavings = totalSavings;
     var loanAccounts = accounts["loanAccounts"] || [];
-    console.log("Loan Accounts:" + JSON.stringify(loanAccounts));
+    logger.log("Loan Accounts:" + JSON.stringify(loanAccounts));
     var lacs = loanAccounts.map(function(lac) {
       return {
         "id": lac.id,
@@ -402,18 +461,30 @@ angular.module('starter.controllers', ['ngCordova'])
     var totalLoans = loanAccounts.reduce(function(sum, account) {
       return sum + account.loanBalance;
     }, 0);
-    console.log("Total Loans Bal: " + totalLoans);
+    logger.log("Total Loans Bal: " + totalLoans);
     $scope.client.TotalLoans = totalLoans;
     $scope.client.loanAccounts = lacs;
   } );
+  $scope.getPhoto = function() {
+    logger.log('Getting camera');
+    Camera.getPicture( {
+      quality: 75,
+      targetWidth: 150,
+      targetHeight: 150,
+      saveToPhotoAlbum: false
+    } ).then(function(imageURI) {
+      $scope.client.face = imageURI;
+    }, function(err) {
+      logger.log(err);
+    } );
+  };
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );
-  // ToDo client savings, loan summary needed
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup, $timeout) {
+    $ionicPopup, $timeout, logger) {
 
   $scope.savingCreate = function()  {
     // TO DO :
@@ -449,13 +520,13 @@ angular.module('starter.controllers', ['ngCordova'])
     });
 
     myPopup.then(function(res) {
-      console.log('Received : ' + '"' + res + '"');
+      logger.log('Received : ' + '"' + res + '"');
       // Insert the appropriate Code here
       // to process the Received Data for Saving Account Creation
     });
 
     $timeout(function() {
-      console.log("Popup TimeOut");
+      logger.log("Popup TimeOut");
       myPopup.close();
     }, 15000);
   };
@@ -463,9 +534,9 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup, $timeout) {
+    $ionicPopup, $timeout, logger) {
   var id = $stateParams.id;
-  console.log("SavingsAccountsCtrl for " + id);
+  logger.log("SavingsAccountsCtrl for " + id);
   $scope.data = {id: id};
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
@@ -491,9 +562,9 @@ angular.module('starter.controllers', ['ngCordova'])
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          console.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
+          logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.deposit(id, params, function(data) {
-            console.log("Deposit successful!");
+            logger.log("Deposit successful!");
             $scope.message = {
               type: 'info',
               text: 'Deposit successful!'
@@ -508,7 +579,7 @@ angular.module('starter.controllers', ['ngCordova'])
               type: 'warn',
               text: 'Deposit failed'
             };
-            console.log("Depsoit fail ("+ res.status+"): " + JSON.stringify(res.data));
+            logger.log("Depsoit fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
       } ]
@@ -532,9 +603,9 @@ angular.module('starter.controllers', ['ngCordova'])
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          console.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
+          logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.withdraw(id, params, function(data) {
-            console.log("Withdrawal successful!");
+            logger.log("Withdrawal successful!");
             $scope.message = {
               type: 'info',
               text: 'Withdrawal successful!'
@@ -549,7 +620,7 @@ angular.module('starter.controllers', ['ngCordova'])
               type: 'warn',
               text: 'Withdraw failed'
             };
-            console.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
+            logger.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
       } ]
@@ -557,9 +628,9 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('SATransCtrl', function($scope, $stateParams, SavingsAccounts) {
+.controller('SATransCtrl', function($scope, $stateParams, SavingsAccounts, logger) {
   var id = $stateParams.id;
-  console.log("SATransCtrl called with: " + id);
+  logger.log("SATransCtrl called with: " + id);
   $scope.data = {id: id};
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
@@ -568,7 +639,7 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('LoansAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup, $timeout) {
+    $ionicPopup, $timeout, logger) {
 
   $scope.loanApply = function()  {
     // TO DO :
@@ -604,22 +675,22 @@ angular.module('starter.controllers', ['ngCordova'])
     });
 
     myPopup.then(function(res) {
-      console.log('Received : ' + '"' + res + '"');
+      logger.log('Received : ' + '"' + res + '"');
       // Insert the appropriate Code here
       // to process the Received Data for Saving Account Creation
     });
 
     $timeout(function() {
-      console.log("Popup TimeOut");
+      logger.log("Popup TimeOut");
       myPopup.close(); //close the popup after 15 seconds for some reason
     }, 15000);
 
   };
 } )
 
-.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup) {
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger) {
   var id = $stateParams.id;
-  console.log("LoanAccountsCtrl for " + id);
+  logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
   LoanAccounts.get(id, function(lac) {
     $scope.data.accountNo = lac.accountNo;
@@ -649,9 +720,9 @@ angular.module('starter.controllers', ['ngCordova'])
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          console.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
+          logger.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
           LoanAccounts.repay(id, params, function(data) {
-            console.log("Repayment successful!");
+            logger.log("Repayment successful!");
             $scope.message = {
               type: 'info',
               text: 'Repayment successful!'
@@ -666,7 +737,7 @@ angular.module('starter.controllers', ['ngCordova'])
               type: 'warn',
               text: 'Repayment failed'
             };
-            console.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
+            logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
       } ]
@@ -674,9 +745,9 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('LoanTransCtrl', function($scope, $stateParams, LoanAccounts) {
+.controller('LoanTransCtrl', function($scope, $stateParams, LoanAccounts, logger) {
   var id = $stateParams.id;
-  console.log("LoanTransCtrl called with: " + id);
+  logger.log("LoanTransCtrl called with: " + id);
   $scope.data = {id: id};
   LoanAccounts.get(id, function(lac) {
     $scope.data.accountNo = lac.accountNo;
@@ -686,7 +757,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('SharesBuyCtrl',
     function($scope, $stateParams, /* SavingsAccounts,  */
-     $ionicPopup, $timeout) {
+     $ionicPopup, $timeout, logger) {
 
   $scope.data = {
       price: 100,
@@ -729,13 +800,13 @@ angular.module('starter.controllers', ['ngCordova'])
     });
 
     myPopup.then(function(res) {
-      console.log('Received : ' + '"' + res + '"');
+      logger.log('Received : ' + '"' + res + '"');
       // Insert the appropriate Code here
       // to process the Received Data for Saving Account Creation
     });
 
     $timeout(function() {
-      console.log("Popup TimeOut");
+      logger.log("Popup TimeOut");
       myPopup.close();
     }, 15000);
   };
@@ -743,9 +814,9 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 //
 
-.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Customers, DateUtil, DataTables) {
+.controller('ClientNextOfKinCtrl', function($scope, $stateParams, Customers, DateUtil, DataTables, logger) {
   var clientId = $stateParams.clientId;
-  console.log("ClientNextOfKinCtrl invoked");
+  logger.log("ClientNextOfKinCtrl invoked for client #" + clientId);
   Customers.get_full(clientId, function(client) {
     $scope.client = client;
     $scope.client.dateOfBirth = DateUtil.isoDateStr(client.dateOfBirth);
@@ -761,30 +832,30 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
-      Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO) {
+      Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
   var clientId = $stateParams.clientId;
-  console.log("Looking to edit client:"+clientId);
+  logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
   $scope.codes = {};
   $scope.$on('$ionicView.enter', function(e) {
     Codes.getValues("Gender", function(gcodes) {
-      console.log("Got gender codes: " + JSON.stringify(gcodes))
+      logger.log("Got gender codes: " + JSON.stringify(gcodes))
       $scope.codes.genders = gcodes;
     } );
     Codes.getValues("ClientClassification", function(ocodes) {
-      console.log("Got occupation codes: " + JSON.stringify(ocodes))
+      logger.log("Got occupation codes: " + JSON.stringify(ocodes))
       $scope.codes.occupations = ocodes;
     } );
     Codes.getValues("Relationship", function(rcodes) {
-      console.log("Relationship codes count:"+rcodes.length);
+      logger.log("Relationship codes count:"+rcodes.length);
       $scope.codes.Relationships = rcodes;
     } );
   } );
   Customers.get_full(clientId, function(client) {
     /*
     var rClient = FormHelper.prepareForm(Clients, client);
-    console.log("Got client: " + JSON.stringify(client));
-    console.log("rClient:" + JSON.stringify(rClient));
+    logger.log("Got client: " + JSON.stringify(client));
+    logger.log("rClient:" + JSON.stringify(rClient));
     $scope.client = rClient;
     */
     FormHelper.prepareForm(Clients, client);
@@ -804,22 +875,22 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
-    console.log("AddressExtraFields Display: " + $scope.extraFields);
+    logger.log("AddressExtraFields Display: " + $scope.extraFields);
   };
   $scope.toggleNextOfKin = function() {
     $scope.nextOfKin = $scope.nextOfKin ? false : true;
     $scope.extraFields = ($scope.extraFields === true) ? false : false;
-    console.log("NextOfKin Display : " + $scope.nextOfKin);
+    logger.log("NextOfKin Display : " + $scope.nextOfKin);
   };
   // y
 
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client);
-    console.log("Going to save client: " + JSON.stringify(cfields));
+    logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
     for(var i = 0; i < cdts.length; ++i) {
       var dt = cdts[i];
-      console.log("Got DATATABLE:" + dt);
+      logger.log("Got DATATABLE:" + dt);
       DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
         HashUtil.copy(client[dt], {
           "locale": "en",
@@ -827,61 +898,53 @@ angular.module('starter.controllers', ['ngCordova'])
         } );
         if (!dtrow) {
           DataTables.save(dt, clientId, client[dt], function(data) {
-            console.log("Added datatables data: " + JSON.stringify(data));
-            setTimeout(function() {
-              $scope.message = {
-                "type": "info",
-                "text": "Added client #" + clientId + " " + dt + "."
-              };
-            }, 1000);
+            logger.log("Added datatables data: " + JSON.stringify(data));
+            $scope.message = {
+              "type": "info",
+              "text": "Added client #" + clientId + " " + dt + "."
+            };
           }, function(response) {
-            setTimeout(function() {
-              $scope.message = {
-                "type": "info",
-                "text": "Accepted add client #" + clientId + " " + dt + "."
-              };
-            }, 1000);
-            console.log("Accepted to add datatables data: " + JSON.stringify(response));
+            $scope.message = {
+              "type": "info",
+              "text": "Accepted add client #" + clientId + " " + dt + "."
+            };
+            logger.log("Accepted to add datatables data: " + JSON.stringify(response));
           }, function(response) {
-            setTimeout(function() {
-              $scope.message = {
-                "type": "warn",
-                "text": "Failed to add client #" + clientId + " " + dt + "."
-              };
-            }, 1000);
-            console.log("Failed to add datatables data: " + response.status);
+            $scope.message = {
+              "type": "warn",
+              "text": "Failed to add client #" + clientId + " " + dt + "."
+            };
+            logger.log("Failed to add datatables data: " + response.status);
           } );
         } else {
           DataTables.update(dt, clientId, client[dt], function(data) {
-            setTimeout(function() {
-              $scope.message = {
-                "type": "info",
-                "text": "Saved client #" + clientId + " " + dt + "."
-              };
-            }, 1000);
-            console.log("Saved datatables data: " + JSON.stringify(data));
+            $scope.message = {
+              "type": "info",
+              "text": "Saved client #" + clientId + " " + dt + "."
+            };
+            logger.log("Saved datatables data: " + JSON.stringify(data));
           }, function(response) {
-            setTimeout(function() {
-              $scope.message = {
-                "type": "info",
-                "text": "Accepted save client #" + clientId + " " + dt + "."
-              };
-            }, 1000);
-            console.log("Accepted datatables for save");
+            $scope.message = {
+              "type": "info",
+              "text": "Accepted save client #" + clientId + " " + dt + "."
+            };
+            logger.log("Accepted datatables for save");
           }, function(response) {
-            setTimeout(function() {
-              $scope.message = {
-                "type": "info",
-                "text": "Failed to save client #" + clientId + " " + dt + "."
-              };
-            }, 1000);
-            console.log("Failed to save datatables data: " + response.status);
+            var errors = response.data.errors;
+            var errmsg = errors ? errors.map(function(e) {
+              return e.defaultUserMessage
+            } ).join("\n") : "";
+            $scope.message = {
+              "type": "info",
+              "text": "Failed to save client #" + clientId + " " + dt + ": " + errmsg
+            };
+            logger.log("Failed to save datatables data: " + response.status);
           } );
         }
       } );
     }
     Clients.update(clientId, cfields, function(eclient) {
-      console.log("Save client success");
+      logger.log("Save client success");
       $scope.message = {
         "type": "info",
         "text": "Client with id #" + eclient.clientId + " saved"
@@ -889,81 +952,54 @@ angular.module('starter.controllers', ['ngCordova'])
     }, function(data) {
       $scope.message = {
         "type": "info",
-        "text": "Client edit request accepted"
+        "text": "Client edit request accepted: #" + data.id
       };
     }, function(response) {
+      var errors = response.data.errors;
+      var errmsg = errors ? errors.map(function(e) {
+        return e.defaultUserMessage
+      } ).join("\n") : "";
       $scope.message = {
         "type": "warn",
-        "text": "Client save failed"
+        "text": "Client save failed:" + errmsg
       };
     } );
   };
 } )
 
-.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO) {
+.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO, FormHelper, logger) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
-    console.log("AddressExtraFields Display: " + $scope.extraFields);
+    logger.log("AddressExtraFields Display: " + $scope.extraFields);
   };
   $scope.toggleNextOfKin = function() {
     $scope.nextOfKin = $scope.nextOfKin ? false : true;
     $scope.extraFields = ($scope.extraFields === true) ? false : false;
-    console.log("NextOfKin Display : " + $scope.nextOfKin);
+    logger.log("NextOfKin Display : " + $scope.nextOfKin);
   };
   // y
 
-  console.log("Looking to register client");
+  logger.log("Looking to register client");
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
-    var keys = ["firstname", "lastname", "mobileNo"];
-    var dateFields = [ "dateOfBirth" ];
-    var cfields = new Object();
-    var sf = Clients.saveFields();
-    for(var i = 0; i < sf.length; ++i) {
-      var fld = sf[i];
-      var val = client[fld];
-      console.log("Client " + fld + " ISA " + typeof(val));
-      if ('Object' === typeof(val)) {
-        if (val["id"]) {
-          val = val.id;
-        } else {
-          console.log("Client Hash field without id:"+fld);
-          val = "";
-        }
-        cfields[fld+"Id"] = val;
-      } else {
-        cfields[fld] = val;
-      }
-    }
-    var df = Clients.dateFields();
-    for(var i = 0; i < df.length; ++i) {
-      var fld = df[i];
-      var val = cfields[fld];
-      if (val != null) {
-        val = val.toISOString().substring(0, 10);
-        cfields[fld] = val;
-        console.log("Client date field " + fld + " = " + val);
-      }
-    }
-    cfields["dateFormat"] = "yyyy-MM-dd";
-    cfields["locale"] = "en";
+    var cfields = FormHelper.preSaveForm(Clients, client, false);
     cfields["active"] = true;
     Clients.save(cfields, function(new_client) {
-      console.log("Client created:" + JSON.stringify(new_client));
+      logger.log("Client created:" + JSON.stringify(new_client));
       $scope.message = {
         "type": "info",
-        "text": "Client created with id #" + new_client.id
+        "text": "Client created with id #" + new_client.clientId
       };
       var cdts = Clients.dataTables();
       for(var i = 0; i < cdts.length; ++i) {
-        DataTables.save(cdts[i], new_client.id, client[cdts[i]], function(data) {
-          console.log("Saved datatables data: " + data);
+        DataTables.save(cdts[i], new_client.clientId, client[cdts[i]], function(data) {
+          logger.log("Saved datatables data: " + data);
         }, function(response) {
-          console.log("Accepted for offline: " + JSON.stringify(response));
+          logger.log("Accepted for offline: " + JSON.stringify(response));
         }, function(response) {
-          console.log("Failed to save datatables data: " + response.status);
+          logger.log("Failed to save datatables data: " + response.status);
         } );
       }
     }, function(new_client) {
@@ -972,10 +1008,17 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Accepted Client create request (offline)"
       };
     }, function(response) {
+      logger.warn("Client create fail(" + response.status + ") RESPONSE:"
+        + JSON.stringify(response.data));
+      var errors = response.data.errors;
+      var errmsg = errors ? errors.map(function(e) {
+        return e.defaultUserMessage
+      } ).join("\n") : "";
+      logger.warn("ERROR: " + errmsg);
       $scope.message = {
         "type": "error",
-        "text": "Client creation failed. Report issue to admin code:"+response.code
-          + " . Possible cause " + JSON.stringify(response.data)
+        "text": "Client creation failed with code:"+response.status+"\n"
+          + errmsg
       };
     } );
   };
@@ -987,7 +1030,7 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.codes.occupations = ocodes;
   } );
   Codes.getValues("Relationship", function(rcodes) {
-    console.log("Relationship codes count:"+rcodes.length);
+    logger.log("Relationship codes count:"+rcodes.length);
     $scope.codes.Relationships = rcodes;
   } );
   SACCO.query(function(saccos) {
@@ -996,25 +1039,43 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
-    Session, Customers, Staff, SACCO, HashUtil, $ionicPopup) {
-  console.log("DashboardCtrl invoked");
-  var session = Session;
-  var role = session.role;
-  switch (role) {
-    case "Admin":
-      SACCO.query_full(function(data) {
-        $scope.num_saccos = data.length;
+    Session, Customers, Staff, SACCO, HashUtil, $ionicPopup, logger) {
+
+  var session = null;
+  $scope.$on('$ionicView.enter', function(e) {
+    if (null == session) {
+      session = Session;
+      var loginPopup = $ionicPopup.alert( {
+        title: 'Logging In',
+        template: '<p>.<br>\n' +
+          '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
+          '<p>Login successful! Welcome ' + session.username() + '</p>',
+        scope: $scope
       } );
-    case "Management":
-      Staff.query(function(staff) {
-        $scope.num_staff = staff.length;
-      } );
-    case "Staff":
-      Customers.query_full(function(clients) {
-        $scope.num_clients = clients.length;
-      } );
-  }
-  $scope.session = session;
+      var role = session.role;
+      switch (role) {
+        case "Admin":
+          SACCO.query_full(function(data) {
+            $scope.num_saccos = data.length;
+          } );
+        case "Management":
+          Staff.query(function(staff) {
+            $scope.num_staff = staff.length;
+          } );
+        case "Staff":
+          Customers.query_full(function(clients) {
+            $scope.num_clients = clients.length;
+          } );
+      }
+      $scope.session = session;
+    }
+  } );
+  /*
+  var saccos = Cache.getObject('h_offices');
+  $scope.nextSACCO = HashUtil.nextKey(saccos);
+  var clients = Cache.getObject('h_clients');
+  $scope.nextClient = HashUtil.nextKey(clients);
+  */
   $scope.ConfirmLogOut = function() {
     var confirmPopup = $ionicPopup.confirm({
       title: 'Confirm Logout',
@@ -1024,10 +1085,10 @@ angular.module('starter.controllers', ['ngCordova'])
     confirmPopup.then(function(res) {
       if(res) {
         // "logout()" Can be Called here
-        console.log('Logout Confirmed!');
+        logger.log('Logout Confirmed!');
         Session.logout();
       } else {
-        console.log('Logout Cancelled!');
+        logger.log('Logout Cancelled!');
       }
     });
   };

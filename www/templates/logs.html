@@ -13,35 +13,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <style>
-label {
- 	color: #558;
+div.col {
+  font-size: 60%;
 }
-.item, ion-item {
-	margin: 2px;
-	padding: 2px 5px;
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
-/*
-Acc No | Saving Acc | Balance | Actions
-*/
+.log {
+  border: 1px solid #446;
+  color: #446;
+}
+.info {
+  border: 1px solid #555;
+  color: #555;
+}
+.warn {
+  border: 1px solid #642;
+  color: #642;
 }
 </style>
-
-<ion-view view-title="Client Loan Details">
-  <ion-content class="padding">
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
-    <div class="list card">
-      <div class="item item-divider">
-	     <label>Client </label> : {{client.name}}
+<ion-view view-title="Logs">
+  <div ng-hide="log.messages">
+    No log messages!
+  </div>
+  <ion-scroll zooming="true" direction="y" ng-show="log.messages">
+    <div class="row {{message.type}}" ng-repeat="message in log.messages">
+      <div class="col col-20">
+        {{message.time}}
       </div>
-      <ion-item>
-	     <label>Acc No | Saving Acc | Balance | Actions</label>
-      </ion-item>
-      <ion-item ng-repeat="">
-	     >> {{AccNo}} | {{SavingAcc}} | {{Balance}} | {{Actions}}
-      </ion-item>
+      <div class="col {{message.type}}">
+        {{message.text}} 
+      </div>
     </div>
-
-  </ion-content>
+  </ion-scroll>
 </ion-view>

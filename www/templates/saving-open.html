@@ -1,3 +1,17 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <ion-view view-title="Open Saving Account">
   <ion-content ng-controller="SavingsAccCreateCtrl">
   <form name="SavingAccCreateForm" novalidate>
@@ -62,7 +76,10 @@
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Initial Deposit :</span>
+        <span class="input-label">
+          Initial Deposit
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </span>
         <label class="item-input-wrapper">
           <input type="text" size="10" ng-minlength="3" name="initialDeposit"
             placeholder="Enter the value" ng-model="XYZ.initialDeposit">
