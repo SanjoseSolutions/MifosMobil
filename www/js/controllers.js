@@ -519,7 +519,13 @@ angular.module('starter.controllers', ['ngCordova'])
               e.preventDefault();
               //don't allow the user to close the popup if empty
             } else {
-              SavingsAccounts.save(
+              SavingsAccounts.save($scope.savings, function(new_sav) {
+                logger.log("Savings created!");
+              }, function(sav) {
+                logger.log("Savings accepted");
+              }, function(response) {
+                logger.log("Savings create failed");
+              } );
             }
           }
         }
