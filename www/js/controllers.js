@@ -968,7 +968,6 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO, FormHelper, logger) {
-  // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
@@ -979,7 +978,6 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.extraFields = ($scope.extraFields === true) ? false : false;
     logger.log("NextOfKin Display : " + $scope.nextOfKin);
   };
-  // y
 
   logger.log("Looking to register client");
   $scope.data = { "op": "Register" };

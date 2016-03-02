@@ -1,3 +1,29 @@
+    <!-- WILL BE USED IN PHASE 2
+    	 in one of the Templates
+
+        <ion-item>
+        Manage Loan Application
+        </ion-item>
+        <ion-item>
+        Name : 
+        </ion-item>
+        <ion-item>
+          Loan Type : 
+          <select>
+          	<option value="Indivual" selected>
+          	  Individual
+          	</option>
+          	<option> Group </option>
+          	<option> etc ... </option>
+          </select>
+        </ion-item>
+    -->
+
+
+
+    
+
+
 ## Feb 4th, 2016
 
 Creation of : client-next-of-kin.html template
