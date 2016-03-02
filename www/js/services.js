@@ -984,6 +984,24 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
+.factory('SavingsProducts', function(authHttp, baseUrl, logger) {
+  return {
+    get: function(id, fn_sav_prod) {
+      authHttp.get(baseUrl + '/savingsproducts/' + id)
+        .then(function(response) {
+          fn_sav_prod(response.data);
+        } );
+    },
+    query: function(fn_sav_prods) {
+      authHttp.get(baseUrl + '/savingsproducts')
+        .then(function(response) {
+          var data = response.data;
+          fn_sav_prods(data.pageItems);
+        } );
+    }
+  }
+} )
+
 .factory('SavingsAccounts', function(authHttp, baseUrl, logger) {
   return {
     get: function(accountNo, fn_sac) {
@@ -999,6 +1017,20 @@ angular.module('starter.services', ['ngCordova'] )
           var data = response.data;
           logger.log("Got " + data.totalFilteredRecords + " savings accounts.");
           fn_accts(data.pageItems);
+        } );
+    },
+    save: function(fields, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts', fields, {},
+        function(response) {
+          var data = response.data;
+          if (response.status == 202) {
+            fn_offline(data);
+          } else {
+            fn_success(data);
+          }
+        },
+        function(response) {
+          fn_fail(response);
         } );
     },
     withdraw: function(id, params, fn_res, fn_offline, fn_err) {

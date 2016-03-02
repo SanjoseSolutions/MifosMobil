@@ -486,11 +486,19 @@ angular.module('starter.controllers', ['ngCordova'])
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
     $ionicPopup, $timeout, logger) {
 
+  $scope.prodChanged = function() {
+    SavingsProducts.query(function(products) {
+      $scope.products = products;
+    } );
+  };
+
   $scope.savingCreate = function()  {
     // TO DO :
     // Check the parameters' list
 
-    $scope.data = $scope.XYZ; 
+    $scope.savings = {
+      minRequiredOpeningBalance: 0
+    }; 
     var myPopup = $ionicPopup.show({
       title: '<strong>Saving Account Creation</strong>',
       /* This Url takes you to a script with the same ID Name in index.html */
@@ -511,8 +519,7 @@ angular.module('starter.controllers', ['ngCordova'])
               e.preventDefault();
               //don't allow the user to close the popup if empty
             } else {
-              // Returning a value will cause the promise to resolve with the given value.
-              return $scope.data; // true;
+              SavingsAccounts.save(
             }
           }
         }
