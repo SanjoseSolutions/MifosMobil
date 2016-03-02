@@ -1047,7 +1047,7 @@ angular.module('starter.controllers', ['ngCordova'])
         title: 'Logging In',
         template: '<p>.<br>\n' +
           '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
-          '<p>Login successful! Welcome ' + session.username() + '</p>',
+          '<p><center>Login Successful!<br /> Welcome <strong>' + session.username() + '</strong></center></p>',
         scope: $scope
       } );
       var role = session.role;

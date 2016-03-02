@@ -18,6 +18,12 @@
 table#SavSum tr>td {
   padding: 3px;
 }
+.button-small {
+  padding: 5px;
+}
+tr {
+  padding: 20px;
+}
 </style>
 
 <ion-view view-title="Dashboard">
@@ -55,7 +61,7 @@ table#SavSum tr>td {
             </td>
             <td> {{num_saccos}} </td>
             <td> 
-              <a href="#/tab/saccos" class="button noVertPadd">
+              <a href="#/tab/saccos" class="button button-small noVertPadd">
                 View
                 <span class="icon ion-ios-briefcase-outline"> </span>
               </a>
@@ -74,7 +80,7 @@ table#SavSum tr>td {
             </td>
             <td> {{num_staff}} </td>
             <td> 
-              <a href="#/tab/staff" class="button noVertPadd">
+              <a href="#/tab/staff" class="button button-small noVertPadd">
                 View
                 <span class="icon ion-happy-outline"> </span>
               </a>
@@ -92,7 +98,7 @@ table#SavSum tr>td {
             </td>
             <td>{{num_clients}} </td>
             <td> 
-              <a href="#/tab/clients" class="button noVertPadd">
+              <a href="#/tab/clients" class="button button-small noVertPadd">
                 View
                 <span class="ion-ios-people-outline"> </span>
               </a>
@@ -118,8 +124,9 @@ table#SavSum tr>td {
         </ion-item>
         <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
-            ng-click="ConfirmLogOut()">
-              Logout<span class="ion-log-out"></span>
+              ng-click="ConfirmLogOut()">
+            Logout
+            <span class="ion-log-out"></span>
           </button>
         </ion-item>
         <ion-item>
