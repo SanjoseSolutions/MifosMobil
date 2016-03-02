@@ -803,12 +803,12 @@ angular.module('starter.services', ['ngCordova'] )
       if (clients) {
         logger.log("Got cached clients: " + typeof(clients));
         if (!HashUtil.isEmpty(clients)) {
-          logger.log("Clients.query got cached clients");
           var a_clients = [];
           for(var id in clients) {
             a_clients.push(clients[id]);
           }
           process_clients(a_clients);
+          logger.log("Clients.query got "+a_clients.length+" cached clients");
         }
       } else {
         logger.log("Clients.query got no cached clients");

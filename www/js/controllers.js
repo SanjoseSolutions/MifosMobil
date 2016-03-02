@@ -425,6 +425,19 @@ angular.module('starter.controllers', ['ngCordova'])
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
   $scope.client = {};
+  $scope.getPhoto = function() {
+    logger.log('Getting camera');
+    Camera.getPicture( {
+      quality: 75,
+      targetWidth: 150,
+      targetHeight: 150,
+      saveToPhotoAlbum: false
+    } ).then(function(imageURI) {
+      $scope.client.face = imageURI;
+    }, function(err) {
+      logger.log(err);
+    } );
+  };
   Customers.get_full(clientId, function(client) {
     client["NumShares"] = parseInt(Math.random()*10);
     $scope.client = client;
@@ -465,19 +478,6 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.client.TotalLoans = totalLoans;
     $scope.client.loanAccounts = lacs;
   } );
-  $scope.getPhoto = function() {
-    logger.log('Getting camera');
-    Camera.getPicture( {
-      quality: 75,
-      targetWidth: 150,
-      targetHeight: 150,
-      saveToPhotoAlbum: false
-    } ).then(function(imageURI) {
-      $scope.client.face = imageURI;
-    }, function(err) {
-      logger.log(err);
-    } );
-  };
   ClientImages.getB64(clientId, function(img_data) {
     $scope.client.face = img_data;
   } );

@@ -20,7 +20,8 @@
     "cordova-plugin-whitelist",
     "cordova-plugin-splashscreen",
     "com.ionic.keyboard",
-    "cordova-plugin-camera"
+    "cordova-plugin-camera",
+    "org.apache.cordova.statusbar"
   ],
   "cordovaPlatforms": [
     "android"

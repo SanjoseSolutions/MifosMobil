@@ -21,7 +21,11 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova'])
-
+/* below lines are used by camera app but seem to prevent login
+.config(function($compileProvider) {
+  $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
+} )
+*/
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -29,7 +33,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
-
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
@@ -253,6 +256,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'LogsCtrl'
       }
     }
+  } )
+  .state('logs', {
+    url: '/logs',
+    templateUrl: 'templates/logs.html',
+    controller: 'LogsCtrl'
   } )
 
   .state('tab.dashboard', {
