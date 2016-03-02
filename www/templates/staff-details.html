@@ -23,31 +23,13 @@ label, .label {
 /*	font-style:italic;	*/
 	font-family:corsiva;
 }
+td {
+  padding: 10px;
+}
 </style>
 
 <ion-view view-title="Staff {{staff.fullname}}">
   <ion-content class="padding"> <!-- style="background-color:grey;" -->
-
-    <!--div class="list">
-      <span>John Wayne</span>
-      <span class="account-status">
-        <span>Savings $10</span>
-        <span>Loans $40</span>
-      </span>
-      Tab specially dedicated to Staff privileges.
-      <br /> Work in progress ...
-
-    </div -->
-
-    <!--ion-list>
-      <ion-item>
-        <button class="button-block ion-edit"
-            ng-click="#">
-            Edit
-        </button>
-      </ion-item>
-    </ion-list-->
-
     <div class="list card" style="clear:both; height:223px">
       <div class="item item-divider">
         <label>Staff Name </label>:  {{staff.fullname}}
@@ -103,32 +85,45 @@ label, .label {
     </div -->
     
     <div class="list card">
-    	<div class="item item-divider">
+    	<ion-item class="item item-divider">
 	       <label>In Charge of </label> : {{staff.officeName || "Byrathi"}}
-	    </div>
+	    </ion-item>      
+      <ion-item>
+        <!-- Table -->
+        <table>
+        <tr>
+          <td> <label>Active Officer </label> </td>
+          <td> : {{isActive}} </td>
+        </tr>
+        <tr>
+          <td> <label>Loan Officer </label> </td>
+          <td> : {{isLoanOfficer}} </td>
+        </tr>
+        <tr>
+          <td> <label> Total Members </label> </td>
+          <td> : <span class="icon ion-ios-people">
+            {{TotalMembers? TotalMembers : 25}} </span>
+          </td>
+        </tr>
+        <tr>
+          <td> <label> Total Loans </label> </td>
+          <td> : <i class="icon ion-social-bitcoin"></i>
+            {{client.TotalLoans?client.TotalLoans:350}}
+          </td>
+          <td> <button ng-click="#"> Transactions </button> </td>
+        </tr>
+        <tr>
+          <td> <label>Total Savings </label> </td>
+          <td> : <i class="icon ion-social-bitcoin"></i>
+            {{client.TotalSavings?client.TotalSavings:250}}
+          </td>
+          <td> <button ng-click="#"> Transactions </button> </td>
+        </tr>
+        </table>
+      </ion-item>
 
-      <ion-item>
-          <label>Active Officer </label>: {{isActive}}
-      </ion-item>
-      <ion-item>
-          <label>Loan Officer </label>: {{isLoanOfficer}}
-      </ion-item>
-      <ion-item>
-      	<label> Total Members </label> :
-        <span class="icon ion-ios-people">
-          {{TotalMembers? TotalMembers : 25}}  
-        </span>
-      </ion-item>
-      <ion-item>
-	       <label> Total Loans </label> : <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalLoans?client.TotalLoans:350}}
-         <button ng-click="#"> Transactions </button>
-      </ion-item>
-      <ion-item>
-          <label>Total Savings </label>: <i class="icon ion-social-bitcoin"></i>
-          {{client.TotalSavings?client.TotalSavings:250}}
-          <button ng-click="#"> Transactions </button>
-      </ion-item>
+
+
     </div>
 
   </ion-content>
