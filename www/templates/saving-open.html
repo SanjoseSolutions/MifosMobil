@@ -55,8 +55,8 @@
             Select Product
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
-          <select name="productID" ng-model="savings.productId" ng-change="prodChanged()" required>
-            <option value="1" selected>Basic Savings</option>
+          <select name="productID" ng-model="savings.productId" ng-change="prodChanged()"
+            required ng-options="p.id as p.name for p in products">
           </select>
         </label>
       </ion-item>

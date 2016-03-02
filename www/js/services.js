@@ -628,8 +628,10 @@ angular.module('starter.services', ['ngCordova'] )
         for(var i = 0; i < dts.length; ++i) {
           var dt = dts[i];
           DataTables.get_one(dt, id, function(fields, dt) {
-            fields.joiningDt = DateUtil.localDate(fields.joiningDate);
-            fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+            if (fields && fields.joiningDate != null) {
+              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+              fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+            }
             office[dt] = fields;
             logger.log("SACCO with " + dt + ": " + JSON.stringify(office));
           } );
@@ -980,6 +982,20 @@ angular.module('starter.services', ['ngCordova'] )
         logger.log("Image for client " + id + " received[b64]. Size: " + response.data.length);
         fn_img(response.data);
       } );
+    },
+    save: function(id, imgData, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/clients/' + id + '/images', imgData, {
+        'Content-Type': 'text/plain'
+      }, function(response) {
+        var data = response.data;
+        if (response.status == 202) {
+          fn_offline(data);
+        } else {
+          fn_success(data);
+        }
+      }, function(response) {
+        fn_fail(response);
+      } );
     }
   };
 } )
@@ -996,7 +1012,8 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.get(baseUrl + '/savingsproducts')
         .then(function(response) {
           var data = response.data;
-          fn_sav_prods(data.pageItems);
+          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          fn_sav_prods(data);
         } );
     }
   }
