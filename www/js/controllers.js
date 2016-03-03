@@ -214,7 +214,8 @@ angular.module('starter.controllers', ['ngCordova'])
       };
       var odts = Office.dataTables();
       for(var i = 0; i < odts.length; ++i) {
-        DataTables.save(odts[i], new_office.officeId, client[cdts[i]], function(data) {
+        var fields = FormHelper.preSaveForm(SACCO_Fields, odts[i], false);
+        DataTables.save(fields, new_office.officeId, client[cdts[i]], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
