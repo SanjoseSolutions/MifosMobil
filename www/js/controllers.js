@@ -925,8 +925,8 @@ angular.module('starter.controllers', ['ngCordova'])
     var cdts = Clients.dataTables();
     for(var i = 0; i < cdts.length; ++i) {
       var dt = cdts[i];
-      logger.log("Got DATATABLE:" + dt);
       DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
+        client[dt] = client[dt] || {};
         HashUtil.copy(client[dt], {
           "locale": "en",
           "dateFormat": "yyyy-MM-dd"
