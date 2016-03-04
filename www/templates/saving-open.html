@@ -55,8 +55,8 @@
             Select Product
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
-          <select name="productID" required>
-            <option selected>Basic Savings</option>
+          <select name="productID" ng-model="savings.productId" ng-change="prodChanged()"
+            required ng-options="p.id as p.name for p in products">
           </select>
         </label>
       </ion-item>
@@ -65,24 +65,24 @@
         <span class="input-label">Date Submitted:</span>
         <label class="item-input-wrapper">
           <input name="openingDate" type="date" placeholder="ex: yyyy-mm-dd"
-            size="15" ng-model="XYZ.openingDate" required>
+            size="15" ng-model="savings.submittedOnDate" required>
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">Field Officer :</span>
         <label class="item-input-wrapper">
           <input type="text" size="20" ng-minlength="3" name="fieldOfficer"
-            placeholder="Field Officer's Name" ng-model="XYZ.fieldOfficer">
+            placeholder="Field Officer's Name" ng-model="savings.fieldOfficerId">
         </label>
       </div>
       <div class="item item-input-inset">
         <span class="input-label">
-          Initial Deposit
+          Minimum Balance
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" ng-minlength="3" name="initialDeposit"
-            placeholder="Enter the value" ng-model="XYZ.initialDeposit">
+          <input type="text" size="10" ng-minlength="1" name="initialDeposit"
+            placeholder="Enter the value" ng-model="savings.minRequiredOpeningBalance">
         </label> <i class="icon ion-social-bitcoin"> </i>
       </div>
 

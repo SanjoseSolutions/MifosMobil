@@ -39,7 +39,7 @@ angular.module('starter.services', ['ngCordova'] )
     logger[method] = function(msg) {
       var dt = new Date();
       $rootScope.messages.unshift( {
-        time: dt.toISOString(),
+        time: dt.toISOString().substr(0,10) + ' ' + dt.toLocaleTimeString().substr(0,8), // for milliseconds + '.' + ('0' + dt.getMilliseconds()).slice(-3),
         type: 'log',
         text: msg
       } );
@@ -172,6 +172,35 @@ angular.module('starter.services', ['ngCordova'] )
 
   return authHttp;
 } ] )
+
+.factory('CommandQueue', function(authHttp, logger) {
+  return {
+    add: function(cmd) {
+      var commands = Cache.getObject('commands');
+      var n = commands.length;
+      commands.push(cmd);
+      Cache.setObject('commands', commands);
+      logger.log("Had " + n + " commands. Added cmd:" + JSON.stringify(cmd));
+    },
+    remove: function() {
+      var commands = Cache.getObject('commands');
+      var cmd = commands.shift();
+      Cache.setObject('commands', commands);
+      logger.log("Deleted from commands. Have " + commands.length);
+      return cmd;
+    },
+    runAndRemoveOne: function(fn_success, fn_fail) {
+      var cmd = this.remove();
+      var method = cmd['method'];
+      var url = cmd['url'];
+      var data = cmd['data'];
+      var config = cmd['config'];
+      $http[method](url, data, config).then(fn_success, fn_fail);
+    },
+    runAndRemoveAll: function(fn_success, fn_fail) {
+    }
+  };
+} )
 
 .factory('Roles', function(Cache, logger) {
   return {
@@ -387,13 +416,13 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.put(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
+        var k = 'dt.' + name + '.' + id;
+        Cache.setObject(k, fields);
         if (202 == response.status) {
-          var k = 'dt.' + name + '.' + id;
-          Cache.setObject(k, fields);
           fn_offline(fields);
-          return;
+        } else {
+          fn_fields(response.data);
         }
-        fn_fields(response.data);
       }, function(response) {
         fn_fail(response);
       } );
@@ -402,9 +431,9 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
+        var k = 'dt.' + name + '.' + id;
+        Cache.setObject(k, fields);
         if (202 == response.status) {
-          var k = 'dt.' + name + '.' + id;
-          Cache.setObject(k, fields);
           logger.log("Request accepted (server offline)");
           fn_offline(fields);
           return;
@@ -628,8 +657,10 @@ angular.module('starter.services', ['ngCordova'] )
         for(var i = 0; i < dts.length; ++i) {
           var dt = dts[i];
           DataTables.get_one(dt, id, function(fields, dt) {
-            fields.joiningDt = DateUtil.localDate(fields.joiningDate);
-            fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+            if (fields && fields.joiningDate != null) {
+              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+              fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+            }
             office[dt] = fields;
             logger.log("SACCO with " + dt + ": " + JSON.stringify(office));
           } );
@@ -803,12 +834,12 @@ angular.module('starter.services', ['ngCordova'] )
       if (clients) {
         logger.log("Got cached clients: " + typeof(clients));
         if (!HashUtil.isEmpty(clients)) {
-          logger.log("Clients.query got cached clients");
           var a_clients = [];
           for(var id in clients) {
             a_clients.push(clients[id]);
           }
           process_clients(a_clients);
+          logger.log("Clients.query got "+a_clients.length+" cached clients");
         }
       } else {
         logger.log("Clients.query got no cached clients");
@@ -877,6 +908,17 @@ angular.module('starter.services', ['ngCordova'] )
             fn_offline(eClient);
           }
         } else {
+          authHttp.get(baseUrl + '/clients/' + id)
+            .then(function(response) {
+              var data = response.data;
+              var id = data.id;
+              clients = Cache.getObject('h_clients');
+              clients[id] = data;
+              Cache.setObject('h_clients', clients);
+              logger.log("Reloaded client data: " + JSON.stringify(data));
+            }, function(response) {
+              logger.log("Failed to reload client #" + id);
+            } );
           logger.log("Update client. Response: " + JSON.stringify(response.data));
           fn_client(response.data);
         }
@@ -980,8 +1022,41 @@ angular.module('starter.services', ['ngCordova'] )
         logger.log("Image for client " + id + " received[b64]. Size: " + response.data.length);
         fn_img(response.data);
       } );
+    },
+    save: function(id, imgData, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/clients/' + id + '/images', imgData, {
+        'Content-Type': 'text/plain'
+      }, function(response) {
+        var data = response.data;
+        if (response.status == 202) {
+          fn_offline(data);
+        } else {
+          fn_success(data);
+        }
+      }, function(response) {
+        fn_fail(response);
+      } );
     }
   };
+} )
+
+.factory('SavingsProducts', function(authHttp, baseUrl, logger) {
+  return {
+    get: function(id, fn_sav_prod) {
+      authHttp.get(baseUrl + '/savingsproducts/' + id)
+        .then(function(response) {
+          fn_sav_prod(response.data);
+        } );
+    },
+    query: function(fn_sav_prods) {
+      authHttp.get(baseUrl + '/savingsproducts')
+        .then(function(response) {
+          var data = response.data;
+          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          fn_sav_prods(data);
+        } );
+    }
+  }
 } )
 
 .factory('SavingsAccounts', function(authHttp, baseUrl, logger) {
@@ -999,6 +1074,20 @@ angular.module('starter.services', ['ngCordova'] )
           var data = response.data;
           logger.log("Got " + data.totalFilteredRecords + " savings accounts.");
           fn_accts(data.pageItems);
+        } );
+    },
+    save: function(fields, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts', fields, {},
+        function(response) {
+          var data = response.data;
+          if (response.status == 202) {
+            fn_offline(data);
+          } else {
+            fn_success(data);
+          }
+        },
+        function(response) {
+          fn_fail(response);
         } );
     },
     withdraw: function(id, params, fn_res, fn_offline, fn_err) {

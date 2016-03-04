@@ -214,7 +214,8 @@ angular.module('starter.controllers', ['ngCordova'])
       };
       var odts = Office.dataTables();
       for(var i = 0; i < odts.length; ++i) {
-        DataTables.save(odts[i], new_office.officeId, client[cdts[i]], function(data) {
+        var fields = FormHelper.preSaveForm(SACCO_Fields, odts[i], false);
+        DataTables.save(fields, new_office.officeId, client[cdts[i]], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
@@ -343,8 +344,10 @@ angular.module('starter.controllers', ['ngCordova'])
   var saccoId = $stateParams.saccoId;
   logger.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
-  SACCO.get_full(saccoId, function(sacco) {
-    $scope.data = sacco;
+  $scope.$on('$ionicView.enter', function(e) {
+    SACCO.get_full(saccoId, function(sacco) {
+      $scope.data = sacco;
+    } );
   } );
 } )
 
@@ -425,12 +428,42 @@ angular.module('starter.controllers', ['ngCordova'])
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
   $scope.client = {};
-  Customers.get_full(clientId, function(client) {
-    client["NumShares"] = parseInt(Math.random()*10);
-    $scope.client = client;
-    $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
-    var gname = client.gender.name || "male";
-    $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
+  $scope.getPhoto = function() {
+    logger.log('Getting camera');
+    Camera.getPicture( {
+      quality: 75,
+      targetWidth: 150,
+      targetHeight: 150,
+      destinationType: 0, //Camera.DestinationType.DATA_URL,
+      encodingType: 0, //Camera.EncodingType.JPEG,
+      saveToPhotoAlbum: false
+    } ).then(function(imageData) {
+      var b64ImageURI = "data:image/jpeg;base64," + imageData;
+      $scope.client.face = b64ImageURI;
+      ClientImages.save(clientId, b64ImageURI, function(result) {
+        logger.log("Client image saved");
+      }, function(response) {
+        logger.log("Image accepted (offline)");
+      }, function(response) {
+        logger.log("Image save failed");
+      } );
+    }, function(err) {
+      logger.log(err);
+    } );
+  };
+  $scope.$on('$ionicView.enter', function(e) {
+    Customers.get_full(clientId, function(client) {
+      client["NumShares"] = parseInt(Math.random()*10);
+      $scope.client = client;
+      $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
+      var gname = client.gender.name || "male";
+      $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
+    } );
+    setTimeout(function(e) {
+      ClientImages.getB64(clientId, function(img_data) {
+        $scope.client.face = img_data;
+      } );
+    }, 2000);
   } );
   Clients.get_accounts(clientId, function(accounts) {
     var savingsAccounts = accounts["savingsAccounts"] || [];
@@ -465,32 +498,27 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.client.TotalLoans = totalLoans;
     $scope.client.loanAccounts = lacs;
   } );
-  $scope.getPhoto = function() {
-    logger.log('Getting camera');
-    Camera.getPicture( {
-      quality: 75,
-      targetWidth: 150,
-      targetHeight: 150,
-      saveToPhotoAlbum: false
-    } ).then(function(imageURI) {
-      $scope.client.face = imageURI;
-    }, function(err) {
-      logger.log(err);
-    } );
-  };
-  ClientImages.getB64(clientId, function(img_data) {
-    $scope.client.face = img_data;
-  } );
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup, $timeout, logger) {
+    SavingsProducts, $ionicPopup, $timeout, logger) {
+
+  SavingsProducts.query(function(products) {
+    logger.log("Got products: " + products.length);
+    $scope.products = products;
+  } );
+
+  $scope.prodChanged = function() {
+    logger.log("Product was changed");
+  };
 
   $scope.savingCreate = function()  {
     // TO DO :
     // Check the parameters' list
 
-    $scope.data = $scope.XYZ; 
+    $scope.savings = {
+      minRequiredOpeningBalance: 0
+    }; 
     var myPopup = $ionicPopup.show({
       title: '<strong>Saving Account Creation</strong>',
       /* This Url takes you to a script with the same ID Name in index.html */
@@ -507,12 +535,19 @@ angular.module('starter.controllers', ['ngCordova'])
         { text: '<b>Save</b>',
           type: 'button-positive',
           onTap: function(e) {
-            if (!$scope.data) {
+            if (!$scope.savings) {
               e.preventDefault();
               //don't allow the user to close the popup if empty
             } else {
-              // Returning a value will cause the promise to resolve with the given value.
-              return $scope.data; // true;
+              var sav = $scope.savings;
+              logger.log("Going to save account: " + JSON.stringify(sav));
+              SavingsAccounts.save(sav, function(new_sav) {
+                logger.log("Savings created!");
+              }, function(sav) {
+                logger.log("Savings accepted");
+              }, function(response) {
+                logger.log("Savings create failed");
+              } );
             }
           }
         }
@@ -890,8 +925,8 @@ angular.module('starter.controllers', ['ngCordova'])
     var cdts = Clients.dataTables();
     for(var i = 0; i < cdts.length; ++i) {
       var dt = cdts[i];
-      logger.log("Got DATATABLE:" + dt);
       DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
+        client[dt] = client[dt] || {};
         HashUtil.copy(client[dt], {
           "locale": "en",
           "dateFormat": "yyyy-MM-dd"

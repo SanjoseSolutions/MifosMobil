@@ -36,33 +36,36 @@ label {
 	font-family:corsiva;
 }
 .client-photo {
-  height: 165px;
+  height: 185px;
   float: left;
 }
-.client-photo img {
-  margin: 2px 2px 15px 2px;
+.client-photo > img {
+  margin: 2px;
 }
-.client-photo .ion-camera {
+.client-photo > center > a.ion-camera {
   font-size: 15px;
-  padding: 1px 3px;
-  height: 15px;
+  padding: 2px 3px;
+  border: 1px solid #889;
+  background-color: #dde;
   margin-left: auto;
   margin-right: auto;
-  color: #778;
-  text-decoration: underline;
+  color: #334;
 }
 </style>
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
-    <div class="list card" style="clear:both; height:170px">
+    <div class="list card" style="clear:both">
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
 	     <h4>{{client.fullname}}</h4>
       </div -->
       <div class="client-photo">
-        <div class="ion-camera" ng-click="getPhoto()">&nbsp;Take Photo</div>
         <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
+        <center>
+        <a ng-click="getPhoto()" class="ion-camera">
+          Take Photo</a>
+        </center>
       </div>
       <ion-list>
         <h4>{{client.displayName}}</h4>
@@ -96,24 +99,24 @@ label {
 
       <ion-item class="item-icon">
         <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-        </label>  {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }}
+        </label>  {{client.Client_Fields.Email || "Not set" }}
         <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
       <ion-item>
         <label> Education <i class="icon ion-university"> </i>:
-        </label>{{client.Client_Fields.Education || "Unspecified"}}
+        </label>{{client.Client_Fields.Education || "Not set"}}
       </ion-item>
       <ion-item>
         <label>Occupation:
-        </label>{{client.Client_Fields.Occupation || "Trader"}}
+        </label>{{client.Client_Fields.Occupation || "Not set"}}
       </ion-item>
       <ion-item>
         <label> Fathers Name:
-        </label>{{client.Client_Fields["Fathers Name"] || "Unspecified"}}
+        </label>{{client.Client_Fields["Fathers Name"] || "Not set"}}
       </ion-item>
       <ion-item>
         <label> Grandfathers Name:
-        </label>{{client.Client_Fields["Grandfathers Name"] || "Unspecified"}}
+        </label>{{client.Client_Fields["Grandfathers Name"] || "Not set"}}
       </ion-item>
       <!--ion-item>
         <label>Location:
@@ -121,7 +124,7 @@ label {
       </ion-item -->
       <ion-item>
         <label> Client's Address <i class="icon ion-ios-home"></i>  : </label>
-        <br /> {{client.Address || "Unspecified" }}
+        <br /> {{client.Address || "Not set" }}
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
       <ion-item>

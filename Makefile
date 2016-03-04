@@ -10,7 +10,7 @@ emulate:
 build:
 	ionic build android
 
-install: build platforms/android/build/outputs/apk/android-debug.apk
+install: platforms/android/build/outputs/apk/android-debug.apk
 	scp platforms/android/build/outputs/apk/android-debug.apk mail:/usr/share/nginx/kmayra.org/targets/kmayra-debug.apk
 
 upload: platforms/android/build/outputs/apk/android-debug.apk
