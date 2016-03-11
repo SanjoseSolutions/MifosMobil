@@ -9,6 +9,7 @@ ion-nav-bar
 */
 body	{
 	background-color: grey;
+/*  cursor: url(images/my-cursor.png), auto; */
 }
 
 .item-divider	{
@@ -62,3 +63,19 @@ ion-content {
     font-family: verdana;
     font-style: italic;
 }
+
+
+ion-content  {
+/* background-color:lightgrey;  */
+}
+
+label {
+  font-size:1.15rem;
+  color: #558;
+}
+.item, ion-item {
+  border: none;
+/*  font-style:italic;  */
+  font-family:corsiva;
+}
+

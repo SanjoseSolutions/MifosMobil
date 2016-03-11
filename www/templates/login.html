@@ -19,6 +19,7 @@
     <ion-card>
       <ion-list>
         <ion-item ng-show="message">
+          <!-- icon ion-wifi -->
           <span class="ion-{{message.type}}">{{message.text}}</span>
         </ion-item>
         <ion-item>
@@ -33,7 +34,8 @@
             placeholder="Your password" ng-minlength="8" required />
         </ion-item>
 
-        <!--ion-item>
+        <!-- Was part of the Initial design. Now It's implicit
+        ion-item>
           <ion-checkbox ng-model="cred.client">I am a Client</ion-checkbox>
         </ion-item-->
 
@@ -52,7 +54,8 @@
             <span class="ion-log-in"></span>
           </button>
         </ion-item>
-        <!-- ion-item class="text-center" ng-hide="1">
+        <!-- CAN BE REUSED TO ALLOW PASSWORD RESET THROUGH THE APP USING THE K-MAYRA EMAIL
+        ion-item class="text-center" ng-hide="1">
           Forgot your password ?
           <br />
           <button class="button button-calm" ng-click="resetPass()">
@@ -60,7 +63,7 @@
             <span class="ion-ios-unlocked"></span>
           </button>
         </ion-item
-         -->
+        -->
       </ion-list>
     </ion-card>
     </form>

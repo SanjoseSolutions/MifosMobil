@@ -63,8 +63,7 @@ label {
       <div class="client-photo">
         <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
         <center>
-        <a ng-click="getPhoto()" class="ion-camera">
-          Take Photo</a>
+          <a ng-click="getPhoto()" class="ion-camera"> Take Photo </a>
         </center>
       </div>
       <ion-list>
@@ -150,7 +149,8 @@ label {
 	       <label>Savings Accounts:</label>
          <span ng-hide="client.savingsAccounts">(None)</span>
           <a href="#/tab/clients/{{client.id}}/savings-apply" class="button positive rightBtn">
-          Apply</a>
+            Apply
+          </a>
          <table style="width:95%">
          <tbody>
           <tr ng-repeat="sac in client.savingsAccounts">
@@ -185,17 +185,9 @@ label {
       <ion-item>
         <label>Share Holdings:</label>
         {{client.NumShares || "0"}}
-        <a href="#/tab/#" class="button positive rightBtn"> <strong> Buy </strong> </a>
+        <a href="#/tab/clients/{{client.id}}/" class="button positive rightBtn"> <strong> Buy </strong> </a>
       </ion-item>
     </div>
-
-    <!-- ion-item>
-      <a href="#/tab/clients/{{client.id}}/edit">
-        <button class="ion-ios-compose-outline">
-          Edit
-        </button>
-      </a>
-    </ion-item -->
 
     </ion-list>
 

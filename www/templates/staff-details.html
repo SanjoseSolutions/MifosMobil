@@ -14,17 +14,21 @@
 -->
 <style>
 label, .label {
+  font-size:1.15rem;
  	color: #558;
 }
 .item, ion-item {
-	margin: 2px;
-	padding: 2px 3px;
+	margin: 0px;
+	padding: 1px 3px;
 	border: none;
 /*	font-style:italic;	*/
 	font-family:corsiva;
 }
 td {
-  padding: 10px;
+  padding: 3.5px;
+}
+.ion-ios-people, .ion-social-bitcoin {
+  font-size: 1.3rem;
 }
 </style>
 
@@ -60,8 +64,11 @@ td {
           {{staff.officeName || "Unspecified" }}
         </ion-item>
         <ion-item class="item item-divider">
-          <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> </span>: 
-         <label style="font-size:0.9rem">{{staff.email?staff.email:" staffusername@kmayra.org" }} </label>
+          <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
+          </span>
+          : <label> <!-- style="font-size:0.9rem" -->
+              {{staff.email?staff.email:" staffusername@kmayra.org" }}
+            </label>
         </ion-item>
       </ion-list>
       <!--div class="item item-divider">
@@ -93,11 +100,11 @@ td {
         <table>
         <tr>
           <td> <label>Active Officer </label> </td>
-          <td> : {{isActive}} </td>
+          <td> : {{isActive || "Undefined"}} </td>
         </tr>
         <tr>
           <td> <label>Loan Officer </label> </td>
-          <td> : {{isLoanOfficer}} </td>
+          <td> : {{isLoanOfficer || "Undefined"}} </td>
         </tr>
         <tr>
           <td> <label> Total Members </label> </td>
@@ -107,15 +114,17 @@ td {
         </tr>
         <tr>
           <td> <label> Total Loans </label> </td>
-          <td> : <i class="icon ion-social-bitcoin"></i>
-            {{client.TotalLoans?client.TotalLoans:350}}
+          <td> :<i class="icon ion-social-bitcoin">
+                  {{client.TotalLoans?client.TotalLoans:350}}
+                </i>
           </td>
           <td> <button ng-click="#"> Transactions </button> </td>
         </tr>
         <tr>
           <td> <label>Total Savings </label> </td>
-          <td> : <i class="icon ion-social-bitcoin"></i>
-            {{client.TotalSavings?client.TotalSavings:250}}
+          <td> :<i class="icon ion-social-bitcoin">
+                  {{client.TotalSavings?client.TotalSavings:250}}
+                </i>
           </td>
           <td> <button ng-click="#"> Transactions </button> </td>
         </tr>
