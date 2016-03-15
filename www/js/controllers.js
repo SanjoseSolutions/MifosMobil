@@ -32,13 +32,78 @@
 
 angular.module('starter.controllers', ['ngCordova'])
 
-.controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork', 'logger',
-    function($rootScope, $scope, Session, $cordovaNetwork, logger) {
+.controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork',
+    'logger', 'CommandQueue', '$state', function($rootScope, $scope, Session,
+    $cordovaNetwork, logger, CommandQueue, $state) {
+
   $scope = {
     session: Session
   };
+
+  if ($scope.session.isAuthenticated() ) {
+    $state.go('tab.dashboard');
+  }
+
+//  document.addEventListener('deviceready', function() {
+
+  /*
+      authHttp.runCommands(function(n) {
+        logger.log("Running command: " + n);
+      }, function(method, url, data, response) {
+        logger.log("PASS: " + method + " " + url + " with :: " +
+          JSON.stringify(data));
+      }, function(method, url, data, response) {
+        logger.log("FAIL: " + method + " " + url + " with :: " +
+          JSON.stringify(data));
+      }, function() {
+        logger.log("ALL DONE!!");
+      } );
+      */
+
   logger.log("Is authenticated: " + $scope.session.isAuthenticated() );
 } ] )
+
+/*      var offlinePopup = $ionicPopup.alert( {
+        title: "Going Offline",
+        template: "k-Mayra is going offline"
+      } );
+
+      setTimeout(function(e) {
+        offlinePopup.close();
+      }, 2000); */
+      /*
+      $rootScope.cmd_success = 0;
+      $rootScope.msg = "";
+      var onlinePopup = $ionicPopup.alert( {
+        title: "Going online",
+        template: "k-Mayra is going online..{{msg}}"
+      } );
+
+      setTimeout(function() {
+        onlinePopup.close();
+      }, 1000);
+
+      authHttp.runCommands(function(n) {
+        $rootScope.cmd_count = n;
+        $rootScope.cmd_success = 0;
+        $rootScope.msg += "<br />Command count: " + n;
+      }, function(method, url, data, response) {
+        logger.log("PASS:" + method + " " + url + " with " + JSON.stringify(data));
+        $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
+          " bytes data SUCCESS";
+        $rootScope.cmd_success++;
+      }, function(method, url, data, response) {
+        logger.log("FAIL:" + method + " " + url + " with " + JSON.stringify(data));
+        $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
+          " bytes data FAIL(" + response.status + ")";
+      }, function() {
+        $rootScope.msg += "<br />RESULT: {{cmd_success}} SUCCESS, {{cmd_count - cmd_success}} FAIL";
+      } );
+
+      // ToDo: add other synchronization code here
+
+      Cache.updateLastSync();
+      */
 
 .controller('LogsCtrl', [ '$rootScope', '$scope', function($rootScope, $scope) {
   $scope.log = {
@@ -56,6 +121,7 @@ angular.module('starter.controllers', ['ngCordova'])
 .controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout, $state, logger) {
   $scope.cred = {};
   $scope.login = function(auth) {
+    /*
     if (window.Connection && $cordovaNetwork.isOffline()) {
       $scope.message = {
         "type": "warn",
@@ -63,9 +129,10 @@ angular.module('starter.controllers', ['ngCordova'])
       };
       return;
     }
+    */
     logger.log("Anon scope Login called..");
     $scope.message = null;
-    Session.login(auth, function(response) {
+    Session.login(auth, function(authinfo) {
       logger.log("Login successful");
       $state.go('tab.dashboard');
     }, function(response) {
@@ -131,52 +198,33 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 })
 
-.controller('TabsCtrl', function($scope, $rootScope, Session,
-    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup) {
+.controller('TabsCtrl', function($scope, $rootScope, Session, logger,
+    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
 
   $scope.session = Session.get();
 
-  $rootScope.$on('$cordovaNetwork:offline', function(e, ns) {
-    $rootScope.isOnline = false;
-    $scope.session.takeOffline();
-    $ionicPopup.alert( {
-      title: "Going Offline",
-      template: "k-Mayra is going offline"
+  $rootScope.$on('$cordovaNetwork:offline', 
+    function(e, ns) {
+      //$rootScope.isOnline = false;
+      //$scope.session.takeOffline();
+      logger.log("Going offline");
     } );
-  } );
 
-  $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
-    $rootScope.isOnline = true;
-    $scope.session.takeOnline();
-    $rootScope.cmd_success = 0;
-    $rootScope.msg = "";
-    $rootScope.onlinePopup =
-      $ionicPopup.confirm( {
-        title: "Going online",
-        template: "k-Mayra is going online..{{msg}}"
+  $rootScope.$on('$cordovaNetwork:online',
+    function(e, ns) {
+      //$rootScope.isOnline = true;
+      //$scope.session.takeOnline();
+      logger.log("Going back online.");
+      authHttp.runCommands(function(n) {
+        logger.log("Starting to execute " + n + " commands");
+      }, function(method, url, data, response) {
+        logger("SUCCESS: " + method + " " + url + " :: " + JSON.stringify(data));
+      }, function(method, url, data, response) {
+        logger("FAILURE: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
+      }, function() {
+        logger.log("All commands done!");
       } );
-    authHttp.runCommands(function(n) {
-      $rootScope.cmd_count = n;
-      $rootScope.cmd_success = 0;
-      $rootScope.msg += "<br />Command count: " + n;
-    }, function(method, url, data, response) {
-      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
-        " bytes data SUCCESS";
-      $rootScope.cmd_success++;
-    }, function(method, url, data, response) {
-      $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
-        " bytes data FAIL(" + response.status + ")";
-    }, function() {
-      $rootScope.msg += "<br />RESULT: {{cmd_success}} SUCCESS, {{cmd_count - cmd_success}} FAIL";
     } );
-    setTimeout(function() {
-      $rootScope.onlinePopup.close();
-    }, 10000);
-
-    // ToDo: add other synchronization code here
-
-    Cache.updateLastSync();
-  } );
 
   $scope.$on('$ionicView.enter', function(e) {
     var rolestat = new Object();
@@ -194,6 +242,8 @@ angular.module('starter.controllers', ['ngCordova'])
     }
     rolestat.showAccount = true;
     $scope.rolestat = rolestat;
+
+      //document.addEventListener('offline', 
   } );
 } )
 
@@ -463,7 +513,7 @@ angular.module('starter.controllers', ['ngCordova'])
       ClientImages.getB64(clientId, function(img_data) {
         $scope.client.face = img_data;
       } );
-    }, 2000);
+    }, 1000);
   } );
   Clients.get_accounts(clientId, function(accounts) {
     var savingsAccounts = accounts["savingsAccounts"] || [];

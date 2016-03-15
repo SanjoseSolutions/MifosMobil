@@ -135,10 +135,15 @@ table#SavSum tr>td {
           </table>
         </ion-item>
         <ion-item>
-          You're {{session.status()}}. 
-          <div ng-hide="isOnline">
+          <center>
+          Connection status: {{session.status()}}
+            <span ng-if="session.isOnline" class="icon ion-android-cloud">&nbsp;</span>
+          </center>
+          <center ng-if="!session.isOnline">
+            <span class="icon ion-android-cloud-outline">&nbsp;</span></center>
+          <center ng-hide="session.isOnline">
             Last synced: {{session.lastSyncSince()}}
-          </div>
+          </center>
         </ion-item>
         <ion-item>
           Logged in <em>@ {{session.loggedInTime()}}</em>
