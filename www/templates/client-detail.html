@@ -73,6 +73,10 @@ label {
 	        <label>Gender :</label>{{client.gender.name}}
 	      </ion-item>
         <ion-item>
+          <label>Marital Status :</label>
+          <br /> {{client.maritalStatus || "Not set"}}
+        </ion-item>
+        <ion-item>
           <label>D.O.B</label>: {{client.dateOfBirth}}
         </ion-item>
         <ion-item>

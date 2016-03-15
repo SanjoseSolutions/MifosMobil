@@ -64,6 +64,13 @@ ion-content {
     font-style: italic;
 }
 
+.briefInfo {
+  margin:0px 5px;
+}
+
+.centered {
+  text-align: center;
+}
 
 ion-content  {
 /* background-color:lightgrey;  */
@@ -74,6 +81,8 @@ label {
   color: #558;
 }
 .item, ion-item {
+  margin: 2px;
+  padding: 2px 5px;
   border: none;
 /*  font-style:italic;  */
   font-family:corsiva;

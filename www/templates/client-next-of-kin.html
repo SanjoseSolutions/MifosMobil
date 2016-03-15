@@ -18,18 +18,6 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<style>
-.item, ion-item {
-/*	margin: 0px; 
-	padding: 2px 3px; */
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
-}
-.briefInfo {
-  margin:0px 5px;
-}
-</style> 
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
@@ -48,23 +36,25 @@
         </p -->
         <div class="briefInfo">
           <label>Gender :</label> {{client.gender.name}}
+          <br /><label>Marital Status :</label>
+          <br />{{client.maritalStatus}}
           <br /><label>D.O.B</label>: {{client.dob}}
           <br />
-          <label title="Mobile">
+          <!--label title="Mobile">
             Telephone
             <span class="icon ion-android-call"></span>
           </label>
-          : <strong>{{client.mobileNo || "9876543210"}}</strong>
+          : <strong>{{client.mobileNo || "9876543210"}}</strong -->
 
         </div>
       </div>
-      <!-- ion-item>
+      <ion-item class="centered">
         <label title="Mobile">
           Telephone
           <span class="icon ion-android-call"></span>
         </label>
         : <strong>{{client.mobileNo || "9876543210"}}</strong>
-      </ion-item --> 
+      </ion-item> 
       <ion-item class="item item-divider item-icon">
         <!-- Email -->
         <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
@@ -118,7 +108,7 @@
       </ion-item>
       <ion-item>
         <label>Full Name</label> :
-        {{client.Client_NextOfKin.Fullname}}
+        <strong>{{client.Client_NextOfKin.Fullname}}</strong>
       </ion-item>
       <ion-item>
         <label title="Mobile">
