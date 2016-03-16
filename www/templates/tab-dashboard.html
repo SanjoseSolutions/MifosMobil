@@ -32,24 +32,12 @@ table#SavSum tr>td {
 
 </style>
 
-
 <ion-view view-title="Dashboard">
   <ion-content>
     <!-- ion-list class="ion-list-calm">
-    	<ion-toggle  ng-model="settings.enableFriends"> Enable Friends </ion-toggle>
+      <ion-toggle  ng-model="settings.enableFriends"> Enable Friends </ion-toggle>
     </ion-list -->
     <ion-card>
-	<!-- hr / -->
-    <!-- div class="list">
-	<div class="item item-input-inset">
-	<label class="item-input-wrapper">
-	    <input type="text" placeholder="Email">
-	</label>
-	<button class="button button-small">
-	    Submit
-	</button>
-	</div>
-    </div -->
 
     <ion-card>
       <ion-list>
@@ -137,7 +125,7 @@ table#SavSum tr>td {
         <ion-item>
           <center>
           Connection status: {{session.status()}}
-            <span ng-if="session.isOnline" class="icon ion-android-cloud">&nbsp;</span>
+            <span ng-if="session.isOnline" class="ion-android-cloud-done">&nbsp;</span>
           </center>
           <center ng-if="!session.isOnline">
             <span class="icon ion-android-cloud-outline">&nbsp;</span></center>
@@ -150,8 +138,8 @@ table#SavSum tr>td {
         </ion-item>
         <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
-            ng-click="ConfirmLogOut()">
-              Logout<span class="ion-log-out"></span>
+              ng-click="ConfirmLogOut()">
+            Logout<span class="ion-log-out"></span>
           </button>
         </ion-item>
         <ion-item>
@@ -161,31 +149,7 @@ table#SavSum tr>td {
           <center><a href="#/tab/dashboard/logs">View Logs</a></center>
           <center>More visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
         </ion-item>
-    <!-- WILL BE USED IN PHASE 2
-    	 in one of the Templates
 
-        <ion-item>
-        Manage Loan Application
-        </ion-item>
-        <ion-item>
-        Name : 
-        </ion-item>
-        <ion-item>
-          Loan Type : 
-          <select>
-          	<option value="Indivual" selected>
-          	  Individual
-          	</option>
-          	<option> Group </option>
-          	<option> etc ... </option>
-          </select>
-        </ion-item>
-    -->
-<!--
-	INITIAL DESIGN SUGGESTED BY FRANCIS
-	When a button is clicked a Modal pops up
-	</button>
--->
       </ion-list>
 
     </ion-card>
