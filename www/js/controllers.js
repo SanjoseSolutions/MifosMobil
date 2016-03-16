@@ -36,13 +36,9 @@ angular.module('starter.controllers', ['ngCordova'])
     'logger', 'CommandQueue', '$state', function($rootScope, $scope, Session,
     $cordovaNetwork, logger, CommandQueue, $state) {
 
-  $scope = {
-    session: Session
+  $rootScope = {
+    session: null
   };
-
-  if ($scope.session.isAuthenticated() ) {
-    $state.go('tab.dashboard');
-  }
 
 //  document.addEventListener('deviceready', function() {
 
@@ -60,7 +56,6 @@ angular.module('starter.controllers', ['ngCordova'])
       } );
       */
 
-  logger.log("Is authenticated: " + $scope.session.isAuthenticated() );
 } ] )
 
 /*      var offlinePopup = $ionicPopup.alert( {
@@ -118,8 +113,16 @@ angular.module('starter.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($scope, Session, $cordovaNetwork, $ionicPopup, $timeout, $state, logger) {
+.controller('AnonCtrl', function($rootScope, $scope, Session, $cordovaNetwork, $ionicPopup, $timeout, $state, Cache, logger) {
   $scope.cred = {};
+
+  $scope.$on('$ionicView.enter', function(e) {
+    $rootScope.session = Session.get();
+    if (Session.isAuthenticated()) {
+      $state.go('tab.dashboard');
+    }
+  } );
+
   $scope.login = function(auth) {
     /*
     if (window.Connection && $cordovaNetwork.isOffline()) {
@@ -200,8 +203,6 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('TabsCtrl', function($scope, $rootScope, Session, logger,
     Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
-
-  $scope.session = Session.get();
 
   $rootScope.$on('$cordovaNetwork:offline', 
     function(e, ns) {
@@ -1123,18 +1124,22 @@ angular.module('starter.controllers', ['ngCordova'])
   }, function(sus) {} );
 } )
 
-.controller('DashboardCtrl', function($scope, authHttp, baseUrl, Cache,
-    Session, Customers, Staff, SACCO, HashUtil, $ionicPopup, logger) {
+.controller('DashboardCtrl', function($rootScope, $scope, authHttp,
+    baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
+    $ionicPopup, logger) {
 
   var session = null;
+
   $scope.$on('$ionicView.enter', function(e) {
     if (null == session) {
-      session = Session;
+      logger.log("Loading session..");
+      session = Session.get();
+      $rootScope.session = session;
       var loginPopup = $ionicPopup.alert( {
         title: 'Logging In',
         template: '<p>.<br>\n' +
           '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
-          '<p>Login successful! Welcome ' + session.username() + '</p>',
+          '<p>Login successful! Welcome ' + Session.username() + '</p>',
         scope: $scope
       } );
       var role = session.role;
@@ -1152,7 +1157,6 @@ angular.module('starter.controllers', ['ngCordova'])
             $scope.num_clients = clients.length;
           } );
       }
-      $scope.session = session;
     }
   } );
   /*

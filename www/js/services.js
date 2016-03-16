@@ -49,7 +49,7 @@ angular.module('starter.services', ['ngCordova'] )
   return logger;
 } ] )
 
-.factory('Cache', function() {
+.factory('Cache', ['logger', function(logger) {
   var index = {};
   var lastSync = null;
   return {
@@ -73,17 +73,19 @@ angular.module('starter.services', ['ngCordova'] )
       localStorage.removeItem(key);
       delete index[key];
     },
-    'clear': function() {
-      for(var key in index) {
-        /*
-        if (key.match(/^passwd./)) {
-          logger.log("Skipping key " + key);
-          continue;
+    'clearAll': function() {
+      logger.log("Called Cache.clearAll()");
+      var keys = Object.keys(index);
+      index = {};
+      logger.log("Got keys: " + keys.join(", "));
+      for(var i = 0; i < keys.length; ++i) {
+        var key = index[i];
+        if (key.match(/^passwd\./)) {
+          index[key] = 1;
+        } else {
+          logger.log("Going to clear key: " + key);
+          localStorage.removeItem(key);
         }
-        */
-        logger.log("Got key: " + key);
-        delete index[key];
-        localStorage.removeItem(key);
       }
     },
     'updateLastSync': function() {
@@ -93,7 +95,7 @@ angular.module('starter.services', ['ngCordova'] )
       return lastSync ? lastSync.toLocaleString() : "Never";
     }
   };
-} )
+} ] )
 
 .factory('baseUrl', function(Settings) {
   return Settings.baseUrl;
@@ -115,6 +117,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   authHttp.clearAuthHeader = function() {
+    logger.log("Clearing authorization header");
     delete $http.defaults.headers.common.Authorization;
   };
 
@@ -305,19 +308,45 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   session.login = function(auth, fn_success, fn_fail) {
+
+    var onLogin = function(data) {
+      session.loginTime = new Date();
+      Cache.set('username', auth.username);
+      session.uname = auth.username;
+      Cache.setObject('commands', []);
+
+      logger.log("Response: " + JSON.stringify(data));
+      Cache.setObject('auth', data);
+
+      var roles = Roles.setRoles(data.roles);
+      var role = roles[0];
+      session.role = role;
+
+      var b64key = data.base64EncodedAuthenticationKey;
+      authHttp.setAuthHeader(b64key);
+
+      Cache.setObject('session', session);
+      Codes.init();
+    };
+
     if (window.Connection && $cordovaNetwork.isOffline()) {
       logger.log("Attempting offline login..");
       var authinfo = Cache.getObject('passwd.'+auth.username);
+      logger.log("Got cached authinfo: " + JSON.stringify(authinfo));
       if (authinfo.password == auth.password) {
+        logger.log("Succesful login :-)");
+        onLogin(authinfo);
         fn_success(authinfo);
       } else {
+        logger.log("Login failed :-/");
         fn_fail( {
           status: 401
         } );
       }
+      return;
     }
     var uri = baseUrl + '/authentication';
-    logger.log("auth:"+JSON.stringify(auth));
+    logger.log("Online login. Credentials: auth="+JSON.stringify(auth));
     if (auth.client) {
       uri = baseUrl + '/self/authentication';
     }
@@ -330,26 +359,14 @@ angular.module('starter.services', ['ngCordova'] )
       'Accept': 'application/json'
     } ).then(function(response) {
 
-      session.loginTime = new Date();
-      Cache.set('username', auth.username);
-      Cache.setObject('commands', []);
+      logger.log("Succesful login :-D");
+      Cache.clearAll();
 
       var data = response.data;
-      logger.log("Response: " + JSON.stringify(data));
-      Cache.setObject('auth', data);
-
       data.password = auth.password;
       Cache.setObject('passwd.' + auth.username, data); 
 
-      var roles = Roles.setRoles(data.roles);
-      var role = roles[0];
-      session.role = role;
-      
-      var b64key = data.base64EncodedAuthenticationKey;
-      authHttp.setAuthHeader(b64key);
-
-      Cache.setObject('session', session);
-      Codes.init();
+      onLogin(data);
 
       fn_success(response);
 
@@ -379,7 +396,7 @@ angular.module('starter.services', ['ngCordova'] )
   session.logout = function() {
     logger.log("Logout attempt");
     authHttp.clearAuthHeader();
-    Cache.clear();
+    Cache.remove('username');
     $state.go('login');
   };
 
