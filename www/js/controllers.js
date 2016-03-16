@@ -1079,10 +1079,10 @@ angular.module('starter.controllers', ['ngCordova'])
     if (null == session) {
       session = Session;
       var loginPopup = $ionicPopup.alert( {
-        title: 'Logging In',
+        title: 'Login Successful!',
         template: '<p>.<br>\n' +
           '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
-          '<p><center>Login Successful!<br /> Welcome <strong>' + session.username() + '</strong></center></p>',
+          '<p><center><h4>Welcome <strong>' + session.username() + '</strong></h4></center></p>',
         scope: $scope
       } );
       var role = session.role;
