@@ -79,7 +79,7 @@ angular.module('starter.services', ['ngCordova'] )
       index = {};
       logger.log("Got keys: " + keys.join(", "));
       for(var i = 0; i < keys.length; ++i) {
-        var key = index[i];
+        var key = keys[i];
         if (key.match(/^passwd\./)) {
           index[key] = 1;
         } else {
@@ -533,6 +533,17 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
+.factory('SACCO_Fields', function() {
+  return {
+    dateFields: function() { return [ 'joiningDate' ]; },
+    saveFields: function() {
+      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
+    },
+    codeFields: function() { return []; },
+    skipFields: function() { return []; }
+  };
+} )
+
 .factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
   return {
     dateFields: function() {
@@ -567,6 +578,12 @@ angular.module('starter.services', ['ngCordova'] )
           Cache.setObject('h_offices', offices);
           fn_offline(new_office);
           return;
+        } else {
+          var offices = Cache.getObject('h_offices');
+          var new_office = response.data;
+          var officeId = new_office.officeId;
+          offices[officeId] = new_office;
+          Cache.setObject('h_offices', offices);
         }
         logger.log("Create office success. Got: " + JSON.stringify(response.data));
         if (fn_office !== null) {
@@ -576,7 +593,7 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
-    update: function(id, fields, fn_office, fn_fail, fn_offline) {
+    update: function(id, fields, fn_office, fn_offline, fn_fail) {
       authHttp.put(baseUrl + '/offices/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
@@ -586,6 +603,7 @@ angular.module('starter.services', ['ngCordova'] )
           if (office) {
             HashUtil.copy(office, fields);
             offices[id] = office;
+            logger.log("Offline update office: " + JSON.stringify(office));
           }
           Cache.setObject('h_offices', offices);
           if (fn_offline) {
@@ -715,8 +733,12 @@ angular.module('starter.services', ['ngCordova'] )
           var dt = dts[i];
           DataTables.get_one(dt, id, function(fields, dt) {
             if (fields && fields.joiningDate != null) {
-              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
-              fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+              if (fields.joiningDate instanceof Array) {
+                fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+                fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+              } else {
+                logger.log("Got joiningDate: " + JSON.stringify(fields.joiningDate));
+              }
             }
             office[dt] = fields;
             logger.log("SACCO with " + dt + ": " + JSON.stringify(office));

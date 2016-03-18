@@ -256,24 +256,24 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
   $scope.saveSacco = function(office, sacco) {
     var sfs = Office.saveFields;
-    ofields = FormHelper.preSaveForm(Office, office, false);
+    var ofields = FormHelper.preSaveForm(Office, office, false);
     logger.log("SACCO data: " + JSON.stringify(ofields));
     Office.save(ofields, function(new_office) {
       $scope.message = {
         "type": "info",
         "text": "Successfully created SACCO #" + new_office.officeId
       };
-      var odts = Office.dataTables();
-      for(var i = 0; i < odts.length; ++i) {
-        var fields = FormHelper.preSaveForm(SACCO_Fields, odts[i], false);
-        DataTables.save(fields, new_office.officeId, client[cdts[i]], function(data) {
-          logger.log("Saved datatables data: " + data);
-        }, function(response) {
-          logger.log("Accepted for offline: " + JSON.stringify(response));
-        }, function(response) {
-          logger.log("Failed to save datatables data: " + response.status);
-        } );
-      }
+      var dtn = "SACCO_Fields";
+      var fields = FormHelper.preSaveForm(SACCO_Fields, dtn, false);
+      logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
+      var officeId = new_office.officeId;
+      DataTables.save(dtn, officeId, fields, function(data) {
+        logger.log("Saved datatables data: " + data);
+      }, function(response) {
+        logger.log("Accepted for offline: " + JSON.stringify(response));
+      }, function(response) {
+        logger.log("Failed to save datatables data: " + response.status);
+      } );
     }, function(office) {
       $scope.message = {
         "type": "info",
@@ -295,7 +295,7 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('SACCOEditCtrl', function($scope, $stateParams, Office,
-    SACCO, DataTables, DateUtil, logger) {
+    SACCO, FormHelper, DataTables, DateUtil, logger) {
   var officeId = $stateParams.saccoId;
   logger.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
@@ -309,6 +309,7 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office) {
+    /*
     var sfs = Office.saveFields;
     var ofields = new Object();
     for(var i = 0; i < sfs.length; ++i) {
@@ -323,17 +324,14 @@ angular.module('starter.controllers', ['ngCordova'])
       val = val.toISOString().substring(0, 10);
       ofields[fld] = val;
     }
+    */
+    var ofields = FormHelper.preSaveForm(Office, office);
+    officeId = officeId || $stateParams.saccoId;
+    logger.log("Attempting update office #" + officeId + " :: " + JSON.stringify(ofields));
     Office.update(officeId, ofields, function(eOffice) {
       var msg = "Successfully edited SACCO:"+officeId;
       var fld = "joiningDate";
-      var sacco = office.SACCO_Fields;
-      var val = sacco[fld];
-      if (val != null) {
-        val = val.toISOString().substring(0, 10);
-        sacco[fld] = val;
-      }
-      sacco.locale = "en";
-      sacco.dateFormat = "yyyy-MM-dd";
+      var sacco = FormHelper.preSaveForm(SACCO_Fields, office.SACCO_Fields);
       DataTables.get_one('SACCO_Fields', officeId, function(sfields, dt) {
         if (sfields) {
           DataTables.update('SACCO_Fields', officeId, sacco, function(fields) {
@@ -367,14 +365,11 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Edit SACCO #" + office.id + " request accepted"
       };
     }, function(response) {
-      var errors = response.data.errors;
-      var errmsg = errors ? errors.map(function(e) {
-        return e.defaultUserMessage
-      } ).join("\n") : "";
+      var errmsg = response.data;
       logger.log("SACCO edit fail: " + errmsg);
       $scope.message = {
         "type": "error",
-        "text": "Failed to create SACCO. Got " + response.code +
+        "text": "Failed to edit SACCO. Got " + response.status +
           ": " + errmsg
       };
     } );
