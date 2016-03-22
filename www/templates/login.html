@@ -67,8 +67,16 @@
       </ion-list>
     </ion-card>
     </form>
-    <center><a href="http://www.kmayra.org">kmayra.org</a> v0.9</center>
     <center><a href="#/logs">View Logs</a></center>
   </ion-content>
+  <ion-footer-bar class="bar-dark">
+    <div style="text-align: center; margin-left: auto; margin-right: auto">
+    <a style="color: #edf" href="http://www.kmayra.org">kmayra.org</a>&nbsp;v0.97-beta3
+    </div>
+    <center ng-if="isOnline">
+      <span class="icon ion-ios-cloud">&nbsp;</span></center>
+    <center ng-if="!isOnline">
+      <span class="icon ion-ios-cloud-outline">&nbsp;</span></center>
+  </ion-footer-bar>
 </ion-view>
 

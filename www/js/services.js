@@ -49,7 +49,7 @@ angular.module('starter.services', ['ngCordova'] )
   return logger;
 } ] )
 
-.factory('Cache', function() {
+.factory('Cache', ['logger', function(logger) {
   var index = {};
   var lastSync = null;
   return {
@@ -73,11 +73,20 @@ angular.module('starter.services', ['ngCordova'] )
       localStorage.removeItem(key);
       delete index[key];
     },
-    'clear': function() {
-      for(var key in index) {
-        localStorage.removeItem(key);
-      }
+    'clearAll': function() {
+      logger.log("Called Cache.clearAll()");
+      var keys = Object.keys(index);
       index = {};
+      logger.log("Got keys: " + keys.join(", "));
+      for(var i = 0; i < keys.length; ++i) {
+        var key = keys[i];
+        if (key.match(/^passwd\./)) {
+          index[key] = 1;
+        } else {
+          logger.log("Going to clear key: " + key);
+          localStorage.removeItem(key);
+        }
+      }
     },
     'updateLastSync': function() {
       lastSync = new Date();
@@ -86,7 +95,7 @@ angular.module('starter.services', ['ngCordova'] )
       return lastSync ? lastSync.toLocaleString() : "Never";
     }
   };
-} )
+} ] )
 
 .factory('baseUrl', function(Settings) {
   return Settings.baseUrl;
@@ -98,7 +107,6 @@ angular.module('starter.services', ['ngCordova'] )
   var authHttp = {};
 
   $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
-  $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 	$http.defaults.headers.common['Accept'] = '*/*';
 	$http.defaults.headers.common['Content-type'] = 'application/json';
 
@@ -108,6 +116,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   authHttp.clearAuthHeader = function() {
+    logger.log("Clearing authorization header");
     delete $http.defaults.headers.common.Authorization;
   };
 
@@ -127,14 +136,15 @@ angular.module('starter.services', ['ngCordova'] )
       config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
       if (window.Connection && $cordovaNetwork.isOffline()) {
         var commands = Cache.getObject('commands');
-        commands.push( {
+        var cmd = {
           'method': method,
           'url': url,
           'data': data,
           'config': config
-        } );
+        };
+        logger.log("Command cached: " + JSON.stringify(cmd));
+        commands.push(cmd);
         Cache.setObject('commands', commands);
-        logger.log("Offline " + method + " attempted");
         fn_success( {
           'status': 202,
           'data': data
@@ -147,6 +157,7 @@ angular.module('starter.services', ['ngCordova'] )
 
   authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
     var commands = Cache.getObject('commands');
+    logger.log("LOADED CACHED COMMANDS: " + commands.length);
     fn_init(commands.length);
     var runNextCmd = function() {
       cmd = commands.shift();
@@ -173,8 +184,21 @@ angular.module('starter.services', ['ngCordova'] )
   return authHttp;
 } ] )
 
+.factory('Network', [ '$cordovaNetwork', function($cordovaNetwork) {
+  var network = $cordovaNetwork;
+  return network;
+} ] )
+
 .factory('CommandQueue', function(authHttp, logger) {
   return {
+    get: function() {
+      var commands = Cache.getObject('commands');
+      return commands;
+    },
+    length: function() {
+      var commands = Cache.getObject('commands');
+      return commands.length;
+    },
     add: function(cmd) {
       var commands = Cache.getObject('commands');
       var n = commands.length;
@@ -188,6 +212,10 @@ angular.module('starter.services', ['ngCordova'] )
       Cache.setObject('commands', commands);
       logger.log("Deleted from commands. Have " + commands.length);
       return cmd;
+    },
+    empty: function() {
+      var commands = Cache.getObject('commands');
+      return (commands.length == 0);
     },
     runAndRemoveOne: function(fn_success, fn_fail) {
       var cmd = this.remove();
@@ -248,8 +276,8 @@ angular.module('starter.services', ['ngCordova'] )
 } )
 
 .factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles', 'Cache', 
-    'Codes', 'logger', '$rootScope', function(baseUrl, authHttp, $http, $state,
-    Roles, Cache, Codes, logger, $rootScope) {
+    'Codes', 'logger', '$rootScope', '$cordovaNetwork', function(baseUrl, authHttp,
+    $http, $state, Roles, Cache, Codes, logger, $rootScope, $cordovaNetwork) {
 
   var session = { isOnline: true, role: null, loginTime: null };
   session.takeOnline = function() {
@@ -279,8 +307,45 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   session.login = function(auth, fn_success, fn_fail) {
+
+    var onLogin = function(data) {
+      session.loginTime = new Date();
+      Cache.set('username', auth.username);
+      session.uname = auth.username;
+      Cache.setObject('commands', []);
+
+      logger.log("Response: " + JSON.stringify(data));
+      Cache.setObject('auth', data);
+
+      var roles = Roles.setRoles(data.roles);
+      var role = roles[0];
+      session.role = role;
+
+      var b64key = data.base64EncodedAuthenticationKey;
+      authHttp.setAuthHeader(b64key);
+
+      Cache.setObject('session', session);
+      Codes.init();
+    };
+
+    if (window.Connection && $cordovaNetwork.isOffline()) {
+      logger.log("Attempting offline login..");
+      var authinfo = Cache.getObject('passwd.'+auth.username);
+      logger.log("Got cached authinfo: " + JSON.stringify(authinfo));
+      if (authinfo.password == auth.password) {
+        logger.log("Succesful login :-)");
+        onLogin(authinfo);
+        fn_success(authinfo);
+      } else {
+        logger.log("Login failed :-/");
+        fn_fail( {
+          status: 401
+        } );
+      }
+      return;
+    }
     var uri = baseUrl + '/authentication';
-    logger.log("auth:"+JSON.stringify(auth));
+    logger.log("Online login. Credentials: auth="+JSON.stringify(auth));
     if (auth.client) {
       uri = baseUrl + '/self/authentication';
     }
@@ -293,23 +358,14 @@ angular.module('starter.services', ['ngCordova'] )
       'Accept': 'application/json'
     } ).then(function(response) {
 
-      session.loginTime = new Date();
-      Cache.set('username', auth.username);
-      Cache.setObject('commands', []);
+      logger.log("Succesful login :-D");
+      Cache.clearAll();
 
       var data = response.data;
-      logger.log("Response: " + JSON.stringify(data));
-      Cache.setObject('auth', data);
+      data.password = auth.password;
+      Cache.setObject('passwd.' + auth.username, data); 
 
-      var roles = Roles.setRoles(data.roles);
-      var role = roles[0];
-      session.role = role;
-      
-      var b64key = data.base64EncodedAuthenticationKey;
-      authHttp.setAuthHeader(b64key);
-
-      Cache.setObject('session', session);
-      Codes.init();
+      onLogin(data);
 
       fn_success(response);
 
@@ -339,7 +395,7 @@ angular.module('starter.services', ['ngCordova'] )
   session.logout = function() {
     logger.log("Logout attempt");
     authHttp.clearAuthHeader();
-    Cache.clear();
+    Cache.remove('username');
     $state.go('login');
   };
 
@@ -394,7 +450,7 @@ angular.module('starter.services', ['ngCordova'] )
     get_one: function(name, id, fn_dtrow, fn_fail) {
       var k = 'dt.' + name + '.' + id;
       var fdata = Cache.getObject(k);
-      if (fdata) {
+      if (fdata && fdata.length) {
         logger.log("DATATABLE: " + k + " from Cache");
         var fields = fdata[0];
         fn_dtrow(fields, name);
@@ -476,6 +532,17 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
+.factory('SACCO_Fields', function() {
+  return {
+    dateFields: function() { return [ 'joiningDate' ]; },
+    saveFields: function() {
+      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
+    },
+    codeFields: function() { return []; },
+    skipFields: function() { return []; }
+  };
+} )
+
 .factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
   return {
     dateFields: function() {
@@ -510,6 +577,12 @@ angular.module('starter.services', ['ngCordova'] )
           Cache.setObject('h_offices', offices);
           fn_offline(new_office);
           return;
+        } else {
+          var offices = Cache.getObject('h_offices');
+          var new_office = response.data;
+          var officeId = new_office.officeId;
+          offices[officeId] = new_office;
+          Cache.setObject('h_offices', offices);
         }
         logger.log("Create office success. Got: " + JSON.stringify(response.data));
         if (fn_office !== null) {
@@ -519,7 +592,7 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
-    update: function(id, fields, fn_office, fn_fail, fn_offline) {
+    update: function(id, fields, fn_office, fn_offline, fn_fail) {
       authHttp.put(baseUrl + '/offices/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
@@ -529,6 +602,7 @@ angular.module('starter.services', ['ngCordova'] )
           if (office) {
             HashUtil.copy(office, fields);
             offices[id] = office;
+            logger.log("Offline update office: " + JSON.stringify(office));
           }
           Cache.setObject('h_offices', offices);
           if (fn_offline) {
@@ -658,8 +732,12 @@ angular.module('starter.services', ['ngCordova'] )
           var dt = dts[i];
           DataTables.get_one(dt, id, function(fields, dt) {
             if (fields && fields.joiningDate != null) {
-              fields.joiningDt = DateUtil.localDate(fields.joiningDate);
-              fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+              if (fields.joiningDate instanceof Array) {
+                fields.joiningDt = DateUtil.localDate(fields.joiningDate);
+                fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
+              } else {
+                logger.log("Got joiningDate: " + JSON.stringify(fields.joiningDate));
+              }
             }
             office[dt] = fields;
             logger.log("SACCO with " + dt + ": " + JSON.stringify(office));
@@ -877,7 +955,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.post(baseUrl + '/clients', client, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
-        if (202 == response.code) {
+        if (202 == response.status) {
           clients = Cache.getObject('h_clients') || {};
           var id = HashUtil.nextKey(clients);
           client["id"] = id;
@@ -898,7 +976,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.put(baseUrl + '/clients/' + id, client, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
-        if (202 == response.code) {
+        if (202 == response.status) {
           clients = Cache.getObject('h_clients');
           if (clients.hasOwnProperty(id)) {
             var eClient = clients[id];
@@ -1266,6 +1344,30 @@ angular.module('starter.services', ['ngCordova'] )
     }
   }
 }])
+
+.factory('MifosEntity', function(authHttp, DataTables) {
+  var obj;
+
+  return {
+    init: function(config) {
+      obj.name = config.name;
+      var dataTables = config.dataTables;
+      angular.forEach(dataTables, function(dt) {
+        obj[dt] = config[dt];
+      } );
+      obj.fields = config.fields;
+      obj.skipFields = config.skipFields;
+    },
+    get: function(id, fn_success, fn_fail) {
+    },
+    query: function(id, fn_success, fn_fail) {
+    },
+    update: function(id, fields, fn_success, fn_offline, fn_fail) {
+    },
+    save: function(fields, fn_success, fn_offline, fn_fail) {
+    }
+  };
+} )
 
 ;
 
