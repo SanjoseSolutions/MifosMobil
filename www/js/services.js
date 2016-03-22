@@ -107,7 +107,6 @@ angular.module('starter.services', ['ngCordova'] )
   var authHttp = {};
 
   $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
-  $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 	$http.defaults.headers.common['Accept'] = '*/*';
 	$http.defaults.headers.common['Content-type'] = 'application/json';
 
@@ -1345,6 +1344,30 @@ angular.module('starter.services', ['ngCordova'] )
     }
   }
 }])
+
+.factory('MifosEntity', function(authHttp, DataTables) {
+  var obj;
+
+  return {
+    init: function(config) {
+      obj.name = config.name;
+      var dataTables = config.dataTables;
+      angular.forEach(dataTables, function(dt) {
+        obj[dt] = config[dt];
+      } );
+      obj.fields = config.fields;
+      obj.skipFields = config.skipFields;
+    },
+    get: function(id, fn_success, fn_fail) {
+    },
+    query: function(id, fn_success, fn_fail) {
+    },
+    update: function(id, fields, fn_success, fn_offline, fn_fail) {
+    },
+    save: function(fields, fn_success, fn_offline, fn_fail) {
+    }
+  };
+} )
 
 ;
 

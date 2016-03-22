@@ -272,7 +272,7 @@ angular.module('starter.controllers', ['ngCordova'])
       }, function(response) {
         logger.log("Accepted for offline: " + JSON.stringify(response));
       }, function(response) {
-        logger.log("Failed to save datatables data: " + response.status);
+        logger.log("Failed to save datatables(" + response.status + ") data: " + response.data);
       } );
     }, function(office) {
       $scope.message = {
@@ -1019,7 +1019,7 @@ angular.module('starter.controllers', ['ngCordova'])
               "type": "info",
               "text": "Failed to save client #" + clientId + " " + dt + ": " + errmsg
             };
-            logger.log("Failed to save datatables data: " + response.status);
+            logger.log("Failed to save datatables(" + response.status + ") data: " + response.data);
           } );
         }
       } );
@@ -1074,15 +1074,15 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Client created with id #" + new_client.clientId
       };
       var cdts = Clients.dataTables();
-      for(var i = 0; i < cdts.length; ++i) {
-        DataTables.save(cdts[i], new_client.clientId, client[cdts[i]], function(data) {
+      angular.forEach(cdts, function(dt) {
+        DataTables.save(dt, new_client.clientId, client[dt], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
         }, function(response) {
-          logger.log("Failed to save datatables data: " + response.status);
+          logger.log("Failed to save datatables(" + response.status + ") data: " + response.data);
         } );
-      }
+      } );
     }, function(new_client) {
       $scope.message = {
         "type": "info",
