@@ -577,7 +577,7 @@ angular.module('starter.services', ['ngCordova'] )
       return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
     },
     codeFields: function() { return []; },
-    skipFields: function() { return []; }
+    skipFields: function() { return {}; }
   };
 } )
 

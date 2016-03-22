@@ -248,24 +248,25 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil, logger) {
+.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil,
+    SACCO_Fields, logger) {
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
     $scope.data.sunions = data;
     $scope.data.op = "Register";
   } );
-  $scope.saveSacco = function(office, sacco) {
+  $scope.saveSacco = function(office) {
     var sfs = Office.saveFields;
     var ofields = FormHelper.preSaveForm(Office, office, false);
     logger.log("SACCO data: " + JSON.stringify(ofields));
-    var fields = FormHelper.preSaveForm(SACCO_Fields, dtn, false);
+    var dtn = "SACCO_Fields";
+    var fields = FormHelper.preSaveForm(SACCO_Fields, office[dtn], false);
     logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
     Office.save(ofields, function(new_office) {
       $scope.message = {
         "type": "info",
         "text": "Successfully created SACCO #" + new_office.officeId
       };
-      var dtn = "SACCO_Fields";
       var officeId = new_office.officeId;
       DataTables.save(dtn, officeId, fields, function(data) {
         logger.log("Saved datatables data: " + data);
