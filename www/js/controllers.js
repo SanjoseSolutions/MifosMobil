@@ -258,14 +258,14 @@ angular.module('starter.controllers', ['ngCordova'])
     var sfs = Office.saveFields;
     var ofields = FormHelper.preSaveForm(Office, office, false);
     logger.log("SACCO data: " + JSON.stringify(ofields));
+    var fields = FormHelper.preSaveForm(SACCO_Fields, dtn, false);
+    logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
     Office.save(ofields, function(new_office) {
       $scope.message = {
         "type": "info",
         "text": "Successfully created SACCO #" + new_office.officeId
       };
       var dtn = "SACCO_Fields";
-      var fields = FormHelper.preSaveForm(SACCO_Fields, dtn, false);
-      logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
       var officeId = new_office.officeId;
       DataTables.save(dtn, officeId, fields, function(data) {
         logger.log("Saved datatables data: " + data);
@@ -275,6 +275,12 @@ angular.module('starter.controllers', ['ngCordova'])
         logger.log("Failed to save datatables(" + response.status + ") data: " + response.data);
       } );
     }, function(office) {
+      var cid = office.cid;
+      HashUtil.copy(fields, {
+        'locale': 'en',
+        'dateFormat': 'yyyy-MM-dd'
+      } );
+      DataTables.saveOffline("SACCO_Fields", fields, cid);
       $scope.message = {
         "type": "info",
         "text": "Accepted SACCO create request (offline): temp id:" + office.id
@@ -1048,7 +1054,8 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil, DataTables, Codes, SACCO, FormHelper, logger) {
+.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil,
+    HashUtil, DataTables, Codes, SACCO, FormHelper, logger) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1067,14 +1074,18 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client, false);
     cfields["active"] = true;
+    var cdts = Clients.dataTables();
     Clients.save(cfields, function(new_client) {
       logger.log("Client created:" + JSON.stringify(new_client));
       $scope.message = {
         "type": "info",
         "text": "Client created with id #" + new_client.clientId
       };
-      var cdts = Clients.dataTables();
       angular.forEach(cdts, function(dt) {
+        HashUtil.copy(client[dt], {
+          'locale': 'en',
+          'dateFormat': 'yyyy-MM-dd'
+        } );
         DataTables.save(dt, new_client.clientId, client[dt], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
@@ -1084,6 +1095,14 @@ angular.module('starter.controllers', ['ngCordova'])
         } );
       } );
     }, function(new_client) {
+      var cid = new_client.cid;
+      angular.forEach(cdts, function(dt) {
+        HashUtil.copy(client[dt], {
+          'locale': 'en',
+          'dateFormat': 'yyyy-MM-dd'
+        } );
+        DataTables.saveOffline(dt, client[dt], cid);
+      } );
       $scope.message = {
         "type": "info",
         "text": "Accepted Client create request (offline)"
