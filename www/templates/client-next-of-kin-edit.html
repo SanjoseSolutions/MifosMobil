@@ -23,17 +23,6 @@
 ion-content  {
 /* background-color:lightgrey;  */
 }
-
-label {
- 	color: #558;
-}
-.item, ion-item {
-	margin: 0px;
-	padding: 2px 3px;
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
-}
 </style> 
 
 <ion-view view-title="Client: {{client.displayName}}">
@@ -59,8 +48,12 @@ label {
 	         </label> {{client.mobileNo || "9876543210"}}
         </ion-item> 
         <ion-item class="item-icon">
-           <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-           </label>  {{client.email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
+          <label title="Email">
+            Email
+            <i class="icon ion-ios-email-outline"></i>: 
+          </label>
+          {{client.email || client.firstname + "@kmayra.org" }}
+          <!-- "extremelysimple@kmayra.org" -->
         </ion-item>
 	    </ion-list> <!--ion-list-->
     </div>
@@ -83,41 +76,8 @@ label {
         <label>Grandfathers Name: </label>
         {{nextOfKin["Grandfathers Name"] || "Unspecified"}}
       </ion-item>
-      <!--ion-item>
-        <a href="#/tab/clients/{{client.id}}/next-of-kin-edit" class="button button-block">
-          <i class="ion-edit">Edit Info</i>
-        </a>
-      </ion-item-->
+      
     </div>
-
-    <!-- ion-item class="item-divider">
-      <!--  h4 class="positive" #> Account Summary <!-- /h4 #>
-    </ion-item>
-
-    <div class="list card">
-      <ion-item>
-	       <label> Account No
-         </label>: -#- <!-- {{client.accNo ? client.accNo: # }} #>	
-      </ion-item>
-      <ion-item>
-	       <label> Loans </label> :
-         <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalLoans || "40" }}
-      </ion-item>
-      <ion-item>
-	       <label> Savings </label>:
-         <i class="icon ion-social-bitcoin"></i>
-         {{client.TotalSavings || "25"}}
-	    </ion-item>
-    </div>
-
-    <!-- ion-item>
-      <a href="#/tab/clients/{{client.id}}/edit">
-        <button class="ion-ios-compose-outline">
-          Edit
-        </button>
-      </a>
-    </ion-item -->
 
     </ion-list>
 

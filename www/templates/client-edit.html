@@ -12,13 +12,6 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<style type="text/css">
-.rightbtn {
-  float: right;
-  width: 20%;
-}
-</style>
-
 <ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
@@ -145,6 +138,12 @@
 
       <div id="xtraFlds" class="list card" ng-show="extraFields">
         <div class="item item-input-inset">
+          <span class="input-label">Address :</span>
+          <label class="item-input-wrapper">
+            <input type="text" title="Your Address in short" name="Address" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model="client.Client_Fields.Address" />
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">Country :</span>
           <label class="item-input-wrapper">
             <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="client.Client_Fields.Country">
@@ -180,23 +179,23 @@
         </div>
 
         <div class="item row">
-        <div class="col">
-          <label class="item-input item-select">
-            <div class="input-label">Males:</div>
-            <select ng-model="client.Client_Fields['Number of males']"
-              ng-options="i as i for i in [0,1,2,3]">
-            </select>
-          </label>
+          <div class="col">
+            <label class="item-input item-select">
+              <div class="input-label">Males:</div>
+              <select ng-model="client.Client_Fields['Number of males']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+          <div class="col">
+            <label class="item-input item-select">
+              <div class="input-label">Females:</div>
+              <select ng-model="client.Client_Fields['Number of females']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
         </div>
-        <div class="col">
-          <label class="item-input item-select">
-            <div class="input-label">Females:</div>
-            <select ng-model="client.Client_Fields['Number of females']"
-              ng-options="i as i for i in [0,1,2,3]">
-            </select>
-          </label>
-        </div>
-      </div>
 
       <!-- To Be ignored
 
@@ -232,15 +231,17 @@
       </div>
 
       <div id="nxtOfKin" class="list card" ng-show="nextOfKin">
-        <!-- div class="item item-input-inset">
-          <span class="input-label">Full Name :</span>
-          <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
-          </label>
-        </div -->
         <label class="item item-input">
           <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
         </label>
+
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Gender:</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.Client_NextOfKin.genderId" ng-options="g.id as g.name for g in codes.genders">
+            </select>
+          </label>
+        </ion-item>
         <label class="item item-input">
           <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Phone">
         </label>
@@ -256,6 +257,49 @@
         <label class="item item-input">
           <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
         </label>
+
+
+        <div class="item item-input-inset">
+          <span class="input-label">Unique Place Name</span>
+          <label class="item-input-wrapper">
+            <input type="text" title="Your Address in short" name="UniquePName" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model='client.Client_NextOfKin["UniquePlaceName"]' />
+            <!-- ng-model="client.Client_Fields.uniquePName" -->
+          </label>
+        </div>    
+        <div class="item item-input-inset">
+          <span class="input-label">Country :</span>
+          <label class="item-input-wrapper">
+            <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" 
+                ng-model='client.Client_NextOfKin["Country"]'>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Region :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Region" placeholder="Enter Region's Name"
+                ng-model='client.Client_NextOfKin["Region"]' />
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Zone :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Zone" placeholder="Enter Zone's Name"
+                ng-model='client.Client_NextOfKin["Zone"]'>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Wereda :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Wereda" placeholder="Enter Wereda's Name"
+                ng-model='client.Client_NextOfKin["Wereda"]'>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Kebele :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="client.Client_Fields.Kebele">
+          </label>
+        </div>
 
       </div>
 

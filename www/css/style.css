@@ -74,8 +74,14 @@ label {
   color: #558;
 }
 .item, ion-item {
+  margin: 0px;
+  padding: 2px 3px;
   border: none;
 /*  font-style:italic;  */
   font-family:corsiva;
 }
 
+.rightBtn {
+  float: right;
+  width: 20%;
+}
