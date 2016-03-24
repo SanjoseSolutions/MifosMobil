@@ -39,7 +39,8 @@ angular.module('starter.services', ['ngCordova'] )
     logger[method] = function(msg) {
       var dt = new Date();
       $rootScope.messages.unshift( {
-        time: dt.toISOString().substr(0,10) + ' ' + dt.toLocaleTimeString().substr(0,8), // for milliseconds + '.' + ('0' + dt.getMilliseconds()).slice(-3),
+        time: dt.toISOString().substr(0,10) + ' ' + dt.toLocaleTimeString().substr(0,8),
+          // for milliseconds + '.' + ('0' + dt.getMilliseconds()).slice(-3),
         type: 'log',
         text: msg
       } );
