@@ -187,28 +187,33 @@ angular.module('starter.services', ['ngCordova'] )
       var data = cmd['data'];
       var config = cmd['config'];
       var rid = cmd['rid'];
-      if (rid != null && results[rid]) {
+      if (rid != null) {
+        logger.log("Cached cmd rid: " + rid);
         var res = results[rid];
-        var resId = res.resourceId;
-        var msg = "Cached cmd rid: " + rid + " resourceId: " + resId;
-        if (resId != null) {
-          url = url + resId;
-          msg = msg + " url: " + url;
+        if (res != null) {
+          logger.log("Result: " + JSON.stringify(res));
+          var resId = res.resourceId;
+          var msg =  "ResourceId: " + resId;
+          if (resId != null) {
+            url = url + resId;
+            msg = msg + ", URL: " + url;
+          }
+          logger.log(msg);
         }
-        logger.log(msg);
       }
       $http[method](url, data, config)
         .then(function(response) {
           results.push(response.data);
           fn_success(method, url, data, response)
         }, function(response) {
-          logger.log("Failed offline cmd: " + response.status
+          logger.log("Failed offline cmd " + method +  " to "
+            + url +  ": " + response.status
             + " :: " + JSON.stringify(response.data));
           results.push(response.data);
           fn_fail(method, url, data, response);
         } );
       if (commands.length) {
-        setTimeout(runNextCmd, 1000);
+        setTimeout(runNextCmd, 3000);
       } else {
         Cache.setObject('commands', []);
         fn_final();
@@ -358,6 +363,7 @@ angular.module('starter.services', ['ngCordova'] )
       session.role = role;
 
       var b64key = data.base64EncodedAuthenticationKey;
+      logger.log("Base64key: " + b64key);
       authHttp.setAuthHeader(b64key);
 
       Cache.setObject('session', session);

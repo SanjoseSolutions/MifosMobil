@@ -217,13 +217,24 @@ angular.module('starter.controllers', ['ngCordova'])
       //$scope.session.takeOnline();
       logger.log("Going back online.");
       authHttp.runCommands(function(n) {
-        logger.log("Starting to execute " + n + " commands");
+        var msg = "Starting to execute " + n + " commands";
+        logger.log(msg);
+        var stPopup = $ionicPopup.alert({
+          title: "Syncing",
+          template: msg,
+          scope: $scope
+        } );
       }, function(method, url, data, response) {
         logger("SUCCESS: " + method + " " + url + " :: " + JSON.stringify(data));
       }, function(method, url, data, response) {
         logger("FAILURE: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
       }, function() {
         logger.log("All commands done!");
+        var rptPopup = $ionicPopup.alert({
+          title: 'Offline Commands',
+          template: 'All commands are done!',
+          scope: $scope
+        } );
       } );
     } );
 
