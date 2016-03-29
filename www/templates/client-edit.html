@@ -80,7 +80,7 @@
         <div class="item item-input-inset">
           <span class="input-label">Mobile:</span>
           <label class="item-input-wrapper">
-            <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobileNo">
+            <input type="tel" placeholder="Ex :919620568920" ng-model="client.mobileNo">
           </label>
         </div>
         <div class="item item-input-inset">
@@ -103,7 +103,7 @@
         <div class="item item-input-inset">
           <span class="input-label">Education:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="email" placeholder="Client Education" ng-model="client.Client_Fields.Education">
+            <input type="text" name="email" size="20" placeholder="Client Education" ng-model="client.Client_Fields.Education">
           </label>
         </div>
 
@@ -115,14 +115,6 @@
           </label>
         </div>
 
-        <!-- 
-        div class="item item-input-inset">
-          <span class="input-label">Address:</span>
-          <label class="item-input-wrapper">
-            <input type="text" size="15" placeholder="Full address" ng-model="client.Address">
-          </label>
-        </div  -->
-
       <!-- /ion-list -->
       </div>
 
@@ -131,7 +123,7 @@
       <div class="item item-divider"> <!-- input-inset -->
         <label>Full Address:</label>
         <button ng-click="toggleExtraFields()" title="Click for more Fields"
-            class="button button-small button-positive rightbtn">
+            class="button button-small button-positive rightBtn">
           <i class="icon ion-plus-circled"></i>
         </button>
       </div>
@@ -197,43 +189,25 @@
           </div>
         </div>
 
-      <!-- To Be ignored
-
-      <div class="item item-input-inset">
-        <span class="input-label">Family Members :</span>
-        <label class="item item-input">
-          <span class="input-label">Male 1</span>
-          <input type="tel">
-        </label>
-      </div>
-
-      <div class="item item-input-inset">
-        <span class="input-label">Family Members :</span>
-        <label class="item-input-inset"> Male 2:
-          <input type="number" name="nMale" size="2" ng-maxlength="2">
-          <# placeholder="Enter Region's Name" ng-model="sacco.Region">
-        </label>
-        <label class="item-input-inset"> Female :
-          <input type="number" name="nFemale" size="3">
-        </label>
-      </div-->
-
       </div>
 
       <hr>
 
       <div class="item item-divider"> <!-- input-inset -->
           <label>Next of Kin Details:</label>
-          <span class="button button-small button-positive rightbtn" ng-click="toggleNextOfKin()"
+          <span class="button button-small button-positive rightBtn" ng-click="toggleNextOfKin()"
             title="Click for more Fields">
            <i class="icon ion-plus-circled"></i>
           </span>
       </div>
 
       <div id="nxtOfKin" class="list card" ng-show="nextOfKin">
-        <label class="item item-input">
-          <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
-        </label>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Full Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
+          </label>
+        </ion-item>
 
         <ion-item class="item item-input-inset">
           <span class="input-label">Gender:</span>
@@ -242,21 +216,31 @@
             </select>
           </label>
         </ion-item>
-        <label class="item item-input">
-          <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Phone">
-        </label>
-        <label class="item item-input-inset">
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Phone No:</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Phone">
+          </label>
+        </ion-item>
+        <ion-item class="item item-input-inset">
           <span class="input-label">Relationship:</span>
-          <select
-            ng-model="client.Client_NextOfKin.Relationship_cd_Relationship" ng-options="r.id as r.name for r in codes.Relationships">
-          </select>
-        </label>
-        <label class="item item-input">
-          <input type="text" placeholder="Father's Name" ng-model="client.Client_NextOfKin['Fathers Name']">
-        </label>
-        <label class="item item-input">
-          <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
-        </label>
+          <label class="item-input-wrapper">
+            <select ng-model="client.Client_NextOfKin.Relationship_cd_Relationship" ng-options="r.id as r.name for r in codes.Relationships" />
+            </select>
+          </label>
+        </ion-item>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Father's Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Father's Name" ng-model="client.Client_NextOfKin['Fathers Name']">
+          </label>
+        </ion-item>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Father's Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
+          </label>
+        </ion-item>
 
 
         <div class="item item-input-inset">
@@ -297,7 +281,7 @@
         <div class="item item-input-inset">
           <span class="input-label">Kebele :</span>
           <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="client.Client_Fields.Kebele">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model='client.Client_NextOfKin.["Kebele"]'>
           </label>
         </div>
 
