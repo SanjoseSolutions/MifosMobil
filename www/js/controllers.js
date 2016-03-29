@@ -224,10 +224,10 @@ angular.module('starter.controllers', ['ngCordova'])
           template: msg,
           scope: $scope
         } );
-      }, function(method, url, data, response) {
-        logger("SUCCESS: " + method + " " + url + " :: " + JSON.stringify(data));
-      }, function(method, url, data, response) {
-        logger("FAILURE: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
+      }, function() {
+        logger("SUCCESS"); // + method + " " + url + " :: " + JSON.stringify(data));
+      }, function() {
+        logger("FAILURE"); //: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
       }, function() {
         logger.log("All commands done!");
         var rptPopup = $ionicPopup.alert({
