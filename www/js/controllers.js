@@ -405,10 +405,10 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
-  var saccoId = $stateParams.saccoId;
-  logger.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
   $scope.$on('$ionicView.enter', function(e) {
+    var saccoId = $stateParams.saccoId;
+    logger.log("Sacco view ctrl invoked for " + saccoId);
     SACCO.get_full(saccoId, function(sacco) {
       $scope.data = sacco;
     } );
@@ -473,7 +473,8 @@ angular.module('starter.controllers', ['ngCordova'])
             clients[i].face = img_data;
           } );
         } else {
-          var gname = clients[i].gender.name;
+          var g = clients[i].gender;
+          var gname = g ? g.name : 'male';
           var glname = gname ? gname.toLowerCase() : 'male';
           clients[i].face = "img/placeholder-" + glname + ".jpg";
         }

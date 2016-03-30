@@ -564,13 +564,19 @@ angular.module('starter.services', ['ngCordova'] )
       return dt;
     },
     isoDate: function(a_date) {
-      var dtStr = this.isoDateStr(a_date);
-      var dt = new Date(dtStr);
-      return dt;
+      if (a_date instanceof Array) {
+        var dtStr = this.isoDateStr(a_date);
+        var dt = new Date(dtStr);
+        return dt;
+      }
+      return a_date;
     },
     localDate: function(a_date) {
-      var dt = new Date(a_date.join("-"));
-      return dt.toLocaleDateString();
+      if (a_date instanceof Array) {
+        var dt = new Date(a_date.join("-"));
+        return dt.toLocaleDateString();
+      }
+      return a_date;
     }
   };
 } )
@@ -1008,8 +1014,12 @@ angular.module('starter.services', ['ngCordova'] )
           client["cid"] = response.cid;
           fn_offline(client);
         } else {
+          clients = Cache.getObject('h_clients') || {};
           logger.log("Created client resp: "+JSON.stringify(response.data));
           var new_client = response.data;
+          var id = new_client.resourceId;
+          clients[id] = new_client;
+          Cache.setObject('h_clients', clients);
           fn_client(new_client);
         }
       }, function(response) {
