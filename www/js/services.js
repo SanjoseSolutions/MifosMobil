@@ -168,12 +168,12 @@ angular.module('starter.services', ['ngCordova'] )
       'data': data,
       'config': config
     };
-    logger.log("Command cached: " + JSON.stringify(cmd));
     var commands = Cache.getObject('commands');
     var subcmds = commands[rid]['commands'] || [];
     subcmds.push(cmd);
     commands[rid]['commands'] = subcmds;
     Cache.setObject('commands', commands);
+    logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + JSON.stringify(cmd));
   };
 
   authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
