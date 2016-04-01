@@ -14,17 +14,21 @@
 -->
 <style>
 td {
-  padding: 3.5px;
+/*  padding-top: 3.5px;
+-  margin-top: 5px; */
 }
 .ion-ios-people, .ion-social-bitcoin {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+}
+button {
+  margin-top: 0px;
 }
 </style>
 
-<ion-view view-title="Staff {{staff.fullname}}">
+<ion-view view-title="Staff : {{staff.fullname}}">
   <ion-content class="padding"> <!-- style="background-color:grey;" -->
-    <div class="list card" style="clear:both; height:223px">
-      <div class="item item-divider">
+    <div class="list card" style="clear:both;"> <!-- height:223px -->
+      <div class="item item-divider item-avatar">
         <label>Staff Name </label>:  {{staff.fullname}}
         <!-- staff.fullname = firstname + ' ' + staff.lastname -->
         <!-- displayName = staff.lastname + ', ' + firstname -->
@@ -56,7 +60,7 @@ td {
           <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
           </span> :
           <label> <!-- style="font-size:0.9rem" -->
-            {{staff.email?staff.email:" staffusername@kmayra.org" }}
+            {{ staff.email || "staffusername@kmayra.org" }}
           </label>
         </ion-item>
       </ion-list>
@@ -99,7 +103,8 @@ td {
                 </i>
           </td>
           <td>
-            <button class="button button-small" ng-click="#">
+            <button class="button button-small button-outline button-positive" ng-click="#">
+              <i class="icon ion-ios-search-strong"></i>
               Transactions
             </button>
           </td>
@@ -111,7 +116,8 @@ td {
                 </i>
           </td>
           <td>
-            <button class="button button-small" ng-click="#">
+            <button class="button button-small button-outline button-positive" ng-click="#">
+              <i class="icon ion-ios-search-strong"></i>
               Transactions
             </button>
           </td>
