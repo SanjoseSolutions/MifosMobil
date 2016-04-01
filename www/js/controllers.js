@@ -150,13 +150,24 @@ angular.module('starter.controllers', ['ngCordova'])
       //$scope.session.takeOnline();
       logger.log("Going back online.");
       authHttp.runCommands(function(n) {
-        logger.log("Starting to execute " + n + " commands");
-      }, function(method, url, data, response) {
-        logger("SUCCESS: " + method + " " + url + " :: " + JSON.stringify(data));
-      }, function(method, url, data, response) {
-        logger("FAILURE: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
+        var msg = "Starting to execute " + n + " commands";
+        logger.log(msg);
+        var stPopup = $ionicPopup.alert({
+          title: "Syncing",
+          template: msg,
+          scope: $scope
+        } );
+      }, function() {
+        logger("SUCCESS"); // + method + " " + url + " :: " + JSON.stringify(data));
+      }, function() {
+        logger("FAILURE"); //: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
       }, function() {
         logger.log("All commands done!");
+        var rptPopup = $ionicPopup.alert({
+          title: 'Offline Commands',
+          template: 'All commands are done!',
+          scope: $scope
+        } );
       } );
     } );
 
@@ -311,10 +322,10 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
-  var saccoId = $stateParams.saccoId;
-  logger.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
   $scope.$on('$ionicView.enter', function(e) {
+    var saccoId = $stateParams.saccoId;
+    logger.log("Sacco view ctrl invoked for " + saccoId);
     SACCO.get_full(saccoId, function(sacco) {
       $scope.data = sacco;
     } );
@@ -379,7 +390,8 @@ angular.module('starter.controllers', ['ngCordova'])
             clients[i].face = img_data;
           } );
         } else {
-          var gname = clients[i].gender.name;
+          var g = clients[i].gender;
+          var gname = g ? g.name : 'male';
           var glname = gname ? gname.toLowerCase() : 'male';
           clients[i].face = "img/placeholder-" + glname + ".jpg";
         }

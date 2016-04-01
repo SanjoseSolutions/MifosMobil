@@ -39,7 +39,8 @@ angular.module('starter.services', ['ngCordova'] )
     logger[method] = function(msg) {
       var dt = new Date();
       $rootScope.messages.unshift( {
-        time: dt.toISOString().substr(0,10) + ' ' + dt.toLocaleTimeString().substr(0,8), // for milliseconds + '.' + ('0' + dt.getMilliseconds()).slice(-3),
+        time: dt.toISOString().substr(0,10) + ' ' + dt.toLocaleTimeString().substr(0,8),
+          // for milliseconds + '.' + ('0' + dt.getMilliseconds()).slice(-3),
         type: 'log',
         text: msg
       } );
@@ -165,13 +166,14 @@ angular.module('starter.services', ['ngCordova'] )
       'method': 'post',
       'url': url,
       'data': data,
-      'config': config,
-      'rid': rid
+      'config': config
     };
-    logger.log("Command cached: " + JSON.stringify(cmd));
     var commands = Cache.getObject('commands');
-    commands.push(cmd);
+    var subcmds = commands[rid]['commands'] || [];
+    subcmds.push(cmd);
+    commands[rid]['commands'] = subcmds;
     Cache.setObject('commands', commands);
+    logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + JSON.stringify(cmd));
   };
 
   authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
@@ -179,35 +181,37 @@ angular.module('starter.services', ['ngCordova'] )
     logger.log("LOADED CACHED COMMANDS: " + commands.length);
     fn_init(commands.length);
     var results = [];
+    var cmdIndex = 0;
     var runNextCmd = function() {
       cmd = commands.shift();
       var method = cmd['method'];
       var url = cmd['url'];
       var data = cmd['data'];
       var config = cmd['config'];
-      var rid = cmd['rid'];
-      if (rid != null && results[rid]) {
-        var res = results[rid];
-        var resId = res.resourceId;
-        var msg = "Cached cmd rid: " + rid + " resourceId: " + resId;
-        if (resId != null) {
-          url = url + resId;
-          msg = msg + " url: " + url;
-        }
-        logger.log(msg);
-      }
+      var subcmds = cmd['commands'];
       $http[method](url, data, config)
         .then(function(response) {
-          results.push(response.data);
-          fn_success(method, url, data, response)
+          var rdata = response.data;
+          if (subcmds) {
+            logger.log("Got subcommands #=" + subcmds.length);
+            var resId = rdata['resourceId'];
+            for(var i = 0; i < subcmds.length; ++i) {
+              var scmd = subcmds[i];
+              scmd['url'] = scmd['url'] + resId;
+              commands.push(scmd);
+              setTimeout(runNextCmd, 2000);
+            }
+          }
+          fn_success(); //method, url, data, response)
         }, function(response) {
-          logger.log("Failed offline cmd: " + response.status
+          logger.log("Failed offline cmd " + method +  " to "
+            + url +  ": " + response.status
             + " :: " + JSON.stringify(response.data));
           results.push(response.data);
-          fn_fail(method, url, data, response);
+          fn_fail(); //method, url, data, response);
         } );
       if (commands.length) {
-        setTimeout(runNextCmd, 1000);
+        setTimeout(runNextCmd, 2000);
       } else {
         Cache.setObject('commands', []);
         fn_final();
@@ -357,6 +361,7 @@ angular.module('starter.services', ['ngCordova'] )
       session.role = role;
 
       var b64key = data.base64EncodedAuthenticationKey;
+      logger.log("Base64key: " + b64key);
       authHttp.setAuthHeader(b64key);
 
       Cache.setObject('session', session);
@@ -559,13 +564,19 @@ angular.module('starter.services', ['ngCordova'] )
       return dt;
     },
     isoDate: function(a_date) {
-      var dtStr = this.isoDateStr(a_date);
-      var dt = new Date(dtStr);
-      return dt;
+      if (a_date instanceof Array) {
+        var dtStr = this.isoDateStr(a_date);
+        var dt = new Date(dtStr);
+        return dt;
+      }
+      return a_date;
     },
     localDate: function(a_date) {
-      var dt = new Date(a_date.join("-"));
-      return dt.toLocaleDateString();
+      if (a_date instanceof Array) {
+        var dt = new Date(a_date.join("-"));
+        return dt.toLocaleDateString();
+      }
+      return a_date;
     }
   };
 } )
@@ -1003,8 +1014,12 @@ angular.module('starter.services', ['ngCordova'] )
           client["cid"] = response.cid;
           fn_offline(client);
         } else {
+          clients = Cache.getObject('h_clients') || {};
           logger.log("Created client resp: "+JSON.stringify(response.data));
           var new_client = response.data;
+          var id = new_client.resourceId;
+          clients[id] = new_client;
+          Cache.setObject('h_clients', clients);
           fn_client(new_client);
         }
       }, function(response) {
