@@ -12,46 +12,28 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<!-- script>
-function ConfirmLogOut() {
-    var x;
-    if (confirm("Confirm Logout !") == true) {
-        logout();
-        x = "Logout Confirmed !";
-    } else {
-        x = "Logout Canceled !";
-    }
-    document.getElementById("demo").innerHTML = x;
-}
-</script -->
+
 
 <style type="text/css">
 table#SavSum tr>td {
   padding: 3px;
 }
-
+.button-small {
+  padding: 5px;
+}
+tr {
+  padding: 20px;
+}
+td {
+  padding-bottom: 10px;
+}
 </style>
-
 
 <ion-view view-title="Dashboard">
   <ion-content>
-    <!-- ion-list class="ion-list-calm">
-    	<ion-toggle  ng-model="settings.enableFriends"> Enable Friends </ion-toggle>
-    </ion-list -->
-    <ion-card>
-	<!-- hr / -->
-    <!-- div class="list">
-	<div class="item item-input-inset">
-	<label class="item-input-wrapper">
-	    <input type="text" placeholder="Email">
-	</label>
-	<button class="button button-small">
-	    Submit
-	</button>
-	</div>
-    </div -->
 
     <ion-card>
+
       <ion-list>
         <ion-item>
           <ion-label>
@@ -150,8 +132,9 @@ table#SavSum tr>td {
         </ion-item>
         <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
-            ng-click="ConfirmLogOut()">
-              Logout<span class="ion-log-out"></span>
+              ng-click="ConfirmLogOut()">
+            Logout
+            <span class="ion-log-out"></span>
           </button>
         </ion-item>
         <ion-item>
@@ -161,33 +144,10 @@ table#SavSum tr>td {
           <center><a href="#/tab/dashboard/logs">View Logs</a></center>
           <center>More visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
         </ion-item>
-    <!-- WILL BE USED IN PHASE 2
-    	 in one of the Templates
 
-        <ion-item>
-        Manage Loan Application
-        </ion-item>
-        <ion-item>
-        Name : 
-        </ion-item>
-        <ion-item>
-          Loan Type : 
-          <select>
-          	<option value="Indivual" selected>
-          	  Individual
-          	</option>
-          	<option> Group </option>
-          	<option> etc ... </option>
-          </select>
-        </ion-item>
-    -->
-<!--
-	INITIAL DESIGN SUGGESTED BY FRANCIS
-	When a button is clicked a Modal pops up
-	</button>
--->
       </ion-list>
 
     </ion-card>
+
   </ion-content>
 </ion-view>

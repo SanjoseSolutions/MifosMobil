@@ -107,7 +107,6 @@ angular.module('starter.services', ['ngCordova'] )
   var authHttp = {};
 
   $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
-  $http.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 	$http.defaults.headers.common['Accept'] = '*/*';
 	$http.defaults.headers.common['Content-type'] = 'application/json';
 
@@ -136,19 +135,21 @@ angular.module('starter.services', ['ngCordova'] )
       config.headers = config.headers || {};
       config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
       if (window.Connection && $cordovaNetwork.isOffline()) {
-        var commands = Cache.getObject('commands');
         var cmd = {
           'method': method,
           'url': url,
           'data': data,
           'config': config
         };
-        logger.log("Command cached: " + JSON.stringify(cmd));
+        var commands = Cache.getObject('commands');
+        var len = commands.length;
         commands.push(cmd);
+        logger.log("Command cached: " + JSON.stringify(cmd));
         Cache.setObject('commands', commands);
         fn_success( {
           'status': 202,
-          'data': data
+          'data': data,
+          'cid': len
         } );
       } else {
         $http[method](url, data, config).then(fn_success, fn_failure);
@@ -156,20 +157,53 @@ angular.module('starter.services', ['ngCordova'] )
     };
   } );
 
+  authHttp.saveOffline = function(url, data, config, rid) {
+    config = config || {};
+    config.headers = config.headers || {};
+    config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
+    var cmd = {
+      'method': 'post',
+      'url': url,
+      'data': data,
+      'config': config,
+      'rid': rid
+    };
+    logger.log("Command cached: " + JSON.stringify(cmd));
+    var commands = Cache.getObject('commands');
+    commands.push(cmd);
+    Cache.setObject('commands', commands);
+  };
+
   authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
     var commands = Cache.getObject('commands');
     logger.log("LOADED CACHED COMMANDS: " + commands.length);
     fn_init(commands.length);
+    var results = [];
     var runNextCmd = function() {
       cmd = commands.shift();
       var method = cmd['method'];
       var url = cmd['url'];
       var data = cmd['data'];
       var config = cmd['config'];
+      var rid = cmd['rid'];
+      if (rid != null && results[rid]) {
+        var res = results[rid];
+        var resId = res.resourceId;
+        var msg = "Cached cmd rid: " + rid + " resourceId: " + resId;
+        if (resId != null) {
+          url = url + resId;
+          msg = msg + " url: " + url;
+        }
+        logger.log(msg);
+      }
       $http[method](url, data, config)
         .then(function(response) {
+          results.push(response.data);
           fn_success(method, url, data, response)
         }, function(response) {
+          logger.log("Failed offline cmd: " + response.status
+            + " :: " + JSON.stringify(response.data));
+          results.push(response.data);
           fn_fail(method, url, data, response);
         } );
       if (commands.length) {
@@ -504,6 +538,9 @@ angular.module('starter.services', ['ngCordova'] )
       }, function(response) {
         fn_fail(response);
       } );
+    },
+    saveOffline: function(name, fields, rid) {
+      authHttp.saveOffline(baseUrl + '/datatables/' + name + '/', fields, {}, rid);
     }
   };
 } )
@@ -540,7 +577,7 @@ angular.module('starter.services', ['ngCordova'] )
       return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
     },
     codeFields: function() { return []; },
-    skipFields: function() { return []; }
+    skipFields: function() { return {}; }
   };
 } )
 
@@ -576,6 +613,7 @@ angular.module('starter.services', ['ngCordova'] )
           HashUtil.copy(new_office, fields);
           offices[k] = new_office;
           Cache.setObject('h_offices', offices);
+          new_office.cid = response.cid;
           fn_offline(new_office);
           return;
         } else {
@@ -962,6 +1000,7 @@ angular.module('starter.services', ['ngCordova'] )
           client["id"] = id;
           clients[id] = client;
           Cache.setObject('h_clients', clients);
+          client["cid"] = response.cid;
           fn_offline(client);
         } else {
           logger.log("Created client resp: "+JSON.stringify(response.data));
@@ -1345,6 +1384,30 @@ angular.module('starter.services', ['ngCordova'] )
     }
   }
 }])
+
+.factory('MifosEntity', function(authHttp, DataTables) {
+  var obj;
+
+  return {
+    init: function(config) {
+      obj.name = config.name;
+      var dataTables = config.dataTables;
+      angular.forEach(dataTables, function(dt) {
+        obj[dt] = config[dt];
+      } );
+      obj.fields = config.fields;
+      obj.skipFields = config.skipFields;
+    },
+    get: function(id, fn_success, fn_fail) {
+    },
+    query: function(id, fn_success, fn_fail) {
+    },
+    update: function(id, fields, fn_success, fn_offline, fn_fail) {
+    },
+    save: function(fields, fn_success, fn_offline, fn_fail) {
+    }
+  };
+} )
 
 ;
 

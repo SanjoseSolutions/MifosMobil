@@ -8,6 +8,5 @@ Makefile
 node_modules/
 platforms/
 plugins/
-# Added by Francis
-Kmayra/
-Push.sh
+# Local Notes
+Updates.note
