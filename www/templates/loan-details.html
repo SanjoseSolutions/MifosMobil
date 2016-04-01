@@ -13,26 +13,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <style>
-label {
- 	color: #558;
-}
-.center {
-  text-align: center;
-}
+
 .item, ion-item {
 	margin: 2px;
 	padding: 2px 5px;
 	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
-
-
-/*    
-Acc No | Loan Acc | Orig Loan | Loan Balance | Amount Paid | Type | Actions
-
-Acc No | Saving Acc | Balance | Actions
-*/
-
 }
 </style>
 
@@ -56,10 +41,10 @@ Acc No | Saving Acc | Balance | Actions
         <label> Loan Repayment:</label> {{data.totalRepayment || "0"}}
       </ion-item>
       <ion-item class="item-divider">
-        <p class="center"> ACTIONS </p>
+        <p class="centered"> ACTIONS </p>
       </ion-item>
       <ion-item>
-        <p class="center">
+        <p class="centered">
           <a href="" class="button button-positive" ng-click="makeRepayment()">Make Repayment</a>
         </p>
       </ion-item>

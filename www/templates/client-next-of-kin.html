@@ -19,70 +19,111 @@
   The Friends service returns an array of friend data
 -->
 <style>
-
-ion-content  {
-/* background-color:lightgrey;  */
-}
-
-label {
- 	color: #558;
-}
 .item, ion-item {
-	margin: 0px;
-	padding: 2px 3px;
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
+/*	margin: 0px; 
+	padding: 2px 3px; */
+}
+.briefInfo {
+  margin:0px 5px;
 }
 </style> 
 
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-content class="padding">
 
-    <div class="list card" style="clear:both; height:160px">
-      <!-- TRYING TO PUT THE NAME AS AN HEADER
-	     div class="item item-divider">
-	     <h4>{{client.fullname}}</h4>
-      </div -->
-    	<img ng-src="{{client.face}}" style="width: 150px; height: 150px; float: left; margin: 5px">
-      <ion-list>
-        <h4>{{client.displayName}}</h4>
-	       <!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
-  	    <ion-item>
-	         <label>Gender :</label>{{client.gender.name}}
-	      </ion-item>
-    	  <ion-item>
-	         <label>D.O.B</label>: {{client.dob}}
-	      </ion-item>
-	      <ion-item>
-	         <label class="icon ion-android-call" title="Mobile">
-	         </label> {{client.mobileNo || "9876543210"}}
-        </ion-item> 
-        <ion-item class="item-icon">
-           <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
-           </label>  {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }} <!-- "extremelysimple@kmayra.org" -->
-        </ion-item>
-	    </ion-list> <!--ion-list-->
-    </div>
-
     <div class="list card">
-      <ion-item>
-        <h3>Next of Kin Details</h3>
+      <div class="item item-divider">
+        <label>{{client.displayName}}</label>
+      </div>
+      <div class="item">
+        <!-- img class="full-image" ng-src="{{client.face}}" style="width:50px; float:left;" / -->
+        <img ng-src="{{client.face}}" class="full-image" style="width:100px; float:left;" />
+        <!-- p>
+          This is a "Facebook" styled Card. The header is created from a Thumbnail List item,
+          the content is from a card-body consisting of an image and paragraph text. The footer
+          consists of tabs, icons aligned left, within the card-footer.
+        </p -->
+        <div class="briefInfo">
+          <label>Gender :</label> {{client.gender.name}}
+          <br /><label>D.O.B</label>: {{client.dob}}
+          <br />
+          <label title="Mobile">
+            Telephone
+            <span class="icon ion-android-call"></span>
+          </label>
+          : <strong>{{client.mobileNo || "9876543210"}}</strong>
+
+        </div>
+      </div>
+      <ion-item class="item item-divider item-icon">
+        <!-- Email -->
+        <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
+        </span>
+        : <label>
+          {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }}
+          </label>
+      </ion-item>
+
+    </div>
+    <div class="list card">
+      <ion-item class="item item-divider">
+        <h3><label>Next of Kin Details</label></h3>
       </ion-item>
       <ion-item>
-        <label>Fullname</label>
-        {{client.Client_NextOfKin.Fullname}}
+        <label>Full Name</label> :
+        {{client.Client_NextOfKin.Fullname || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label>Relationship with Client:</label> {{client.Client_NextOfKin.Relationship}}
+        <label>Gender </label> :
+        {{client.Client_NextOfKin["Gender"] || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label>Fathers Name:</label> {{client.Client_NextOfKin["Fathers Name"] || "Unspecified"}}
+        <label title="Mobile">
+          Telephone
+          <span class="icon ion-android-call"></span>
+        </label>
+        : <strong>{{client.Client_NextOfKin.Mobile || "Unspecified"}}</strong>
       </ion-item>
       <ion-item>
-        <label>Grandfathers Name: </label>
+        <label>Relationship with Client:</label>
+        {{client.Client_NextOfKin.Relationship}}
+      </ion-item>
+      <ion-item>
+        <label>Father's Name:</label>
+        {{client.Client_NextOfKin["Fathers Name"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label>Grand Father's Name: </label>
         {{client.Client_NextOfKin["Grandfathers Name"] || "Unspecified"}}
       </ion-item>
+      <ion-item class="item item-divider">
+        <label>Address Details</label>
+      </ion-item>
+      <ion-item>
+        <label>Unique Place Name </label>
+        : {{client.Client_NextOfKin["UniquePlaceName"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Country </label>
+        : {{client.Client_NextOfKin["Country"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Region </label>
+        : {{client.Client_NextOfKin["Region"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Zone </label>
+        : {{client.Client_NextOfKin["Zone"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Wereda </label>
+        : {{client.Client_NextOfKin["Wereda"] || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Kebele </label>
+        : {{client.Client_NextOfKin["Kebele"] || "Unspecified"}}
+      </ion-item>
+
     </div>
 
     </ion-list>

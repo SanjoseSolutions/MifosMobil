@@ -12,24 +12,21 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<!-- script>
-function ConfirmLogOut() {
-    var x;
-    if (confirm("Confirm Logout !") == true) {
-        logout();
-        x = "Logout Confirmed !";
-    } else {
-        x = "Logout Canceled !";
-    }
-    document.getElementById("demo").innerHTML = x;
-}
-</script -->
+
 
 <style type="text/css">
 table#SavSum tr>td {
   padding: 3px;
 }
-
+.button-small {
+  padding: 5px;
+}
+tr {
+  padding: 20px;
+}
+td {
+  padding-bottom: 10px;
+}
 </style>
 
 <ion-view view-title="Dashboard">
@@ -37,8 +34,6 @@ table#SavSum tr>td {
     <!-- ion-list class="ion-list-calm">
       <ion-toggle  ng-model="settings.enableFriends"> Enable Friends </ion-toggle>
     </ion-list -->
-    <ion-card>
-
     <ion-card>
       <ion-list>
         <ion-item>
@@ -137,12 +132,13 @@ table#SavSum tr>td {
           </center>
         </ion-item>
         <ion-item>
-          Logged in <em>@ {{session.loggedInTime()}}</em>
+          Logged in <em>@ {{session.loginTime}}</em>
         </ion-item>
         <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
               ng-click="ConfirmLogOut()">
-            Logout<span class="ion-log-out"></span>
+            Logout
+            <span class="ion-log-out"></span>
           </button>
         </ion-item>
         <ion-item>
@@ -156,5 +152,6 @@ table#SavSum tr>td {
       </ion-list>
 
     </ion-card>
+
   </ion-content>
 </ion-view>
