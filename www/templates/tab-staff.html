@@ -32,18 +32,17 @@
       <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="s in staff" type="item-text-wrap" href="#/tab/staff/{{s.id}}">
         <img ng-src="{{'img/staff-placeholder-Male.jpg'}}">
         <div class="fullname">
-        <h2>{{s.firstname}} {{s.lastname}}</h2>
+          <h2>{{s.firstname}} {{s.lastname}}</h2>
         </div>
         <div>
           <span style="padding-left:2em">
-            <div style="margin-top:10px" class="icon ion-ios-people">
-            </div>: {{s.clients || "35" }}
+            <div style="margin-top:10px" class="icon ion-ios-people"></div>
+            : {{s.clients || "35" }}
           </span>
           | &Sigma;S: {{s.totalSavings || "55" }} <!-- Green -->
           | &Sigma;L: {{s.totalLoans || "80" }}   <!-- Red / Blue -->
         </div>
         <i class="icon ion-chevron-right icon-accessory"></i>
-
         <ion-option-button class="button-assertive" ng-click="remove(client)">
           Delete
         </ion-option-button>

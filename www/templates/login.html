@@ -34,11 +34,6 @@
             placeholder="Your password" ng-minlength="8" required />
         </ion-item>
 
-        <!-- Was part of the Initial design. Now It's implicit
-        ion-item>
-          <ion-checkbox ng-model="cred.client">I am a Client</ion-checkbox>
-        </ion-item-->
-
         <ion-item>
           <div ng-hide="loginForm.username.$pristine">
             <span class="ion-warn" ng-show="loginForm.username.$error.required">Username is required</span>
@@ -79,4 +74,3 @@
       <span class="icon ion-ios-cloud-outline">&nbsp;</span></center>
   </ion-footer-bar>
 </ion-view>
-
