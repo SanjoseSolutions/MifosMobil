@@ -1068,7 +1068,6 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.extraFields = ($scope.extraFields === true) ? false : false;
     logger.log("NextOfKin Display : " + $scope.nextOfKin);
   };
-  // y
 
   logger.log("Looking to register client");
   $scope.data = { "op": "Register" };
@@ -1151,10 +1150,10 @@ angular.module('starter.controllers', ['ngCordova'])
       session = Session.get();
       $rootScope.session = session;
       var loginPopup = $ionicPopup.alert( {
-        title: 'Logging In',
+        title: 'Login Successful!',
         template: '<p>.<br>\n' +
           '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
-          '<p>Login successful! Welcome ' + Session.username() + '</p>',
+          '<p><center><h4>Welcome <strong>' + session.username() + '</strong></h4></center></p>',
         scope: $scope
       } );
       var role = session.role;
