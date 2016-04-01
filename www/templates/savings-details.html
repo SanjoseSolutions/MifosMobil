@@ -16,7 +16,7 @@
 label {
  	color: #558;
 }
-.center {
+.centered {
   text-align: center;
 }
 .item, ion-item {
@@ -26,12 +26,6 @@ label {
 /*	font-style:italic;	*/
 	font-family:corsiva;
 
-
-/*    
-Acc No | Loan Acc | Orig Loan | Loan Balance | Amount Paid | Type | Actions
-
-Acc No | Saving Acc | Balance | Actions
-*/
 
 }
 </style>
@@ -49,10 +43,10 @@ Acc No | Saving Acc | Balance | Actions
         <label>Account Balance:</label> {{data.accountBalance || "Unspecified"}}
       </ion-item>
       <ion-item class="item-divider">
-        <p class="center">ACTIONS</p>
+        <p class="centered">ACTIONS</p>
       </ion-item>
       <ion-item>
-        <p class="center">
+        <p class="centered">
           <a href="" class="button button-positive" ng-click="makeDeposit()"> Deposit </a>
           <a href="" class="button button-calm" ng-click="doWithdrawal()"> Withdraw </a>
         </p>

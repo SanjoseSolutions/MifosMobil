@@ -64,21 +64,21 @@ ion-content {
     font-style: italic;
 }
 
-
 ion-content  {
 /* background-color:lightgrey;  */
 }
 
-label {
-  font-size:1.15rem;
+label, .label {
+  font-size:1.1rem;
   color: #558;
 }
+
 .item, ion-item {
   margin: 0px;
   padding: 2px 3px;
   border: none;
-/*  font-style:italic;  */
   font-family:corsiva;
+  /*  font-style:italic;  */  
 }
 
 .rightBtn {
@@ -91,3 +91,4 @@ select {
 input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:focus, textarea:focus{
   background-color: lightblue;
 }
+
