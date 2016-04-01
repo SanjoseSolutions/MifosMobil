@@ -13,17 +13,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <style>
-label, .label {
-  font-size:1.15rem;
- 	color: #558;
-}
-.item, ion-item {
-	margin: 0px;
-	padding: 1px 3px;
-	border: none;
-/*	font-style:italic;	*/
-	font-family:corsiva;
-}
 td {
   padding: 3.5px;
 }
@@ -65,37 +54,27 @@ td {
         </ion-item>
         <ion-item class="item item-divider">
           <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
-          </span>
-          : <label> <!-- style="font-size:0.9rem" -->
-              {{staff.email?staff.email:" staffusername@kmayra.org" }}
-            </label>
+          </span> :
+          <label> <!-- style="font-size:0.9rem" -->
+            {{staff.email?staff.email:" staffusername@kmayra.org" }}
+          </label>
         </ion-item>
       </ion-list>
-      <!--div class="item item-divider">
-	       <label style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> : 
-         </label>{{staff.email?staff.email:" personal@kmayra.org" }}
-      </div-->
-
+      
       <!--ion-item>
-        <a href="#/tab/clients/{{staff.id}}/edit"
-          class="button button-block">
+        <a href="#/tab/clients/{{staff.id}}/edit" class="button button-block">
           <i class="ion-edit"> Edit Info</i>
         </a>
-      </ion-item-->
+      </ion-item -->
 
     </div>
     <!-- ion-list -->
-
-    <!-- div class="item item-divider">
-         <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"> </span>: 
-         <label style="font-size:0.9rem">{{staff.email?staff.email:" personal@kmayra.org" }} </label>
-    </div -->
     
     <div class="list card">
     	<ion-item class="item item-divider">
 	       <label>In Charge of </label> : {{staff.officeName || "Byrathi"}}
 	    </ion-item>      
-      <ion-item>
+      <ion-item class="item item-icon">
         <!-- Table -->
         <table>
         <tr>
@@ -108,17 +87,22 @@ td {
         </tr>
         <tr>
           <td> <label> Total Members </label> </td>
-          <td> : <span class="icon ion-ios-people">
-            {{TotalMembers? TotalMembers : 25}} </span>
+          <td> :<span class="icon ion-ios-people">
+               {{TotalMembers? TotalMembers : 25}}
+                </span>
           </td>
         </tr>
         <tr>
           <td> <label> Total Loans </label> </td>
           <td> :<i class="icon ion-social-bitcoin">
-                  {{client.TotalLoans?client.TotalLoans:350}}
+                  {{client.TotalLoans?client.TotalLoans : 350}}
                 </i>
           </td>
-          <td> <button ng-click="#"> Transactions </button> </td>
+          <td>
+            <button class="button button-small" ng-click="#">
+              Transactions
+            </button>
+          </td>
         </tr>
         <tr>
           <td> <label>Total Savings </label> </td>
@@ -126,12 +110,14 @@ td {
                   {{client.TotalSavings?client.TotalSavings:250}}
                 </i>
           </td>
-          <td> <button ng-click="#"> Transactions </button> </td>
+          <td>
+            <button class="button button-small" ng-click="#">
+              Transactions
+            </button>
+          </td>
         </tr>
         </table>
       </ion-item>
-
-
 
     </div>
 

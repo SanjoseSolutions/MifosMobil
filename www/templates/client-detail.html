@@ -19,22 +19,6 @@
   The Friends service returns an array of friend data
 -->
 <style>
-.rightBtn {
-  float: right;
-}
-ion-content  {
-/* background-color:lightgrey;  */
-}
-
-label {
- 	color: #558;
-}
-.item, ion-item {
-	margin: 0px;
-	padding: 2px 3px;
-	border: none;
-	font-family:corsiva;
-}
 .client-photo {
   height: 185px;
   float: left;
@@ -63,7 +47,8 @@ label {
       <div class="client-photo">
         <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
         <center>
-          <a ng-click="getPhoto()" class="ion-camera"> Take Photo </a>
+          <a ng-click="getPhoto()" class="ion-camera">
+           Take Photo </a>
         </center>
       </div>
       <ion-list>
@@ -113,29 +98,49 @@ label {
         <label>Occupation:
         </label>{{client.Client_Fields.Occupation || "Not set"}}
       </ion-item>
-      <ion-item>
-        <label> Fathers Name:
-        </label>{{client.Client_Fields["Fathers Name"] || "Not set"}}
+      <!-- Family Member Size -->
+      <ion-item class="item-divider"> 
+        <i class="icon icon-left ion-ios-people"></i>
+        Client's Family Size &amp; Details
+        <i class="icon icon-right ion-ios-people"></i>
       </ion-item>
       <ion-item>
-        <label> Grandfathers Name:
-        </label>{{client.Client_Fields["Grandfathers Name"] || "Not set"}}
+        <div class="item row">
+          <div class="col">
+            <label> Males: </label>
+            {{client.Client_Fields['Number of males'] || "Not set"}}
+          </div>
+          <div class="col">
+            <label> Females: </label>
+            {{client.Client_Fields['Number of females'] || "Not set"}}
+          </div>
+        </div>
       </ion-item>
-      <!--ion-item>
-        <label>Location:
-        </label> Sector 137
-      </ion-item -->
+      
+      <ion-item>
+        <label> Fathers Name:</label>
+        {{client.Client_Fields["Fathers Name"] || "Not set"}}
+      </ion-item>
+      <ion-item>
+        <label> Grandfathers Name: </label>
+        {{client.Client_Fields["Grandfathers Name"] || "Not set"}}
+      </ion-item>
       <ion-item>
         <label> Client's Address <i class="icon ion-ios-home"></i>  : </label>
-        <br /> {{client.Address || "Not set" }}
+        <br /> {{client.Client_Fields.Address || "Not set" }}
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
       <ion-item>
         <label>Next of kin:</label>
-        <span>
-          {{client.Client_NextOfKin.Fullname}}
-          <a class="ion-search" href="#/tab/clients/{{client.id}}/next-of-kin">View Details</a>
-        </span>
+        <a href="#/tab/clients/{{client.id}}/next-of-kin"
+            class="button button-small button-positive button-outline button-icon icon-right ion-search">
+          {{client.Client_NextOfKin.Fullname || "Unspecified"}}
+        </a>
+        <button class="button button-small rightBtn">
+          <i class="icon ion-edit"></i>
+          Edit
+        </button>
+
       </ion-item>
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
@@ -175,16 +180,17 @@ label {
             class="button button-positive rightBtn">
           Apply
         </a>
-         <table style="width:95%">
-         <tbody>
+        <br />
+        <table style="width:95%">
+        <tbody>
           <tr ng-repeat="lac in client.loanAccounts">
             <td width="30%"><strong>{{lac.productName}}</strong></td>
             <td><a href="#/tab/loan/{{lac.id}}">{{lac.accountNo}}</a></td>
             <td><span class="icon ion-social-bitcoin">{{lac.loanBalance}}</span></td>
             <td><a href="#/tab/loan/{{lac.id}}/transactions">Transactions</a></td>
           </tr>
-         </tbody>
-         </table>
+        </tbody>
+        </table>
       </ion-item>
       <ion-item>
         <label>Share Holdings:</label>
