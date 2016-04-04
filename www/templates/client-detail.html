@@ -126,16 +126,16 @@
         <br /> {{client.Client_Fields.Address || "Not set" }}
          <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
-      <ion-item>
+      <ion-item class="item">
         <label>Next of kin:</label>
         <a href="#/tab/clients/{{client.id}}/next-of-kin"
-            class="button button-small button-positive button-outline button-icon icon-right ion-search">
+            class="button button-small button-positive button-outline button-icon icon-left ion-search">
           {{client.Client_NextOfKin.Fullname || "Unspecified"}}
         </a>
-        <button class="button button-small rightBtn">
+        <!-- button class="button button-small rightBtn">
           <i class="icon ion-edit"></i>
           Edit
-        </button>
+        </button -->
 
       </ion-item>
       <ion-item>
