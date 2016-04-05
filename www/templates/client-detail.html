@@ -92,7 +92,7 @@
       </ion-item>
       <ion-item>
         <label>Occupation:
-        </label>{{client.Client_Fields.Occupation || "Not set"}}
+        </label>{{client.clientClassification.name || "Not set"}}
       </ion-item>
       <!-- Family Member Size -->
       <ion-item class="item-divider"> 
@@ -188,11 +188,11 @@
         </tbody>
         </table>
       </ion-item>
-      <ion-item>
+      <!-- ion-item>
         <label>Share Holdings:</label>
         {{client.NumShares || "0"}}
         <a href="#/tab/#" class="button positive rightBtn"> <strong> Buy </strong> </a>
-      </ion-item>
+      </ion-item -->
     </div>
 
     </ion-list>
