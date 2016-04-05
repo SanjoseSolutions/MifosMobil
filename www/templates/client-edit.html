@@ -83,15 +83,6 @@
         </div>
         <div class="item item-input-inset">
           <span class="input-label">
-            Activation Date
-            <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          </span>
-          <label class="item-input-wrapper">
-            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
-          </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">
             Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
@@ -101,12 +92,32 @@
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">
+            Membership
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
+          <label class="item-input-wrapper">
+            <select name="clientMembership" ng-model="client.clientMembership" required>
+              <option value="Member" selected>Member</option>
+              <option value="Non-Member">Non-Member</option>
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">
+            Activation Date
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
+          <label class="item-input-wrapper">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">Education:</span>
           <label class="item-input-wrapper">
             <input type="text" name="email" size="20" placeholder="Client Education" ng-model="client.Client_Fields.Education">
           </label>
         </div>
-
         <div class="item item-input-inset">
           <span class="input-label">Occupation:</span>
           <label class="item-input-wrapper">

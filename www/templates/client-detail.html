@@ -86,6 +86,11 @@
         </label>  {{client.Client_Fields.Email || "Not set" }}
         <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
+      
+      <ion-item>
+        <label> Membership </label> :
+        {{ client.clientMembership || "Not set" }}
+      </ion-item>
       <ion-item>
         <label> Education <i class="icon ion-university"> </i>:
         </label>{{client.Client_Fields.Education || "Not set"}}
