@@ -12,20 +12,15 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<style type="text/css">
-.rightbtn {
-  float: right;
-  width: 20%;
-}
-</style>
-
 <ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
-	<button class="button button-icon" ng-click="newTask()">Edit
-    <i class="ion-compose icon"></i>
-  </button>
+	  <button class="button button-icon" ng-click="newTask()">
+      Edit
+      <i class="ion-compose icon"></i>
+    </button>
   </ion-header-bar>
+
   <ion-content class="padding">
     <form name="clientEditForm" novalidate>
     <ion-list>
@@ -36,6 +31,7 @@
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
+
       <div class="list card">
         <div class="item item-input-inset">
           <span class="input-label">
@@ -73,18 +69,25 @@
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">Mobile:</span>
+          <label class="item-input-wrapper">
+            <input type="tel" placeholder="Ex :919620568920" ng-model="client.mobileNo">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Email:</span>
+          <label class="item-input-wrapper">
+            <input type="email" name="email" placeholder="Client Email Address"
+                ng-model="client.Client_Fields.Email">
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">
             Activation Date
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
-          </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Mobile:</span>
-          <label class="item-input-wrapper">
-            <input type="tel" size="15" placeholder="Ex :919620568920" ng-model="client.mobileNo">
           </label>
         </div>
         <div class="item item-input-inset">
@@ -98,23 +101,11 @@
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Email:</span>
-          <label class="item-input-wrapper">
-            <input type="email" name="email" placeholder="Client Email Address" ng-model="client.Client_Fields.Email">
-          </label>
-        </div>
-        <div class="item item-input-inset">
           <span class="input-label">Education:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="email" placeholder="Client Education" ng-model="client.Client_Fields.Education">
+            <input type="text" name="email" size="20" placeholder="Client Education" ng-model="client.Client_Fields.Education">
           </label>
         </div>
-        <!--div class="item item-input-inset">
-          <span class="input-label">Confirm:</span>
-          <label class="item-input-wrapper">
-            <input type="email" name="emailConf" placeholder="Your Email">
-          </label>
-        </div-->
 
         <div class="item item-input-inset">
           <span class="input-label">Occupation:</span>
@@ -123,108 +114,97 @@
             </select>
           </label>
         </div>
+        
+        <div class="item item-input-inset">
+          <span class="input-label">Fathers Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="text" size="20" placeholder="Enter Father's Name" ng-model="client.Client_Fields['Fathers Name']">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Grand Fathers Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="text" size="20" placeholder="Enter Grand Father's Name" ng-model="client.Client_Fields['Grandfathers Name']">
+          </label>
+        </div>
 
-      <!-- div class="item item-input-inset">
-        <span class="input-label">Sector:</span>
-        <label class="item-input-wrapper">
-          <input type="text" size="15" placeholder="Byrathi">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Address:</span>
-        <label class="item-input-wrapper">
-          <input type="text" size="15" placeholder="Full address" ng-model="client.Address">
-        </label>
-      </div  -->
+      </div> <!-- end of ion-list -->
 
-      <!-- /ion-list -->
-      </div>
-
-      <!-- Here   
-      div id="xtraFlds" class="list card"> ng-show="extraFields" -->
+      <!-- Here -->
       <div class="item item-divider"> <!-- input-inset -->
         <label>Full Address:</label>
-        <button class="button button-small button-positive rightbtn" ng-click="toggleExtraFields()"
-            title="Click for more Fields">
+        <button ng-click="toggleExtraFields()" title="Click for more Fields"
+            class="button button-small button-positive rightBtn">
           <i class="icon ion-plus-circled"></i>
         </button>
       </div>
 
       <div id="xtraFlds" class="list card" ng-show="extraFields">
-      <div class="item item-input-inset">
-        <span class="input-label">Country :</span>
-        <label class="item-input-wrapper">
-          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="client.Client_Fields.Country">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Region :</span>
-        <label class="item-input-wrapper">
-          <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="client.Client_Fields.Region">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Zone :</span>
-        <label class="item-input-wrapper">
-          <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="client.Client_Fields.Zone">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Wereda :</span>
-        <label class="item-input-wrapper">
-          <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="client.Client_Fields.Wereda">
-        </label>
-      </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Kebele :</span>
-        <label class="item-input-wrapper">
-          <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="client.Client_Fields.Kebele">
-        </label>
-      </div>
-      <!-- Family Member Size -->
-      <div class="item item-divider"> 
+        <div class="item item-input-inset">
+          <span class="input-label">Address :</span>
+          <label class="item-input-wrapper">
+            <input type="text" title="Your Address in short" name="Address" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model="client.Client_Fields.Address" />
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Country :</span>
+          <label class="item-input-wrapper">
+            <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="client.Client_Fields.Country">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Region :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Region" placeholder="Enter Region's Name" ng-model="client.Client_Fields.Region">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Zone :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Zone" placeholder="Enter Zone's Name" ng-model="client.Client_Fields.Zone">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Wereda :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Wereda" placeholder="Enter Wereda's Name" ng-model="client.Client_Fields.Wereda">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Kebele :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="client.Client_Fields.Kebele">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Unique Place Name :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="UniquePlaceName" placeholder="Enter Unique Place's Name" ng-model="client.Client_Fields.UniquePlaceName">
+          </label>
+        </div>
+        <!-- Family Member Size -->
+        <div class="item item-divider"> 
           <span class="input-label">Family Size </span>
-      </div>
+        </div>
 
-      <div class="item row">
-      <div class="col">
-        <label class="item-input item-select">
-          <div class="input-label">Males:</div>
-          <select ng-model="client.Client_Fields['Number of males']"
-            ng-options="i as i for i in [0,1,2,3]">
-          </select>
-        </label>
-      </div>
-      <div class="col">
-        <label class="item-input item-select">
-          <div class="input-label">Females:</div>
-          <select ng-model="client.Client_Fields['Number of females']"
-            ng-options="i as i for i in [0,1,2,3]">
-          </select>
-        </label>
-      </div>
-      </div>
-
-      <!-- To Be ignored
-
-      <div class="item item-input-inset">
-        <span class="input-label">Family Members :</span>
-        <label class="item item-input">
-          <span class="input-label">Male 1</span>
-          <input type="tel">
-        </label>
-      </div>
-
-      <div class="item item-input-inset">
-        <span class="input-label">Family Members :</span>
-        <label class="item-input-inset"> Male 2:
-          <input type="number" name="nMale" size="2" ng-maxlength="2">
-          <# placeholder="Enter Region's Name" ng-model="sacco.Region">
-        </label>
-        <label class="item-input-inset"> Female :
-          <input type="number" name="nFemale" size="3">
-        </label>
-      </div-->
+        <div class="item row">
+          <div class="col">
+            <label class="item-input item-select">
+              <div class="input-label">Males:</div>
+              <select ng-model="client.Client_Fields['Number of males']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+          <div class="col">
+            <label class="item-input item-select">
+              <div class="input-label">Females:</div>
+              <select ng-model="client.Client_Fields['Number of females']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+        </div>
 
       </div>
 
@@ -232,77 +212,125 @@
 
       <div class="item item-divider"> <!-- input-inset -->
           <label>Next of Kin Details:</label>
-          <span class="button button-small button-positive rightbtn" ng-click="toggleNextOfKin()"
+          <span class="button button-small button-positive rightBtn" ng-click="toggleNextOfKin()"
             title="Click for more Fields">
            <i class="icon ion-plus-circled"></i>
           </span>
       </div>
 
       <div id="nxtOfKin" class="list card" ng-show="nextOfKin">
-        <!-- div class="item item-input-inset">
-          <span class="input-label">Full Name :</span>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Full Name:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+            <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
           </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Relationship with the Client:</span>
+        </ion-item>
+
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Gender:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+            <select ng-model="client.Client_NextOfKin.genderId" ng-options="g.id as g.name for g in codes.genders">
+            </select>
           </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Father's Name :</span>
+        </ion-item>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Phone No:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
+            <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Phone">
           </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Grand Father's Name :</span>
-          <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.Kebele">
-          </label>
-        </div -->
-        <label class="item item-input">
-          <input type="text" placeholder="Next of Kin Full Name" ng-model="client.Client_NextOfKin.Fullname">
-        </label>
-        <label class="item item-input">
-          <input type="text" placeholder="Next of Kin Number" ng-model="client.Client_NextOfKin.Phone">
-        </label>
-        <label class="item item-input-inset">
+        </ion-item>
+        <ion-item class="item item-input-inset">
           <span class="input-label">Relationship:</span>
-          <select
-            ng-model="client.Client_NextOfKin.Relationship_cd_Relationship" ng-options="r.id as r.name for r in codes.Relationships">
-          </select>
-        </label>
-        <label class="item item-input">
-          <input type="text" placeholder="Father's Name" ng-model="client.Client_NextOfKin['Fathers Name']">
-        </label>
-        <label class="item item-input">
-          <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
-        </label>
+          <label class="item-input-wrapper">
+            <select ng-model="client.Client_NextOfKin.Relationship_cd_Relationship" ng-options="r.id as r.name for r in codes.Relationships" />
+            </select>
+          </label>
+        </ion-item>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Father's Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Father's Name" ng-model="client.Client_NextOfKin['Fathers Name']">
+          </label>
+        </ion-item>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Grand Father's Name:</span>
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
+          </label>
+        </ion-item>
+
+
+        <div class="item item-input-inset">
+          <span class="input-label">Unique Place Name</span>
+          <label class="item-input-wrapper">
+            <input type="text" title="Your Address in short" name="UniquePName" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model='client.Client_NextOfKin["UniquePlaceName"]' />
+            <!-- ng-model="client.Client_Fields.uniquePName" -->
+          </label>
+        </div>    
+        <div class="item item-input-inset">
+          <span class="input-label">Country :</span>
+          <label class="item-input-wrapper">
+            <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" 
+                ng-model='client.Client_NextOfKin["Country"]'>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Region :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Region" placeholder="Enter Region's Name"
+                ng-model='client.Client_NextOfKin["Region"]' />
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Zone :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Zone" placeholder="Enter Zone's Name"
+                ng-model='client.Client_NextOfKin["Zone"]'>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Wereda :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Wereda" placeholder="Enter Wereda's Name"
+                ng-model='client.Client_NextOfKin["Wereda"]'>
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Kebele :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model='client.Client_NextOfKin["Kebele"]'>
+          </label>
+        </div>
 
       </div>
 
-      <ion-item>
-        <div ng-hide="clientEditForm.firstName.$pristine">
-          <span class="ion-warn" ng-show="clientEditForm.firstName.$warn.required">First Name is required</span>
-          <span class="ion-warn" ng-show="clientEditForm.firstName.$warn.minlength">First Name must be at least 3 characters</span>
-        </div>
-        <div ng-hide="clientEditForm.lastName.$pristine">
-          <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.required">Last Name is required</span>
-          <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.minlength">Last Name must be at least 3 characters</span>
-        </div>
-        <ion-item ng-show="message">
-          <span class="ion-{{message.type}}">{{message.text}}</span>
+        <ion-item>
+          <div ng-hide="clientEditForm.firstName.$pristine">
+            <span class="ion-warn" ng-show="clientEditForm.firstName.$warn.required">
+              First Name is required
+            </span>
+            <span class="ion-warn" ng-show="clientEditForm.firstName.$warn.minlength">
+              First Name must be at least 3 characters
+            </span>
+          </div>
+          <div ng-hide="clientEditForm.lastName.$pristine">
+            <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.required">
+              Last Name is required
+            </span>
+            <span class="ion-warn" ng-show="clientEditForm.lastName.$warn.minlength">
+              Last Name must be at least 3 characters
+            </span>
+          </div>
+          <ion-item ng-show="message">
+            <span class="ion-{{message.type}}">{{message.text}}</span>
+          </ion-item>
+
+      	  <button class="button button-block button-positive" 
+      		    ng-click="saveClient(client)" ng-disabled="clientEditForm.$invalid">
+            <h4>Save</h4>
+      	  </button>
+
         </ion-item>
-
-    	  <button class="button button-block button-positive" 
-    		  ng-click="saveClient(client)" ng-disabled="clientEditForm.$invalid">
-          <h4>Save</h4>
-    	  </button>
-
-      </ion-item>
 
       </ion-list> <!-- End of List -->
     </form>  

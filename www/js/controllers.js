@@ -40,65 +40,7 @@ angular.module('starter.controllers', ['ngCordova'])
     session: null
   };
 
-//  document.addEventListener('deviceready', function() {
-
-  /*
-      authHttp.runCommands(function(n) {
-        logger.log("Running command: " + n);
-      }, function(method, url, data, response) {
-        logger.log("PASS: " + method + " " + url + " with :: " +
-          JSON.stringify(data));
-      }, function(method, url, data, response) {
-        logger.log("FAIL: " + method + " " + url + " with :: " +
-          JSON.stringify(data));
-      }, function() {
-        logger.log("ALL DONE!!");
-      } );
-      */
-
 } ] )
-
-/*      var offlinePopup = $ionicPopup.alert( {
-        title: "Going Offline",
-        template: "k-Mayra is going offline"
-      } );
-
-      setTimeout(function(e) {
-        offlinePopup.close();
-      }, 2000); */
-      /*
-      $rootScope.cmd_success = 0;
-      $rootScope.msg = "";
-      var onlinePopup = $ionicPopup.alert( {
-        title: "Going online",
-        template: "k-Mayra is going online..{{msg}}"
-      } );
-
-      setTimeout(function() {
-        onlinePopup.close();
-      }, 1000);
-
-      authHttp.runCommands(function(n) {
-        $rootScope.cmd_count = n;
-        $rootScope.cmd_success = 0;
-        $rootScope.msg += "<br />Command count: " + n;
-      }, function(method, url, data, response) {
-        logger.log("PASS:" + method + " " + url + " with " + JSON.stringify(data));
-        $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
-          " bytes data SUCCESS";
-        $rootScope.cmd_success++;
-      }, function(method, url, data, response) {
-        logger.log("FAIL:" + method + " " + url + " with " + JSON.stringify(data));
-        $rootScope.msg += "<br />Command " + method + " to " + url + " with " + data.length +
-          " bytes data FAIL(" + response.status + ")";
-      }, function() {
-        $rootScope.msg += "<br />RESULT: {{cmd_success}} SUCCESS, {{cmd_count - cmd_success}} FAIL";
-      } );
-
-      // ToDo: add other synchronization code here
-
-      Cache.updateLastSync();
-      */
 
 .controller('LogsCtrl', [ '$rootScope', '$scope', function($rootScope, $scope) {
   $scope.log = {
@@ -124,15 +66,6 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 
   $scope.login = function(auth) {
-    /*
-    if (window.Connection && $cordovaNetwork.isOffline()) {
-      $scope.message = {
-        "type": "warn",
-        "text": "No connection to Internet"
-      };
-      return;
-    }
-    */
     logger.log("Anon scope Login called..");
     $scope.message = null;
     Session.login(auth, function(authinfo) {
@@ -217,13 +150,24 @@ angular.module('starter.controllers', ['ngCordova'])
       //$scope.session.takeOnline();
       logger.log("Going back online.");
       authHttp.runCommands(function(n) {
-        logger.log("Starting to execute " + n + " commands");
-      }, function(method, url, data, response) {
-        logger("SUCCESS: " + method + " " + url + " :: " + JSON.stringify(data));
-      }, function(method, url, data, response) {
-        logger("FAILURE: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
+        var msg = "Starting to execute " + n + " commands";
+        logger.log(msg);
+        var stPopup = $ionicPopup.alert({
+          title: "Syncing",
+          template: msg,
+          scope: $scope
+        } );
+      }, function() {
+        logger("SUCCESS"); // + method + " " + url + " :: " + JSON.stringify(data));
+      }, function() {
+        logger("FAILURE"); //: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
       }, function() {
         logger.log("All commands done!");
+        var rptPopup = $ionicPopup.alert({
+          title: 'Offline Commands',
+          template: 'All commands are done!',
+          scope: $scope
+        } );
       } );
     } );
 
@@ -316,22 +260,6 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office) {
-    /*
-    var sfs = Office.saveFields;
-    var ofields = new Object();
-    for(var i = 0; i < sfs.length; ++i) {
-      var fld = sfs[i];
-      ofields[fld] = office[fld];
-    }
-    ofields.dateFormat = "yyyy-MM-dd";
-    ofields.locale = "en";
-    var fld = "openingDate";
-    var val = ofields[fld];
-    if (val != null) {
-      val = val.toISOString().substring(0, 10);
-      ofields[fld] = val;
-    }
-    */
     var ofields = FormHelper.preSaveForm(Office, office);
     officeId = officeId || $stateParams.saccoId;
     logger.log("Attempting update office #" + officeId + " :: " + JSON.stringify(ofields));
@@ -394,10 +322,10 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
-  var saccoId = $stateParams.saccoId;
-  logger.log("Sacco view ctrl invoked for " + saccoId);
   $scope.data = {};
   $scope.$on('$ionicView.enter', function(e) {
+    var saccoId = $stateParams.saccoId;
+    logger.log("Sacco view ctrl invoked for " + saccoId);
     SACCO.get_full(saccoId, function(sacco) {
       $scope.data = sacco;
     } );
@@ -462,7 +390,8 @@ angular.module('starter.controllers', ['ngCordova'])
             clients[i].face = img_data;
           } );
         } else {
-          var gname = clients[i].gender.name;
+          var g = clients[i].gender;
+          var gname = g ? g.name : 'male';
           var glname = gname ? gname.toLowerCase() : 'male';
           clients[i].face = "img/placeholder-" + glname + ".jpg";
         }
@@ -940,12 +869,6 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
   } );
   Customers.get_full(clientId, function(client) {
-    /*
-    var rClient = FormHelper.prepareForm(Clients, client);
-    logger.log("Got client: " + JSON.stringify(client));
-    logger.log("rClient:" + JSON.stringify(rClient));
-    $scope.client = rClient;
-    */
     FormHelper.prepareForm(Clients, client);
     $scope.client = client;
     SACCO.query(function(saccos) {
@@ -1068,7 +991,6 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.extraFields = ($scope.extraFields === true) ? false : false;
     logger.log("NextOfKin Display : " + $scope.nextOfKin);
   };
-  // y
 
   logger.log("Looking to register client");
   $scope.data = { "op": "Register" };
@@ -1151,10 +1073,10 @@ angular.module('starter.controllers', ['ngCordova'])
       session = Session.get();
       $rootScope.session = session;
       var loginPopup = $ionicPopup.alert( {
-        title: 'Logging In',
+        title: 'Login Successful!',
         template: '<p>.<br>\n' +
           '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
-          '<p>Login successful! Welcome ' + Session.username() + '</p>',
+          '<p><center><h4>Welcome <strong>' + session.username() + '</strong></h4></center></p>',
         scope: $scope
       } );
       var role = session.role;
@@ -1174,12 +1096,6 @@ angular.module('starter.controllers', ['ngCordova'])
       }
     }
   } );
-  /*
-  var saccos = Cache.getObject('h_offices');
-  $scope.nextSACCO = HashUtil.nextKey(saccos);
-  var clients = Cache.getObject('h_clients');
-  $scope.nextClient = HashUtil.nextKey(clients);
-  */
   $scope.ConfirmLogOut = function() {
     var confirmPopup = $ionicPopup.confirm({
       title: 'Confirm Logout',

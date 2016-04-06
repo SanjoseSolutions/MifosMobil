@@ -13,15 +13,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <style>
-label {
-  color: #558;
-}
 .item, ion-item {
   margin: 2px;
   padding: 2px 5px;
   border: none;
-/*  font-style:italic;  */
-  font-family:corsiva;
+
 }
 </style>
 
@@ -62,7 +58,10 @@ label {
       <ion-item>
         <label>Kebele: </label> {{data.SACCO_Fields.Kebele || "Not set"}}
       </ion-item>
-
+      <ion-item>
+        <label>Unique Place Name: </label> {{data.SACCO_Fields.UniquePlaceName || "Not set"}}
+      </ion-item>
+      
       <ion-item>
         <a href="#/tab/saccos/{{data.id}}/edit"
           class="button button-block">

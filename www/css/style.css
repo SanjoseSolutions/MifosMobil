@@ -9,6 +9,7 @@ ion-nav-bar
 */
 body	{
 	background-color: grey;
+/*  cursor: url(images/my-cursor.png), auto; */
 }
 
 .item-divider	{
@@ -61,4 +62,32 @@ ion-content {
     font-size: 0.9rem;
     font-family: verdana;
     font-style: italic;
+}
+
+ion-content  {
+/* background-color:lightgrey;  */
+}
+
+label, .label {
+  font-size:1.1rem;
+  color: #558;
+}
+
+.item, ion-item {
+  margin: 0px;
+  padding: 2px 3px;
+  border: none;
+  font-family:corsiva;
+  /*  font-style:italic;  */  
+}
+
+.rightBtn {
+  float: right;
+  width: 20%;
+}
+select {
+  width: 100%;
+}
+input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:focus, textarea:focus{
+  background-color: lightblue;
 }
