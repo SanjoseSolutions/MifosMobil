@@ -171,6 +171,16 @@ angular.module('starter.controllers', ['ngCordova'])
       } );
     } );
 
+  $rootScope.$on('sessionExpired', function() {
+    var notifyPopup = $ionicPopup.alert({
+      title: 'Session expired',
+      template: 'You will be logged out'
+    } );
+    notifyPopup.then(function() {
+      Session.logout();
+    } );
+  } );
+
   $scope.$on('$ionicView.enter', function(e) {
     var rolestat = new Object();
     var roles = Roles.getRoles();

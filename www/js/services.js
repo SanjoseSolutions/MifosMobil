@@ -102,14 +102,18 @@ angular.module('starter.services', ['ngCordova'] )
   return Settings.baseUrl;
 } )
 
-.factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache', 'logger',
-    function($http, Settings, $cordovaNetwork, Cache, logger) {
+.factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache', 'logger', '$rootScope',
+    function($http, Settings, $cordovaNetwork, Cache, logger, $rootScope) {
 
   var authHttp = {};
 
   $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
 	$http.defaults.headers.common['Accept'] = '*/*';
 	$http.defaults.headers.common['Content-type'] = 'application/json';
+
+  authHttp.getAuthHeader = function() {
+    return $http.defaults.headers.common.Authorization;
+  };
 
   authHttp.setAuthHeader = function(key) {
     $http.defaults.headers.common.Authorization = 'Basic ' + key;
@@ -135,6 +139,9 @@ angular.module('starter.services', ['ngCordova'] )
       config = config || {};
       config.headers = config.headers || {};
       config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
+      if (!authHttp.getAuthHeader()) {
+        $rootScope.$broadcast('sessionExpired');
+      }
       if (window.Connection && $cordovaNetwork.isOffline()) {
         var cmd = {
           'method': method,
@@ -450,6 +457,11 @@ angular.module('starter.services', ['ngCordova'] )
 
   session.isAuthenticated = function() {
     return (session.username() != null && session.username() != '');
+  };
+
+  session.isAuthorized = function() {
+    var auth_header = $http.defaults.headers.common.Authorization;
+    return auth_header ? true : false;
   };
 
   session.get = function() {
