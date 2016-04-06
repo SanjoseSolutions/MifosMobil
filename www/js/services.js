@@ -990,6 +990,22 @@ angular.module('starter.services', ['ngCordova'] )
         fn_client(client);
       }
     },
+    fetch: function(id, fn_client) {
+      authHttp.get(baseUrl + '/clients/' + id)
+      .then(function(response) {
+        var client = response.data;
+        clients = Cache.getObject('h_clients');
+        clients[id] = client;
+        Cache.setObject('h_clients', clients);
+        logger.log("Fetched client #" + id + " and updated cache");
+        fn_client(client);
+      }, function(response) {
+        logger.log("Clients.fetch(" + id + ")failed ");
+      } );
+      if (clients) {
+        fn_client(client);
+      }
+    },
     save: function(client, fn_client, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/clients', client, {
         "params": { "tenantIdentifier": Settings.tenant }
@@ -1004,8 +1020,13 @@ angular.module('starter.services', ['ngCordova'] )
           fn_offline(client);
         } else {
           logger.log("Created client resp: "+JSON.stringify(response.data));
-          var new_client = response.data;
-          fn_client(new_client);
+          var data = response.data;
+          var id = data.resourceId;
+          Clients.fetch(id, function(new_client) {
+            clients[id] = new_client;
+            Cache.setObject('h_clients', clients);
+            fn_client(new_client);
+          } );
         }
       }, function(response) {
         logger.log("Client create failed:"+JSON.stringify(response));
