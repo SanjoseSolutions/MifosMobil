@@ -27,7 +27,8 @@
         <label>SACCO's Name:</label> {{data.name || "Not set"}}
       </ion-item>
       <ion-item>
-        <label>Registration Number</label> {{data.coopLicRegNo || "Not set"}}
+        <label>Registration Number </label> :
+        {{data.SACCO_Fields.["License Registration No"] || "Not set"}}
       </ion-item>
       <ion-item>
         <label>Parent Office:</label> {{data.parentName}}
@@ -41,7 +42,7 @@
       <ion-item>
         <label style="font-size:18px;">Location</label> <br />
         <label>Latitude:</label> {{ data.SACCO_Fields.Latitude }}
-        <label>Longitude</label> {{ data.SACCO_Fields.Longitude }}
+        <label>Longitude :</label> {{ data.SACCO_Fields.Longitude }}
       </ion-item>
       <ion-item class="item item-divider">
         <label>Office Full Address </label>{{data.SACCO_Fields.Address}}
