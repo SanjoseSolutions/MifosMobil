@@ -230,11 +230,6 @@ angular.module('starter.services', ['ngCordova'] )
   return authHttp;
 } ] )
 
-.factory('Network', [ '$cordovaNetwork', function($cordovaNetwork) {
-  var network = $cordovaNetwork;
-  return network;
-} ] )
-
 .factory('CommandQueue', function(authHttp, logger) {
   return {
     get: function() {
