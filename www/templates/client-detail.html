@@ -38,7 +38,7 @@
 </style>
 
 <ion-view view-title="Client: {{client.displayName}}">
-  <ion-content class="padding">
+  <ion-content id="client-details" class="padding">
     <div class="list card" style="clear:both">
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
@@ -49,6 +49,8 @@
         <center>
           <a ng-click="getPhoto()" class="ion-camera">
            Take Photo </a>
+          <a ng-click="print()" class="ion-printer">
+           Print </a>
         </center>
       </div>
       <ion-list>
