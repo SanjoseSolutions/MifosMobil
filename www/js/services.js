@@ -879,6 +879,9 @@ angular.module('starter.services', ['ngCordova'] )
         for(var i = 0; i < dfs.length; ++i) {
           var df = dfs[i];
           var v = sObject[df];
+          if (!v) {
+            continue;
+          }
           logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
             v = v.toISOString();
@@ -1042,7 +1045,7 @@ angular.module('starter.services', ['ngCordova'] )
           logger.log("Created client resp: "+JSON.stringify(response.data));
           var data = response.data;
           var id = data.resourceId;
-          Clients.fetch(id, function(new_client) {
+          this.fetch(id, function(new_client) {
             clients[id] = new_client;
             Cache.setObject('h_clients', clients);
             fn_client(new_client);

@@ -1000,7 +1000,7 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil,
-    HashUtil, DataTables, Codes, SACCO, FormHelper, logger) {
+    HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1017,7 +1017,13 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client, false);
-    cfields["active"] = true;
+    if ($scope.rolestat.isStaff) {
+      cfields["active"] = false;
+      var auth = Cache.getObject('auth');
+      cfields["officeId"] = auth.officeId;
+    } else {
+      cfields["active"] = true;
+    }
     var cdts = Clients.dataTables();
     Clients.save(cfields, function(new_client) {
       logger.log("Client created:" + JSON.stringify(new_client));

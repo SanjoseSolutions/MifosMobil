@@ -81,7 +81,7 @@
                 ng-model="client.Client_Fields.Email">
           </label>
         </div>
-        <div class="item item-input-inset">
+        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
           <span class="input-label">
             Activation Date
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
@@ -90,7 +90,7 @@
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
           </label>
         </div>
-        <div class="item item-input-inset">
+        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
           <span class="input-label">
             Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
