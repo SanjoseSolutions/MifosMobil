@@ -1096,13 +1096,36 @@ angular.module('starter.controllers', ['ngCordova'])
   }, function(sus) {} );
 } )
 
-.controller('DashboardCtrl', function($rootScope, $scope, authHttp,
+.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
+    'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
+    '$ionicPopup', 'logger', 'Clients', function($rootScope, $scope, authHttp,
     baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-    $ionicPopup, logger) {
+    $ionicPopup, logger, Clients) {
 
   var session = null;
 
   $scope.$on('$ionicView.enter', function(e) {
+    $scope.num_inactiveClients = 0;
+    var role = Session.role;
+    switch (role) {
+      case "Admin":
+        SACCO.query_full(function(data) {
+          logger.log("Fetched SACCOs");
+          $scope.num_saccos = data.length;
+        } );
+      case "Management":
+        Staff.query(function(staff) {
+          $scope.num_staff = staff.length;
+        } );
+      case "Staff":
+        Customers.query_full(function(clients) {
+          logger.log("Fetched Clients");
+          $scope.num_clients = clients.length;
+        } );
+        Clients.query_inactive(function(iClients) {
+          $scope.num_inactiveClients = iClients.totalFilteredRecords;
+        } );
+    }
     if (null == session) {
       logger.log("Loading session..");
       session = Session.get();
@@ -1114,27 +1137,9 @@ angular.module('starter.controllers', ['ngCordova'])
           '<p><center><h4>Welcome <strong>' + session.username() + '</strong></h4></center></p>',
         scope: $scope
       } );
-      var role = session.role;
-      $scope.num_inactiveClients = 0;
-      switch (role) {
-        case "Admin":
-          SACCO.query_full(function(data) {
-            $scope.num_saccos = data.length;
-          } );
-        case "Management":
-          Staff.query(function(staff) {
-            $scope.num_staff = staff.length;
-          } );
-        case "Staff":
-          Customers.query_full(function(clients) {
-            $scope.num_clients = clients.length;
-          } );
-          Clients.query_inactive(function(iClients) {
-            $scope.num_inactiveClients = iClients.totalFilteredRecords;
-          } );
-      }
     }
   } );
+
   $scope.ConfirmLogOut = function() {
     var confirmPopup = $ionicPopup.confirm({
       title: 'Confirm Logout',
@@ -1151,5 +1156,5 @@ angular.module('starter.controllers', ['ngCordova'])
       }
     });
   };
-} )
+} ] )
 ;

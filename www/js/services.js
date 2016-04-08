@@ -682,16 +682,23 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
+    fetch: function(id, fn_office) {
+      var offices = Cache.getObject('h_offices') || {};
+      authHttp.get(baseUrl + '/offices/' + id)
+      .then(function(response) {
+        var odata = response.data;
+        fn_office(odata);
+        offices[id] = odata;
+        Cache.setObject('h_offices', offices);
+      } );
+    },
     get: function(id, fn_office) {
       var offices = Cache.getObject('h_offices') || {};
       if (offices[id]) {
         fn_office(offices[id]);
         return;
       }
-      authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
-        var odata = response.data;
-        fn_office(odata);
-      } );
+      this.fetch(id, fn_office);
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
@@ -1001,9 +1008,11 @@ angular.module('starter.services', ['ngCordova'] )
       }
     },
     query_inactive: function(fn_iClients) {
+      logger.log("Going to call inactive clients");
       authHttp.get(baseUrl + '/clients?sqlSearch=activation_date IS NULL')
       .then(function(response) {
         var data = response.data;
+        logger.log("Got response:"+JSON.stringify(data));
         fn_iClients(data);
       } );
     },
@@ -1017,7 +1026,9 @@ angular.module('starter.services', ['ngCordova'] )
         var client = clients[id];
         logger.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
         fn_client(client);
+        return;
       }
+      this.fetch(id, fn_client);
     },
     fetch: function(id, fn_client) {
       authHttp.get(baseUrl + '/clients/' + id)
