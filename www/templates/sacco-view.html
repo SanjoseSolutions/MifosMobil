@@ -17,28 +17,32 @@
   margin: 2px;
   padding: 2px 5px;
   border: none;
-
 }
 </style>
 
 <ion-view view-title="Details: {{data.name}}">
   <ion-content class="padding">
     <div class="list card">
-      <div class="item item-divider">
+      <ion-item class="item item-divider">
         <label>SACCO's Name:</label> {{data.name || "Not set"}}
-      </div>
+      </ion-item>
+      <ion-item>
+        <label>Registration Number </label> :
+        {{data.SACCO_Fields["License Registration No"] || "Not set"}}
+      </ion-item>
       <ion-item>
         <label>Parent Office:</label> {{data.parentName}}
       </ion-item>
       <ion-item>
-        <label>Date Established:</label> {{data.openingDt}}
+        <label>Date Established:</label> {{data.openingDate}}
       </ion-item>
       <ion-item>
-        <label>Date of Joining Union:</label> {{data.SACCO_Fields.joiningDt}}
+        <label>Date of Joining Union:</label> {{data.SACCO_Fields.joiningDate}}
       </ion-item>
       <ion-item>
         <label style="font-size:18px;">Location</label> <br />
-        <label>Latitude:</label> {{ data.SACCO_Fields.Latitude }} <label>Longitude</label> {{ data.SACCO_Fields.Longitude }}
+        <label>Latitude:</label> {{ data.SACCO_Fields.Latitude }}
+        <label>Longitude :</label> {{ data.SACCO_Fields.Longitude }}
       </ion-item>
       <ion-item class="item item-divider">
         <label>Office Full Address </label>{{data.SACCO_Fields.Address}}
@@ -48,17 +52,20 @@
       </ion-item>
       <ion-item>
           <label>Region: </label> {{data.SACCO_Fields.Region || "Not set"}}
-        </ion-item>
+      </ion-item>
       <ion-item>
           <label>Zone: </label> {{data.SACCO_Fields.Zone || "Not set"}}
-        </ion-item>
+      </ion-item>
       <ion-item>
         <label>Wereda: </label> {{data.SACCO_Fields.Wereda || "Not set"}}
       </ion-item>
       <ion-item>
         <label>Kebele: </label> {{data.SACCO_Fields.Kebele || "Not set"}}
       </ion-item>
-
+      <ion-item>
+        <label>Unique Place Name: </label> {{data.SACCO_Fields.UniquePlaceName || "Not set"}}
+      </ion-item>
+      
       <ion-item>
         <a href="#/tab/saccos/{{data.id}}/edit"
           class="button button-block">

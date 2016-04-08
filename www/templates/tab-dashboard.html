@@ -31,17 +31,17 @@ td {
 
 <ion-view view-title="Dashboard">
   <ion-content>
-
+    <!-- ion-list class="ion-list-calm">
+      <ion-toggle  ng-model="settings.enableFriends"> Enable Friends </ion-toggle>
+    </ion-list -->
     <ion-card>
-
       <ion-list>
         <ion-item>
           <ion-label>
-            Welcome, <strong>{{session.uname}}</strong>!
+            <center>Welcome, <strong>{{session.uname}}</strong>!</center>
           </ion-label>
         </ion-item>
         <ion-item ng-show="num_clients && num_saccos && num_staff">
-          Your role: <strong>{{session.role}}</strong>     
           <!-- Table Summary -->
           <table border="1" style="width:100%">
           <caption> Your Session Summary </caption>
@@ -52,6 +52,10 @@ td {
           <tr> td>Short Report :</td>  </tr>
           </tfoot -->
           <tbody>
+          <tr>
+            <td> Your role: </td>
+            <td> <strong>{{session.role}}</strong> </td>
+          </tr>
           <tr ng-show="rolestat.isAdmin && !num_saccos">
             <td>Loading SACCOs..</td>
             <td>&nbsp;</td>
@@ -119,7 +123,7 @@ td {
         <ion-item>
           <center>
           Connection status: {{session.status()}}
-            <span ng-if="session.isOnline" class="icon ion-android-cloud">&nbsp;</span>
+            <span ng-if="session.isOnline" class="ion-android-cloud-done">&nbsp;</span>
           </center>
           <center ng-if="!session.isOnline">
             <span class="icon ion-android-cloud-outline">&nbsp;</span></center>

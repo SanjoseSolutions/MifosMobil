@@ -69,18 +69,25 @@
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">Mobile:</span>
+          <label class="item-input-wrapper">
+            <input type="tel" placeholder="Ex :919620568920" ng-model="client.mobileNo">
+          </label>
+        </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Email:</span>
+          <label class="item-input-wrapper">
+            <input type="email" name="email" placeholder="Client Email Address"
+                ng-model="client.Client_Fields.Email">
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">
             Activation Date
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.activationDate">
-          </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Mobile:</span>
-          <label class="item-input-wrapper">
-            <input type="tel" placeholder="Ex :919620568920" ng-model="client.mobileNo">
           </label>
         </div>
         <div class="item item-input-inset">
@@ -91,13 +98,6 @@
           <label class="item-input-wrapper">
             <select ng-model="client.officeId" ng-options="o.id as o.name for o in codes.offices">
             </select>
-          </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Email:</span>
-          <label class="item-input-wrapper">
-            <input type="email" name="email" placeholder="Client Email Address"
-                ng-model="client.Client_Fields.Email">
           </label>
         </div>
         <div class="item item-input-inset">
@@ -176,6 +176,12 @@
             <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="client.Client_Fields.Kebele">
           </label>
         </div>
+        <div class="item item-input-inset">
+          <span class="input-label">Unique Place Name :</span>
+          <label class="item-input-wrapper">
+            <input type="text" name="UniquePlaceName" placeholder="Enter Unique Place's Name" ng-model="client.Client_Fields.UniquePlaceName">
+          </label>
+        </div>
         <!-- Family Member Size -->
         <div class="item item-divider"> 
           <span class="input-label">Family Size </span>
@@ -225,6 +231,12 @@
           <label class="item-input-wrapper">
             <select ng-model="client.Client_NextOfKin.genderId" ng-options="g.id as g.name for g in codes.genders">
             </select>
+          </label>
+        </ion-item>
+        <ion-item class="item item-input-inset">
+          <span class="input-label">Date of Birth:</span>
+          <label class="item-input-wrapper">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.Client_NextOfKin.dateOfBirth">
           </label>
         </ion-item>
         <ion-item class="item item-input-inset">
