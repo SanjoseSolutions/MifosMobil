@@ -171,6 +171,16 @@ angular.module('starter.controllers', ['ngCordova'])
       } );
     } );
 
+  $rootScope.$on('sessionExpired', function() {
+    var notifyPopup = $ionicPopup.alert({
+      title: 'Session expired',
+      template: 'You will be logged out'
+    } );
+    notifyPopup.then(function() {
+      Session.logout();
+    } );
+  } );
+
   $scope.$on('$ionicView.enter', function(e) {
     var rolestat = new Object();
     var roles = Roles.getRoles();
@@ -406,7 +416,7 @@ angular.module('starter.controllers', ['ngCordova'])
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
-    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera) {
+    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
   $scope.client = {};
@@ -480,6 +490,17 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.client.TotalLoans = totalLoans;
     $scope.client.loanAccounts = lacs;
   } );
+
+  // Print Client Detail
+  $scope.print = function() {
+    if($cordovaPrinter.isAvailable()) {
+      var doc = document.getElementById('client-details');
+      $cordovaPrinter.print(doc);
+    } else {
+      alert("Printing is not available on device");
+    } 
+  }
+
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,

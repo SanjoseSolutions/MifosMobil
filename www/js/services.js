@@ -102,14 +102,18 @@ angular.module('starter.services', ['ngCordova'] )
   return Settings.baseUrl;
 } )
 
-.factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache', 'logger',
-    function($http, Settings, $cordovaNetwork, Cache, logger) {
+.factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache', 'logger', '$rootScope',
+    function($http, Settings, $cordovaNetwork, Cache, logger, $rootScope) {
 
   var authHttp = {};
 
   $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
 	$http.defaults.headers.common['Accept'] = '*/*';
 	$http.defaults.headers.common['Content-type'] = 'application/json';
+
+  authHttp.getAuthHeader = function() {
+    return $http.defaults.headers.common.Authorization;
+  };
 
   authHttp.setAuthHeader = function(key) {
     $http.defaults.headers.common.Authorization = 'Basic ' + key;
@@ -135,6 +139,9 @@ angular.module('starter.services', ['ngCordova'] )
       config = config || {};
       config.headers = config.headers || {};
       config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
+      if (!authHttp.getAuthHeader()) {
+        $rootScope.$broadcast('sessionExpired');
+      }
       if (window.Connection && $cordovaNetwork.isOffline()) {
         var cmd = {
           'method': method,
@@ -221,11 +228,6 @@ angular.module('starter.services', ['ngCordova'] )
   };
 
   return authHttp;
-} ] )
-
-.factory('Network', [ '$cordovaNetwork', function($cordovaNetwork) {
-  var network = $cordovaNetwork;
-  return network;
 } ] )
 
 .factory('CommandQueue', function(authHttp, logger) {
@@ -452,6 +454,11 @@ angular.module('starter.services', ['ngCordova'] )
     return (session.username() != null && session.username() != '');
   };
 
+  session.isAuthorized = function() {
+    var auth_header = $http.defaults.headers.common.Authorization;
+    return auth_header ? true : false;
+  };
+
   session.get = function() {
     return Cache.getObject('session');
   };
@@ -459,17 +466,27 @@ angular.module('starter.services', ['ngCordova'] )
   return session;
 } ] )
 
-.factory('DataTables', function(authHttp, baseUrl, Settings, Cache, logger) {
+.factory('DataTables', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'logger', 'DateUtil', 'Codes',
+    function(authHttp, baseUrl, Settings, Cache, logger, DateUtil, Codes) {
   return {
     decode: function(obj) {
       var ret = new Object();
       for(var f in obj) {
-        var m = f.match(/(.*)_cd_.*/);
-        var v;
-        if (m) {
-          ret[obj[m[1]]] = obj[f];
+        var v = obj[f];
+        if (v instanceof Array) {
+          logger.log("DataTables.decode date: " + JSON.stringify(v));
+          ret[f] = DateUtil.localDate(v);
         } else {
-          ret[f] = obj[f];
+          var m = f.match(/(.*)_cd_.*/);
+          if (m) {
+            var codeNm = m[1];
+            logger.log("DataTables.decode code " + codeNm + " = " + JSON.stringify(v));
+            Codes.getCodeValue(codeNm, v, function(cv) {
+              ret[codeNm] = cv;
+            } );
+          } else {
+            ret[f] = v;
+          }
         }
       }
       return ret;
@@ -548,7 +565,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.saveOffline(baseUrl + '/datatables/' + name + '/', fields, {}, rid);
     }
   };
-} )
+} ] )
 
 .factory('DateUtil', function() {
   return {
@@ -775,21 +792,12 @@ angular.module('starter.services', ['ngCordova'] )
     },
     get_full: function(id, fn_office) {
       Office.get(id, function(office) {
-        office.openingDt = DateUtil.localDate(office.openingDate);
-        office.openingDate = DateUtil.isoDate(office.openingDate);
+        office.openingDate = DateUtil.localDate(office.openingDate);
         var dts = Office.dataTables();
         for(var i = 0; i < dts.length; ++i) {
           var dt = dts[i];
           DataTables.get_one(dt, id, function(fields, dt) {
-            if (fields && fields.joiningDate != null) {
-              if (fields.joiningDate instanceof Array) {
-                fields.joiningDt = DateUtil.localDate(fields.joiningDate);
-                fields.joiningDate = DateUtil.isoDate(fields.joiningDate);
-              } else {
-                logger.log("Got joiningDate: " + JSON.stringify(fields.joiningDate));
-              }
-            }
-            office[dt] = fields;
+            office[dt] = DataTables.decode(fields);
             logger.log("SACCO with " + dt + ": " + JSON.stringify(office));
           } );
         }
@@ -1098,7 +1106,7 @@ angular.module('starter.services', ['ngCordova'] )
           var dt = dts[i];
           logger.log("Client DataTable:" + dt + " for #" + id);
           DataTables.get_one(dt, id, function(fields, dt) {
-            client[dt] = fields;
+            client[dt] = DataTables.decode(fields);
             logger.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
           } );
@@ -1115,7 +1123,7 @@ angular.module('starter.services', ['ngCordova'] )
           for(var j = 0; j < dts.length; ++j) {
             var dt = dts[j];
             DataTables.get_one(dt, id, function(fields, dt) {
-              client[dt] = fields;
+              client[dt] = DataTables.decode(fields);
             } );
           }
         }
@@ -1338,7 +1346,9 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Codes', function(authHttp, baseUrl, Cache, logger) {
+.factory('Codes', [
+    'authHttp', 'baseUrl', 'Cache', 'logger', 'HashUtil',
+    function(authHttp, baseUrl, Cache, logger, HashUtil) {
   var codeNames = {
     "Gender": 4,
     "ClientClassification": 17,
@@ -1392,9 +1402,24 @@ angular.module('starter.services', ['ngCordova'] )
         return cid;
       }
       return 0;
+    },
+    getCodeValue: function(codeNm, v, fn_cv) {
+      codesObj.getValues(codeNm, function(cvs) {
+        var cvh = {};
+        logger.log("DT CodeValues: " + JSON.stringify(cvs));
+        for(var i = 0; i < cvs.length; ++i) {
+          cv = cvs[i];
+          cvh[cv['id']] = cv['name'];
+        }
+        logger.log("DT CodeValue Hash: " + JSON.stringify(cvh));
+        if (cvh[v]) {
+          logger.log("DT CodeValue found for " + cvh[v]);
+          fn_cv(cvh[v]);
+        }
+      } );
     }
   };
-} )
+} ] )
 
 .factory('Camera', ['$q', function($q) {
 
