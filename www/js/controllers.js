@@ -362,6 +362,14 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
+.controller('InactiveClientsCtrl', [ '$scope', 'Clients', function($scope, Clients) {
+  $scope.$on('$ionicView.enter', function(e) {
+    Clients.query_inactive(function(iClients) {
+      $scope.clients = iClients.pageItems;
+    } );
+  } );
+} ] )
+
 .controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts, logger) {
 
   $scope.$on('$ionicView.enter', function(e) {

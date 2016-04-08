@@ -139,6 +139,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
+  .state('tab.iclients', {
+    url: '/clients/inactive',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/tab-inactiveClients.html',
+        controller: 'InactiveClientsCtrl'
+      }
+    }
+  } )
   .state('tab.client-detail', {
     url: '/clients/:clientId',
     views: {
