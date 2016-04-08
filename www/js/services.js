@@ -1000,6 +1000,13 @@ angular.module('starter.services', ['ngCordova'] )
         } );
       }
     },
+    query_inactive: function(fn_iClients) {
+      authHttp.get(baseUrl + '/clients?sqlSearch=activation_date IS NULL')
+      .then(function(response) {
+        var data = response.data;
+        fn_iClients(data);
+      } );
+    },
     remove: function(id) {
       delete clients[id];
     },

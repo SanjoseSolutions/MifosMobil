@@ -1107,6 +1107,7 @@ angular.module('starter.controllers', ['ngCordova'])
         scope: $scope
       } );
       var role = session.role;
+      $scope.num_inactiveClients = 0;
       switch (role) {
         case "Admin":
           SACCO.query_full(function(data) {
@@ -1119,6 +1120,9 @@ angular.module('starter.controllers', ['ngCordova'])
         case "Staff":
           Customers.query_full(function(clients) {
             $scope.num_clients = clients.length;
+          } );
+          Clients.query_inactive(function(iClients) {
+            $scope.num_inactiveClients = iClients.totalFilteredRecords;
           } );
       }
     }
