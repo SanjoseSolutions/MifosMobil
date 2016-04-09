@@ -12,6 +12,11 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+<style type="text/css">
+select {
+  width: 50%;
+}
+</style>
 <ion-view view-title="{{data.op}} Client">
 
   <ion-header-bar>
@@ -31,7 +36,7 @@
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
-
+      
       <div class="list card">
         <div class="item item-input-inset">
           <span class="input-label">
@@ -97,9 +102,10 @@
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
-            <select name="clientMembership" ng-model="client.clientMembership" required>
-              <option value="Member" selected>Member</option>
-              <option value="Non-Member">Non-Member</option>
+            <select name="ClientType" ng-model="client.client.ClientType" required>
+              <option value="-1" selected>Select Client Type</option>
+              <option value="1">Member</option>
+              <option value="2">Non-Member</option>
             </select>
           </label>
         </div>
@@ -125,7 +131,31 @@
             </select>
           </label>
         </div>
-        
+
+        <!-- Family Member Size -->
+        <div class="item item-divider"> 
+          <span class="input-label">Family Size </span>
+        </div>
+        <div class="item row">
+          <div class="col">
+            <label class="item-input item-select">
+              <!-- div class="input-label">Males:</div -->
+              <span class="input-label">Males:</span>
+              <select ng-model="client.Client_Fields['Number of males']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+          <div class="col">
+            <label class="item-input item-select">
+              <span class="input-label">Females:</span>
+              <select ng-model="client.Client_Fields['Number of females']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+        </div>
+
         <div class="item item-input-inset">
           <span class="input-label">Fathers Name:</span>
           <label class="item-input-wrapper">
@@ -135,7 +165,7 @@
         <div class="item item-input-inset">
           <span class="input-label">Grand Fathers Name:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="text" size="20" placeholder="Enter Grand Father's Name" ng-model="client.Client_Fields['Grandfathers Name']">
+            <input type="text" name="text" placeholder="Enter Grand Father's Name" ng-model="client.Client_Fields['Grandfathers Name']">
           </label>
         </div>
 
@@ -192,29 +222,6 @@
           <label class="item-input-wrapper">
             <input type="text" name="UniquePlaceName" placeholder="Enter Unique Place's Name" ng-model="client.Client_Fields.UniquePlaceName">
           </label>
-        </div>
-        <!-- Family Member Size -->
-        <div class="item item-divider"> 
-          <span class="input-label">Family Size </span>
-        </div>
-
-        <div class="item row">
-          <div class="col">
-            <label class="item-input item-select">
-              <div class="input-label">Males:</div>
-              <select ng-model="client.Client_Fields['Number of males']"
-                ng-options="i as i for i in [0,1,2,3]">
-              </select>
-            </label>
-          </div>
-          <div class="col">
-            <label class="item-input item-select">
-              <div class="input-label">Females:</div>
-              <select ng-model="client.Client_Fields['Number of females']"
-                ng-options="i as i for i in [0,1,2,3]">
-              </select>
-            </label>
-          </div>
         </div>
 
       </div>
