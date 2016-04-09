@@ -35,10 +35,13 @@
   margin-right: auto;
   color: #334;
 }
+ion-content {
+  background-color: tan;
+}
 </style>
 
 <ion-view view-title="Client: {{client.displayName}}">
-  <ion-content id="client-details" class="padding">
+  <ion-content class="padding">
     <div class="list card" style="clear:both">
       <!-- TRYING TO PUT THE NAME AS AN HEADER
 	     div class="item item-divider">
@@ -47,10 +50,8 @@
       <div class="client-photo">
         <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
         <center>
-          <a ng-click="getPhoto()" class="ion-camera">
-           Take Photo </a>
-          <a ng-click="print()" class="ion-printer">
-           Print </a>
+          <!-- a ng-click="getPhoto()" class="icon ion-camera">
+           Take Photo </a -->
         </center>
       </div>
       <ion-list>
@@ -69,20 +70,6 @@
       </ion-list>
     </div>
     <div class="list card">
-      <!-- SIMPLE TEST Don't mind
-        ion-item>
-        <label> Relationship with Client : </label>
-        <select>
-          <option> Spouse </option>
-          <option> Father </option>
-          <option> Mother </option>
-          <option> Son </option>
-          <option> Daughter </option>
-          <option selected> Unspecified </option>
-        </select>
-      </ion-item  -->
-
-
       <ion-item class="item-icon">
         <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
         </label>  {{client.Client_Fields.Email || "Not set" }}
@@ -145,6 +132,18 @@
           <i class="ion-edit"> Edit Info</i>
         </a>
       </ion-item>
+      <ion-item>
+        <button-bar>
+          <button class="button button-assertive" ng-click="approveClient()">
+            Reject
+            <i class="icon ion-close-round"></i>
+          </button>
+          <button class="button button-positive">
+            Approve
+            <i class="icon ion-android-checkmark-circle"></i>
+          </button>
+        </button-bar>
+      </ion-item>
     </div>
 
     <ion-item class="item-divider">
@@ -155,9 +154,9 @@
       <ion-item>
 	       <label>Savings Accounts:</label>
          <span ng-hide="client.savingsAccounts">(None)</span>
-          <a href="#/tab/clients/{{client.id}}/savings-apply" class="button positive rightBtn">
+          <!-- a href="#/tab/clients/{{client.id}}/savings-apply" class="button positive rightBtn">
             Apply
-          </a>
+          </a -->
          <table style="width:95%">
          <tbody>
           <tr ng-repeat="sac in client.savingsAccounts">
@@ -174,10 +173,10 @@
       <ion-item>
 	      <label>Loans:</label>
         <span ng-hide="client.loanAccounts.length">(None)</span>
-        <a href="#/tab/clients/{{client.id}}/loan-apply"
+        <!-- a href="#/tab/clients/{{client.id}}/loan-apply"
             class="button button-positive rightBtn">
           Apply
-        </a>
+        </a -->
         <br />
         <table style="width:95%">
         <tbody>
