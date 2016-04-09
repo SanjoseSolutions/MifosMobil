@@ -41,14 +41,8 @@
       </ion-item>
 
       <ion-item class="item item-divider">
-        <label>Cooperative Licence Registration Number</label>
-        <sup><i class="icon ion-asterisk assertive"></i></sup> :
-      </ion-item>
-      <ion-item class="item item-input-inset">
-        <label class="item-input-wrapper">
-           <input type="text" name="coopLicRegNo" placeholder="Enter the Registration Number"
-              ng-model="data.SACCO_Fields['License Registration No']" size="40" ng-minlength="3" autofocus required />
-        </label>
+        <label>Office Details</label>
+        <!-- sup><i class="icon ion-asterisk assertive"></i></sup -->
       </ion-item>
 
       <ion-list-item class="item item-input-inset">
@@ -57,9 +51,36 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-           <input type="text" name="name" placeholder="Enter the SACCO's Name" ng-model="sacco.name" required ng-minlength="3">
+          <input type="text" name="name" placeholder="Enter the SACCO's Name"
+              ng-model="sacco.name" ng-minlength="3" size="25" autofocus required />
         </label>
       </ion-list-item>
+
+      <!-- ion-item class="item item-input-inset">
+        <span class="input-input item-stacked-label">
+          Cooperative Licence Registration Number
+        </span>
+        <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        <br />
+        <label class="item-input-wrapper">
+           <input type="text" name="coopLicRegNo" placeholder="Enter the Registration Number"
+              ng-model="data.SACCO_Fields['License Registration No']" size="40" ng-minlength="3" required />
+        </label>
+      </ion-item -->
+
+        <!-- label class="item item-input item-input-wrapper item-stacked-label"-->
+      <ion-item class="item item-input item-stacked-label">
+        <label class="item item-input-wrapper item-stacked-label">
+          <span class="input-label">
+            Cooperative Licence Registration Number
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>          
+          <input type="text" name="coopLicRegNo" placeholder="Enter the Licence Number" size="40" ng-minlength="3"
+              ng-model="data.SACCO_Fields['License Registration No']" required />
+        </label>
+      </ion-item>
+
+
 
       <label class="item item-input item-select">
         <div class="input-label">
@@ -92,7 +113,7 @@
 
       <div class="item item-input-inset">
         <label class="item item-input item-stacked-label">
-          <span class="input-label">Location</span>
+          <span class="input-label centered">Geo-Location</span>
           <div class="row">
             <div class="col col-50">
               <label class="item-input-wrapper">
@@ -109,7 +130,7 @@
       </div> <!-- End of item-input-inset -->
 
       <div class="item item-divider"> <!-- input-inset -->
-        <span class="input-label">Office Full Address:</span>
+        <label>Office Full Address</label>
       </div>
 
       <div class="item item-input-inset">
