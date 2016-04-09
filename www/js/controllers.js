@@ -451,6 +451,20 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log(err);
     } );
   };
+  $scope.approveClient = function(client) {
+    var id = client.id;
+    var dt = new Date();
+    Clients.activate(id, dt, function(response) {
+      logger.log("Succesfully approved client");
+    } );
+  };
+  $scope.rejectClient = function(client) {
+    var id = client.id;
+    var dt = new Date();
+    Clients.reject(id, dt, function(response) {
+      logger.log("Client #" + id + " rejected");
+    } );
+  };
   $scope.$on('$ionicView.enter', function(e) {
     Customers.get_full(clientId, function(client) {
       client["NumShares"] = parseInt(Math.random()*10);

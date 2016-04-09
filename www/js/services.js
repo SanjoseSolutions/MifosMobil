@@ -948,7 +948,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Clients', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
+.factory('Clients', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, DateUtil) {
   var clients = null;
 
   return {
@@ -1045,6 +1045,24 @@ angular.module('starter.services', ['ngCordova'] )
       if (clients) {
         fn_client(client);
       }
+    },
+    reject: function(id, dt, fn_callback) {
+      authHttp.post(baseUrl + '/clients/' + id, {
+        locale: "en",
+        dateFormat: "yyyy-MM-dd",
+        rejectionDate: DateUtil.localDate(dt)
+      } ).then(function(response) {
+        fn_callback(response.data);
+      } );
+    },
+    activate: function(id, dt, fn_callback) {
+      authHttp.post(baseUrl + '/clients/' + id, {
+        locale: "en",
+        dateFormat: "yyyy-MM-dd",
+        activationDate: DateUtil.localDate(dt)
+      } ).then(function(response) {
+        fn_callback(response.data);
+      } );
     },
     save: function(client, fn_client, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/clients', client, {

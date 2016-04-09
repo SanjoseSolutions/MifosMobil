@@ -145,6 +145,17 @@
           <i class="ion-edit"> Edit Info</i>
         </a>
       </ion-item>
+      <ion-item ng-hide="client.active">
+        <button-bar>
+          <button class="button button-assertive" ng-click="rejectClient(client)">
+            Reject
+            <i class="icon ion-close-round"></i>
+          </button>
+          <button class="button button-positive" ng-click="approveClient(client)">
+            Approve
+            <i class="icon ion-android-checkmark-circle"></i>
+          </button>
+        </button-bar>
     </div>
 
     <ion-item class="item-divider">
