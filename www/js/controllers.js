@@ -323,6 +323,21 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('SACCOListCtrl', function($scope, SACCO, logger) {
   logger.log("SACCOListCtrl called");
+  var s_clients = {};
+  clients.map(function(c) {
+    var oid = c.officeId;
+    s_clients[oid] = s_clients[oid] || 0;
+    ++s_clients[oid];
+  } );
+  var offices = Cache.getObject('h_offices');
+  if (offices) {
+    offices.map(function(o) {
+      if (s_clients[o.id]) {
+        o['members'] = s_clients[oid];
+      }
+    } );
+    Cache.setObject('h_offices', offices);
+  }
   SACCO.query(function(saccos) {
     logger.log("Got SACCOs: " + saccos.length);
     $scope.data = { "saccos": saccos };
@@ -1104,6 +1119,9 @@ angular.module('starter.controllers', ['ngCordova'])
   var session = null;
 
   $scope.$on('$ionicView.enter', function(e) {
+    if (!authHttp.getAuthHeader()) {
+      $rootScope.$broadcast('sessionExpired');
+    }
     $scope.num_inactiveClients = 0;
     var role = Session.role;
     switch (role) {

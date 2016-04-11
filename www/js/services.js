@@ -719,7 +719,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', function(Office, Cache, DataTables, DateUtil, HashUtil, logger) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp',
+    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp) {
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -815,7 +816,7 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
   };
-} )
+} ] )
 
 .factory('Staff', function(authHttp, baseUrl, Cache, logger) {
   var staff = [];
