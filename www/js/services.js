@@ -948,7 +948,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Clients', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, DateUtil) {
+.factory('Clients', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'HashUtil', 'logger', 'Codes', 'DateUtil',
+    function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Codes, DateUtil) {
   var clients = null;
 
   return {
@@ -969,6 +970,9 @@ angular.module('starter.services', ['ngCordova'] )
         },
         "clientClassificationId": function(client) {
           return client.clientClassification.id;
+        },
+        "clientTypeId": function(client) {
+          return client.clientType.id;
         }
       }
     },
@@ -1125,6 +1129,24 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
+    get_codevalues: function(fn_codes) {
+      var codes = {};
+      Codes.getValues("Gender", function(gcodes) {
+        codes.genders = gcodes;
+      } );
+      Codes.getValues("ClientClassification", function(ocodes) {
+        codes.occupations = ocodes;
+      } );
+      Codes.getValues("Relationship", function(rcodes) {
+        logger.log("Relationship codes count:"+rcodes.length);
+        codes.Relationships = rcodes;
+      } );
+      Codes.getValues("ClientType", function(tcodes) {
+        logger.log("ClientType codes count:"+tcodes.length);
+        codes.ClientTypes = tcodes;
+      } );
+      fn_codes(codes);
+    },
     get_accounts: function(id, fn_accts) {
       authHttp.get(baseUrl + '/clients/' + id + '/accounts')
         .then(function(response) {
@@ -1134,7 +1156,7 @@ angular.module('starter.services', ['ngCordova'] )
         } );
     }
   };
-} )
+} ] )
 
 .factory('Customers', function(authHttp, baseUrl, Clients, DataTables, logger) {
   return {
@@ -1391,7 +1413,8 @@ angular.module('starter.services', ['ngCordova'] )
   var codeNames = {
     "Gender": 4,
     "ClientClassification": 17,
-    "Relationship": 26
+    "Relationship": 26,
+    "ClientType": 16
   };
 
   var codesObj = {

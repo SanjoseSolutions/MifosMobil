@@ -896,33 +896,17 @@ angular.module('starter.controllers', ['ngCordova'])
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
-  $scope.codes = {};
   $scope.$on('$ionicView.enter', function(e) {
-    Codes.getValues("Gender", function(gcodes) {
-      logger.log("Got gender codes: " + JSON.stringify(gcodes))
-      $scope.codes.genders = gcodes;
-    } );
-    Codes.getValues("ClientClassification", function(ocodes) {
-      logger.log("Got occupation codes: " + JSON.stringify(ocodes))
-      $scope.codes.occupations = ocodes;
-    } );
-    Codes.getValues("Relationship", function(rcodes) {
-      logger.log("Relationship codes count:"+rcodes.length);
-      $scope.codes.Relationships = rcodes;
+    Clients.get_codevalues(function(codes) {
+      $scope.codes = codes;
+      SACCO.query(function(saccos) {
+        $scope.codes.offices = saccos;
+      }, function(sus) {} );
     } );
   } );
   Customers.get_full(clientId, function(client) {
     FormHelper.prepareForm(Clients, client);
     $scope.client = client;
-    SACCO.query(function(saccos) {
-      if (!saccos.length) {
-        saccos = [ {
-          id: client.officeId,
-          name: client.officeName
-        } ];
-      }
-      $scope.codes.offices = saccos;
-    }, function(sus) {} );
   } );
 
   // x
@@ -1094,16 +1078,8 @@ angular.module('starter.controllers', ['ngCordova'])
       };
     } );
   };
-  $scope.codes = {};
-  Codes.getValues("Gender", function(gcodes) {
-    $scope.codes.genders = gcodes;
-  } );
-  Codes.getValues("ClientClassification", function(ocodes) {
-    $scope.codes.occupations = ocodes;
-  } );
-  Codes.getValues("Relationship", function(rcodes) {
-    logger.log("Relationship codes count:"+rcodes.length);
-    $scope.codes.Relationships = rcodes;
+  Clients.get_codevalues(function(codes) {
+    $scope.codes = codes;
   } );
   SACCO.query(function(saccos) {
     $scope.codes.offices = saccos;
