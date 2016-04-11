@@ -102,10 +102,11 @@ select {
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
-            <select name="ClientType" ng-model="client.client.ClientType" required>
+            <select ng-model="client.ClientType" ng-options="ct.id as ct.name for ct in codes.ClientType"> 
+              <!-- name="ClientType" ng-model="client.client.ClientType" required>
               <option value="-1" selected>Select Client Type</option>
               <option value="1">Member</option>
-              <option value="2">Non-Member</option>
+              <option value="2">Non-Member</option -->
             </select>
           </label>
         </div>
