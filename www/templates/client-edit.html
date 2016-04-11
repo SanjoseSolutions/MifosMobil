@@ -86,7 +86,7 @@ select {
                 ng-model="client.Client_Fields.Email">
           </label>
         </div>
-        <div class="item item-input-inset">
+        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
           <span class="input-label">
             Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
@@ -96,7 +96,7 @@ select {
             </select>
           </label>
         </div>
-        <div class="item item-input-inset">
+        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
           <span class="input-label">
             Membership
             <sup><i class="icon ion-asterisk assertive"></i></sup> :

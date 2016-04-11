@@ -362,6 +362,14 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
+.controller('InactiveClientsCtrl', [ '$scope', 'Clients', function($scope, Clients) {
+  $scope.$on('$ionicView.enter', function(e) {
+    Clients.query_inactive(function(iClients) {
+      $scope.clients = iClients.pageItems;
+    } );
+  } );
+} ] )
+
 .controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts, logger) {
 
   $scope.$on('$ionicView.enter', function(e) {
@@ -443,10 +451,33 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log(err);
     } );
   };
+  $scope.approveClient = function(client) {
+    var id = client.id;
+    logger.log("Called Client approve for #" + id);
+    var dt = new Date();
+    Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
+      $scope.client.pending = false;
+      logger.log("Succesfully approved client");
+    } );
+  };
+  $scope.rejectClient = function(client) {
+    var id = client.id;
+    var dt = new Date();
+    var reasonId = 38; // Unspecified
+    var fields = {
+      'rejectionDate': DateUtil.toISODateString(dt),
+      'rejectionReasonId': reasonId
+    };
+    Clients.reject(id, fields, function(response) {
+      $scope.client.pending = false;
+      logger.log("Client #" + id + " rejected");
+    } );
+  };
   $scope.$on('$ionicView.enter', function(e) {
     Customers.get_full(clientId, function(client) {
-      client["NumShares"] = parseInt(Math.random()*10);
       $scope.client = client;
+      logger.log('Client status: ' + JSON.stringify(client['status']));
+      $scope.client.pending = (client['status']['value'] == 'Pending');
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
       var gname = client.gender.name || "male";
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
@@ -984,7 +1015,7 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil,
-    HashUtil, DataTables, Codes, SACCO, FormHelper, logger) {
+    HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1001,7 +1032,13 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client, false);
-    cfields["active"] = true;
+    if ($scope.rolestat.isStaff) {
+      cfields["active"] = false;
+      var auth = Cache.getObject('auth');
+      cfields["officeId"] = auth.officeId;
+    } else {
+      cfields["active"] = true;
+    }
     var cdts = Clients.dataTables();
     Clients.save(cfields, function(new_client) {
       logger.log("Client created:" + JSON.stringify(new_client));
@@ -1058,13 +1095,36 @@ angular.module('starter.controllers', ['ngCordova'])
   }, function(sus) {} );
 } )
 
-.controller('DashboardCtrl', function($rootScope, $scope, authHttp,
+.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
+    'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
+    '$ionicPopup', 'logger', 'Clients', function($rootScope, $scope, authHttp,
     baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-    $ionicPopup, logger) {
+    $ionicPopup, logger, Clients) {
 
   var session = null;
 
   $scope.$on('$ionicView.enter', function(e) {
+    $scope.num_inactiveClients = 0;
+    var role = Session.role;
+    switch (role) {
+      case "Admin":
+        SACCO.query_full(function(data) {
+          logger.log("Fetched SACCOs");
+          $scope.num_saccos = data.length;
+        } );
+      case "Management":
+        Staff.query(function(staff) {
+          $scope.num_staff = staff.length;
+        } );
+      case "Staff":
+        Customers.query_full(function(clients) {
+          logger.log("Fetched " + clients.length + "Clients");
+          $scope.num_clients = clients.length;
+        } );
+        Clients.query_inactive(function(iClients) {
+          $scope.num_inactiveClients = iClients.totalFilteredRecords;
+        } );
+    }
     if (null == session) {
       logger.log("Loading session..");
       session = Session.get();
@@ -1076,23 +1136,9 @@ angular.module('starter.controllers', ['ngCordova'])
           '<p><center><h4>Welcome <strong>' + session.username() + '</strong></h4></center></p>',
         scope: $scope
       } );
-      var role = session.role;
-      switch (role) {
-        case "Admin":
-          SACCO.query_full(function(data) {
-            $scope.num_saccos = data.length;
-          } );
-        case "Management":
-          Staff.query(function(staff) {
-            $scope.num_staff = staff.length;
-          } );
-        case "Staff":
-          Customers.query_full(function(clients) {
-            $scope.num_clients = clients.length;
-          } );
-      }
     }
   } );
+
   $scope.ConfirmLogOut = function() {
     var confirmPopup = $ionicPopup.confirm({
       title: 'Confirm Logout',
@@ -1109,5 +1155,5 @@ angular.module('starter.controllers', ['ngCordova'])
       }
     });
   };
-} )
+} ] )
 ;
