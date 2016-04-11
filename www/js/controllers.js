@@ -453,21 +453,26 @@ angular.module('starter.controllers', ['ngCordova'])
   };
   $scope.approveClient = function(client) {
     var id = client.id;
+    logger.log("Called Client approve for #" + id);
     var dt = new Date();
-    Clients.activate(id, dt, function(response) {
+    Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
       logger.log("Succesfully approved client");
     } );
   };
   $scope.rejectClient = function(client) {
     var id = client.id;
     var dt = new Date();
-    Clients.reject(id, dt, function(response) {
+    var reasonId = 38; // Unspecified
+    var fields = {
+      'rejectionDate': DateUtil.toISODateString(dt),
+      'rejectionReasonId': reasonId
+    };
+    Clients.reject(id, fields, function(response) {
       logger.log("Client #" + id + " rejected");
     } );
   };
   $scope.$on('$ionicView.enter', function(e) {
     Customers.get_full(clientId, function(client) {
-      client["NumShares"] = parseInt(Math.random()*10);
       $scope.client = client;
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
       var gname = client.gender.name || "male";

@@ -594,6 +594,9 @@ angular.module('starter.services', ['ngCordova'] )
         return dt.toLocaleDateString();
       }
       return a_date;
+    },
+    toISODateString: function(dt) {
+      return dt.toISOString().substr(0,10);
     }
   };
 } )
@@ -1013,10 +1016,17 @@ angular.module('starter.services', ['ngCordova'] )
     },
     query_inactive: function(fn_iClients) {
       logger.log("Going to call inactive clients");
+      var iClients = Cache.getObject('h_iClients') || {};
       authHttp.get(baseUrl + '/clients?sqlSearch=activation_date IS NULL')
       .then(function(response) {
         var data = response.data;
         logger.log("Got response:"+JSON.stringify(data));
+        if (data instanceof Array) {
+          for(var i = 0; i < data.length; ++i) {
+            iClients[data[i].id] = data[i];
+          }
+          Cache.setObject('h_iClients', iClients);
+        }
         fn_iClients(data);
       } );
     },
@@ -1050,21 +1060,20 @@ angular.module('starter.services', ['ngCordova'] )
         fn_client(client);
       }
     },
-    reject: function(id, dt, fn_callback) {
-      authHttp.post(baseUrl + '/clients/' + id, {
-        locale: "en",
-        dateFormat: "yyyy-MM-dd",
-        rejectionDate: DateUtil.localDate(dt)
-      } ).then(function(response) {
-        fn_callback(response.data);
-      } );
+    reject: function(id, fields, fn_callback) {
+      fields['locale'] = 'en';
+      fields['dateFormat'] = "yyyy-MM-dd";
+      authHttp.post(baseUrl + '/clients/' + id + '?command=reject',
+        fields, function(response) {
+          fn_callback(response.data);
+        } );
     },
     activate: function(id, dt, fn_callback) {
-      authHttp.post(baseUrl + '/clients/' + id, {
+      authHttp.post(baseUrl + '/clients/' + id + '?command=activate', {
         locale: "en",
         dateFormat: "yyyy-MM-dd",
-        activationDate: DateUtil.localDate(dt)
-      } ).then(function(response) {
+        activationDate: dt
+      }, function(response) {
         fn_callback(response.data);
       } );
     },
