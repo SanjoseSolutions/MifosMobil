@@ -143,14 +143,13 @@
           <i class="icon ion-edit"></i>
           Edit
         </button>
-
       </ion-item>
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
           <i class="ion-edit"> Edit Info</i>
         </a>
       </ion-item>
-      <ion-item ng-hide="client.active">
+      <ion-item ng-show="client.pending">
         <button-bar>
           <button class="button button-assertive" ng-click="rejectClient(client)">
             Reject

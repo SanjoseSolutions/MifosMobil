@@ -1017,7 +1017,7 @@ angular.module('starter.services', ['ngCordova'] )
     query_inactive: function(fn_iClients) {
       logger.log("Going to call inactive clients");
       var iClients = Cache.getObject('h_iClients') || {};
-      authHttp.get(baseUrl + '/clients?sqlSearch=activation_date IS NULL')
+      authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
       .then(function(response) {
         var data = response.data;
         logger.log("Got response:"+JSON.stringify(data));
@@ -1038,8 +1038,10 @@ angular.module('starter.services', ['ngCordova'] )
       if (clients) {
         logger.log("Clients.get found cached " + typeof(clients));
         var client = clients[id];
-        logger.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
-        fn_client(client);
+        if (client) {
+          logger.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
+          fn_client(client);
+        }
         return;
       }
       this.fetch(id, fn_client);
@@ -1171,33 +1173,31 @@ angular.module('starter.services', ['ngCordova'] )
   return {
     get_full: function(id, fn_customer) {
       Clients.get(id, function(client) {
+        fn_customer(client);
         var dts = Clients.dataTables();
-        for(var i = 0; i < dts.length; ++i) {
-          var dt = dts[i];
+        angular.forEach(dts, function(dt) {
           logger.log("Client DataTable:" + dt + " for #" + id);
           DataTables.get_one(dt, id, function(fields, dt) {
             client[dt] = DataTables.decode(fields);
             logger.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
           } );
-        }
-        fn_customer(client);
+        } );
       } );
     },
     query_full: function(fn_customers) {
       Clients.query(function(clients) {
+        fn_customers(clients);
         for(var i = 0; i < clients.length; ++i) {
           var client = clients[i];
           var id = client.id;
           var dts = Clients.dataTables();
-          for(var j = 0; j < dts.length; ++j) {
-            var dt = dts[j];
+          angular.forEach(dts, function(dt) {
             DataTables.get_one(dt, id, function(fields, dt) {
               client[dt] = DataTables.decode(fields);
             } );
-          }
+          } );
         }
-        fn_customers(clients);
       } );
     }
   };

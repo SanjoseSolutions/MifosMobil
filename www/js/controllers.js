@@ -456,6 +456,7 @@ angular.module('starter.controllers', ['ngCordova'])
     logger.log("Called Client approve for #" + id);
     var dt = new Date();
     Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
+      $scope.client.pending = false;
       logger.log("Succesfully approved client");
     } );
   };
@@ -468,12 +469,15 @@ angular.module('starter.controllers', ['ngCordova'])
       'rejectionReasonId': reasonId
     };
     Clients.reject(id, fields, function(response) {
+      $scope.client.pending = false;
       logger.log("Client #" + id + " rejected");
     } );
   };
   $scope.$on('$ionicView.enter', function(e) {
     Customers.get_full(clientId, function(client) {
       $scope.client = client;
+      logger.log('Client status: ' + JSON.stringify(client['status']));
+      $scope.client.pending = (client['status']['value'] == 'Pending');
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
       var gname = client.gender.name || "male";
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
@@ -1114,7 +1118,7 @@ angular.module('starter.controllers', ['ngCordova'])
         } );
       case "Staff":
         Customers.query_full(function(clients) {
-          logger.log("Fetched Clients");
+          logger.log("Fetched " + clients.length + "Clients");
           $scope.num_clients = clients.length;
         } );
         Clients.query_inactive(function(iClients) {
