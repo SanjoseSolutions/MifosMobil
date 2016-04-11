@@ -114,6 +114,31 @@
             </select>
           </label>
         </div>
+
+        <!-- Family Member Size -->
+        <div class="item item-divider"> 
+          <!-- span class="input-label">Family Size </span -->
+          <label>Family Size &amp; Details </label>
+        </div>
+
+        <div class="item row">
+          <div class="col">
+            <label class="item-input item-select">
+              <div class="input-label">Males:</div>
+              <select ng-model="client.Client_Fields['Number of males']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+          <div class="col">
+            <label class="item-input item-select">
+              <div class="input-label">Females:</div>
+              <select ng-model="client.Client_Fields['Number of females']"
+                ng-options="i as i for i in [0,1,2,3]">
+              </select>
+            </label>
+          </div>
+        </div>
         
         <div class="item item-input-inset">
           <span class="input-label">Fathers Name:</span>
@@ -181,29 +206,6 @@
           <label class="item-input-wrapper">
             <input type="text" name="UniquePlaceName" placeholder="Enter Unique Place's Name" ng-model="client.Client_Fields.UniquePlaceName">
           </label>
-        </div>
-        <!-- Family Member Size -->
-        <div class="item item-divider"> 
-          <span class="input-label">Family Size </span>
-        </div>
-
-        <div class="item row">
-          <div class="col">
-            <label class="item-input item-select">
-              <div class="input-label">Males:</div>
-              <select ng-model="client.Client_Fields['Number of males']"
-                ng-options="i as i for i in [0,1,2,3]">
-              </select>
-            </label>
-          </div>
-          <div class="col">
-            <label class="item-input item-select">
-              <div class="input-label">Females:</div>
-              <select ng-model="client.Client_Fields['Number of females']"
-                ng-options="i as i for i in [0,1,2,3]">
-              </select>
-            </label>
-          </div>
         </div>
 
       </div>
