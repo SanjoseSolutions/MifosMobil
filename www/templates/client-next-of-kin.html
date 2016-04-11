@@ -42,7 +42,7 @@
         <div class="briefInfo">
           <label>Gender :</label> {{client.gender.name}}
           <br /><label>Marital Status :</label>
-          <br />{{client.maritalStatus}}
+          <br />{{client.maritalStatus || "Unspecified"}}
           <br /><label>D.O.B</label>: {{client.dob}}
           <br />
           <!--label title="Mobile">
