@@ -22,7 +22,15 @@
     "com.ionic.keyboard",
     "cordova-plugin-camera",
     "org.apache.cordova.statusbar",
-    "cordova-plugin-network-information"
+    "cordova-plugin-network-information",
+    {
+      "locator": "https://github.com/katzer/cordova-plugin-printer.git",
+      "id": "de.appplant.cordova.plugin.printer"
+    },
+    {
+      "locator": "http://github.com/don/cordova-filechooser.git",
+      "id": "com.megster.cordova.FileChooser"
+    }
   ],
   "cordovaPlatforms": [
     "android"
