@@ -103,13 +103,25 @@ td {
             <td>
               <div> Your Clients: </div>
             </td>
-            <td>{{num_clients}} </td>
+            <td>{{num_clients - num_inactiveClients}} </td>
             <td> 
               <a href="#/tab/clients" class="button button-small noVertPadd">
                 View
                 <span class="ion-ios-people-outline"> </span>
               </a>
               <!--span>{{nextClient}}</span-->
+            </td>
+          </tr>
+          <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && num_inactiveClients">
+            <td>
+              <div> Pending Approval: </div>
+            </td>
+            <td> {{num_inactiveClients}} </td>
+            <td> 
+              <a href="#/tab/clients/inactive" class="button button-small noVertPadd">
+                Review
+                <span class="icon ion-infromation-circled"> </span>
+              </a>
             </td>
           </tr>
           <!-- FOR SAVINGS, LOANS, SHARES, etc
