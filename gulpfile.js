@@ -6,6 +6,7 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var karma = require('karma').Server;
 
 var paths = {
   sass: ['./scss/**/*.scss']
@@ -49,3 +50,12 @@ gulp.task('git-check', function(done) {
   }
   done();
 });
+
+gulp.task('test', function(done) {
+  karma.start( {
+    configFile: __dirname + '/tests/mobil.conf.js',
+    singleRun: true
+  }, function() {
+    done();
+  } );
+} );
