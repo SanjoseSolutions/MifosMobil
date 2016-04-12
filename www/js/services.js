@@ -1055,15 +1055,7 @@ angular.module('starter.services', ['ngCordova'] )
       var iClients = Cache.getObject('h_iClients') || {};
       authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
       .then(function(response) {
-        var data = response.data;
-        logger.log("Got response:"+JSON.stringify(data));
-        if (data instanceof Array) {
-          for(var i = 0; i < data.length; ++i) {
-            iClients[data[i].id] = data[i];
-          }
-          Cache.setObject('h_iClients', iClients);
-        }
-        fn_iClients(data);
+        fn_iClients(response.data);
       } );
     },
     remove: function(id) {
