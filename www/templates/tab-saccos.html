@@ -47,8 +47,13 @@ span.sacco-icon {
       <ion-item class="item-remove-animate item-avatar sacco-item"
             ng-repeat="sacco in data.saccos | filter : searchQuery" type="item-text-wrap"
             href="#/tab/saccos/{{sacco.id}}">        
-          <span class="sacco-icon ion-briefcase"></span>
-          <h2 class="sacco-icon">#{{sacco.id}}: {{sacco.name}}</h2>
+          <div>
+            <span class="sacco-icon ion-briefcase"></span>
+            <h2 class="sacco-icon">#{{sacco.id}}: {{sacco.name}}</h2>
+          </div>
+          <div>
+            <div style="margin-top:10px" class="icon ion-ios-people"></div>: {{sacco.members}}
+          </div>
           <ion-option-button class="button-assertive" ng-click="remove(sacco)">
             Delete
           </ion-option-button>

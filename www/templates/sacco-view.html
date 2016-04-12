@@ -27,8 +27,11 @@
         <label>SACCO's Name:</label> {{data.name || "Not set"}}
       </ion-item>
       <ion-item>
-        <label>Licence Number </label> :
+        <label title="Cooperative License Reg. No.">Licence Number </label> :
         {{data.SACCO_Fields["License Registration No"] || "Not set"}}
+      </ion-item>
+      <ion-item>
+        <label>Member Count: </label>{{data.members}}
       </ion-item>
       <ion-item>
         <label>Parent Office:</label> {{data.parentName}}
@@ -39,10 +42,20 @@
       <ion-item>
         <label>Date of Joining Union:</label> {{data.SACCO_Fields.joiningDate}}
       </ion-item>
+      <ion-item class="item item-divider">
+        <label style="font-size:18px;">Office Geo Location</label>
+      </ion-item>
       <ion-item>
-        <label style="font-size:18px;">Location</label> <br />
-        <label>Latitude:</label> {{ data.SACCO_Fields.Latitude }}
-        <label>Longitude :</label> {{ data.SACCO_Fields.Longitude }}
+        <div class="row">
+          <div class="col col-50">
+            <label>Latitude  :</label>
+            {{ data.SACCO_Fields.Latitude }}
+          </div>
+          <div class="col col-50">
+            <label>Longitude :</label>
+            {{ data.SACCO_Fields.Longitude }}
+          </div>
+        </div>
       </ion-item>
       <ion-item class="item item-divider">
         <label>Office Full Address </label>{{data.SACCO_Fields.Address}}

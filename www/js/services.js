@@ -54,10 +54,10 @@ angular.module('starter.services', ['ngCordova'] )
   var index = {};
   var lastSync = null;
   return {
-    'get': function(key) {
+    get: function(key) {
       return localStorage.getItem(key);
     },
-    'set': function(key, val) {
+    set: function(key, val) {
       localStorage.setItem(key, val);
       index[key] = 1;
     },
@@ -73,6 +73,20 @@ angular.module('starter.services', ['ngCordova'] )
     'remove': function(key) {
       localStorage.removeItem(key);
       delete index[key];
+    },
+    'clear': function() {
+      var new_cache = {};
+      var pkeys = Object.keys(index).filter(function(e) {
+        return e.match('^passwd.');
+      } );
+      angular.forEach(pkeys, function(k) {
+        new_cache[k] = this.get(k);
+      } );
+      localStorage.clear();
+      for(k in new_cache) {
+        this.set(k, new_cache[k]);
+        index[k] = 1;
+      }
     },
     'clearAll': function() {
       logger.log("Called Cache.clearAll()");
@@ -401,7 +415,7 @@ angular.module('starter.services', ['ngCordova'] )
     } ).then(function(response) {
 
       logger.log("Succesful login :-D");
-      Cache.clearAll();
+      Cache.clear();
 
       var data = response.data;
       data.password = auth.password;
@@ -477,12 +491,13 @@ angular.module('starter.services', ['ngCordova'] )
           logger.log("DataTables.decode date: " + JSON.stringify(v));
           ret[f] = DateUtil.localDate(v);
         } else {
-          var m = f.match(/(.*)_cd_.*/);
-          if (m) {
+          var m = f.match(/(.*)_cd_(.*)/);
+          if (m && v) {
             var codeNm = m[1];
+            var codeKey = m[2] || codeNm;
             logger.log("DataTables.decode code " + codeNm + " = " + JSON.stringify(v));
             Codes.getCodeValue(codeNm, v, function(cv) {
-              ret[codeNm] = cv;
+              ret[codeKey] = cv;
             } );
           } else {
             ret[f] = v;
@@ -701,7 +716,7 @@ angular.module('starter.services', ['ngCordova'] )
         fn_office(offices[id]);
         return;
       }
-      this.fetch(id, fn_office);
+      fetch_client(id, fn_office);
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
@@ -719,7 +734,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', function(Office, Cache, DataTables, DateUtil, HashUtil, logger) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp', 'baseUrl',
+    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp, baseUrl) {
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -815,7 +831,7 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
   };
-} )
+} ] )
 
 .factory('Staff', function(authHttp, baseUrl, Cache, logger) {
   var staff = [];
@@ -955,6 +971,23 @@ angular.module('starter.services', ['ngCordova'] )
     function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Codes, DateUtil) {
   var clients = null;
 
+  var fetch_client = function(id, fn_client) {
+      authHttp.get(baseUrl + '/clients/' + id)
+      .then(function(response) {
+        var client = response.data;
+        clients = Cache.getObject('h_clients');
+        clients[id] = client;
+        Cache.setObject('h_clients', clients);
+        logger.log("Fetched client #" + id + " and updated cache");
+        fn_client(client);
+      }, function(response) {
+        logger.log("Clients.fetch(" + id + ")failed ");
+      } );
+      if (clients) {
+        fn_client(client);
+      }
+    };
+
   return {
     dateFields: function() {
       return ["dateOfBirth", "activationDate"];
@@ -976,6 +1009,9 @@ angular.module('starter.services', ['ngCordova'] )
         },
         "clientTypeId": function(client) {
           return client.clientType.id;
+        },
+        "maritalStatusId": function(client) {
+          return client.maritalStatus.id;
         }
       }
     },
@@ -1019,15 +1055,7 @@ angular.module('starter.services', ['ngCordova'] )
       var iClients = Cache.getObject('h_iClients') || {};
       authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
       .then(function(response) {
-        var data = response.data;
-        logger.log("Got response:"+JSON.stringify(data));
-        if (data instanceof Array) {
-          for(var i = 0; i < data.length; ++i) {
-            iClients[data[i].id] = data[i];
-          }
-          Cache.setObject('h_iClients', iClients);
-        }
-        fn_iClients(data);
+        fn_iClients(response.data);
       } );
     },
     remove: function(id) {
@@ -1046,22 +1074,7 @@ angular.module('starter.services', ['ngCordova'] )
       }
       this.fetch(id, fn_client);
     },
-    fetch: function(id, fn_client) {
-      authHttp.get(baseUrl + '/clients/' + id)
-      .then(function(response) {
-        var client = response.data;
-        clients = Cache.getObject('h_clients');
-        clients[id] = client;
-        Cache.setObject('h_clients', clients);
-        logger.log("Fetched client #" + id + " and updated cache");
-        fn_client(client);
-      }, function(response) {
-        logger.log("Clients.fetch(" + id + ")failed ");
-      } );
-      if (clients) {
-        fn_client(client);
-      }
-    },
+    fetch: fetch_client,
     reject: function(id, fields, fn_callback) {
       fields['locale'] = 'en';
       fields['dateFormat'] = "yyyy-MM-dd";
@@ -1096,7 +1109,7 @@ angular.module('starter.services', ['ngCordova'] )
           logger.log("Created client resp: "+JSON.stringify(response.data));
           var data = response.data;
           var id = data.resourceId;
-          this.fetch(id, function(new_client) {
+          fetch_client(id, function(new_client) {
             clients[id] = new_client;
             Cache.setObject('h_clients', clients);
             fn_client(new_client);
@@ -1155,6 +1168,10 @@ angular.module('starter.services', ['ngCordova'] )
       Codes.getValues("ClientType", function(tcodes) {
         logger.log("ClientType codes count:"+tcodes.length);
         codes.ClientTypes = tcodes;
+      } );
+      Codes.getValues("MaritalStatus", function(mcodes) {
+        logger.log("MaritalStatus codes count:"+mcodes.length);
+        codes.MaritalStatus = mcodes;
       } );
       fn_codes(codes);
     },
@@ -1423,7 +1440,8 @@ angular.module('starter.services', ['ngCordova'] )
     "Gender": 4,
     "ClientClassification": 17,
     "Relationship": 26,
-    "ClientType": 16
+    "ClientType": 16,
+    "MaritalStatus": 27
   };
 
   var codesObj = {
