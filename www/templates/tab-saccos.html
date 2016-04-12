@@ -31,7 +31,13 @@ span.sacco-icon {
 }
 </style>
 <ion-view view-title="SACCOs">
-  <ion-content>
+  <div class="bar bar-subheader bar-calm item-input-inset">
+    <label class="item-input-wrapper">
+      <i class="icon ion-search placeholder-icon"></i>
+      <input type="search" ng-model="searchQuery" placeholder="Search ..." />
+    </label>
+  </div>
+  <ion-content class="has-subheader">
     <ion-list>
       <ion-item class="item-divider"><span>SACCO List</span>
         <a href="#/tab/sacco-register" class="button icon ion-medkit"
@@ -39,7 +45,7 @@ span.sacco-icon {
         </a>
       </ion-item>
       <ion-item class="item-remove-animate item-avatar sacco-item"
-            ng-repeat="sacco in data.saccos" type="item-text-wrap"
+            ng-repeat="sacco in data.saccos | filter : searchQuery" type="item-text-wrap"
             href="#/tab/saccos/{{sacco.id}}">        
           <span class="sacco-icon ion-briefcase"></span>
           <h2 class="sacco-icon">#{{sacco.id}}: {{sacco.name}}</h2>
