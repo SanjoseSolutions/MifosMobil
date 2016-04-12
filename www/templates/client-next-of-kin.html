@@ -19,10 +19,6 @@
   The Friends service returns an array of friend data
 -->
 <style>
-.item, ion-item {
-/*	margin: 0px; 
-	padding: 2px 3px; */
-}
 .briefInfo {
   margin:0px 5px;
 }
@@ -45,33 +41,38 @@
         </p -->
         <div class="briefInfo">
           <label>Gender :</label> {{client.gender.name}}
+          <br /><label>Marital Status :</label>
+          <br />{{client.ClientFields["Marital Status"] || "Unspecified"}}
           <br /><label>D.O.B</label>: {{client.dob}}
           <br />
-          <label title="Mobile">
+          <!--label title="Mobile">
             Telephone
             <span class="icon ion-android-call"></span>
           </label>
-          : <strong>{{client.mobileNo || "9876543210"}}</strong>
+          : <strong>{{client.mobileNo || "9876543210"}}</strong -->
 
         </div>
       </div>
+      <ion-item class="centered">
+        <label title="Mobile">
+          Telephone
+          <span class="icon ion-android-call"></span>
+        </label>
+        : <strong>{{client.mobileNo || "9876543210"}}</strong>
+      </ion-item> 
       <ion-item class="item item-divider item-icon">
-        <!-- Email -->
-        <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
-        </span>
-        : <label>
-          {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }}
-          </label>
+        <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email"></span> :
+        <label> {{client.Client_Fields.Email || client.firstname + "@kmayra.org" }} </label>
       </ion-item>
-
     </div>
+
     <div class="list card">
       <ion-item class="item item-divider">
         <h3><label>Next of Kin Details</label></h3>
       </ion-item>
       <ion-item>
         <label>Full Name</label> :
-        {{client.Client_NextOfKin.Fullname || "Unspecified"}}
+        <strong>{{client.Client_NextOfKin.Fullname || "Unspecified"}}</strong>        
       </ion-item>
       <ion-item>
         <label>Gender </label> :

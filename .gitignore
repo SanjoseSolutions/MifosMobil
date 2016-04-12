@@ -8,4 +8,5 @@ Makefile
 node_modules/
 platforms/
 plugins/
-Updates.note 	# Local Notes
+# Local Notes
+Updates.note

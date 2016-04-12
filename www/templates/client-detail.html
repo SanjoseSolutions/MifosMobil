@@ -20,13 +20,14 @@
 -->
 <style>
 .client-photo {
-  height: 185px;
+  height: 195px;
   float: left;
 }
 .client-photo > img {
   margin: 2px;
 }
-.client-photo > center > a.ion-camera {
+.client-photo > center > a.ion-camera,
+.client-photo > center > a.ion-printer {
   font-size: 15px;
   padding: 2px 3px;
   border: 1px solid #889;
@@ -34,6 +35,15 @@
   margin-left: auto;
   margin-right: auto;
   color: #334;
+}
+.client-photo > center > a.ion-printer {
+  background-color: #fff;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
 }
 </style>
 
@@ -47,9 +57,9 @@
       <div class="client-photo">
         <img ng-src="{{client.face}}" style="width: 150px; height: 150px">
         <center>
-          <a ng-click="getPhoto()" class="ion-camera">
-           Take Photo </a>
-          <a ng-click="print()" class="ion-printer">
+          <a ng-click="getPhoto()" class="button button-small icon ion-camera">
+           Photo </a>
+          <a ng-click="print()" class="button button-small icon ion-printer">
            Print </a>
         </center>
       </div>
@@ -59,6 +69,10 @@
       	<ion-item>
 	        <label>Gender :</label>{{client.gender.name}}
 	      </ion-item>
+        <ion-item>
+          <label>Marital Status :</label>
+          <br /> {{client.ClientFields["Marital Status"] || "Not set"}}
+        </ion-item>
         <ion-item>
           <label>D.O.B</label>: {{client.dateOfBirth}}
         </ion-item>
@@ -103,9 +117,11 @@
       </ion-item>
       <!-- Family Member Size -->
       <ion-item class="item-divider"> 
-        <i class="icon icon-left ion-ios-people"></i>
-        Client's Family Size &amp; Details
-        <i class="icon icon-right ion-ios-people"></i>
+        <label>
+          <i class="icon icon-left ion-ios-people"></i>
+          Client's Family Size &amp; Details
+          <i class="icon icon-right ion-ios-people"></i>
+        </label>
       </ion-item>
       <ion-item>
         <div class="item row">
@@ -139,10 +155,10 @@
             class="button button-small button-positive button-outline button-icon icon-right ion-search">
           {{client.Client_NextOfKin.Fullname || "Unspecified"}}
         </a>
-        <button class="button button-small rightBtn">
+        <!-- button class="button button-small rightBtn">
           <i class="icon ion-edit"></i>
           Edit
-        </button>
+        </button -->
       </ion-item>
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
@@ -150,16 +166,16 @@
         </a>
       </ion-item>
       <ion-item ng-show="client.pending">
-        <button-bar>
-          <button class="button button-assertive" ng-click="rejectClient(client)">
+        <ion-button-bar>
+          <button class="button button-assertive left" ng-click="rejectClient(client)">
             Reject
             <i class="icon ion-close-round"></i>
           </button>
-          <button class="button button-positive" ng-click="approveClient(client)">
+          <button class="button button-positive right" ng-click="approveClient(client)">
             Approve
             <i class="icon ion-android-checkmark-circle"></i>
           </button>
-        </button-bar>
+        </ion-button-bar>
     </div>
 
     <ion-item class="item-divider">
