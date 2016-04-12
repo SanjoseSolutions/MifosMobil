@@ -3,7 +3,6 @@
 *.sw?
 www/js/shareholders.json
 Makefile
-*.json
 
 node_modules/
 platforms/
