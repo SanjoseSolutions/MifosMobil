@@ -424,25 +424,38 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
 
     Clients.query(function(clients) {
-      for(var i = 0; i < clients.length; ++i) {
-        if (Settings.showClientListFaces) {
-          ClientImages.getB64(clients[i].id, function(img_data) {
-            clients[i].face = img_data;
-          } );
-        } else {
-          var g = clients[i].gender;
-          var gname = g ? g.name : 'male';
-          var glname = gname ? gname.toLowerCase() : 'male';
-          clients[i].face = "img/placeholder-" + glname + ".jpg";
-        }
-      }
-      $scope.clients = clients;
+      process_data();
     } );
   } );
 
   $scope.remove = function(client) {
     Clients.remove(client);
   };
+
+  $scope.fetchNewClients = function() {
+    Clients.fetch_all(function(clients) {
+      process_data();
+      $scope.$broadcast('scroll.refreshComplete');
+    } );
+  };
+
+  function process_data() {
+    for(var i = 0; i < clients.length; ++i) {
+      if (Settings.showClientListFaces) {
+        ClientImages.getB64(clients[i].id, function(img_data) {
+          clients[i].face = img_data;
+        } );
+      } else {
+        var g = clients[i].gender;
+        var gname = g ? g.name : 'male';
+        var glname = gname ? gname.toLowerCase() : 'male';
+        clients[i].face = "img/placeholder-" + glname + ".jpg";
+      }
+    }
+    $scope.clients = clients;
+    return true;
+  }
+
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
