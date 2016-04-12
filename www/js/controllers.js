@@ -150,6 +150,7 @@ angular.module('starter.controllers', ['ngCordova'])
       //$scope.session.takeOnline();
       logger.log("Going back online.");
       authHttp.runCommands(function(n) {
+        if (n == 0) return;
         var msg = "Starting to execute " + n + " commands";
         logger.log(msg);
         var stPopup = $ionicPopup.alert({
@@ -217,11 +218,11 @@ angular.module('starter.controllers', ['ngCordova'])
     var fields = FormHelper.preSaveForm(SACCO_Fields, office[dtn], false);
     logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
     Office.save(ofields, function(new_office) {
+      var officeId = new_office.id;
       $scope.message = {
         "type": "info",
-        "text": "Successfully created SACCO #" + new_office.officeId
+        "text": "Successfully created SACCO #" + officeId
       };
-      var officeId = new_office.officeId;
       DataTables.save(dtn, officeId, fields, function(data) {
         logger.log("Saved datatables data: " + data);
       }, function(response) {
@@ -345,7 +346,7 @@ angular.module('starter.controllers', ['ngCordova'])
     }
     SACCO.query(function(saccos) {
       logger.log("Got SACCOs: " + saccos.length);
-      $scope.data = { "saccos": saccos };
+      $scope.data = { "saccos": saccos.reverse() };
     }, function(sunions) {
       logger.log("Got SACCO Unions: " + sunions.length);
     } );
