@@ -1032,26 +1032,27 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client, false);
-    if ($scope.rolestat.isStaff) {
+    var rstat = $scope.rolestat;
+    if (rstat.isManagement || rstat.isAdmin) {
+      cfields["active"] = true;
+    } else {
       cfields["active"] = false;
       var auth = Cache.getObject('auth');
       cfields["officeId"] = auth.officeId;
-    } else {
-      cfields["active"] = true;
     }
     var cdts = Clients.dataTables();
     Clients.save(cfields, function(new_client) {
       logger.log("Client created:" + JSON.stringify(new_client));
       $scope.message = {
         "type": "info",
-        "text": "Client created with id #" + new_client.clientId
+        "text": "Client created with id #" + new_client.id
       };
       angular.forEach(cdts, function(dt) {
         HashUtil.copy(client[dt], {
           'locale': 'en',
           'dateFormat': 'yyyy-MM-dd'
         } );
-        DataTables.save(dt, new_client.clientId, client[dt], function(data) {
+        DataTables.save(dt, new_client.id, client[dt], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
