@@ -60,6 +60,10 @@
 	        <label>Gender :</label>{{client.gender.name}}
 	      </ion-item>
         <ion-item>
+          <label>Marital Status :</label>
+          <br /> {{client.ClientFields["Marital Status"] || "Not set"}}
+        </ion-item>
+        <ion-item>
           <label>D.O.B</label>: {{client.dateOfBirth}}
         </ion-item>
         <ion-item>

@@ -68,6 +68,13 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">Marital Status :</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.maritalStatusId" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">Date of Birth:</span>
           <label class="item-input-wrapper">
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">

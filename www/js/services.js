@@ -976,6 +976,9 @@ angular.module('starter.services', ['ngCordova'] )
         },
         "clientTypeId": function(client) {
           return client.clientType.id;
+        },
+        "maritalStatusId": function(client) {
+          return client.maritalStatus.id;
         }
       }
     },
@@ -1155,6 +1158,10 @@ angular.module('starter.services', ['ngCordova'] )
       Codes.getValues("ClientType", function(tcodes) {
         logger.log("ClientType codes count:"+tcodes.length);
         codes.ClientTypes = tcodes;
+      } );
+      Codes.getValues("MaritalStatus", function(mcodes) {
+        logger.log("MaritalStatus codes count:"+mcodes.length);
+        codes.MaritalStatus = mcodes;
       } );
       fn_codes(codes);
     },
@@ -1423,7 +1430,8 @@ angular.module('starter.services', ['ngCordova'] )
     "Gender": 4,
     "ClientClassification": 17,
     "Relationship": 26,
-    "ClientType": 16
+    "ClientType": 16,
+    "MaritalStatus": 27
   };
 
   var codesObj = {
