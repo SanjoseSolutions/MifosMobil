@@ -16,11 +16,11 @@
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
+// 'mifosmobil' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-// 'starter.services' is found in services.js
-// 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova'])
+// 'mifosmobil.services' is found in services.js
+// 'mifosmobil.controllers' is found in controllers.js
+angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.services', 'mifosmobil.utilities', 'ngCordova'])
 /* below lines are used by camera app but seem to prevent login
 .config(function($compileProvider) {
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
