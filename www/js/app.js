@@ -26,7 +26,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 } )
 */
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope, $state, $log) { // , $rootScope, $state, $log
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -39,6 +39,20 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleDefault();
     }
   });
+  //
+  $rootScope.$on('$stateChangeSuccess', function () {
+    $log.log($state.current.name);
+    var tabs = angular.element(document.querySelector(".tabs-top"));
+    //Important!!!! Put the state name you want this script to run on.  
+    //change 'tab.chats' to state you want run on
+    if ($state.current.name == "tab.sacco-list") {
+        tabs.addClass('subheader');
+    }
+    else {
+        tabs.removeClass('subheader');
+    }
+  });
+  //
 })
 
 
