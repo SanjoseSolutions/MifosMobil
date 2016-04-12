@@ -594,6 +594,9 @@ angular.module('starter.services', ['ngCordova'] )
         return dt.toLocaleDateString();
       }
       return a_date;
+    },
+    toISODateString: function(dt) {
+      return dt.toISOString().substr(0,10);
     }
   };
 } )
@@ -682,16 +685,23 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
+    fetch: function(id, fn_office) {
+      var offices = Cache.getObject('h_offices') || {};
+      authHttp.get(baseUrl + '/offices/' + id)
+      .then(function(response) {
+        var odata = response.data;
+        fn_office(odata);
+        offices[id] = odata;
+        Cache.setObject('h_offices', offices);
+      } );
+    },
     get: function(id, fn_office) {
       var offices = Cache.getObject('h_offices') || {};
       if (offices[id]) {
         fn_office(offices[id]);
         return;
       }
-      authHttp.get(baseUrl + '/offices/' + id).then(function(response) {
-        var odata = response.data;
-        fn_office(odata);
-      } );
+      this.fetch(id, fn_office);
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
@@ -879,6 +889,9 @@ angular.module('starter.services', ['ngCordova'] )
         for(var i = 0; i < dfs.length; ++i) {
           var df = dfs[i];
           var v = sObject[df];
+          if (!v) {
+            continue;
+          }
           logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
             v = v.toISOString();
@@ -938,8 +951,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Clients', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'HashUtil', 'logger', 'Codes',
-    function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Codes) {
+.factory('Clients', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'HashUtil', 'logger', 'Codes', 'DateUtil',
+    function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Codes, DateUtil) {
   var clients = null;
 
   return {
@@ -963,6 +976,9 @@ angular.module('starter.services', ['ngCordova'] )
         },
         "clientTypeId": function(client) {
           return client.clientType.id;
+        },
+        "maritalStatusId": function(client) {
+          return client.maritalStatus.id;
         }
       }
     },
@@ -1001,6 +1017,22 @@ angular.module('starter.services', ['ngCordova'] )
         } );
       }
     },
+    query_inactive: function(fn_iClients) {
+      logger.log("Going to call inactive clients");
+      var iClients = Cache.getObject('h_iClients') || {};
+      authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
+      .then(function(response) {
+        var data = response.data;
+        logger.log("Got response:"+JSON.stringify(data));
+        if (data instanceof Array) {
+          for(var i = 0; i < data.length; ++i) {
+            iClients[data[i].id] = data[i];
+          }
+          Cache.setObject('h_iClients', iClients);
+        }
+        fn_iClients(data);
+      } );
+    },
     remove: function(id) {
       delete clients[id];
     },
@@ -1009,9 +1041,13 @@ angular.module('starter.services', ['ngCordova'] )
       if (clients) {
         logger.log("Clients.get found cached " + typeof(clients));
         var client = clients[id];
-        logger.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
-        fn_client(client);
+        if (client) {
+          logger.log("Clients.get for: " + id + " :: " + JSON.stringify(client));
+          fn_client(client);
+        }
+        return;
       }
+      this.fetch(id, fn_client);
     },
     fetch: function(id, fn_client) {
       authHttp.get(baseUrl + '/clients/' + id)
@@ -1028,6 +1064,23 @@ angular.module('starter.services', ['ngCordova'] )
       if (clients) {
         fn_client(client);
       }
+    },
+    reject: function(id, fields, fn_callback) {
+      fields['locale'] = 'en';
+      fields['dateFormat'] = "yyyy-MM-dd";
+      authHttp.post(baseUrl + '/clients/' + id + '?command=reject',
+        fields, function(response) {
+          fn_callback(response.data);
+        } );
+    },
+    activate: function(id, dt, fn_callback) {
+      authHttp.post(baseUrl + '/clients/' + id + '?command=activate', {
+        locale: "en",
+        dateFormat: "yyyy-MM-dd",
+        activationDate: dt
+      }, function(response) {
+        fn_callback(response.data);
+      } );
     },
     save: function(client, fn_client, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/clients', client, {
@@ -1046,7 +1099,7 @@ angular.module('starter.services', ['ngCordova'] )
           logger.log("Created client resp: "+JSON.stringify(response.data));
           var data = response.data;
           var id = data.resourceId;
-          Clients.fetch(id, function(new_client) {
+          this.fetch(id, function(new_client) {
             clients[id] = new_client;
             Cache.setObject('h_clients', clients);
             fn_client(new_client);
@@ -1106,6 +1159,10 @@ angular.module('starter.services', ['ngCordova'] )
         logger.log("ClientType codes count:"+tcodes.length);
         codes.ClientTypes = tcodes;
       } );
+      Codes.getValues("MaritalStatus", function(mcodes) {
+        logger.log("MaritalStatus codes count:"+mcodes.length);
+        codes.MaritalStatus = mcodes;
+      } );
       fn_codes(codes);
     },
     get_accounts: function(id, fn_accts) {
@@ -1123,33 +1180,31 @@ angular.module('starter.services', ['ngCordova'] )
   return {
     get_full: function(id, fn_customer) {
       Clients.get(id, function(client) {
+        fn_customer(client);
         var dts = Clients.dataTables();
-        for(var i = 0; i < dts.length; ++i) {
-          var dt = dts[i];
+        angular.forEach(dts, function(dt) {
           logger.log("Client DataTable:" + dt + " for #" + id);
           DataTables.get_one(dt, id, function(fields, dt) {
             client[dt] = DataTables.decode(fields);
             logger.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
           } );
-        }
-        fn_customer(client);
+        } );
       } );
     },
     query_full: function(fn_customers) {
       Clients.query(function(clients) {
+        fn_customers(clients);
         for(var i = 0; i < clients.length; ++i) {
           var client = clients[i];
           var id = client.id;
           var dts = Clients.dataTables();
-          for(var j = 0; j < dts.length; ++j) {
-            var dt = dts[j];
+          angular.forEach(dts, function(dt) {
             DataTables.get_one(dt, id, function(fields, dt) {
               client[dt] = DataTables.decode(fields);
             } );
-          }
+          } );
         }
-        fn_customers(clients);
       } );
     }
   };
@@ -1375,7 +1430,8 @@ angular.module('starter.services', ['ngCordova'] )
     "Gender": 4,
     "ClientClassification": 17,
     "Relationship": 26,
-    "ClientType": 16
+    "ClientType": 16,
+    "MaritalStatus": 27
   };
 
   var codesObj = {

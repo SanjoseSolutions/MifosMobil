@@ -65,6 +65,15 @@
               ng-model="sacco.name" ng-minlength="3" size="25" autofocus required />
         </label>
       </ion-list-item>
+      <ion-list-item class="item item-input-inset">
+        <span class="input-label">
+          License Reg. No.
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </span>
+        <label class="item-input-wrapper">
+           <input type="text" name="coopLicRegNo" placeholder="Enter the SACCO's Name" ng-model="sacco.coopLicRegNo" required ng-minlength="3">
+        </label>
+      </ion-list-item>     
 
       <!-- ion-item class="item item-input-inset">
         <span class="input-input item-stacked-label">
