@@ -48,6 +48,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     if ($state.current.name == "tab.sacco-list") {
         tabs.addClass('subheader');
     }
+    else if ($state.current.name == "tab.staff") {
+        tabs.addClass('subheader');
+    }
+    else if ($state.current.name == "tab.clients") {
+        tabs.addClass('subheader');
+    }
     else {
         tabs.removeClass('subheader');
     }
