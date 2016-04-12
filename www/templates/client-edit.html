@@ -68,6 +68,13 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">Marital Status :</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.maritalStatusId" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">Date of Birth:</span>
           <label class="item-input-wrapper">
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
@@ -102,10 +109,11 @@ select {
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
-            <select name="ClientType" ng-model="client.client.ClientType" required>
+            <select ng-model="client.clientTypeId" ng-options="ct.id as ct.name for ct in codes.ClientTypes"> 
+              <!-- name="ClientType" ng-model="client.client.ClientType" required>
               <option value="" selected>Select Client Type</option>
               <option value="1">Member</option>
-              <option value="2">Non-Member</option>
+              <option value="2">Non-Member</option -->
             </select>
           </label>
         </div>
@@ -134,8 +142,10 @@ select {
 
         <!-- Family Member Size -->
         <div class="item item-divider"> 
-          <span class="input-label">Family Size </span>
+          <!-- span class="input-label">Family Size </span -->
+          <label>Family Size &amp; Details </label>
         </div>
+
         <div class="item row">
           <div class="col">
             <label class="item-input item-select">
@@ -288,7 +298,6 @@ select {
           <span class="input-label">Unique Place Name</span>
           <label class="item-input-wrapper">
             <input type="text" title="Your Address in short" name="UniquePName" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model='client.Client_NextOfKin["UniquePlaceName"]' />
-            <!-- ng-model="client.Client_Fields.uniquePName" -->
           </label>
         </div>    
         <div class="item item-input-inset">
