@@ -13,7 +13,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <ion-view view-title="Clients">
-  <ion-content>
+  <div class="bar bar-subheader bar-calm item-input-inset">
+    <label class="item-input-wrapper">
+      <i class="icon ion-search placeholder-icon"></i>
+      <input type="search" ng-model="searchQuery" placeholder="Search ..." />
+    </label>
+  </div>
+  <ion-content class="has-subheader">
     <ion-refresher on-refresh="fetchNewClients()"></ion-refresher>
     <ion-list>
       <ion-item class="item-divider">Clients List
@@ -21,7 +27,7 @@
           title="Register Client" style="float: right; font-size: 25px">&nbsp;+
         </a>
       </ion-item>
-      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="client in clients" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
+      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="client in clients | filter : searchQuery" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
         <img ng-src="{{client.face}}">
         <h2 style="padding-left:10px;">#{{client.id}}: {{client.displayName}}</h2>
         <p style="padding-left:10px;"> <!-- {{client.fullname}} -->
