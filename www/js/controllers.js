@@ -321,30 +321,36 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('SACCOListCtrl', function($scope, SACCO, logger) {
-  logger.log("SACCOListCtrl called");
-  var s_clients = {};
-  clients.map(function(c) {
-    var oid = c.officeId;
-    s_clients[oid] = s_clients[oid] || 0;
-    ++s_clients[oid];
-  } );
-  var offices = Cache.getObject('h_offices');
-  if (offices) {
-    offices.map(function(o) {
-      if (s_clients[o.id]) {
-        o['members'] = s_clients[oid];
-      }
+.controller('SACCOListCtrl', [ '$scope', 'SACCO', 'logger', 'Clients', 'Cache',
+    function($scope, SACCO, logger, Clients, Cache) {
+
+  $scope.$on('$ionicView.enter', function(e) {
+    logger.log("SACCOListCtrl called");
+    var s_clients = {};
+    Clients.query(function(clients) {
+      clients.map(function(c) {
+        var oid = c.officeId;
+        s_clients[oid] = s_clients[oid] || 0;
+        ++s_clients[oid];
+      } );
     } );
-    Cache.setObject('h_offices', offices);
-  }
-  SACCO.query(function(saccos) {
-    logger.log("Got SACCOs: " + saccos.length);
-    $scope.data = { "saccos": saccos };
-  }, function(sunions) {
-    logger.log("Got SACCO Unions: " + sunions.length);
+    var offices = Cache.getObject('h_offices');
+    if (offices) {
+      Object.keys(offices).map(function(oid) {
+        if (s_clients[oid]) {
+          offices[oid]['members'] = s_clients[oid];
+        }
+      } );
+      Cache.setObject('h_offices', offices);
+    }
+    SACCO.query(function(saccos) {
+      logger.log("Got SACCOs: " + saccos.length);
+      $scope.data = { "saccos": saccos };
+    }, function(sunions) {
+      logger.log("Got SACCO Unions: " + sunions.length);
+    } );
   } );
-} )
+} ] )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
   $scope.data = {};
