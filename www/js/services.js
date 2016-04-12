@@ -1021,6 +1021,25 @@ angular.module('starter.services', ['ngCordova'] )
     dataTables: function() {
       return [ "Client_Fields", "Client_NextOfKin" ];
     },
+    fetch_all: function(new_data) {
+      authHttp.get(baseUrl + '/clients')
+        .then(function(response) {
+          var data = response.data;
+          if (data.totalFilteredRecords) {
+            var n_clients = data.pageItems;
+            clients = {};
+            for(var i = 0; i < n_clients.length; ++i) {
+              var c = n_clients[i];
+              logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
+              clients[c.id] = c;
+            }
+            // Replacing existing Clients data from cache
+            Cache.setObject('h_clients', clients);
+            logger.log("Got " + n_clients.length + " clients");
+            new_data(n_clients);
+          }
+        } );
+    },
     query: function(process_clients) {
       clients = Cache.getObject('h_clients');
       if (clients) {
