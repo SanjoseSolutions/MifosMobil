@@ -424,7 +424,7 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
 
     Clients.query(function(clients) {
-      process_data();
+      process_data(clients);
     } );
   } );
 
@@ -434,12 +434,12 @@ angular.module('starter.controllers', ['ngCordova'])
 
   $scope.fetchNewClients = function() {
     Clients.fetch_all(function(clients) {
-      process_data();
+      process_data(clients);
       $scope.$broadcast('scroll.refreshComplete');
     } );
   };
 
-  function process_data() {
+  function process_data(clients) {
     for(var i = 0; i < clients.length; ++i) {
       if (Settings.showClientListFaces) {
         ClientImages.getB64(clients[i].id, function(img_data) {
