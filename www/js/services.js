@@ -200,6 +200,7 @@ angular.module('starter.services', ['ngCordova'] )
   authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
     var commands = Cache.getObject('commands');
     logger.log("LOADED CACHED COMMANDS: " + commands.length);
+    if (commands.length == 0) return;
     fn_init(commands.length);
     var results = [];
     var cmdIndex = 0;
@@ -628,6 +629,16 @@ angular.module('starter.services', ['ngCordova'] )
 } )
 
 .factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
+  var fetch_office = function(id, fn_office) {
+    authHttp.get(baseUrl + '/offices/' + id)
+    .then(function(response) {
+      var odata = response.data;
+      var offices = Cache.getObject('h_offices') || {};
+      offices[id] = odata;
+      Cache.setObject('h_offices', offices);
+      fn_office(odata);
+    } );
+  };
   return {
     dateFields: function() {
       return ["openingDate"];
@@ -664,14 +675,15 @@ angular.module('starter.services', ['ngCordova'] )
           return;
         } else {
           var offices = Cache.getObject('h_offices');
-          var new_office = response.data;
-          var officeId = new_office.officeId;
-          offices[officeId] = new_office;
-          Cache.setObject('h_offices', offices);
-        }
-        logger.log("Create office success. Got: " + JSON.stringify(response.data));
-        if (fn_office !== null) {
-          fn_office(response.data);
+          var data = response.data;
+          var id = data.officeId;
+          fetch_office(id, function(new_office) {
+            offices[id] = new_office;
+            Cache.setObject('h_offices', offices);
+            if (fn_office !== null) {
+              fn_office(new_office);
+            }
+          } );
         }
       }, function(response) {
         fn_fail(response);
@@ -700,16 +712,7 @@ angular.module('starter.services', ['ngCordova'] )
         fn_fail(response);
       } );
     },
-    fetch: function(id, fn_office) {
-      var offices = Cache.getObject('h_offices') || {};
-      authHttp.get(baseUrl + '/offices/' + id)
-      .then(function(response) {
-        var odata = response.data;
-        fn_office(odata);
-        offices[id] = odata;
-        Cache.setObject('h_offices', offices);
-      } );
-    },
+    fetch: fetch_office,
     get: function(id, fn_office) {
       var offices = Cache.getObject('h_offices') || {};
       if (offices[id]) {
@@ -1055,15 +1058,7 @@ angular.module('starter.services', ['ngCordova'] )
       var iClients = Cache.getObject('h_iClients') || {};
       authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
       .then(function(response) {
-        var data = response.data;
-        logger.log("Got response:"+JSON.stringify(data));
-        if (data instanceof Array) {
-          for(var i = 0; i < data.length; ++i) {
-            iClients[data[i].id] = data[i];
-          }
-          Cache.setObject('h_iClients', iClients);
-        }
-        fn_iClients(data);
+        fn_iClients(response.data);
       } );
     },
     remove: function(id) {
@@ -1080,7 +1075,7 @@ angular.module('starter.services', ['ngCordova'] )
         }
         return;
       }
-      this.fetch(id, fn_client);
+      fetch_client(id, fn_client);
     },
     fetch: fetch_client,
     reject: function(id, fields, fn_callback) {
