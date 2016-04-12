@@ -491,12 +491,13 @@ angular.module('starter.services', ['ngCordova'] )
           logger.log("DataTables.decode date: " + JSON.stringify(v));
           ret[f] = DateUtil.localDate(v);
         } else {
-          var m = f.match(/(.*)_cd_.*/);
-          if (m) {
+          var m = f.match(/(.*)_cd_(.*)/);
+          if (m && v) {
             var codeNm = m[1];
+            var codeKey = m[2] || codeNm;
             logger.log("DataTables.decode code " + codeNm + " = " + JSON.stringify(v));
             Codes.getCodeValue(codeNm, v, function(cv) {
-              ret[codeNm] = cv;
+              ret[codeKey] = cv;
             } );
           } else {
             ret[f] = v;
@@ -733,7 +734,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', function(Office, Cache, DataTables, DateUtil, HashUtil, logger) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp', 'baseUrl',
+    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp, baseUrl) {
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -829,7 +831,7 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
   };
-} )
+} ] )
 
 .factory('Staff', function(authHttp, baseUrl, Cache, logger) {
   var staff = [];
