@@ -516,6 +516,7 @@ angular.module('starter.controllers', ['ngCordova'])
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
       var gname = client.gender.name || "male";
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
+      logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
     } );
     setTimeout(function(e) {
       ClientImages.getB64(clientId, function(img_data) {

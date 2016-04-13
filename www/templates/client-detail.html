@@ -67,10 +67,10 @@
         <h4>{{client.displayName}}</h4>
       	<!--ion-item class="item item-positive">PERSONAL INFO :</ion-item -->
       	<ion-item>
-	        <label>Gender :</label>{{client.gender.name}}
+	        <label>Gender</label>: {{client.gender.name}}
 	      </ion-item>
         <ion-item>
-          <label>Marital Status :</label>
+          <label>Marital Status</label>:
           {{client.Client_Fields["Marital Status"] || "Not set"}}
         </ion-item>
         <ion-item>
@@ -83,32 +83,18 @@
       </ion-list>
     </div>
     <div class="list card">
-      <!-- SIMPLE TEST Don't mind
-        ion-item>
-        <label> Relationship with Client : </label>
-        <select>
-          <option> Spouse </option>
-          <option> Father </option>
-          <option> Mother </option>
-          <option> Son </option>
-          <option> Daughter </option>
-          <option selected> Unspecified </option>
-        </select>
-      </ion-item  -->
-
-
       <ion-item class="item-icon">
-        <label title="Email"> Email <i class="icon ion-ios-email-outline"></i>: 
+        <label title="Email">Email <i class="icon ion-ios-email-outline"></i>: 
         </label>  {{client.Client_Fields.Email || "Not set" }}
         <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
       
       <ion-item>
-        <label> Membership </label> :
+        <label>Membership</label>:
         {{ client.clientType.name || "Not set" }}
       </ion-item>
       <ion-item>
-        <label> Education <i class="icon ion-university"> </i>:
+        <label>Education <i class="icon ion-university"></i>:
         </label>{{client.Client_Fields.Education || "Not set"}}
       </ion-item>
       <ion-item>
