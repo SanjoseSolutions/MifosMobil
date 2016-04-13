@@ -98,10 +98,14 @@ input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:f
   background-color: lightblue;
 }
 
+/* Fix : SubHeader for tabs template for Android */
 .tabs-top.subheader > .tabs {
   top: 90px; 
 }
 
+.iClient>.item-content {  /* ion-content { */
+  background-color: #EEE8D6 !important;  /* #E5E5E5; */
+}
 /*login page logo center*/
 .image-center {
   margin: auto;
