@@ -1051,7 +1051,7 @@ angular.module('starter.controllers', ['ngCordova'])
 } )
 
 .controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil,
-    HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache) {
+    HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1084,12 +1084,16 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Client created with id #" + new_client.id
       };
       angular.forEach(cdts, function(dt) {
-        HashUtil.copy(client[dt], {
-          'locale': 'en',
-          'dateFormat': 'yyyy-MM-dd'
-        } );
-        DataTables.save(dt, new_client.id, client[dt], function(data) {
-          logger.log("Saved datatables data: " + data);
+        if (!client || !client[dt])
+          return;
+        var dfields = null;
+        if ('Client_NextOfKin' == dt) {
+          dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
+        } else {
+          dfields = client[dt];
+        }
+        DataTables.save(dt, new_client.id, dfields, function(data) {
+          logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
         }, function(response) {
