@@ -747,7 +747,7 @@ angular.module('starter.services', ['ngCordova'] )
         fn_offices(odata);
       } );
     },
-    new: function(fn_offices) {
+    new_data: function(fn_offices) {
       authHttp.get(baseUrl + '/offices').then(function(response) {
         var odata = response.data.sort(function(a, b) { return a.id - b.id } );
         Cache.setObject('h_offices', HashUtil.from_a(odata));
@@ -787,7 +787,7 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
     fetch_all: function(fn_saccos, fn_sunions) {
-      Office.new(function(data) {
+      Office.new_data(function(data) {
         var sunions = [];
         var po = new Object();
         var saccos = [];
