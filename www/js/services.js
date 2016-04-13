@@ -53,10 +53,11 @@ angular.module('starter.services', ['ngCordova'] )
 .factory('Cache', ['logger', function(logger) {
   var index = {};
   var lastSync = null;
+  var get_cached = function(key) {
+    return localStorage.getItem(key);
+  };
   return {
-    get: function(key) {
-      return localStorage.getItem(key);
-    },
+    get: get_cached,
     set: function(key, val) {
       localStorage.setItem(key, val);
       index[key] = 1;
@@ -80,7 +81,7 @@ angular.module('starter.services', ['ngCordova'] )
         return e.match('^passwd.');
       } );
       angular.forEach(pkeys, function(k) {
-        new_cache[k] = this.get(k);
+        new_cache[k] = get_cached(k);
       } );
       localStorage.clear();
       for(k in new_cache) {
@@ -617,6 +618,18 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
+.factory('Client_NextOfKin', function() {
+  return {
+    dateFields: function() { return [ 'dateOfBirth' ]; },
+    saveFields: function() {
+      return [ 'dateOfBirth', 'Fullname', 'Fathers Name', 'Grandfathers Name', 'Phone', 'Relationship',
+        'Gender', 'Region', 'Zone', 'Woreda', 'Kebele', 'UniquePlaceName' ];
+    },
+    codeFields: function() { return [ 'Relationship_cd_Relationship', 'Gender_cd_Gender' ]; },
+    skipFields: function() { return {}; }
+  };
+} )
+
 .factory('SACCO_Fields', function() {
   return {
     dateFields: function() { return [ 'joiningDate' ]; },
@@ -895,7 +908,6 @@ angular.module('starter.services', ['ngCordova'] )
       var skf = type.skipFields();
       var svf = type.saveFields();
       var dfs = type.dateFields();
-      var dfHash = new Object();
       for(var i = 0; i < svf.length; ++i) {
         var k = svf[i];
         if (isUpdate && skf && skf[k]) {
@@ -982,13 +994,10 @@ angular.module('starter.services', ['ngCordova'] )
         clients[id] = client;
         Cache.setObject('h_clients', clients);
         logger.log("Fetched client #" + id + " and updated cache");
-        fn_client(client);
+        if (client) fn_client(client);
       }, function(response) {
         logger.log("Clients.fetch(" + id + ")failed ");
       } );
-      if (clients) {
-        fn_client(client);
-      }
     };
 
   return {
@@ -997,7 +1006,7 @@ angular.module('starter.services', ['ngCordova'] )
     },
     saveFields: function() {
       return [ "dateOfBirth", "activationDate", "firstname", "lastname",
-        "genderId", "mobileNo", "clientClassificationId", "officeId" ];
+        "genderId", "mobileNo", "clientTypeId", "clientClassificationId", "officeId" ];
     },
     skipFields: function() {
       return { "officeId": true }
