@@ -150,6 +150,7 @@ angular.module('starter.controllers', ['ngCordova'])
       //$scope.session.takeOnline();
       logger.log("Going back online.");
       authHttp.runCommands(function(n) {
+        if (n == 0) return;
         var msg = "Starting to execute " + n + " commands";
         logger.log(msg);
         var stPopup = $ionicPopup.alert({
@@ -217,11 +218,11 @@ angular.module('starter.controllers', ['ngCordova'])
     var fields = FormHelper.preSaveForm(SACCO_Fields, office[dtn], false);
     logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
     Office.save(ofields, function(new_office) {
+      var officeId = new_office.id;
       $scope.message = {
         "type": "info",
-        "text": "Successfully created SACCO #" + new_office.officeId
+        "text": "Successfully created SACCO #" + officeId
       };
-      var officeId = new_office.officeId;
       DataTables.save(dtn, officeId, fields, function(data) {
         logger.log("Saved datatables data: " + data);
       }, function(response) {
@@ -321,15 +322,36 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('SACCOListCtrl', function($scope, SACCO, logger) {
-  logger.log("SACCOListCtrl called");
-  SACCO.query(function(saccos) {
-    logger.log("Got SACCOs: " + saccos.length);
-    $scope.data = { "saccos": saccos };
-  }, function(sunions) {
-    logger.log("Got SACCO Unions: " + sunions.length);
+.controller('SACCOListCtrl', [ '$scope', 'SACCO', 'logger', 'Clients', 'Cache',
+    function($scope, SACCO, logger, Clients, Cache) {
+
+  $scope.$on('$ionicView.enter', function(e) {
+    logger.log("SACCOListCtrl called");
+    var s_clients = {};
+    Clients.query(function(clients) {
+      clients.map(function(c) {
+        var oid = c.officeId;
+        s_clients[oid] = s_clients[oid] || 0;
+        ++s_clients[oid];
+      } );
+    } );
+    var offices = Cache.getObject('h_offices');
+    if (offices) {
+      Object.keys(offices).map(function(oid) {
+        if (s_clients[oid]) {
+          offices[oid]['members'] = s_clients[oid];
+        }
+      } );
+      Cache.setObject('h_offices', offices);
+    }
+    SACCO.query(function(saccos) {
+      logger.log("Got SACCOs: " + saccos.length);
+      $scope.data = { "saccos": saccos.reverse() };
+    }, function(sunions) {
+      logger.log("Got SACCO Unions: " + sunions.length);
+    } );
   } );
-} )
+} ] )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
   $scope.data = {};
@@ -402,25 +424,38 @@ angular.module('starter.controllers', ['ngCordova'])
     } );
 
     Clients.query(function(clients) {
-      for(var i = 0; i < clients.length; ++i) {
-        if (Settings.showClientListFaces) {
-          ClientImages.getB64(clients[i].id, function(img_data) {
-            clients[i].face = img_data;
-          } );
-        } else {
-          var g = clients[i].gender;
-          var gname = g ? g.name : 'male';
-          var glname = gname ? gname.toLowerCase() : 'male';
-          clients[i].face = "img/placeholder-" + glname + ".jpg";
-        }
-      }
-      $scope.clients = clients;
+      process_data(clients);
     } );
   } );
 
   $scope.remove = function(client) {
     Clients.remove(client);
   };
+
+  $scope.fetchNewClients = function() {
+    Clients.fetch_all(function(clients) {
+      process_data(clients);
+      $scope.$broadcast('scroll.refreshComplete');
+    } );
+  };
+
+  function process_data(clients) {
+    for(var i = 0; i < clients.length; ++i) {
+      if (Settings.showClientListFaces) {
+        ClientImages.getB64(clients[i].id, function(img_data) {
+          clients[i].face = img_data;
+        } );
+      } else {
+        var g = clients[i].gender;
+        var gname = g ? g.name : 'male';
+        var glname = gname ? gname.toLowerCase() : 'male';
+        clients[i].face = "img/placeholder-" + glname + ".jpg";
+      }
+    }
+    $scope.clients = clients;
+    return true;
+  }
+
 })
 
 .controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
@@ -1032,26 +1067,27 @@ angular.module('starter.controllers', ['ngCordova'])
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     var cfields = FormHelper.preSaveForm(Clients, client, false);
-    if ($scope.rolestat.isStaff) {
+    var rstat = $scope.rolestat;
+    if (rstat.isManagement || rstat.isAdmin) {
+      cfields["active"] = true;
+    } else {
       cfields["active"] = false;
       var auth = Cache.getObject('auth');
       cfields["officeId"] = auth.officeId;
-    } else {
-      cfields["active"] = true;
     }
     var cdts = Clients.dataTables();
     Clients.save(cfields, function(new_client) {
       logger.log("Client created:" + JSON.stringify(new_client));
       $scope.message = {
         "type": "info",
-        "text": "Client created with id #" + new_client.clientId
+        "text": "Client created with id #" + new_client.id
       };
       angular.forEach(cdts, function(dt) {
         HashUtil.copy(client[dt], {
           'locale': 'en',
           'dateFormat': 'yyyy-MM-dd'
         } );
-        DataTables.save(dt, new_client.clientId, client[dt], function(data) {
+        DataTables.save(dt, new_client.id, client[dt], function(data) {
           logger.log("Saved datatables data: " + data);
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
@@ -1104,6 +1140,9 @@ angular.module('starter.controllers', ['ngCordova'])
   var session = null;
 
   $scope.$on('$ionicView.enter', function(e) {
+    if (!authHttp.getAuthHeader()) {
+      $rootScope.$broadcast('sessionExpired');
+    }
     $scope.num_inactiveClients = 0;
     var role = Session.role;
     switch (role) {

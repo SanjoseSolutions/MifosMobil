@@ -93,7 +93,7 @@ select {
                 ng-model="client.Client_Fields.Email">
           </label>
         </div>
-        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
+        <div class="item item-input-inset" ng-show="rolestat.isManagement || rolestat.isAdmin">
           <span class="input-label">
             Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
