@@ -351,6 +351,16 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log("Got SACCO Unions: " + sunions.length);
     } );
   } );
+
+  $scope.fetchNewSaccos = function() {
+    SACCO.fetch_all(function(saccos) {
+      $scope.data = { "saccos": saccos.reverse() };
+      $scope.$broadcast('scroll.refreshComplete');
+    }, function(sunions) {
+      logger.log("Got SACCO Unions: " + sunions.length);
+    } );
+  };
+
 } ] )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
@@ -492,6 +502,7 @@ angular.module('starter.controllers', ['ngCordova'])
     var dt = new Date();
     Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
       $scope.client.pending = false;
+      alert("Succesfully approved client");
       logger.log("Succesfully approved client");
     } );
   };
@@ -505,6 +516,7 @@ angular.module('starter.controllers', ['ngCordova'])
     };
     Clients.reject(id, fields, function(response) {
       $scope.client.pending = false;
+      alert("Client #" + id + " rejected");
       logger.log("Client #" + id + " rejected");
     } );
   };

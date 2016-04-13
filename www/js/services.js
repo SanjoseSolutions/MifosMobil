@@ -746,6 +746,13 @@ angular.module('starter.services', ['ngCordova'] )
         Cache.setObject('h_offices', HashUtil.from_a(odata));
         fn_offices(odata);
       } );
+    },
+    new_data: function(fn_offices) {
+      authHttp.get(baseUrl + '/offices').then(function(response) {
+        var odata = response.data.sort(function(a, b) { return a.id - b.id } );
+        Cache.setObject('h_offices', HashUtil.from_a(odata));
+        fn_offices(odata);
+      } );
     }
   };
 } )
@@ -755,6 +762,32 @@ angular.module('starter.services', ['ngCordova'] )
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
+        var sunions = [];
+        var po = new Object();
+        var saccos = [];
+        for(var i = 0; i < data.length; ++i) {
+          if (data[i].id == 1) {
+            continue;
+          }
+          if (data[i].parentId == 1) {
+            sunions.push(data[i]);
+            po[data[i].id] = data[i].parentId;
+          } else {
+            var parentId = data[i].parentId;
+            var gpId = po[parentId];
+            if (gpId != null && gpId == 1) {
+              saccos.push(data[i]);
+            }
+          }
+        }
+        fn_saccos(saccos);
+        if (fn_sunions) {
+          fn_sunions(sunions);
+        }
+      } );
+    },
+    fetch_all: function(fn_saccos, fn_sunions) {
+      Office.new_data(function(data) {
         var sunions = [];
         var po = new Object();
         var saccos = [];

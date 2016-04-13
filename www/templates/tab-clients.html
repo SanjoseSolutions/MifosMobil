@@ -13,12 +13,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <ion-view view-title="Clients">
-  <div class="bar bar-subheader bar-calm item-input-inset">
+
+  <ion-nav-buttons side="right">
+      <a class="right button button-icon icon ion-android-add" href="#/tab/client-register"></a>
+  </ion-nav-buttons>
+
+  <div class="bar bar-subheader item-input-inset">
     <label class="item-input-wrapper">
       <i class="icon ion-search placeholder-icon"></i>
       <input type="search" ng-model="searchQuery" placeholder="Search ..." />
     </label>
   </div>
+
   <ion-content class="has-subheader">
     <ion-refresher on-refresh="fetchNewClients()"></ion-refresher>
     <ion-list>
@@ -30,16 +36,19 @@
       <ion-item ng-class="{'iClient': !client.active}" class="item item-remove-animate item-avatar item-icon-left item-icon-right"
           ng-repeat="client in clients | filter : searchQuery" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
         <img ng-src="{{client.face}}">
-        <h2 style="padding-left:10px;">#{{client.id}}: {{client.displayName}}</h2>
-        <p style="padding-left:10px;"> <!-- {{client.fullname}} -->
+        <h2>#{{client.id}}: {{client.displayName}}</h2>
+        <p> 
+          <!-- {{client.fullname}} -->
           Loans: {{clientOutstanding[client.id] || "NONE"}} |
           Savings: {{clientSavings[client.id] || "NONE"}}
         </p>
+
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-assertive" ng-click="remove(client)">
           Delete
         </ion-option-button>
+
       </ion-item>
     </ion-list>
   </ion-content>
