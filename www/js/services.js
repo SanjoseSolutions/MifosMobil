@@ -53,10 +53,11 @@ angular.module('starter.services', ['ngCordova'] )
 .factory('Cache', ['logger', function(logger) {
   var index = {};
   var lastSync = null;
+  var get_cached = function(key) {
+    return localStorage.getItem(key);
+  };
   return {
-    get: function(key) {
-      return localStorage.getItem(key);
-    },
+    get: get_cached,
     set: function(key, val) {
       localStorage.setItem(key, val);
       index[key] = 1;
@@ -80,7 +81,7 @@ angular.module('starter.services', ['ngCordova'] )
         return e.match('^passwd.');
       } );
       angular.forEach(pkeys, function(k) {
-        new_cache[k] = this.get(k);
+        new_cache[k] = get_cached(k);
       } );
       localStorage.clear();
       for(k in new_cache) {
@@ -997,7 +998,7 @@ angular.module('starter.services', ['ngCordova'] )
     },
     saveFields: function() {
       return [ "dateOfBirth", "activationDate", "firstname", "lastname",
-        "genderId", "mobileNo", "clientClassificationId", "officeId" ];
+        "genderId", "mobileNo", "clientTypeId", "clientClassificationId", "officeId" ];
     },
     skipFields: function() {
       return { "officeId": true }

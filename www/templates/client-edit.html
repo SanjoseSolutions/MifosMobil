@@ -70,7 +70,7 @@ select {
         <div class="item item-input-inset">
           <span class="input-label">Marital Status :</span>
           <label class="item-input-wrapper">
-            <select ng-model="client.maritalStatusId" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
             </select>
           </label>
         </div>
@@ -103,17 +103,13 @@ select {
             </select>
           </label>
         </div>
-        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
+        <div class="item item-input-inset">
           <span class="input-label">
             Membership
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
             <select ng-model="client.clientTypeId" ng-options="ct.id as ct.name for ct in codes.ClientTypes"> 
-              <!-- name="ClientType" ng-model="client.client.ClientType" required>
-              <option value="" selected>Select Client Type</option>
-              <option value="1">Member</option>
-              <option value="2">Non-Member</option -->
             </select>
           </label>
         </div>
@@ -257,7 +253,7 @@ select {
         <ion-item class="item item-input-inset">
           <span class="input-label">Gender:</span>
           <label class="item-input-wrapper">
-            <select ng-model="client.Client_NextOfKin.genderId" ng-options="g.id as g.name for g in codes.genders">
+            <select ng-model="client.Client_NextOfKin.Gender_cd_Gender" ng-options="g.id as g.name for g in codes.genders">
             </select>
           </label>
         </ion-item>
