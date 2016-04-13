@@ -70,7 +70,7 @@ select {
         <div class="item item-input-inset">
           <span class="input-label">Marital Status :</span>
           <label class="item-input-wrapper">
-            <select ng-model="client.maritalStatusId" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
             </select>
           </label>
         </div>
@@ -110,10 +110,6 @@ select {
           </span>
           <label class="item-input-wrapper">
             <select ng-model="client.clientTypeId" ng-options="ct.id as ct.name for ct in codes.ClientTypes"> 
-              <!-- name="ClientType" ng-model="client.client.ClientType" required>
-              <option value="" selected>Select Client Type</option>
-              <option value="1">Member</option>
-              <option value="2">Non-Member</option -->
             </select>
           </label>
         </div>

@@ -1005,7 +1005,7 @@ angular.module('starter.services', ['ngCordova'] )
     },
     saveFields: function() {
       return [ "dateOfBirth", "activationDate", "firstname", "lastname",
-        "genderId", "mobileNo", "clientClassificationId", "officeId" ];
+        "genderId", "mobileNo", "clientTypeId", "clientClassificationId", "officeId" ];
     },
     skipFields: function() {
       return { "officeId": true }

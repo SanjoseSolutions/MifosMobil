@@ -1090,6 +1090,10 @@ angular.module('starter.controllers', ['ngCordova'])
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
         } else {
           dfields = client[dt];
+          HashUtil.copy(dfields, {
+            locale: 'en',
+            dateFormat: 'yyyy-mm-dd'
+          } );
         }
         DataTables.save(dt, new_client.id, dfields, function(data) {
           logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
