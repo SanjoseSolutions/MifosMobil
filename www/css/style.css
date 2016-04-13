@@ -86,7 +86,8 @@ label, .label {
   padding: 2px 5px; /* 2px 3px; */
   border: none;
   font-family:corsiva;
-  /*  font-style:italic;  */  
+  /* font-style:italic;
+  background-color: #E5E5E5; */
 }
 
 .rightBtn {
@@ -100,6 +101,11 @@ input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:f
   background-color: lightblue;
 }
 
+/* Fix : SubHeader for tabs template for Android */
 .tabs-top.subheader > .tabs {
   top: 90px; 
+}
+
+.iClient>.item-content {  /* ion-content { */
+  background-color: #EEE8D6 !important;  /* #E5E5E5; */
 }
