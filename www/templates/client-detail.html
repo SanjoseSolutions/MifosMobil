@@ -29,7 +29,6 @@
         <p><b>Gender:</b>{{client.gender.name}}</p>
         <p><b>Marital Status:</b> {{client.Client_Fields["Marital Status"] || "Not set"}}</p>
         <p><b>D.O.B:</b> {{client.dateOfBirth}}</p>
-        <p><b><i class="icon ion-android-call"></i></b> {{client.mobileNo || "9876543210"}}</p>
       </div>
 
       <div class="button-bar">
@@ -51,7 +50,7 @@
 
         <ion-item href="#" class="item item-icon-left">
           <i class="icon ion-person-add"></i>
-          Membership: {{ client.ClientType || "Not set" }}
+          Membership: {{ client.clientType.name || "Not set" }}
         </ion-item>
         <ion-item>
           <label class="icon ion-android-call" title="Mobile">
@@ -60,16 +59,6 @@
       </ion-list>
     </div>
     <div class="list card">
-      <ion-item class="item-icon">
-        <label title="Email">Email <i class="icon ion-ios-email-outline"></i>: 
-        </label>  {{client.Client_Fields.Email || "Not set" }}
-        <!-- "extremelysimple@kmayra.org" -->
-      </ion-item>
-      
-      <ion-item>
-        <label>Membership</label>:
-        {{ client.clientType.name || "Not set" }}
-      </ion-item>
       <ion-item>
         <label>Education <i class="icon ion-university"></i>:
         </label>{{client.Client_Fields.Education || "Not set"}}
