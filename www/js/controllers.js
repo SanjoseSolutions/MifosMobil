@@ -492,6 +492,7 @@ angular.module('starter.controllers', ['ngCordova'])
     var dt = new Date();
     Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
       $scope.client.pending = false;
+      alert("Succesfully approved client");
       logger.log("Succesfully approved client");
     } );
   };
@@ -505,6 +506,7 @@ angular.module('starter.controllers', ['ngCordova'])
     };
     Clients.reject(id, fields, function(response) {
       $scope.client.pending = false;
+      alert("Client #" + id + " rejected");
       logger.log("Client #" + id + " rejected");
     } );
   };
