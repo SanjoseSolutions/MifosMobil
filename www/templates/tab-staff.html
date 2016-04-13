@@ -18,11 +18,16 @@
   margin-left: 5px;
 }
 </style>
-<ion-view view-title="Staffs">
+<ion-view view-title="Staffs Members">
   <!-- ion-header-bar class="bar bar-dark">
     <h2 class="title">Artist List</h2>
   </ion-header-bar -->
-  <div class="bar bar-subheader bar-calm item-input-inset">
+
+  <!-- <ion-nav-buttons side="right">
+      <a class="right button button-icon icon ion-person-stalker" href="#/tab/staff-register"></a>
+  </ion-nav-buttons> -->
+
+  <div class="bar bar-subheader item-input-inset">
     <label class="item-input-wrapper">
       <i class="icon ion-search placeholder-icon"></i>
       <input type="search" ng-model="searchQuery" placeholder="Search ..." />
@@ -30,13 +35,6 @@
   </div>
   <ion-content class="has-subheader">
     <ion-list>
-      <ion-item class="item item-divider">
-        Staff Members
-        <!-- To Create New Staff Members
-        a href="#/tab/staff-register" class="button icon ion-person-stalker"
-          title="Register Staff" style="float: right; font-size: 25px">&nbsp;+
-        </a -->
-      </ion-item>
 
       <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="s in staff | filter : searchQuery" type="item-text-wrap" href="#/tab/staff/{{s.id}}">
         <img ng-src="{{'img/staff-placeholder-Male.jpg'}}">
