@@ -351,6 +351,16 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log("Got SACCO Unions: " + sunions.length);
     } );
   } );
+
+  $scope.fetchNewSaccos = function() {
+    SACCO.fetch_all(function(saccos) {
+      $scope.data = { "saccos": saccos.reverse() };
+      $scope.$broadcast('scroll.refreshComplete');
+    }, function(sunions) {
+      logger.log("Got SACCO Unions: " + sunions.length);
+    } );
+  };
+
 } ] )
 
 .controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {

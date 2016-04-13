@@ -61,6 +61,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   //
 })
 
+.config(function($ionicConfigProvider) {
+  if(!ionic.Platform.isIOS()) { 
+    $ionicConfigProvider.scrolling.jsScrolling(false);
+  }
+})
 
 .config(function($stateProvider, $urlRouterProvider) {
 
