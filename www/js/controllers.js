@@ -589,6 +589,122 @@ angular.module('starter.controllers', ['ngCordova'])
     } 
   }
 
+  $scope.uploadDoc = function (clientId) {
+    fileChooser.open(function(uri) {
+
+      var server = baseUrl + '/clients/'+ clientId + '/documents';
+      var options = {};
+      options.headers = {"Fineract-Platform-TenantId": Settings.tenant, "Authorization": $http.defaults.headers.common.Authorization};
+      options.params = {"name":"test"}
+      document.addEventListener('deviceready', function () {
+
+        $cordovaFileTransfer.upload(server, uri, options)
+          .then(function(result) {
+            // Success!
+            console.log(result)
+          }, function(err) {
+            // Error
+            console.log(err)
+          }, function (progress) {
+            console.log(progress);
+            // constant progress updates
+          });
+
+      }, false);
+
+    });
+  }
+
+})
+
+.controller('DocumentCtrl', function($scope, $stateParams, logger, Documents, 
+        $ionicModal, $cordovaFileTransfer, baseUrl, Settings, $http) {
+
+    $scope.docForm = {};
+    var clientId = $stateParams.id;
+
+    Documents.getDocsList(clientId).then(function(docs) {
+      $scope.docs = docs;
+    })
+
+    $ionicModal.fromTemplateUrl('addDoc.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });
+    
+    $scope.closeModal = function() {
+      $scope.modal.hide();
+    };
+
+
+    $scope.downloadDoc = function(docId) {
+        var server = baseUrl + '/clients/'+ clientId + '/documents/' + docId + '/attachment?tenantIdentifier=' + Settings.tenant;
+        var path = cordova.file.externalRootDirectory;
+        var options = {};
+        
+        options.headers = {"Fineract-Platform-TenantId": Settings.tenant, "Authorization": $http.defaults.headers.common.Authorization};
+
+        document.addEventListener('deviceready', function () {
+
+          $cordovaFileTransfer.download(server, path, options)
+            .then(function(result) {
+              // Success!
+              console.log(result);
+              alert("Succesfully Downloaded");
+              $scope.closeModal();
+            }, function(err) {
+              // Error
+              console.log(err);
+              alert("Download failed");
+            }, function (progress) {
+              console.log(progress);
+              // constant progress updates
+            });
+
+        }, false);
+    };
+
+    $scope.removeDoc = function(){
+      Documents.removeDoc(clientId, docId).then(function(result) {
+        console.log(result);
+      })
+    }
+
+    $scope.uploadDoc = function() {   
+
+      fileChooser.open(function(uri) {
+        
+        console.log(uri);
+
+        var server = baseUrl + '/clients/'+ clientId + '/documents';
+        var options = {};
+        
+        options.headers = {"Fineract-Platform-TenantId": Settings.tenant, "Authorization": $http.defaults.headers.common.Authorization};
+        options.params = $scope.docForm;
+
+        document.addEventListener('deviceready', function () {
+
+          $cordovaFileTransfer.upload(server, uri, options)
+            .then(function(result) {
+              // Success!
+              console.log(result);
+              alert("Succesfully Upload");
+              $scope.closeModal();
+            }, function(err) {
+              // Error
+              console.log(err);
+              alert("Upload failed");
+            }, function (progress) {
+              console.log(progress);
+              // constant progress updates
+            });
+
+        }, false);
+
+      });
+    }
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
