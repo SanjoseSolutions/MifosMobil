@@ -206,6 +206,7 @@ angular.module('starter.services', ['ngCordova'] )
             for(var i = 0; i < subcmds.length; ++i) {
               var scmd = subcmds[i];
               scmd['url'] = scmd['url'] + resId;
+              logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
               commands.push(scmd);
               setTimeout(runNextCmd, 2000);
             }

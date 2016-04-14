@@ -1052,7 +1052,7 @@ angular.module('starter.controllers', ['ngCordova'])
   logger.log("ClientNextOfKinCtrl invoked for client #" + clientId);
   Customers.get_full(clientId, function(client) {
     $scope.client = client;
-    $scope.client.dateOfBirth = DateUtil.isoDateStr(client.dateOfBirth);
+    $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
 } )
@@ -1240,11 +1240,17 @@ angular.module('starter.controllers', ['ngCordova'])
     }, function(new_client) {
       var cid = new_client.cid;
       angular.forEach(cdts, function(dt) {
-        HashUtil.copy(client[dt], {
-          'locale': 'en',
-          'dateFormat': 'yyyy-MM-dd'
-        } );
-        DataTables.saveOffline(dt, client[dt], cid);
+        var dfields = null;
+        if ('Client_NextOfKin' == dt) {
+          dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
+        } else {
+          dfields = client[dt];
+          HashUtil.copy(dfields, {
+            locale: 'en',
+            dateFormat: 'yyyy-mm-dd'
+          } );
+        }
+        DataTables.saveOffline(dt, dfields, cid);
       } );
       $scope.message = {
         "type": "info",
