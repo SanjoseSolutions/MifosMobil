@@ -630,7 +630,8 @@ angular.module('starter.services', ['ngCordova'] )
   return {
     dateFields: function() { return [ 'joiningDate' ]; },
     saveFields: function() {
-      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
+      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region",
+        "Zone", "Wereda", "Kebele", "UniquePlaceName", "License Registration No" ];
     },
     codeFields: function() { return []; },
     skipFields: function() { return {}; }
@@ -819,7 +820,7 @@ angular.module('starter.services', ['ngCordova'] )
               "name": data[i].name
             } );
           }   
-        }
+
 //        logger.log("No. of SUs: " + sunions.length);
         fn_sunions(sunions);
       } );
@@ -839,7 +840,7 @@ angular.module('starter.services', ['ngCordova'] )
             continue;
           }
           DataTables.get_one(dt, id, function(fields, dt) {
-            office[dt] = fields;
+            office[dt] = DataTables.decode(fields);
             var k = 'dt.'+dt+'.'+id;
             Cache.setObject(k, fields);
           } );
@@ -1029,6 +1030,14 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     };
 
+  var get_displayName = function(client) {
+    var dName = client['firstname'];
+    if (client['lastname']) {
+      dName = dName + ' ' + client['lastname'];
+    }
+    return dName;
+  };
+  
   return {
     dateFields: function() {
       return ["dateOfBirth", "activationDate"];
@@ -1161,6 +1170,7 @@ angular.module('starter.services', ['ngCordova'] )
           var id = HashUtil.nextKey(clients);
           client["id"] = id;
           clients[id] = client;
+          client["displayName"] = get_displayName(client);
           Cache.setObject('h_clients', clients);
           client["cid"] = response.cid;
           fn_offline(client);

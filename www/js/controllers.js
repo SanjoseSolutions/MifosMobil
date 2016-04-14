@@ -265,8 +265,10 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('SACCOEditCtrl', function($scope, $stateParams, Office,
-    SACCO, FormHelper, DataTables, DateUtil, logger) {
+.controller('SACCOEditCtrl', [ '$scope', '$stateParams', 'Office', 'SACCO',
+    'FormHelper', 'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
+  function($scope, $stateParams, Office,
+    SACCO, FormHelper, DataTables, DateUtil, logger, SACCO_Fields) {
   var officeId = $stateParams.saccoId;
   logger.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
@@ -277,6 +279,7 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
   SACCO.get_full(officeId, function(sacco) {
     logger.log("SACCO:" + JSON.stringify(sacco));
+    FormHelper.prepareForm(Office, sacco);
     $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office) {
@@ -329,7 +332,7 @@ angular.module('starter.controllers', ['ngCordova'])
       };
     } );
   };
-} )
+} ] )
 
 .controller('SACCOListCtrl', [ '$scope', 'SACCO', 'logger', 'Clients', 'Cache',
     function($scope, SACCO, logger, Clients, Cache) {
