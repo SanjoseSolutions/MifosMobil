@@ -645,9 +645,11 @@ angular.module('starter.controllers', ['ngCordova'])
 
     $scope.downloadDoc = function(docId) {
         var server = baseUrl + '/clients/'+ clientId + '/documents/' + docId + '/attachment?tenantIdentifier=' + Settings.tenant;
-        var path = cordova.file.externalRootDirectory;
+        var path = cordova.file.externalRootDirectory + 'test.pdf';
         var options = {};
         
+        console.log($http.defaults.headers.common.Authorization)
+
         options.headers = {"Fineract-Platform-TenantId": Settings.tenant, "Authorization": $http.defaults.headers.common.Authorization};
 
         document.addEventListener('deviceready', function () {
