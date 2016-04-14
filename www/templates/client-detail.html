@@ -89,7 +89,8 @@
           Write SMS <i class="icon ion-ios-email-outline"></i>
         </button>
         <span class="centered">{{client.mobileNo || "9876543210"}}</span>
-        <a class="button button-small button-positive w20 rightBtn">
+        <a class="button button-small button-positive w20 rightBtn"
+            ng-href="tel:{{client.mobileNo}}">
           <i class="icon ion-android-call"></i> Make Call
         </a>
       </ion-item>
