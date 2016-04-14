@@ -822,7 +822,8 @@ angular.module('starter.services', ['ngCordova'] )
           }   
 
 //        logger.log("No. of SUs: " + sunions.length);
-        fn_sunions(sunions);
+          fn_sunions(sunions);
+        }
       } );
     },
     query_full: function(fn_saccos) {
