@@ -820,9 +820,10 @@ angular.module('starter.services', ['ngCordova'] )
               "name": data[i].name
             } );
           }   
-
+        } //
 //        logger.log("No. of SUs: " + sunions.length);
         fn_sunions(sunions);
+      	//
       } );
     },
     query_full: function(fn_saccos) {
