@@ -1266,7 +1266,7 @@ angular.module('starter.controllers', ['ngCordova'])
         "text": "Accepted Client create request (offline)"
       };
       setTimeout(function() {
-        $state.go('tab.client-detail', { 'clientId': new_client.cid } );
+        $state.go('tab.client-detail', { 'clientId': new_client.id } );
       }, 3000);
     }, function(response) {
       logger.warn("Client create fail(" + response.status + ") RESPONSE:"

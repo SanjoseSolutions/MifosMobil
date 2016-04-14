@@ -896,7 +896,7 @@ angular.module('starter.services', ['ngCordova'] )
   }
 } )
 
-.factory('FormHelper', function(DateUtil, logger) {
+.factory('FormHelper', [ 'DateUtil', 'logger', function(DateUtil, logger) {
   return {
     prepareForm: function(type, object) {
       var sfs = type.saveFields().concat(type.dataTables());
@@ -943,7 +943,7 @@ angular.module('starter.services', ['ngCordova'] )
           }
           logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
-            v = v.toISOString();
+            v = DateUtil.toISODateString(v);
           }
           v = v.substr(0, 10);
           logger.log("Got date " + df + "=" + v);
@@ -955,7 +955,7 @@ angular.module('starter.services', ['ngCordova'] )
       return sObject;
     },
   };
-} )
+} ] )
 
 .factory('HashUtil', function(logger) {
   return {
