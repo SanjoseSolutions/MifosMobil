@@ -55,15 +55,16 @@ angular.module('starter.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($rootScope, $scope, Session, $cordovaNetwork, $ionicPopup, $timeout, $state, Cache, logger) {
+.controller('AnonCtrl', function($rootScope, $scope, Session, $cordovaNetwork,
+    $ionicHistory, $ionicPopup, $timeout, $state, Cache, logger) {
+
   $scope.cred = {};
 
   $scope.$on('$ionicView.enter', function(e) {
+    $ionicHistory.clearHistory();
     $rootScope.session = Session.get();
     if (Session.isAuthenticated()) {
       $state.go('tab.dashboard');
-    } else {
-      Cache.clear();
     }
   } );
 

@@ -78,7 +78,7 @@ angular.module('starter.services', ['ngCordova'] )
     'clear': function() {
       var new_cache = {};
       var pkeys = Object.keys(index).filter(function(e) {
-        return e.match('^passwd.');
+        return e.match('^(passwd|codevalues)\.');
       } );
       angular.forEach(pkeys, function(k) {
         new_cache[k] = get_cached(k);
@@ -87,21 +87,6 @@ angular.module('starter.services', ['ngCordova'] )
       for(k in new_cache) {
         this.set(k, new_cache[k]);
         index[k] = 1;
-      }
-    },
-    'clearAll': function() {
-      logger.log("Called Cache.clearAll()");
-      var keys = Object.keys(index);
-      index = {};
-      logger.log("Got keys: " + keys.join(", "));
-      for(var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
-        if (key.match(/^passwd\./)) {
-          index[key] = 1;
-        } else {
-          logger.log("Going to clear key: " + key);
-          localStorage.removeItem(key);
-        }
       }
     },
     'updateLastSync': function() {
@@ -413,6 +398,8 @@ angular.module('starter.services', ['ngCordova'] )
     $http.post(uri, {
       'Accept': 'application/json'
     } ).then(function(response) {
+
+      Cache.clear();
 
       logger.log("Succesful login :-D");
 
