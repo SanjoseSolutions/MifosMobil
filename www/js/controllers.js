@@ -1071,8 +1071,10 @@ angular.module('starter.controllers', ['ngCordova'])
   };
 } )
 
-.controller('ClientRegCtrl', function($scope, Clients, ClientImages, DateUtil,
-    HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
+.controller('ClientRegCtrl', [ '$scope', 'Clients', 'ClientImages', 'DateUtil', '$state',
+  'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
+    function($scope, Clients, ClientImages, DateUtil, $state,
+      HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1125,6 +1127,9 @@ angular.module('starter.controllers', ['ngCordova'])
           logger.log("Failed to save datatables(" + response.status + ") data: " + response.data);
         } );
       } );
+      setTimeout(function() {
+        $state.go('tab.client-detail', { 'clientId': new_client.id } );
+      }, 3000);
     }, function(new_client) {
       var cid = new_client.cid;
       angular.forEach(cdts, function(dt) {
@@ -1138,6 +1143,9 @@ angular.module('starter.controllers', ['ngCordova'])
         "type": "info",
         "text": "Accepted Client create request (offline)"
       };
+      setTimeout(function() {
+        $state.go('tab.client-detail', { 'clientId': new_client.cid } );
+      }, 3000);
     }, function(response) {
       logger.warn("Client create fail(" + response.status + ") RESPONSE:"
         + JSON.stringify(response.data));
@@ -1159,7 +1167,7 @@ angular.module('starter.controllers', ['ngCordova'])
   SACCO.query(function(saccos) {
     $scope.codes.offices = saccos;
   }, function(sus) {} );
-} )
+} ] )
 
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',

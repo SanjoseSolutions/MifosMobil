@@ -140,7 +140,7 @@
     
 
     <div class="list card">
-      <ion-item ng-show="client.pending">
+      <ion-item ng-show="client.pending && (rolestat.isAdmin || rolestat.isManagement)">
         <ion-button-bar>
           <button class="button button-assertive left" ng-click="rejectClient(client)">
             Reject
