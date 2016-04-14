@@ -630,7 +630,8 @@ angular.module('starter.services', ['ngCordova'] )
   return {
     dateFields: function() { return [ 'joiningDate' ]; },
     saveFields: function() {
-      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
+      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region",
+        "Zone", "Wereda", "Kebele", "UniquePlaceName", "License Registration No" ];
     },
     codeFields: function() { return []; },
     skipFields: function() { return {}; }
@@ -819,7 +820,7 @@ angular.module('starter.services', ['ngCordova'] )
               "name": data[i].name
             } );
           }   
-        }
+
 //        logger.log("No. of SUs: " + sunions.length);
         fn_sunions(sunions);
       } );
@@ -839,7 +840,7 @@ angular.module('starter.services', ['ngCordova'] )
             continue;
           }
           DataTables.get_one(dt, id, function(fields, dt) {
-            office[dt] = fields;
+            office[dt] = DataTables.decode(fields);
             var k = 'dt.'+dt+'.'+id;
             Cache.setObject(k, fields);
           } );
