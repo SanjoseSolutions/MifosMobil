@@ -91,6 +91,12 @@ label, .label {
 .rightBtn {
   float: right;
 }
+.leftBtn {
+  float: left;
+}
+.w20 {
+  width:20%;
+}
 select {
   width: 100%;
 }
