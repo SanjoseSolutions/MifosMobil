@@ -78,7 +78,7 @@ angular.module('starter.services', ['ngCordova'] )
     'clear': function() {
       var new_cache = {};
       var pkeys = Object.keys(index).filter(function(e) {
-        return e.match('^passwd.');
+        return e.match('^(passwd|codevalues)\.');
       } );
       angular.forEach(pkeys, function(k) {
         new_cache[k] = get_cached(k);
@@ -87,21 +87,6 @@ angular.module('starter.services', ['ngCordova'] )
       for(k in new_cache) {
         this.set(k, new_cache[k]);
         index[k] = 1;
-      }
-    },
-    'clearAll': function() {
-      logger.log("Called Cache.clearAll()");
-      var keys = Object.keys(index);
-      index = {};
-      logger.log("Got keys: " + keys.join(", "));
-      for(var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
-        if (key.match(/^passwd\./)) {
-          index[key] = 1;
-        } else {
-          logger.log("Going to clear key: " + key);
-          localStorage.removeItem(key);
-        }
       }
     },
     'updateLastSync': function() {
@@ -413,6 +398,8 @@ angular.module('starter.services', ['ngCordova'] )
     $http.post(uri, {
       'Accept': 'application/json'
     } ).then(function(response) {
+
+      Cache.clear();
 
       logger.log("Succesful login :-D");
 
@@ -754,9 +741,30 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp', 'baseUrl',
-    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp, baseUrl) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil',
+    'logger', 'authHttp', 'baseUrl', 'Clients',
+      function(Office, Cache, DataTables, DateUtil, HashUtil, logger,
+        authHttp, baseUrl, Clients) {
   return {
+    set_member_counts: function() {
+      var s_clients = {};
+      Clients.query(function(clients) {
+        clients.map(function(c) {
+          var oid = c.officeId;
+          s_clients[oid] = s_clients[oid] || 0;
+          ++s_clients[oid];
+        } );
+      } );
+      var offices = Cache.getObject('h_offices');
+      if (offices) {
+        Object.keys(offices).map(function(oid) {
+          if (s_clients[oid]) {
+            offices[oid]['members'] = s_clients[oid];
+          }
+        } );
+        Cache.setObject('h_offices', offices);
+      }
+    },
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
         var sunions = [];
@@ -820,10 +828,9 @@ angular.module('starter.services', ['ngCordova'] )
               "name": data[i].name
             } );
           }   
-        } //
 //        logger.log("No. of SUs: " + sunions.length);
-        fn_sunions(sunions);
-      	//
+          fn_sunions(sunions);
+        }
       } );
     },
     query_full: function(fn_saccos) {
@@ -909,7 +916,7 @@ angular.module('starter.services', ['ngCordova'] )
   }
 } )
 
-.factory('FormHelper', function(DateUtil, logger) {
+.factory('FormHelper', [ 'DateUtil', 'logger', function(DateUtil, logger) {
   return {
     prepareForm: function(type, object) {
       var sfs = type.saveFields().concat(type.dataTables());
@@ -956,7 +963,7 @@ angular.module('starter.services', ['ngCordova'] )
           }
           logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
-            v = v.toISOString();
+            v = DateUtil.toISODateString(v);
           }
           v = v.substr(0, 10);
           logger.log("Got date " + df + "=" + v);
@@ -968,7 +975,7 @@ angular.module('starter.services', ['ngCordova'] )
       return sObject;
     },
   };
-} )
+} ] )
 
 .factory('HashUtil', function(logger) {
   return {
@@ -1626,6 +1633,37 @@ angular.module('starter.services', ['ngCordova'] )
     }
   };
 } )
+
+.factory('Documents', [ '$q', 'authHttp', 'baseUrl', 'Settings', 'Cache', 
+  function($q, authHttp, baseUrl, Settings, Cache) {
+    var docs = {};
+
+    docs.getDocsList = function(clientId){
+      var deferred = $q.defer();
+      
+      authHttp.get(baseUrl + '/clients/' + clientId + '/documents').then(function(response) {
+          var data = response.data;
+          console.log(data);
+          deferred.resolve(data);
+         } );
+
+      return deferred.promise;
+    },
+
+    docs.removeDoc = function(clientId, docId){
+      var deferred = $q.defer();
+      
+      authHttp.delete(baseUrl + '/clients/' + clientId + '/documents/' + docId).then(function(response) {
+          var data = response.data;
+          console.log(data);
+          deferred.resolve(data);
+         } );
+
+      return deferred.promise;
+    }
+
+    return docs;
+}]);
 
 ;
 

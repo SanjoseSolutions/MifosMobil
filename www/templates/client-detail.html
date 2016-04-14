@@ -37,8 +37,7 @@
           Photo </a>
         <a ng-click="print()" class="button button-clear button-positive icon ion-printer">
           Print </a>
-        <a class="button button-clear button-positive icon ion-document">
-          Upload Docs</a>
+        <a href="#/tab/clients/{{client.id}}/edit" class="button button-clear button-positive icon ion-edit">Edit</a>
       </div>
 
     </div>
@@ -69,6 +68,10 @@
       <ion-item>
         <label>Occupation:
         </label>{{client.clientClassification.name || "Not set"}}
+      </ion-item>
+      <ion-item>
+        <a href="#/tab/clients/{{client.id}}/docs" class="button button-block">
+          <i class="ion-document-text"> Documents</i></a>
       </ion-item>
       <!-- Family Member Size -->
       <ion-item class="item-divider"> 
@@ -138,6 +141,7 @@
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
           <i class="ion-edit"> Edit Info</i>
         </a>
+      </ion-item>
     </div>
 
     
