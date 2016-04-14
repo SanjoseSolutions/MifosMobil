@@ -365,23 +365,21 @@ angular.module('starter.services', ['ngCordova'] )
 
   session.login = function(auth, fn_success, fn_fail) {
 
-    var onLogin = function(data) {
-      session.loginTime = new Date();
+    var onLogin = function(auth, data) {
       Cache.set('username', auth.username);
       session.uname = auth.username;
-      Cache.setObject('commands', []);
-
-      logger.log("Response: " + JSON.stringify(data));
-      Cache.setObject('auth', data);
 
       var roles = Roles.setRoles(data.roles);
       var role = roles[0];
       session.role = role;
 
+      session.loginTime = new Date();
       var b64key = data.base64EncodedAuthenticationKey;
       logger.log("Base64key: " + b64key);
       authHttp.setAuthHeader(b64key);
 
+      Cache.setObject('auth', data);
+      Cache.setObject('commands', []);
       Cache.setObject('session', session);
       Codes.init();
     };
@@ -392,7 +390,7 @@ angular.module('starter.services', ['ngCordova'] )
       logger.log("Got cached authinfo: " + JSON.stringify(authinfo));
       if (authinfo.password == auth.password) {
         logger.log("Succesful login :-)");
-        onLogin(authinfo);
+        onLogin(auth, authinfo);
         fn_success(authinfo);
       } else {
         logger.log("Login failed :-/");
@@ -417,15 +415,13 @@ angular.module('starter.services', ['ngCordova'] )
     } ).then(function(response) {
 
       logger.log("Succesful login :-D");
-      Cache.clear();
 
       var data = response.data;
+      onLogin(auth, data);
       data.password = auth.password;
       Cache.setObject('passwd.' + auth.username, data); 
 
-      onLogin(data);
-
-      fn_success(response);
+      fn_success(response.data);
 
     }, function(response) {
       fn_fail(response);

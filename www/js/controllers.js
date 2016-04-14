@@ -62,6 +62,8 @@ angular.module('starter.controllers', ['ngCordova'])
     $rootScope.session = Session.get();
     if (Session.isAuthenticated()) {
       $state.go('tab.dashboard');
+    } else {
+      Cache.clear();
     }
   } );
 
@@ -70,6 +72,13 @@ angular.module('starter.controllers', ['ngCordova'])
     $scope.message = null;
     Session.login(auth, function(authinfo) {
       logger.log("Login successful");
+      var loginPopup = $ionicPopup.alert( {
+        title: 'Login Successful!',
+        template: '<p>.<br>\n' +
+          '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
+          '<p><center><h4>Welcome <strong>' + auth.username + '</strong></h4></center></p>',
+        scope: $scope
+      } );
       $state.go('tab.dashboard');
     }, function(response) {
       logger.log("Login failed. Got:"+response.status);
@@ -1166,6 +1175,8 @@ angular.module('starter.controllers', ['ngCordova'])
     }
     $scope.num_inactiveClients = 0;
     var role = Session.role;
+    $scope.uname = Session.uname;
+    $scope.role = role;
     switch (role) {
       case "Admin":
         SACCO.query_full(function(data) {
@@ -1189,13 +1200,6 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log("Loading session..");
       session = Session.get();
       $rootScope.session = session;
-      var loginPopup = $ionicPopup.alert( {
-        title: 'Login Successful!',
-        template: '<p>.<br>\n' +
-          '<img src="img/kmayra.png" width="188" height="60" title="k-Mayra" />' +
-          '<p><center><h4>Welcome <strong>' + session.username() + '</strong></h4></center></p>',
-        scope: $scope
-      } );
     }
   } );
 
