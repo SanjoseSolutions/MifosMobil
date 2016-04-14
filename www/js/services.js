@@ -741,9 +741,30 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp', 'baseUrl',
-    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp, baseUrl) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil',
+    'logger', 'authHttp', 'baseUrl', 'Clients',
+      function(Office, Cache, DataTables, DateUtil, HashUtil, logger,
+        authHttp, baseUrl, Clients) {
   return {
+    set_member_counts: function() {
+      var s_clients = {};
+      Clients.query(function(clients) {
+        clients.map(function(c) {
+          var oid = c.officeId;
+          s_clients[oid] = s_clients[oid] || 0;
+          ++s_clients[oid];
+        } );
+      } );
+      var offices = Cache.getObject('h_offices');
+      if (offices) {
+        Object.keys(offices).map(function(oid) {
+          if (s_clients[oid]) {
+            offices[oid]['members'] = s_clients[oid];
+          }
+        } );
+        Cache.setObject('h_offices', offices);
+      }
+    },
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
         var sunions = [];
