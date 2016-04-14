@@ -1626,5 +1626,36 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
+.factory('Documents', [ '$q', 'authHttp', 'baseUrl', 'Settings', 'Cache', 
+  function($q, authHttp, baseUrl, Settings, Cache) {
+    var docs = {};
+
+    docs.getDocsList = function(clientId){
+      var deferred = $q.defer();
+      
+      authHttp.get(baseUrl + '/clients/' + clientId + '/documents').then(function(response) {
+          var data = response.data;
+          console.log(data);
+          deferred.resolve(data);
+         } );
+
+      return deferred.promise;
+    },
+
+    docs.removeDoc = function(clientId, docId){
+      var deferred = $q.defer();
+      
+      authHttp.delete(baseUrl + '/clients/' + clientId + '/documents/' + docId).then(function(response) {
+          var data = response.data;
+          console.log(data);
+          deferred.resolve(data);
+         } );
+
+      return deferred.promise;
+    }
+
+    return docs;
+}]);
+
 ;
 

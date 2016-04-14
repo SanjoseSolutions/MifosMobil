@@ -200,6 +200,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   } )
+  .state('tab.client-documents', {
+    url: '/clients/:id/docs',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/documents.html',
+        controller: 'DocumentCtrl'
+      }
+    }
+  } )
   .state('tab.client-savings', {
     url: '/savingsAccount/:id',
     views: {
