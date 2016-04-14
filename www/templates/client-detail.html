@@ -47,7 +47,9 @@
           <i class="icon ion-email"></i>
           {{client.Client_Fields.Email || "Not set" }}
         </ion-item>
-
+        <ion-item>
+          <label>Office</label>: {{client.officeId}} | {{ codes.offices['Name Decorated'] }} || {{ codes.offices.id }}
+        </ion-item>
         <ion-item href="#" class="item item-icon-left">
           <i class="icon ion-person-add"></i>
           Membership: {{ client.clientType.name || "Not set" }}
@@ -56,7 +58,7 @@
           <label class="icon ion-android-call" title="Mobile">
 	        </label> {{client.mobileNo || "9876543210"}}
         </ion-item> 
-      </ion-list>
+      <!-- /ion-list -->
     </div>
     <div class="list card">
       <ion-item>
