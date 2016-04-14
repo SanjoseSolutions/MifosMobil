@@ -523,6 +523,7 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log('Client status: ' + JSON.stringify(client['status']));
       $scope.client.pending = (client['status']['value'] == 'Pending');
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
+      $scope.client.createdOnDate = DateUtil.localDate(client.timeline.submittedOnDate);
       var gname = client.gender.name || "male";
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
       logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
