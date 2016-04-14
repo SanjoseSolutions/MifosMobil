@@ -1029,6 +1029,14 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     };
 
+  var get_displayName = function(client) {
+    var dName = client['firstname'];
+    if (client['lastname']) {
+      dName = dName + ' ' + client['lastname'];
+    }
+    return dName;
+  };
+  
   return {
     dateFields: function() {
       return ["dateOfBirth", "activationDate"];
@@ -1161,6 +1169,7 @@ angular.module('starter.services', ['ngCordova'] )
           var id = HashUtil.nextKey(clients);
           client["id"] = id;
           clients[id] = client;
+          client["displayName"] = get_displayName(client);
           Cache.setObject('h_clients', clients);
           client["cid"] = response.cid;
           fn_offline(client);
