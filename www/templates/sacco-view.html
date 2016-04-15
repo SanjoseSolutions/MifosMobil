@@ -31,7 +31,7 @@
         {{data.SACCO_Fields["License Registration No"] || "Not set"}}
       </ion-item>
       <ion-item>
-        <label>Member Count</label>: {{data.members}}
+        <label>Member Count</label>: {{data.members || "0" }}
       </ion-item>
       <ion-item>
         <label>Parent Office:</label> {{data.parentName}}
