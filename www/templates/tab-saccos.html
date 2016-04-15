@@ -32,12 +32,10 @@ span.sacco-icon {
 .ion-ios-people {
 /*  font-size: 2.3rem; */
 }
-/*
 .noMembers {
-	color: #558;
-}
-*/
-</style>
+  color: #558;
+  font-size:1rem;
+}</style>
 <ion-view view-title="SACCOs">
 
   <ion-nav-buttons side="right">
@@ -65,20 +63,19 @@ span.sacco-icon {
 
           <img src="img/saccos.png">
           <h2 class="sacco-icon">#{{sacco.id}}: {{sacco.name}}</h2>
-          <div>
+          <!-- div>
             <span style="padding-left:2em">
               <div style="margin-top:10px" class="icon ion-ios-people"></div>
-              : {{s.clients || "35" }}
+              : 
             </span>
-            | &Sigma;S: {{s.totalSavings || "55" }} <!-- Green -->
-            | &Sigma;L: {{s.totalLoans || "80" }}   <!-- Red / Blue -->
-          </div>
+            .
+          </div -->
           <p ng-hide="{{sacco.members}}">
-            <i class="icon ion-close-round"></i>
-            <label>No Members</label>
+            <!-- i class="icon ion-close-round"></i -->
+            <label class="noMembers">No Members</label>
           </p>
           <p ng-show="{{sacco.members}}">	
-            <i class="ion-ios-people"></i>
+            <!-- i class="ion-ios-people"></i -->
             Members : {{sacco.members}}
           </p>
           <!-- div>

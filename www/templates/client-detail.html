@@ -28,24 +28,26 @@
 }
 </style>
 <ion-view view-title="Client: {{client.displayName}}">
+  <ion-nav-buttons side="right">
+      <a class="button button-outline button-icon rightBtn"
+          href="#/tab/clients/{{client.id}}/edit" title="Edit Client Infos">
+        <i class="icon ion-edit"> Edit</i>
+      </a>
+  </ion-nav-buttons>
   <ion-content id="client-details">
-    <a href="#/tab/clients/{{client.id}}/edit" class="button button-block w20 rightBtn">
-      <label><i class="ion-edit"> Edit</i></label>
-    </a>
+    <!-- a href="#/tab/clients/{{client.id}}/edit" class="button button-block w20 rightBtn">
+      <label><i class="ion-edit"></i></label>
+    </a -->
 
     <div class="list card" style="clear:both;">
       <!-- To Prevent long Name to be cut -->
       <ion-item class="item item-divider">
-        <div class="button-bar">
-          <a class="button button-clear button-positive">
-            <label class="positive">{{client.displayName}}</label>
-          </a>
-          <a href="#/tab/clients/{{client.id}}/edit"
-              class="button button-clear button-positive w20 rightBtn icon ion-edit myEdit"
-              style='clear:both; float: right; font-size: 1rem;'> <!-- &nbsp;  + Edit -->
-              <!-- label><i class="ion-edit"> Edit</i></label -->
-          </a>
-        </div>
+        <label class="positive">{{client.displayName}}</label>
+        <!-- a href="#/tab/clients/{{client.id}}/edit"
+            class="button button-clear button-positive w20 rightBtn icon ion-edit myEdit"
+            style='clear:both;'>  float:right; font-size: 1rem;' &nbsp;  + Edit >
+            < ! - - label><i class="ion-edit"> Edit</i></label >
+        </a -->
       </ion-item>
 
       <div class="item item-avatar custom">
@@ -59,11 +61,10 @@
       </div>
 
       <ion-item class="item item-icon">
-        <label>Office</label>:{{client.officeName}}<br />
+        <label>Office</label> # {{client.officeId}} : {{client.officeName}}<br />
         <label>Membership</label>:
         <i class="icon ion-person-add"></i>
         {{ client.clientType.name || "Not set" }}
-        |\ {{ client.clientType.Name || "Not set" }}
       </ion-item>
 
       <div class="button-bar">
@@ -85,7 +86,7 @@
       </ion-item>
 
       <ion-item class="item"> <!-- item-button" -->
-        <button class="button button-small button-positive w20 leftBtn">
+        <button class="button button-small button-positive leftBtn">
           Write SMS <i class="icon ion-ios-email-outline"></i>
         </button>
         <span class="centered">{{client.mobileNo || "9876543210"}}</span>
@@ -154,8 +155,8 @@
         {{client.Client_Fields.Wereda || "Not set" }} <br />
         <label>Kebele</label>:
         {{client.Client_Fields.Kebele || "Not set" }} <br />
-        <label>Unique Place Name</label>:
-        {{client.Client_Fields.UniquePlaceName || "Not set" }} <br />
+        <label>Unique Place Name</label>:<br />
+        {{client.Client_Fields.UniquePlaceName || "Not set" }}
       </ion-item>
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
