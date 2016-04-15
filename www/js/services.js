@@ -1575,12 +1575,10 @@ angular.module('starter.services', ['ngCordova'] )
     getCodeValue: function(codeNm, v, fn_cv) {
       codesObj.getValues(codeNm, function(cvs) {
         var cvh = {};
-        logger.log("DT CodeValues: " + JSON.stringify(cvs));
         for(var i = 0; i < cvs.length; ++i) {
           cv = cvs[i];
           cvh[cv['id']] = cv['name'];
         }
-        logger.log("DT CodeValue Hash: " + JSON.stringify(cvh));
         if (cvh[v]) {
           logger.log("DT CodeValue found for " + cvh[v]);
           fn_cv(cvh[v]);
