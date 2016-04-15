@@ -68,6 +68,13 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
+          <span class="input-label">Marital Status :</span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">Date of Birth:</span>
           <label class="item-input-wrapper">
             <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
@@ -86,7 +93,7 @@ select {
                 ng-model="client.Client_Fields.Email">
           </label>
         </div>
-        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
+        <div class="item item-input-inset" ng-show="rolestat.isManagement || rolestat.isAdmin">
           <span class="input-label">
             Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
@@ -96,16 +103,13 @@ select {
             </select>
           </label>
         </div>
-        <div class="item item-input-inset" ng-hide="rolestat.isStaff">
+        <div class="item item-input-inset">
           <span class="input-label">
             Membership
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
-            <select name="ClientType" ng-model="client.client.ClientType" required>
-              <option value="" selected>Select Client Type</option>
-              <option value="1">Member</option>
-              <option value="2">Non-Member</option>
+            <select ng-model="client.clientTypeId" ng-options="ct.id as ct.name for ct in codes.ClientTypes"> 
             </select>
           </label>
         </div>
@@ -134,8 +138,10 @@ select {
 
         <!-- Family Member Size -->
         <div class="item item-divider"> 
-          <span class="input-label">Family Size </span>
+          <!-- span class="input-label">Family Size </span -->
+          <label>Family Size &amp; Details </label>
         </div>
+
         <div class="item row">
           <div class="col">
             <label class="item-input item-select">
@@ -247,7 +253,7 @@ select {
         <ion-item class="item item-input-inset">
           <span class="input-label">Gender:</span>
           <label class="item-input-wrapper">
-            <select ng-model="client.Client_NextOfKin.genderId" ng-options="g.id as g.name for g in codes.genders">
+            <select ng-model="client.Client_NextOfKin.Gender_cd_Gender" ng-options="g.id as g.name for g in codes.genders">
             </select>
           </label>
         </ion-item>
@@ -288,7 +294,6 @@ select {
           <span class="input-label">Unique Place Name</span>
           <label class="item-input-wrapper">
             <input type="text" title="Your Address in short" name="UniquePName" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model='client.Client_NextOfKin["UniquePlaceName"]' />
-            <!-- ng-model="client.Client_Fields.uniquePName" -->
           </label>
         </div>    
         <div class="item item-input-inset">
@@ -313,10 +318,10 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Wereda :</span>
+          <span class="input-label">Woreda :</span>
           <label class="item-input-wrapper">
-            <input type="text" name="Wereda" placeholder="Enter Wereda's Name"
-                ng-model='client.Client_NextOfKin["Wereda"]'>
+            <input type="text" name="Woreda" placeholder="Enter Woreda's Name"
+                ng-model='client.Client_NextOfKin["Woreda"]'>
           </label>
         </div>
         <div class="item item-input-inset">

@@ -45,11 +45,12 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
 .factory('Cache', ['logger', function(logger) {
   var index = {};
   var lastSync = null;
+  var get_cached = function(key) {
+    return localStorage.getItem(key);
+  };
   return {
-    'get': function(key) {
-      return localStorage.getItem(key);
-    },
-    'set': function(key, val) {
+    get: get_cached,
+    set: function(key, val) {
       localStorage.setItem(key, val);
       index[key] = 1;
     },
@@ -66,19 +67,18 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       localStorage.removeItem(key);
       delete index[key];
     },
-    'clearAll': function() {
-      logger.log("Called Cache.clearAll()");
-      var keys = Object.keys(index);
-      index = {};
-      logger.log("Got keys: " + keys.join(", "));
-      for(var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
-        if (key.match(/^passwd\./)) {
-          index[key] = 1;
-        } else {
-          logger.log("Going to clear key: " + key);
-          localStorage.removeItem(key);
-        }
+    'clear': function() {
+      var new_cache = {};
+      var pkeys = Object.keys(index).filter(function(e) {
+        return e.match('^(passwd|codevalues)\.');
+      } );
+      angular.forEach(pkeys, function(k) {
+        new_cache[k] = get_cached(k);
+      } );
+      localStorage.clear();
+      for(k in new_cache) {
+        this.set(k, new_cache[k]);
+        index[k] = 1;
       }
     },
     'updateLastSync': function() {
