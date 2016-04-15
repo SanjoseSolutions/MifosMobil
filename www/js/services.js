@@ -1114,7 +1114,6 @@ angular.module('starter.services', ['ngCordova'] )
             clients = {};
             for(var i = 0; i < n_clients.length; ++i) {
               var c = n_clients[i];
-              logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
               clients[c.id] = c;
             }
             // Replacing existing Clients data from cache
@@ -1185,7 +1184,7 @@ angular.module('starter.services', ['ngCordova'] )
       fields['locale'] = 'en';
       fields['dateFormat'] = "yyyy-MM-dd";
       authHttp.post(baseUrl + '/clients/' + id + '?command=reject',
-        fields, function(response) {
+        fields, {}, function(response) {
           fn_callback(response.data);
         } );
     },
@@ -1194,7 +1193,7 @@ angular.module('starter.services', ['ngCordova'] )
         locale: "en",
         dateFormat: "yyyy-MM-dd",
         activationDate: dt
-      }, function(response) {
+      }, {}, function(response) {
         fn_callback(response.data);
       } );
     },
