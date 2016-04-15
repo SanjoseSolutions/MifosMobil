@@ -1,6 +1,6 @@
 {
   "name": "k-Mayra",
-  "version": "1.0.0",
+  "version": "0.98.0",
   "description": "k-Mayra: Bank on your Mobile",
   "dependencies": {
     "gulp": "^3.5.6",
@@ -36,7 +36,8 @@
     {
       "locator": "http://github.com/don/cordova-filechooser.git",
       "id": "com.megster.cordova.FileChooser"
-    }
+    },
+    "cordova-plugin-file-transfer"
   ],
   "cordovaPlatforms": [
     "android"

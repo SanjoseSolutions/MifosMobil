@@ -27,11 +27,11 @@
         <label>SACCO's Name:</label> {{data.name || "Not set"}}
       </ion-item>
       <ion-item>
-        <label>Licence Number </label> :
+        <label title="Cooperative License Reg. No.">Licence Number </label> :
         {{data.SACCO_Fields["License Registration No"] || "Not set"}}
       </ion-item>
       <ion-item>
-        <label>Cooperative License Reg. No.:</label><br /> # {{data.coopLicRegNo || "Not set"}}
+        <label>Member Count: </label>{{data.members}}
       </ion-item>
       <ion-item>
         <label>Parent Office:</label> {{data.parentName}}

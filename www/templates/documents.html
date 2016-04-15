@@ -1,0 +1,57 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<ion-view view-title="Documents">
+
+  <ion-nav-buttons side="right">
+      <a class="right button button-icon icon ion-android-add" ng-click="modal.show()"></a>
+  </ion-nav-buttons>
+
+  <ion-content>
+    <ion-list>
+      <ion-item ng-click="downloadDoc(doc)" class="item item-remove-animate item-icon-right"
+          ng-repeat="doc in docs" type="item-text-wrap" >
+        <h2>{{doc.name}}</h2>
+        <p>{{doc.description}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-assertive" ng-click="removeDoc(doc.id)">
+          Delete
+        </ion-option-button>
+
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
+
+<script id="addDoc.html" type="text/ng-template">
+  <ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-positive">
+      <h1 class="title">Upload Document</h1>
+      <button class="button button-clear button-primary" ng-click="modal.hide()">Cancel</button>
+    </ion-header-bar>
+    <ion-content class="padding">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Name</span>
+          <input ng-model="docForm.name" type="text">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Description</span>
+          <input ng-model="docForm.description" type="text">
+        </label>
+        <button class="button button-full button-positive" ng-click="uploadDoc()">Upload Doc</button>
+      </div>
+    </ion-content>
+  </ion-modal-view>
+</script>
