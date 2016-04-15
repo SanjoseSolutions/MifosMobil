@@ -30,7 +30,7 @@
  *  - DashboardCtrl: 
  */
 
-angular.module('starter.controllers', ['ngCordova'])
+angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork',
     'logger', 'CommandQueue', '$state', function($rootScope, $scope, Session,

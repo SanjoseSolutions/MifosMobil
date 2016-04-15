@@ -1,12 +1,4 @@
 {
   "name": "k-Mayra",
-  "app_id": "kmayra.org",
-  "gulpStartupTasks": [
-    "sass",
-    "watch"
-  ],
-  "watchPatterns": [
-    "www/**/*",
-    "!www/lib/**/*"
-  ]
+  "app_id": "kmayra.org"
 }
