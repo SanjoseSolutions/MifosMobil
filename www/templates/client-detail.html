@@ -56,17 +56,18 @@
         <p><b>Gender</b>:{{client.gender.name}}</p>
         <p><b>Marital Status:</b> {{client.Client_Fields["Marital Status"] || "Not set"}}</p>
         <p><b>D.O.B:</b> {{client.dateOfBirth}}</p>
-        <p><b>Office:</b> {{client.officeName}}</p>
+        <!-- p><b>Office:</b> {{client.officeName}}</p>
         <p><b>Created:</b> {{client.createdOnDate}}</p>
-        <!-- p><label><i class="icon ion-android-call"></i></label> {{client.mobileNo || "9876543210"}}</p -->
+        <p><label><i class="icon ion-android-call"></i></label> {{client.mobileNo || "9876543210"}}</p -->
       </div>
 
       <ion-item class="item item-icon">
+        <!-- To Prevent long names to be cut -->
         <label>Office</label> # {{client.officeId}} : {{client.officeName}}<br />
-        <label>Created</label>: {{client.createdOnDate}}
+        <label>Created</label>: {{client.createdOnDate}}<br />
         <label>Membership</label>:
           <i class="icon ion-person-add"></i>
-          {{ client.clientType.name || "Not set" }}
+          {{ client.clientType.name || "Not set" }}<br />
       </ion-item>
 
       <div class="button-bar">
@@ -81,7 +82,6 @@
 
     </div>
     <div class="list card no-text-wrap">
-<<<<<<< HEAD
       <ion-item class="item item-icon-left">
         <!-- ion-ios-email-outline" -->
         <label class="icon ion-email"></label>
