@@ -56,19 +56,14 @@
         <p><b>Gender</b>:{{client.gender.name}}</p>
         <p><b>Marital Status:</b> {{client.Client_Fields["Marital Status"] || "Not set"}}</p>
         <p><b>D.O.B:</b> {{client.dateOfBirth}}</p>
-        <!-- p><b>Office:</b> {{client.officeName}}</p>
-        <p><b>Created:</b> {{client.createdOnDate}}</p>
-        <p><label><i class="icon ion-android-call"></i></label> {{client.mobileNo || "9876543210"}}</p -->
-      </div>
-
-      <ion-item class="item item-icon">
         <!-- To Prevent long names to be cut -->
-        <label>Office</label> # {{client.officeId}} : {{client.officeName}}<br />
-        <label>Created</label>: {{client.createdOnDate}}<br />
-        <label>Membership</label>:
-          <i class="icon ion-person-add"></i>
-          {{ client.clientType.name || "Not set" }}<br />
-      </ion-item>
+        <p><b>Office:</b> # {{client.officeId}} <br /> {{client.officeName}}</p>
+        <p><b>Created:</b> {{client.createdOnDate}}</p>
+        <p><b>Membership :</b>
+          <!-- i class="icon ion-person-add"></i -->
+          {{ client.clientType.name || "Not set" }}</p>
+        <!-- p><label><i class="icon ion-android-call"></i></label> {{client.mobileNo || "9876543210"}}</p -->
+      </div>
 
       <div class="button-bar">
         <a ng-click="getPhoto()" class="button button-clear button-positive icon ion-camera">
@@ -137,7 +132,7 @@
       <ion-item>
         <label>Father's Name</label>:
         {{client.Client_Fields["Fathers Name"] || "Not set"}} <br />
-        <label>Grand Father's Name</label>:
+        <label>Gd Father's Name</label>:
         {{client.Client_Fields["Grandfathers Name"] || "Not set"}}
       </ion-item>
       <ion-item>
