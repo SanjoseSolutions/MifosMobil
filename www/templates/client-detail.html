@@ -86,11 +86,12 @@
       </ion-item>
 
       <ion-item class="item"> <!-- item-button" -->
-        <button class="button button-small button-positive leftBtn">
+        <!-- button class="button button-small button-positive leftBtn">
           Write SMS <i class="icon ion-ios-email-outline"></i>
-        </button>
-        <span class="centered">{{client.mobileNo || "9876543210"}}</span>
-        <a class="button button-small button-positive w20 rightBtn"
+        </button -->
+        <strong class="positive">{{client.mobileNo || "9876543210"}}</strong>
+        <!--span class="centered">{{client.mobileNo || "9876543210"}}</span -->
+        <a class="button button-small button-positive rightBtn"
             ng-href="tel:{{client.mobileNo}}">
           <i class="icon ion-android-call"></i> Make Call
         </a>
@@ -144,7 +145,7 @@
         {{client.Client_Fields.Address || "Address Field Not set" }}
         <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
-      <ion-item>
+      <ion-item class="item item-body">
         <label>Country</label>:
         {{client.Client_Fields.Country || "Not set" }} <br />
         <label>Region</label>:
