@@ -465,7 +465,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, $ionicPopup,
     Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
@@ -499,7 +499,10 @@ angular.module('starter.controllers', ['ngCordova'])
     var dt = new Date();
     Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
       $scope.client.pending = false;
-      alert("Succesfully approved client");
+      $ionicPopup.alert( {
+        titel: "Success",
+        template: "Succesfully approved client"
+      } );
       logger.log("Succesfully approved client");
     } );
   };
@@ -513,7 +516,10 @@ angular.module('starter.controllers', ['ngCordova'])
     };
     Clients.reject(id, fields, function(response) {
       $scope.client.pending = false;
-      alert("Client #" + id + " rejected");
+      $ionicPopup.alert( {
+        titel: "Rejected",
+        template: "Client #" + id + " rejected"
+      } );
       logger.log("Client #" + id + " rejected");
     } );
   };
@@ -523,6 +529,7 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log('Client status: ' + JSON.stringify(client['status']));
       $scope.client.pending = (client['status']['value'] == 'Pending');
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
+      $scope.client.createdOnDate = DateUtil.localDate(client.timeline.submittedOnDate);
       var gname = client.gender.name || "male";
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
       logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
@@ -627,9 +634,9 @@ angular.module('starter.controllers', ['ngCordova'])
     };
 
 
-    $scope.downloadDoc = function(docId) {
-        var server = baseUrl + '/clients/'+ clientId + '/documents/' + docId + '/attachment?tenantIdentifier=' + Settings.tenant;
-        var path = cordova.file.externalRootDirectory + 'test.pdf';
+    $scope.downloadDoc = function(doc) {
+        var server = baseUrl + '/clients/'+ clientId + '/documents/' + doc.id + '/attachment?tenantIdentifier=' + Settings.tenant;
+        var path = cordova.file.externalRootDirectory + doc.name;
         var options = {};
         
         console.log($http.defaults.headers.common.Authorization)
@@ -657,7 +664,7 @@ angular.module('starter.controllers', ['ngCordova'])
     };
 
     $scope.removeDoc = function(){
-      Documents.removeDoc(clientId, docId).then(function(result) {
+      Documents.removeDoc(clientId, doc.id).then(function(result) {
         console.log(result);
       })
     }
@@ -1051,7 +1058,7 @@ angular.module('starter.controllers', ['ngCordova'])
   logger.log("ClientNextOfKinCtrl invoked for client #" + clientId);
   Customers.get_full(clientId, function(client) {
     $scope.client = client;
-    $scope.client.dateOfBirth = DateUtil.isoDateStr(client.dateOfBirth);
+    $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
     $scope.client.face = "img/placeholder-" + client.gender.name.toLowerCase() + ".jpg";
   } );
 } )
@@ -1239,11 +1246,17 @@ angular.module('starter.controllers', ['ngCordova'])
     }, function(new_client) {
       var cid = new_client.cid;
       angular.forEach(cdts, function(dt) {
-        HashUtil.copy(client[dt], {
-          'locale': 'en',
-          'dateFormat': 'yyyy-MM-dd'
-        } );
-        DataTables.saveOffline(dt, client[dt], cid);
+        var dfields = null;
+        if ('Client_NextOfKin' == dt) {
+          dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
+        } else {
+          dfields = client[dt];
+          HashUtil.copy(dfields, {
+            locale: 'en',
+            dateFormat: 'yyyy-mm-dd'
+          } );
+        }
+        DataTables.saveOffline(dt, dfields, cid);
       } );
       $scope.message = {
         "type": "info",

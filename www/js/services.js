@@ -206,6 +206,7 @@ angular.module('starter.services', ['ngCordova'] )
             for(var i = 0; i < subcmds.length; ++i) {
               var scmd = subcmds[i];
               scmd['url'] = scmd['url'] + resId;
+              logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
               commands.push(scmd);
               setTimeout(runNextCmd, 2000);
             }
@@ -625,7 +626,7 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
+.factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Clients) {
   var fetch_office = function(id, fn_office) {
     authHttp.get(baseUrl + '/offices/' + id)
     .then(function(response) {
@@ -720,6 +721,7 @@ angular.module('starter.services', ['ngCordova'] )
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
+      console.log(h_offices);
       var offices = HashUtil.to_a(h_offices);
       if (offices.length) {
         fn_offices(offices);
@@ -735,7 +737,32 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.get(baseUrl + '/offices').then(function(response) {
         var odata = response.data.sort(function(a, b) { return a.id - b.id } );
         Cache.setObject('h_offices', HashUtil.from_a(odata));
-        fn_offices(odata);
+        
+        // duplicate code for hot fix for set_member_counts
+        var s_clients = {};
+        Clients.query(function(clients) {
+          clients.map(function(c) {
+            console.log(c);
+            var oid = c.officeId;
+            s_clients[oid] = s_clients[oid] || 0;
+            ++s_clients[oid];
+          } );
+        } );
+        var offices = Cache.getObject('h_offices');
+        if (offices) {
+          Object.keys(offices).map(function(oid) {
+            if (s_clients[oid]) {
+              offices[oid]['members'] = s_clients[oid];
+            }
+          } );
+          Cache.setObject('h_offices', offices);
+        }
+        
+        var h_offices = Cache.getObject('h_offices') || {};
+        console.log(h_offices);
+        offices = HashUtil.to_a(h_offices);
+
+        fn_offices(offices);
       } );
     }
   };
@@ -750,6 +777,7 @@ angular.module('starter.services', ['ngCordova'] )
       var s_clients = {};
       Clients.query(function(clients) {
         clients.map(function(c) {
+          console.log(c);
           var oid = c.officeId;
           s_clients[oid] = s_clients[oid] || 0;
           ++s_clients[oid];
@@ -1085,7 +1113,6 @@ angular.module('starter.services', ['ngCordova'] )
             clients = {};
             for(var i = 0; i < n_clients.length; ++i) {
               var c = n_clients[i];
-              logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
               clients[c.id] = c;
             }
             // Replacing existing Clients data from cache
@@ -1156,7 +1183,7 @@ angular.module('starter.services', ['ngCordova'] )
       fields['locale'] = 'en';
       fields['dateFormat'] = "yyyy-MM-dd";
       authHttp.post(baseUrl + '/clients/' + id + '?command=reject',
-        fields, function(response) {
+        fields, {}, function(response) {
           fn_callback(response.data);
         } );
     },
@@ -1165,7 +1192,7 @@ angular.module('starter.services', ['ngCordova'] )
         locale: "en",
         dateFormat: "yyyy-MM-dd",
         activationDate: dt
-      }, function(response) {
+      }, {}, function(response) {
         fn_callback(response.data);
       } );
     },
@@ -1573,12 +1600,10 @@ angular.module('starter.services', ['ngCordova'] )
     getCodeValue: function(codeNm, v, fn_cv) {
       codesObj.getValues(codeNm, function(cvs) {
         var cvh = {};
-        logger.log("DT CodeValues: " + JSON.stringify(cvs));
         for(var i = 0; i < cvs.length; ++i) {
           cv = cvs[i];
           cvh[cv['id']] = cv['name'];
         }
-        logger.log("DT CodeValue Hash: " + JSON.stringify(cvh));
         if (cvh[v]) {
           logger.log("DT CodeValue found for " + cvh[v]);
           fn_cv(cvh[v]);
