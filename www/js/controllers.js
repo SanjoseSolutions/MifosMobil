@@ -628,9 +628,9 @@ angular.module('starter.controllers', ['ngCordova'])
     };
 
 
-    $scope.downloadDoc = function(docId) {
-        var server = baseUrl + '/clients/'+ clientId + '/documents/' + docId + '/attachment?tenantIdentifier=' + Settings.tenant;
-        var path = cordova.file.externalRootDirectory + 'test.pdf';
+    $scope.downloadDoc = function(doc) {
+        var server = baseUrl + '/clients/'+ clientId + '/documents/' + doc.id + '/attachment?tenantIdentifier=' + Settings.tenant;
+        var path = cordova.file.externalRootDirectory + doc.name;
         var options = {};
         
         console.log($http.defaults.headers.common.Authorization)
@@ -658,7 +658,7 @@ angular.module('starter.controllers', ['ngCordova'])
     };
 
     $scope.removeDoc = function(){
-      Documents.removeDoc(clientId, docId).then(function(result) {
+      Documents.removeDoc(clientId, doc.id).then(function(result) {
         console.log(result);
       })
     }
