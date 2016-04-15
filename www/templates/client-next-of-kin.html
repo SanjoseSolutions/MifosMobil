@@ -42,8 +42,8 @@
         <div class="briefInfo">
           <label>Gender :</label> {{client.gender.name}}
           <br /><label>Marital Status :</label>
-          <br />{{client.ClientFields["Marital Status"] || "Unspecified"}}
-          <br /><label>D.O.B</label>: {{client.dob}}
+          <br />{{client.Client_Fields["Marital Status"] || "Unspecified"}}
+          <br /><label>D.O.B</label>: {{client.dateOfBirth}}
           <br />
           <!--label title="Mobile">
             Telephone
@@ -87,7 +87,7 @@
           Telephone
           <span class="icon ion-android-call"></span>
         </label>
-        : <strong>{{client.Client_NextOfKin.Mobile || "Unspecified"}}</strong>
+        : <strong>{{client.Client_NextOfKin.Phone || "Unspecified"}}</strong>
       </ion-item>
       <ion-item>
         <label>Relationship with Client:</label>
@@ -121,8 +121,8 @@
         : {{client.Client_NextOfKin["Zone"] || "Unspecified"}}
       </ion-item>
       <ion-item>
-        <label> Wereda </label>
-        : {{client.Client_NextOfKin["Wereda"] || "Unspecified"}}
+        <label> Woreda </label>
+        : {{client.Client_NextOfKin["Woreda"] || "Unspecified"}}
       </ion-item>
       <ion-item>
         <label> Kebele </label>

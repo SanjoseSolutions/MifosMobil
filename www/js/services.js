@@ -78,7 +78,7 @@ angular.module('starter.services', ['ngCordova'] )
     'clear': function() {
       var new_cache = {};
       var pkeys = Object.keys(index).filter(function(e) {
-        return e.match('^passwd.');
+        return e.match('^(passwd|codevalues)\.');
       } );
       angular.forEach(pkeys, function(k) {
         new_cache[k] = get_cached(k);
@@ -87,21 +87,6 @@ angular.module('starter.services', ['ngCordova'] )
       for(k in new_cache) {
         this.set(k, new_cache[k]);
         index[k] = 1;
-      }
-    },
-    'clearAll': function() {
-      logger.log("Called Cache.clearAll()");
-      var keys = Object.keys(index);
-      index = {};
-      logger.log("Got keys: " + keys.join(", "));
-      for(var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
-        if (key.match(/^passwd\./)) {
-          index[key] = 1;
-        } else {
-          logger.log("Going to clear key: " + key);
-          localStorage.removeItem(key);
-        }
       }
     },
     'updateLastSync': function() {
@@ -221,6 +206,7 @@ angular.module('starter.services', ['ngCordova'] )
             for(var i = 0; i < subcmds.length; ++i) {
               var scmd = subcmds[i];
               scmd['url'] = scmd['url'] + resId;
+              logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
               commands.push(scmd);
               setTimeout(runNextCmd, 2000);
             }
@@ -365,23 +351,21 @@ angular.module('starter.services', ['ngCordova'] )
 
   session.login = function(auth, fn_success, fn_fail) {
 
-    var onLogin = function(data) {
-      session.loginTime = new Date();
+    var onLogin = function(auth, data) {
       Cache.set('username', auth.username);
       session.uname = auth.username;
-      Cache.setObject('commands', []);
-
-      logger.log("Response: " + JSON.stringify(data));
-      Cache.setObject('auth', data);
 
       var roles = Roles.setRoles(data.roles);
       var role = roles[0];
       session.role = role;
 
+      session.loginTime = new Date();
       var b64key = data.base64EncodedAuthenticationKey;
       logger.log("Base64key: " + b64key);
       authHttp.setAuthHeader(b64key);
 
+      Cache.setObject('auth', data);
+      Cache.setObject('commands', []);
       Cache.setObject('session', session);
       Codes.init();
     };
@@ -392,7 +376,7 @@ angular.module('starter.services', ['ngCordova'] )
       logger.log("Got cached authinfo: " + JSON.stringify(authinfo));
       if (authinfo.password == auth.password) {
         logger.log("Succesful login :-)");
-        onLogin(authinfo);
+        onLogin(auth, authinfo);
         fn_success(authinfo);
       } else {
         logger.log("Login failed :-/");
@@ -416,16 +400,16 @@ angular.module('starter.services', ['ngCordova'] )
       'Accept': 'application/json'
     } ).then(function(response) {
 
-      logger.log("Succesful login :-D");
       Cache.clear();
 
+      logger.log("Succesful login :-D");
+
       var data = response.data;
+      onLogin(auth, data);
       data.password = auth.password;
       Cache.setObject('passwd.' + auth.username, data); 
 
-      onLogin(data);
-
-      fn_success(response);
+      fn_success(response.data);
 
     }, function(response) {
       fn_fail(response);
@@ -634,7 +618,8 @@ angular.module('starter.services', ['ngCordova'] )
   return {
     dateFields: function() { return [ 'joiningDate' ]; },
     saveFields: function() {
-      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region", "Zone", "Wereda", "Kebele" ];
+      return [ "joiningDate", "Latitude", "Longitude", "Country", "Region",
+        "Zone", "Wereda", "Kebele", "UniquePlaceName", "License Registration No" ];
     },
     codeFields: function() { return []; },
     skipFields: function() { return {}; }
@@ -757,9 +742,30 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp', 'baseUrl',
-    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp, baseUrl) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil',
+    'logger', 'authHttp', 'baseUrl', 'Clients',
+      function(Office, Cache, DataTables, DateUtil, HashUtil, logger,
+        authHttp, baseUrl, Clients) {
   return {
+    set_member_counts: function() {
+      var s_clients = {};
+      Clients.query(function(clients) {
+        clients.map(function(c) {
+          var oid = c.officeId;
+          s_clients[oid] = s_clients[oid] || 0;
+          ++s_clients[oid];
+        } );
+      } );
+      var offices = Cache.getObject('h_offices');
+      if (offices) {
+        Object.keys(offices).map(function(oid) {
+          if (s_clients[oid]) {
+            offices[oid]['members'] = s_clients[oid];
+          }
+        } );
+        Cache.setObject('h_offices', offices);
+      }
+    },
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
         var sunions = [];
@@ -823,9 +829,10 @@ angular.module('starter.services', ['ngCordova'] )
               "name": data[i].name
             } );
           }   
-        }
+
 //        logger.log("No. of SUs: " + sunions.length);
-        fn_sunions(sunions);
+          fn_sunions(sunions);
+        }
       } );
     },
     query_full: function(fn_saccos) {
@@ -843,7 +850,7 @@ angular.module('starter.services', ['ngCordova'] )
             continue;
           }
           DataTables.get_one(dt, id, function(fields, dt) {
-            office[dt] = fields;
+            office[dt] = DataTables.decode(fields);
             var k = 'dt.'+dt+'.'+id;
             Cache.setObject(k, fields);
           } );
@@ -911,7 +918,7 @@ angular.module('starter.services', ['ngCordova'] )
   }
 } )
 
-.factory('FormHelper', function(DateUtil, logger) {
+.factory('FormHelper', [ 'DateUtil', 'logger', function(DateUtil, logger) {
   return {
     prepareForm: function(type, object) {
       var sfs = type.saveFields().concat(type.dataTables());
@@ -958,7 +965,7 @@ angular.module('starter.services', ['ngCordova'] )
           }
           logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
-            v = v.toISOString();
+            v = DateUtil.toISODateString(v);
           }
           v = v.substr(0, 10);
           logger.log("Got date " + df + "=" + v);
@@ -970,7 +977,7 @@ angular.module('starter.services', ['ngCordova'] )
       return sObject;
     },
   };
-} )
+} ] )
 
 .factory('HashUtil', function(logger) {
   return {
@@ -1033,6 +1040,14 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     };
 
+  var get_displayName = function(client) {
+    var dName = client['firstname'];
+    if (client['lastname']) {
+      dName = dName + ' ' + client['lastname'];
+    }
+    return dName;
+  };
+  
   return {
     dateFields: function() {
       return ["dateOfBirth", "activationDate"];
@@ -1165,6 +1180,7 @@ angular.module('starter.services', ['ngCordova'] )
           var id = HashUtil.nextKey(clients);
           client["id"] = id;
           clients[id] = client;
+          client["displayName"] = get_displayName(client);
           Cache.setObject('h_clients', clients);
           client["cid"] = response.cid;
           fn_offline(client);
@@ -1559,12 +1575,10 @@ angular.module('starter.services', ['ngCordova'] )
     getCodeValue: function(codeNm, v, fn_cv) {
       codesObj.getValues(codeNm, function(cvs) {
         var cvh = {};
-        logger.log("DT CodeValues: " + JSON.stringify(cvs));
         for(var i = 0; i < cvs.length; ++i) {
           cv = cvs[i];
           cvh[cv['id']] = cv['name'];
         }
-        logger.log("DT CodeValue Hash: " + JSON.stringify(cvh));
         if (cvh[v]) {
           logger.log("DT CodeValue found for " + cvh[v]);
           fn_cv(cvh[v]);
@@ -1619,6 +1633,37 @@ angular.module('starter.services', ['ngCordova'] )
     }
   };
 } )
+
+.factory('Documents', [ '$q', 'authHttp', 'baseUrl', 'Settings', 'Cache', 
+  function($q, authHttp, baseUrl, Settings, Cache) {
+    var docs = {};
+
+    docs.getDocsList = function(clientId){
+      var deferred = $q.defer();
+      
+      authHttp.get(baseUrl + '/clients/' + clientId + '/documents').then(function(response) {
+          var data = response.data;
+          console.log(data);
+          deferred.resolve(data);
+         } );
+
+      return deferred.promise;
+    },
+
+    docs.removeDoc = function(clientId, docId){
+      var deferred = $q.defer();
+      
+      authHttp.delete(baseUrl + '/clients/' + clientId + '/documents/' + docId).then(function(response) {
+          var data = response.data;
+          console.log(data);
+          deferred.resolve(data);
+         } );
+
+      return deferred.promise;
+    }
+
+    return docs;
+}]);
 
 ;
 
