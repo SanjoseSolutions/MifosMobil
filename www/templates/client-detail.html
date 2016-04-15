@@ -59,7 +59,7 @@
       </div>
 
       <ion-item class="item item-icon">
-        <label>Office</label>:{{client.officeName}}<br />
+        <label>Office</label> # {{client.officeId}} : {{client.officeName}}<br />
         <label>Membership</label>:
         <i class="icon ion-person-add"></i>
         {{ client.clientType.name || "Not set" }}
@@ -85,11 +85,11 @@
       </ion-item>
 
       <ion-item class="item"> <!-- item-button" -->
-        <button class="button button-small button-positive w20 leftBtn">
+        <button class="button button-small button-positive leftBtn">
           Write SMS <i class="icon ion-ios-email-outline"></i>
         </button>
         <span class="centered">{{client.mobileNo || "9876543210"}}</span>
-        <a class="button button-small button-positive w20 rightBtn">
+        <a class="button button-small button-positive rightBtn">
           <i class="icon ion-android-call"></i> Make Call
         </a>
       </ion-item>
