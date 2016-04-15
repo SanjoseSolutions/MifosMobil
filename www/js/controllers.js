@@ -465,7 +465,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, 
+.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, $ionicPopup,
     Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
@@ -499,7 +499,10 @@ angular.module('starter.controllers', ['ngCordova'])
     var dt = new Date();
     Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
       $scope.client.pending = false;
-      alert("Succesfully approved client");
+      $ionicPopup.alert( {
+        titel: "Success",
+        template: "Succesfully approved client"
+      } );
       logger.log("Succesfully approved client");
     } );
   };
@@ -513,7 +516,10 @@ angular.module('starter.controllers', ['ngCordova'])
     };
     Clients.reject(id, fields, function(response) {
       $scope.client.pending = false;
-      alert("Client #" + id + " rejected");
+      $ionicPopup.alert( {
+        titel: "Rejected",
+        template: "Client #" + id + " rejected"
+      } );
       logger.log("Client #" + id + " rejected");
     } );
   };
