@@ -1237,7 +1237,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         }, function(response) {
           logger.log("Accepted for offline: " + JSON.stringify(response));
         }, function(response) {
-          logger.log("Failed to save datatables(" + response.status + ") data: " + response.data);
+          logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
         } );
       } );
       setTimeout(function() {

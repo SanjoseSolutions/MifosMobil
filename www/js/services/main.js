@@ -907,7 +907,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           if (v instanceof Date) {
             v = DateUtil.toISODateString(v);
           }
-          v = v.substr(0, 10);
           logger.log("Got date " + df + "=" + v);
           sObject[df] = v;
         }
@@ -923,8 +922,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   return {
     dateFields: function() { return [ 'dateOfBirth' ]; },
     saveFields: function() {
-      return [ 'dateOfBirth', 'Fullname', 'Fathers Name', 'Grandfathers Name', 'Phone', 'Relationship',
-        'Gender', 'Region', 'Zone', 'Woreda', 'Kebele', 'UniquePlaceName' ];
+      return [ 'dateOfBirth', 'Fullname', 'Fathers Name', 'Grandfathers Name', 'Phone',
+        'Relationship_cd_Relationship', 'Gender_cd_Gender', 'Country', 'Region', 'Zone',
+        'Woreda', 'Kebele', 'UniquePlaceName' ];
     },
     codeFields: function() { return [ 'Relationship_cd_Relationship', 'Gender_cd_Gender' ]; },
     skipFields: function() { return {}; }
