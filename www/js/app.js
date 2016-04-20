@@ -61,6 +61,10 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   //
 })
 
+.config(function($logProvider) {
+  $logProvider.debugEnabled(false);
+})
+
 .config(function($ionicConfigProvider) {
   if(!ionic.Platform.isIOS()) { 
     $ionicConfigProvider.scrolling.jsScrolling(false);

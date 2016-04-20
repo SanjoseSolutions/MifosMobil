@@ -13,7 +13,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
- *  Filename: www/js/services.js
+ *  Filename: www/js/services/main.js
  *  This file has a set of services
  *  Current services available (to be kept up-to-date)
  *    1. baseUrl: the base URL of Mifos X backend
@@ -59,6 +59,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     delete $http.defaults.headers.common.Authorization;
   };
 
+  authHttp.resetAuthHeader = function() {
+    var auth = Cache.getObject('auth');
+    var b64key = auth.base64EncodedAuthenticationKey;
+    authHttp.setAuthHeader(b64key);
+    return b64key ? true : false;
+  };
+
   /* Custom headers: GET, HEAD, DELETE */
   angular.forEach(['get', 'delete', 'head'], function (method) {
     authHttp[method] = function(url, config) {
@@ -74,7 +81,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       config.headers = config.headers || {};
       config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
       if (!authHttp.getAuthHeader()) {
-        $rootScope.$broadcast('sessionExpired');
+        $rootScope.$broadcast('resetSession');
       }
       if (window.Connection && $cordovaNetwork.isOffline()) {
         var cmd = {
@@ -99,10 +106,19 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     };
   } );
 
-  authHttp.replaceData = function(cid, data) {
+  authHttp.alterCachedCommand = function(cid, fn_cmd) {
     var commands = Cache.getObject('commands');
-    commands[cid]['data'] = data;
-    Cache.setObject('commands', commands);
+    var cmd = commands[cid];
+    if (cmd) {
+      fn_cmd(cmd);
+    }
+    Cache.setCommands('commands', commands);
+  };
+
+  authHttp.replaceData = function(cid, data) {
+    authHttp.alterCachedCommand(cid, function(cmd) {
+      cmd['data'] = data;
+    } );
   };
 
   authHttp.saveOffline = function(url, data, config, rid) {
@@ -152,7 +168,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
               }
               logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
               commands.push(scmd);
-              setTimeout(runNextCmd, 2000);
             }
           }
           fn_success(); //method, url, data, response)
@@ -162,18 +177,36 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
             + " :: " + JSON.stringify(response.data));
           results.push(response.data);
           fn_fail(); //method, url, data, response);
+        } )
+        .finally(function() {
+          if (commands.length) {
+            setTimeout(runNextCmd, 1000);
+          } else {
+            Cache.setObject('commands', []);
+            fn_final();
+          }
         } );
-      if (commands.length) {
-        setTimeout(runNextCmd, 2000);
-      } else {
-        Cache.setObject('commands', []);
-        fn_final();
-      }
     };
     setTimeout(runNextCmd, 1000);
   };
 
   return authHttp;
+} ] )
+
+.factory('CachedHash', [ 'Cache', 'logger', 
+  function(Cache, logger) {
+    
+  return {
+    update: function(hkey, id, fn_item) {
+      // takes parent entity id callback for cached cmd
+      var hash = Cache.getObject(hkey);
+      if (!hash) return;
+      var item = hash[id];
+      fn_item(item);
+      Cache.setObject(hkey, hash);
+    }
+  };
+
 } ] )
 
 .factory('CommandQueue', function(authHttp, logger) {
@@ -291,6 +324,17 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
   session.loggedInTime = function() {
     return session.loginTime ? session.loginTime.toLocaleString() : "Never";
+  };
+
+  $rootScope.$on('resetSession', function() {
+    if (!session.reset()) {
+      $rootScope.$broadcast('sessionExpired');
+    }
+  } );
+
+  session.reset = function() {
+    session = Cache.getObject('session');
+    return authHttp.resetAuthHeader();
   };
 
   session.login = function(auth, fn_success, fn_fail) {
@@ -587,18 +631,17 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     update: function(id, fields, fn_office, fn_offline, fn_fail) {
       if (id.match('T[0-9]\+$')) {
-        offices = Cache.getObject('h_offices');
-        var office = offices[id];
-        if (office) {
+        CachedHash.update('h_offices', id, function(office) {
           var cid = office.cid;
+          HashUtil.copy(office, fields);
           if (cid) {
             HashUtil.copy(office, fields);
             authHttp.replaceData(cid, office);
             fn_office(office);
-            return;
+          } else {
+            fn_fail(office);
           }
-        }
-        fn_fail(office);
+        } );
         return;
       }
       authHttp.put(baseUrl + '/offices/' + id, fields, {
@@ -634,7 +677,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
-      console.log(h_offices);
+      logger.log(h_offices);
       var offices = HashUtil.to_a(h_offices);
       if (offices.length) {
         fn_offices(offices);
@@ -655,7 +698,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         var s_clients = {};
         Clients.query(function(clients) {
           clients.map(function(c) {
-            console.log(c);
+            logger.log(c);
             var oid = c.officeId;
             s_clients[oid] = s_clients[oid] || 0;
             ++s_clients[oid];
@@ -672,7 +715,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         }
         
         var h_offices = Cache.getObject('h_offices') || {};
-        console.log(h_offices);
+        logger.log(h_offices);
         offices = HashUtil.to_a(h_offices);
 
         fn_offices(offices);
@@ -690,7 +733,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var s_clients = {};
       Clients.query(function(clients) {
         clients.map(function(c) {
-          console.log(c);
+          logger.log(c);
           var oid = c.officeId;
           s_clients[oid] = s_clients[oid] || 0;
           ++s_clients[oid];
@@ -1109,6 +1152,22 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     update: function(id, client, fn_client, fn_offline, fn_fail) {
+      if (id.match('T[0-9]\+$')) {
+        clients = Cache.getObject('h_clients');
+        var client = clients[id];
+        if (client) {
+          var cid = client.cid;
+          if (cid) {
+            HashUtil.copy(client, fields);
+            authHttp.replaceData(cid, client);
+            Cache.setObject('h_clients', clients);
+            fn_client(client);
+            return;
+          }
+        }
+        fn_fail(client);
+        return;
+      }
       authHttp.put(baseUrl + '/clients/' + id, client, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
@@ -1498,7 +1557,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           cvh[cv['id']] = cv['name'];
         }
         if (cvh[v]) {
-          logger.log("DT CodeValue found for " + cvh[v]);
           fn_cv(cvh[v]);
         }
       } );
@@ -1530,8 +1588,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('Documents', [ '$q', 'authHttp', 'baseUrl', 'Settings', 'Cache', 
-  function($q, authHttp, baseUrl, Settings, Cache) {
+.factory('Documents', [ '$q', 'authHttp', 'baseUrl', 'Settings', 'Cache', 'logger',
+  function($q, authHttp, baseUrl, Settings, Cache, logger) {
     var docs = {};
 
     docs.getDocsList = function(clientId){
@@ -1539,7 +1597,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       
       authHttp.get(baseUrl + '/clients/' + clientId + '/documents').then(function(response) {
           var data = response.data;
-          console.log(data);
+          logger.log(data);
           deferred.resolve(data);
          } );
 
@@ -1551,7 +1609,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       
       authHttp.delete(baseUrl + '/clients/' + clientId + '/documents/' + docId).then(function(response) {
           var data = response.data;
-          console.log(data);
+          logger.log(data);
           deferred.resolve(data);
          } );
 

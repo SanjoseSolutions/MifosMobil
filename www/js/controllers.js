@@ -596,12 +596,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         $cordovaFileTransfer.upload(server, uri, options)
           .then(function(result) {
             // Success!
-            console.log(result)
+            logger.log(result)
           }, function(err) {
             // Error
-            console.log(err)
+            logger.log(err)
           }, function (progress) {
-            console.log(progress);
+            logger.log(progress);
             // constant progress updates
           });
 
@@ -613,7 +613,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('DocumentCtrl', function($scope, $stateParams, logger, Documents, 
-        $ionicModal, $cordovaFileTransfer, baseUrl, Settings, $http) {
+        $ionicModal, $cordovaFileTransfer, baseUrl, Settings, $http, $log) {
 
     $scope.docForm = {};
     var clientId = $stateParams.id;
@@ -639,7 +639,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         var path = cordova.file.externalRootDirectory + doc.name;
         var options = {};
         
-        console.log($http.defaults.headers.common.Authorization)
+        $log.log($http.defaults.headers.common.Authorization)
 
         options.headers = {"Fineract-Platform-TenantId": Settings.tenant, "Authorization": $http.defaults.headers.common.Authorization};
 
@@ -648,15 +648,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           $cordovaFileTransfer.download(server, path, options)
             .then(function(result) {
               // Success!
-              console.log(result);
+              $log.log(result);
               alert("Succesfully Downloaded");
               $scope.closeModal();
             }, function(err) {
               // Error
-              console.log(err);
+              $log.log(err);
               alert("Download failed");
             }, function (progress) {
-              console.log(progress);
+              $log.log(progress);
               // constant progress updates
             });
 
@@ -665,7 +665,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
     $scope.removeDoc = function(){
       Documents.removeDoc(clientId, doc.id).then(function(result) {
-        console.log(result);
+        $log.log(result);
       })
     }
 
@@ -673,7 +673,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
       fileChooser.open(function(uri) {
         
-        console.log(uri);
+        $log.log(uri);
 
         var server = baseUrl + '/clients/'+ clientId + '/documents';
         var options = {};
@@ -686,15 +686,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           $cordovaFileTransfer.upload(server, uri, options)
             .then(function(result) {
               // Success!
-              console.log(result);
+              $log.log(result);
               alert("Succesfully Upload");
               $scope.closeModal();
             }, function(err) {
               // Error
-              console.log(err);
+              $log.log(err);
               alert("Upload failed");
             }, function (progress) {
-              console.log(progress);
+              $log.log(progress);
               // constant progress updates
             });
 
@@ -1105,9 +1105,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var cfields = FormHelper.preSaveForm(Clients, client);
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
-    for(var i = 0; i < cdts.length; ++i) {
-      var dt = cdts[i];
-      DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
+    angular.forEach(cdts, function(dt) {
+      DataTables.get_one(dt, clientId, function(dtrow, dt) {
         client[dt] = client[dt] || {};
         HashUtil.copy(client[dt], {
           "locale": "en",
@@ -1159,7 +1158,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           } );
         }
       } );
-    }
+    } );
     Clients.update(clientId, cfields, function(eclient) {
       logger.log("Save client success");
       $scope.message = {
@@ -1298,7 +1297,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.$on('$ionicView.enter', function(e) {
     if (!authHttp.getAuthHeader()) {
-      $rootScope.$broadcast('sessionExpired');
+      if (!Session.reset()) {
+        $rootScope.$broadcast('resetSession');
+      }
     }
     $scope.num_inactiveClients = 0;
     var role = Session.role;
