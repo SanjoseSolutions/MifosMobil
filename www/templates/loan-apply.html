@@ -68,13 +68,31 @@
             size="15" ng-model="XYZ.openingDate" required>
         </label>
       </div>
+
       <div class="item item-input-inset">
         <span class="input-label">Loan Officer :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="20" ng-minlength="3" name="loanOfficer"
-              placeholder="Loan Officer's Name" ng-model="XYZ.loanOfficer">
+          <select ng-model="loanOfficer"> <!-- ng-options="loanOfficer in loanOfficers" -->
+            <option selected>List of the Sacco's Officers</option>
+          </select>
         </label>
       </div>
+
+      <!-- ion-item>
+        <label class="item item-input item-select">
+          <div class="input-label">Loan Officer :
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </div>
+          <select name="productId" required>
+            <option> O1 </option>
+            <option> O2 </option>
+          </select>
+        </label>
+      </ion-item -->
+
+
+
+
       <div class="item item-input-inset">
         <span class="input-label">Loan Purpose :</span>
         <label class="item-input-wrapper">
