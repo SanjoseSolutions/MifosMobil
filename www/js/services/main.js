@@ -99,6 +99,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     };
   } );
 
+  authHttp.replaceData = function(cid, data) {
+    var commands = Cache.getObject('commands');
+    commands[cid]['data'] = data;
+    Cache.setObject('commands', commands);
+  };
+
   authHttp.saveOffline = function(url, data, config, rid) {
     config = config || {};
     config.headers = config.headers || {};
@@ -136,10 +142,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           var rdata = response.data;
           if (subcmds) {
             logger.log("Got subcommands #=" + subcmds.length);
-            var resId = rdata['resourceId'];
             for(var i = 0; i < subcmds.length; ++i) {
               var scmd = subcmds[i];
-              scmd['url'] = scmd['url'] + resId;
+              var url = scmd['url'];
+              var matches = url.match(/:([a-zA-Z]+)/);
+              if (matches) {
+                var attr = matches[1];
+                scmd['url'] = url.replace(':' + attr, rdata[attr]);
+              }
               logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
               commands.push(scmd);
               setTimeout(runNextCmd, 2000);
@@ -497,7 +507,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     saveOffline: function(name, fields, rid) {
-      authHttp.saveOffline(baseUrl + '/datatables/' + name + '/', fields, {}, rid);
+      authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid);
     }
   };
 } ] )
@@ -554,9 +564,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           var k = HashUtil.nextKey(offices);
           var new_office = {id: k};
           HashUtil.copy(new_office, fields);
+          new_office.cid = response.cid;
           offices[k] = new_office;
           Cache.setObject('h_offices', offices);
-          new_office.cid = response.cid;
           fn_offline(new_office);
           return;
         } else {
@@ -576,6 +586,21 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     update: function(id, fields, fn_office, fn_offline, fn_fail) {
+      if (id.match('T[0-9]\+$')) {
+        offices = Cache.getObject('h_offices');
+        var office = offices[id];
+        if (office) {
+          var cid = office.cid;
+          if (cid) {
+            HashUtil.copy(office, fields);
+            authHttp.replaceData(cid, office);
+            fn_office(office);
+            return;
+          }
+        }
+        fn_fail(office);
+        return;
+      }
       authHttp.put(baseUrl + '/offices/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
@@ -1063,8 +1088,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           client["id"] = id;
           clients[id] = client;
           client["displayName"] = get_displayName(client);
-          Cache.setObject('h_clients', clients);
           client["cid"] = response.cid;
+          Cache.setObject('h_clients', clients);
           fn_offline(client);
         } else {
           clients = Cache.getObject('h_clients') || {};
@@ -1207,7 +1232,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('ClientImages', function(authHttp, baseUrl, logger) {
+.factory('ClientImages', function(authHttp, baseUrl, logger, Cache) {
   /* ClientImages.get, getB64
    * get image binary, base64 encoded image data
    * Arguments:
@@ -1232,6 +1257,16 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     save: function(id, imgData, fn_success, fn_offline, fn_fail) {
+      if (id.match(/^T\d+$/)) {
+        logger.log("Trying to save client #"+id+" image offline");
+        var clients = Cache.getObject('h_clients');
+        var c = clients[id];
+        var cid = c.cid;
+        authHttp.saveOffline(baseUrl + '/clients/:resourceId/images', imgData, {
+          'Content-Type': 'text/plain'
+        }, cid);
+        return;
+      }
       authHttp.post(baseUrl + '/clients/' + id + '/images', imgData, {
         'Content-Type': 'text/plain'
       }, function(response) {
