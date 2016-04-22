@@ -17,17 +17,17 @@
  *  This file has all Controllers:
  *  - MainCtrl: common to entire app
  *  - AnonCtrl: Login page (for anonymous users)
+ *  - DashboardCtrl: Home(dashboard) tab in the App
  *  - TabsCtrl: Tabs for authenticated users
+ *  - SACCOListCtrl: SACCO List Tab
+ *  - SACCOViewCtrl: SACCO View controller
  *  - SACCOEditCtrl: SACCO Edit controller
- *  - SACCOListCtrl: 
- *  - SACCOViewCtrl: 
- *  - StaffCtrl: 
- *  - StaffDetailCtrl: 
- *  - ClientsCtrl: 
- *  - ClientDetailCtrl: 
- *  - ClientNextOfKinCtrl:
- *  - ClientEditCtrl: 
- *  - DashboardCtrl: 
+ *  - StaffCtrl: Staff List
+ *  - StaffDetailCtrl: Staff detail
+ *  - ClientsCtrl: Client List Tab
+ *  - ClientDetailCtrl: Client Details
+ *  - ClientNextOfKinCtrl: Client Next of Kin
+ *  - ClientEditCtrl: Client Edit
  */
 
 angular.module('mifosmobil.controllers', ['ngCordova'])
@@ -1082,10 +1082,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         $scope.codes.offices = saccos;
       }, function(sus) {} );
     } );
-  } );
-  Customers.get_full(clientId, function(client) {
-    FormHelper.prepareForm(Clients, client);
-    $scope.client = client;
+    Customers.get_full(clientId, function(client) {
+      logger.log("Going to call client #"+clientId+" edit prepareForm");
+      FormHelper.prepareForm(Clients, client);
+      logger.log("Client to edit: " + JSON.stringify(client));
+      $scope.client = client;
+    } );
   } );
 
   // x

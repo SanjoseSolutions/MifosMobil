@@ -870,14 +870,20 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
       for(var i = 0; i < sfs.length; ++i) {
         var k = sfs[i];
-        var fn = cfs[k];
+        var fn = cfs[k]; // get codes function fn
         var v = object[k];
-        if (fn) {
-          object[k] = fn(object);
-        } else if (dfHash[k]) { 
-          object[k] = DateUtil.isoDate(v);
-        } else {
-          object[k] = v;
+        if (fn) { // call fn if defined
+          if (v) {
+            object[k] = v;
+          } else {
+            object[k] = fn(object);
+          }
+        } else if (v) {
+          if (dfHash[k]) {
+            object[k] = DateUtil.isoDate(v);
+          } else {
+            object[k] = v;
+          }
         }
       }
     },
