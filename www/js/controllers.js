@@ -1104,6 +1104,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   // y
 
   $scope.saveClient = function(client) {
+    $scope.btnDisabled = true;
     var cfields = FormHelper.preSaveForm(Clients, client);
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
@@ -1214,6 +1215,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   logger.log("Looking to register client");
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
+    $scope.btnDisabled = true;
     var cfields = FormHelper.preSaveForm(Clients, client, false);
     var rstat = $scope.rolestat;
     if (rstat.isManagement || rstat.isAdmin) {
