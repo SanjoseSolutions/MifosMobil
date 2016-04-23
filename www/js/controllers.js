@@ -1188,8 +1188,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('ClientRegCtrl', [ '$scope', 'Clients', 'ClientImages', 'DateUtil', '$state',
   'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
+  'Client_Fields',
     function($scope, Clients, ClientImages, DateUtil, $state,
-      HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
+      HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin,
+      Client_Fields) {
   // x
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1227,12 +1229,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
-        } else {
-          dfields = client[dt];
-          HashUtil.copy(dfields, {
-            locale: 'en',
-            dateFormat: 'yyyy-mm-dd'
-          } );
+        } else if ('Client_Fields' == dt) {
+          dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
         }
         DataTables.save(dt, new_client.id, dfields, function(data) {
           logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
@@ -1251,12 +1249,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
-        } else {
-          dfields = client[dt];
-          HashUtil.copy(dfields, {
-            locale: 'en',
-            dateFormat: 'yyyy-mm-dd'
-          } );
+        } else if ('Client_Fields' == dt) {
+          dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
         }
         DataTables.saveOffline(dt, dfields, cid);
       } );

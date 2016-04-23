@@ -104,10 +104,14 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       return dt;
     },
     isoDate: function(a_date) {
+      var dtStr;
       if (a_date instanceof Array) {
-        var dtStr = this.isoDateStr(a_date);
-        var dt = new Date(dtStr);
-        return dt;
+        dtStr = this.isoDateStr(a_date);
+      } else if (typeof(a_date) == 'string') {
+        dtStr = a_date;
+      }
+      if (dtStr) {
+        return new Date(dtStr);
       }
       return a_date;
     },
