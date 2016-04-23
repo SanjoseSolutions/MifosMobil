@@ -246,7 +246,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         'locale': 'en',
         'dateFormat': 'yyyy-MM-dd'
       } );
-      DataTables.saveOffline("SACCO_Fields", fields, cid);
+      DataTables.saveOffline("SACCO_Fields", office.id, fields, cid);
       $scope.message = {
         "type": "info",
         "text": "Accepted SACCO create request (offline): temp id:" + office.id
@@ -1107,7 +1107,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var cfields = FormHelper.preSaveForm(Clients, client);
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
-    angular.forEach(cdts, function(dt) {
+    var i = 0, len / cdts.length;
+    for(; i < len; ++i) {
+      var dt = cdts[i];
       DataTables.get_one(dt, clientId, function(dtrow, dt) {
         client[dt] = client[dt] || {};
         HashUtil.copy(client[dt], {
@@ -1121,7 +1123,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           }
           var cid = client.cid;
           logger.log('OFFLINE PARTIAL Datatables ' + dt + ' ' + method + ' called');
-          DataTables.saveOffline(dt, client[dt], cid, method);
+          DataTables.saveOffline(dt, clientId, client[dt], cid, method);
         } else if (!dtrow) {
           DataTables.save(dt, clientId, client[dt], function(data) {
             logger.log("Added datatables data: " + JSON.stringify(data));
@@ -1168,7 +1170,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           } );
         }
       } );
-    } );
+    }
     Clients.update(clientId, cfields, function(eclient) {
       logger.log("Save client success");
       $scope.message = {
@@ -1228,7 +1230,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         "type": "info",
         "text": "Client created with id #" + new_client.id
       };
-      angular.forEach(cdts, function(dt) {
+      var i = 0, len / cdts.length;
+      for(; i < len; ++i) {
+        var dt = cdts[i];
         if (!client || !client[dt])
           return;
         var dfields = null;
@@ -1255,7 +1259,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }, function(new_client) {
       // offline client save
       var cid = new_client.cid;
-      angular.forEach(cdts, function(dt) {
+      var i = 0, len / cdts.length;
+      for(; i < len; ++i) {
+        var dt = cdts[i];
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
@@ -1266,8 +1272,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
             dateFormat: 'yyyy-mm-dd'
           } );
         }
-        DataTables.saveOffline(dt, dfields, cid);
-      } );
+        logger.log("Going to call DT.saveOffline");
+        DataTables.saveOffline(dt, new_client.id, dfields, cid);
+      }
       $scope.message = {
         "type": "info",
         "text": "Accepted Client create request (offline)"

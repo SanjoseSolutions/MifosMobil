@@ -504,10 +504,20 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var fdata = Cache.getObject(k);
       if (fdata) {
         var fields;
-        if (fdata instanceof Object) {
-          fields = fdata;
-        } else if (fdata instanceof Array) {
+        if (fdata instanceof Array) {
           fields = fdata[0];
+          logger.log("GOT CACHED DT ITEM (" + k + ") :" + JSON.stringify(fields));
+        } else if (fdata instanceof Object) {
+          fields = fdata;
+          logger.log("GOT CACHED DT OBJECT (" + k + ") :" + JSON.stringify(fields));
+        }
+        for(n in fields) {
+          if (n.match(/_cd_/)) {
+            var v = fields[n];
+            if (v.match(/^\d+/)) {
+              fields[n] = parseInt(v);
+            }
+          }
         }
         if (fields) {
           fn_dtrow(fields, name);
@@ -562,7 +572,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_fail(response);
       } );
     },
-    saveOffline: function(name, fields, rid, method) {
+    saveOffline: function(name, id, fields, rid, method) {
+      var k = 'dt.' + name + '.' + id;
+      Cache.setObject(k, fields);
+      logger.log('DT::' + name + ' cached ' + JSON.stringify(fields));
       method = method || 'post';
       authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid, method);
     }
@@ -1257,30 +1270,33 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     get_full: function(id, fn_customer, decode) {
       decode = null==decode && true;
       Clients.get(id, function(client) {
-        fn_customer(client);
-        var dts = Clients.dataTables();
-        angular.forEach(dts, function(dt) {
-          logger.log("Client DataTable:" + dt + " for #" + id);
+        var dts = Clients.dataTables(), i = 0, len = dts.length;
+        for(; i < len; ++i) {
+          var dt = dts[i];
+//          logger.log("Client DataTable:" + dt + " for #" + id);
           DataTables.get_one(dt, id, function(fields, dt) {
             client[dt] = decode ? DataTables.decode(fields) : fields;
             logger.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
           } );
-        } );
+        }
+        fn_customer(client);
       } );
     },
     query_full: function(fn_customers) {
       Clients.query(function(clients) {
         fn_customers(clients);
-        for(var i = 0; i < clients.length; ++i) {
+        var i = 0, len = clients.length;
+        for(; i < len; ++i) {
           var client = clients[i];
           var id = client.id;
           var dts = Clients.dataTables();
-          angular.forEach(dts, function(dt) {
+          var i = 0, len = dts.length;
+          for(; i < len; ++i) {
             DataTables.get_one(dt, id, function(fields, dt) {
               client[dt] = DataTables.decode(fields);
             } );
-          } );
+          }
         }
       } );
     }
@@ -1591,9 +1607,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     init: function(config) {
       obj.name = config.name;
       var dataTables = config.dataTables;
-      angular.forEach(dataTables, function(dt) {
+      var i = 0, len = dataTables.length;
+      for(; i < len; ++i) {
+        dt = dataTables[i];
         obj[dt] = config[dt];
-      } );
+      }
       obj.fields = config.fields;
       obj.skipFields = config.skipFields;
     },
