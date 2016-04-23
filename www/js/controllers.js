@@ -1107,7 +1107,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var cfields = FormHelper.preSaveForm(Clients, client);
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
-    var i = 0, len / cdts.length;
+    var i = 0, len = cdts.length;
     for(; i < len; ++i) {
       var dt = cdts[i];
       DataTables.get_one(dt, clientId, function(dtrow, dt) {
@@ -1230,7 +1230,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         "type": "info",
         "text": "Client created with id #" + new_client.id
       };
-      var i = 0, len / cdts.length;
+      var i = 0, len = cdts.length;
       for(; i < len; ++i) {
         var dt = cdts[i];
         if (!client || !client[dt])
@@ -1252,14 +1252,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         }, function(response) {
           logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
         } );
-      } );
+      }
       setTimeout(function() {
         $state.go('tab.client-detail', { 'clientId': new_client.id } );
       }, 3000);
     }, function(new_client) {
       // offline client save
       var cid = new_client.cid;
-      var i = 0, len / cdts.length;
+      var i = 0, len = cdts.length;
       for(; i < len; ++i) {
         var dt = cdts[i];
         var dfields = null;
