@@ -246,7 +246,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         'locale': 'en',
         'dateFormat': 'yyyy-MM-dd'
       } );
-      DataTables.saveOffline("SACCO_Fields", fields, cid);
+      DataTables.saveOffline("SACCO_Fields", office.id, fields, cid);
       $scope.message = {
         "type": "info",
         "text": "Accepted SACCO create request (offline): temp id:" + office.id
@@ -596,12 +596,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         $cordovaFileTransfer.upload(server, uri, options)
           .then(function(result) {
             // Success!
-            console.log(result)
+            logger.log(result)
           }, function(err) {
             // Error
-            console.log(err)
+            logger.log(err)
           }, function (progress) {
-            console.log(progress);
+            logger.log(progress);
             // constant progress updates
           });
 
@@ -613,7 +613,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('DocumentCtrl', function($scope, $stateParams, logger, Documents, 
-        $ionicModal, $cordovaFileTransfer, baseUrl, Settings, $http) {
+        $ionicModal, $cordovaFileTransfer, baseUrl, Settings, $http, $log) {
 
     $scope.docForm = {};
     var clientId = $stateParams.id;
@@ -639,7 +639,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         var path = cordova.file.externalRootDirectory + doc.name;
         var options = {};
         
-        console.log($http.defaults.headers.common.Authorization)
+        $log.log($http.defaults.headers.common.Authorization)
 
         options.headers = {"Fineract-Platform-TenantId": Settings.tenant, "Authorization": $http.defaults.headers.common.Authorization};
 
@@ -648,15 +648,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           $cordovaFileTransfer.download(server, path, options)
             .then(function(result) {
               // Success!
-              console.log(result);
+              $log.log(result);
               alert("Succesfully Downloaded");
               $scope.closeModal();
             }, function(err) {
               // Error
-              console.log(err);
+              $log.log(err);
               alert("Download failed");
             }, function (progress) {
-              console.log(progress);
+              $log.log(progress);
               // constant progress updates
             });
 
@@ -665,7 +665,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
     $scope.removeDoc = function(){
       Documents.removeDoc(clientId, doc.id).then(function(result) {
-        console.log(result);
+        $log.log(result);
       })
     }
 
@@ -673,7 +673,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
       fileChooser.open(function(uri) {
         
-        console.log(uri);
+        $log.log(uri);
 
         var server = baseUrl + '/clients/'+ clientId + '/documents';
         var options = {};
@@ -686,15 +686,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           $cordovaFileTransfer.upload(server, uri, options)
             .then(function(result) {
               // Success!
-              console.log(result);
+              $log.log(result);
               alert("Succesfully Upload");
               $scope.closeModal();
             }, function(err) {
               // Error
-              console.log(err);
+              $log.log(err);
               alert("Upload failed");
             }, function (progress) {
-              console.log(progress);
+              $log.log(progress);
               // constant progress updates
             });
 
@@ -1087,7 +1087,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       FormHelper.prepareForm(Clients, client);
       logger.log("Client to edit: " + JSON.stringify(client));
       $scope.client = client;
-    } );
+    }, false);
   } );
 
   // x
@@ -1104,18 +1104,28 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   // y
 
   $scope.saveClient = function(client) {
+    $scope.btnDisabled = true;
     var cfields = FormHelper.preSaveForm(Clients, client);
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
-    for(var i = 0; i < cdts.length; ++i) {
+    var i = 0, len = cdts.length;
+    for(; i < len; ++i) {
       var dt = cdts[i];
-      DataTables.get_one(cdts[i], clientId, function(dtrow, dt) {
+      DataTables.get_one(dt, clientId, function(dtrow, dt) {
         client[dt] = client[dt] || {};
         HashUtil.copy(client[dt], {
           "locale": "en",
           "dateFormat": "yyyy-MM-dd"
         } );
-        if (!dtrow) {
+        if (clientId.match('T[0-9]\+$')) {
+          var method = 'post';
+          if (dtrow) {
+            method = 'put';
+          }
+          var cid = client.cid;
+          logger.log('OFFLINE PARTIAL Datatables ' + dt + ' ' + method + ' called');
+          DataTables.saveOffline(dt, clientId, client[dt], cid, method);
+        } else if (!dtrow) {
           DataTables.save(dt, clientId, client[dt], function(data) {
             logger.log("Added datatables data: " + JSON.stringify(data));
             $scope.message = {
@@ -1207,6 +1217,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   logger.log("Looking to register client");
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
+    $scope.btnDisabled = true;
     var cfields = FormHelper.preSaveForm(Clients, client, false);
     var rstat = $scope.rolestat;
     if (rstat.isManagement || rstat.isAdmin) {
@@ -1223,7 +1234,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         "type": "info",
         "text": "Client created with id #" + new_client.id
       };
-      angular.forEach(cdts, function(dt) {
+      var i = 0, len = cdts.length;
+      for(; i < len; ++i) {
+        var dt = cdts[i];
         if (!client || !client[dt])
           return;
         var dfields = null;
@@ -1239,21 +1252,25 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         }, function(response) {
           logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
         } );
-      } );
+      }
       setTimeout(function() {
         $state.go('tab.client-detail', { 'clientId': new_client.id } );
       }, 3000);
     }, function(new_client) {
+      // offline client save
       var cid = new_client.cid;
-      angular.forEach(cdts, function(dt) {
+      var i = 0, len = cdts.length;
+      for(; i < len; ++i) {
+        var dt = cdts[i];
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
         } else if ('Client_Fields' == dt) {
           dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
         }
-        DataTables.saveOffline(dt, dfields, cid);
-      } );
+        logger.log("Going to call DT.saveOffline");
+        DataTables.saveOffline(dt, new_client.id, dfields, cid);
+      }
       $scope.message = {
         "type": "info",
         "text": "Accepted Client create request (offline)"
@@ -1294,7 +1311,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.$on('$ionicView.enter', function(e) {
     if (!authHttp.getAuthHeader()) {
-      $rootScope.$broadcast('sessionExpired');
+      if (!Session.reset()) {
+        $rootScope.$broadcast('resetSession');
+      }
     }
     $scope.num_inactiveClients = 0;
     var role = Session.role;

@@ -355,7 +355,7 @@ select {
           </ion-item>
 
       	  <button class="button button-block button-positive" 
-      		    ng-click="saveClient(client)" ng-disabled="clientEditForm.$invalid">
+              ng-click="saveClient(client)" ng-disabled="btnDisabled || clientEditForm.$invalid">
             <h4>Save</h4>
       	  </button>
 

@@ -13,18 +13,18 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
- *  Filename: www/js/services.js
- *  This file has a set of services
+ *  Filename: www/js/services/utilities.js
+ *  This file has a few utility services
  *  Current services available (to be kept up-to-date)
- *    1. baseUrl: the base URL of Mifos X backend
- *    2. authHttp: HTTP + Authentication (wraps around http)
- *    3. Session: login, logout, username, authinfo
- *    3. resources: Clients, Staff
+ *    1. logger: for console and internal app logging
+ *    2. Cache: offline storage wrapper around localStorage
+ *    3. DateUtil: format conversion of dates
+ *    4. HashUtil: hashes copy, convert to/from array
  */
 
 angular.module('mifosmobil.utilities', ['ngCordova'])
 
-.factory('logger', [ '$rootScope', function($rootScope) {
+.factory('logger', [ '$rootScope', '$log', function($rootScope, $log) {
   var logger = {};
   $rootScope.messages = [];
   angular.forEach(['log', 'warn', 'info'], function(method) {
@@ -36,7 +36,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
         type: 'log',
         text: msg
       } );
-      console[method](msg);
+//      $log[method](msg);
     };
   } );
   return logger;
