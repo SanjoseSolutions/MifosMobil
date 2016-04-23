@@ -221,6 +221,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.data.op = "Register";
   } );
   $scope.saveSacco = function(office) {
+    $scope.btnDisabled = true;
     var sfs = Office.saveFields;
     var ofields = FormHelper.preSaveForm(Office, office, false);
     logger.log("SACCO data: " + JSON.stringify(ofields));
@@ -284,6 +285,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office) {
+    $scope.btnDisabled = true;
     var ofields = FormHelper.preSaveForm(Office, office);
     officeId = officeId || $stateParams.saccoId;
     logger.log("Attempting update office #" + officeId + " :: " + JSON.stringify(ofields));
@@ -1236,7 +1238,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       for(; i < len; ++i) {
         var dt = cdts[i];
         if (!client || !client[dt])
-          return;
+          continue;
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
@@ -1264,6 +1266,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       var i = 0, len = cdts.length;
       for(; i < len; ++i) {
         var dt = cdts[i];
+        if (!client || !client[dt])
+          continue;
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
