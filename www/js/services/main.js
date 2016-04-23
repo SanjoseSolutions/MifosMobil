@@ -503,23 +503,17 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var k = 'dt.' + name + '.' + id;
       var fdata = Cache.getObject(k);
       if (fdata) {
-        var fields;
-        if (fdata instanceof Array) {
-          fields = fdata[0];
-          logger.log("GOT CACHED DT ITEM (" + k + ") :" + JSON.stringify(fields));
-        } else if (fdata instanceof Object) {
-          fields = fdata;
-          logger.log("GOT CACHED DT OBJECT (" + k + ") :" + JSON.stringify(fields));
-        }
-        for(n in fields) {
-          if (n.match(/_cd_/)) {
-            var v = fields[n];
-            if (v.match(/^\d+/)) {
-              fields[n] = parseInt(v);
+        logger.log("DATATABLE: " + k + " from Cache");
+        var fields = (fdata instanceof Array) ? fdata[0] : fdata;
+        if (fields) {
+          for(n in fields) {
+            if (n.match(/_cd_/)) {
+              var v = fields[n];
+              if (v.match(/^\d+/)) {
+                fields[n] = parseInt(v);
+              }
             }
           }
-        }
-        if (fields) {
           fn_dtrow(fields, name);
         }
         return;
@@ -589,7 +583,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       return [ "joiningDate", "Latitude", "Longitude", "Country", "Region",
         "Zone", "Wereda", "Kebele", "UniquePlaceName", "License Registration No" ];
     },
-    codeFields: function() { return []; },
+    codeFields: function() { return {}; },
     skipFields: function() { return {}; }
   };
 } )
@@ -612,7 +606,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     saveFields: function() {
       return ["openingDate", "name", "parentId"];
     },
-    codeFields: function() { return []; },
+    codeFields: function() { return {}; },
     skipFields: function() { return {} },
     prepareForm: function(office) {
       var sfs = this.saveFields;
@@ -993,6 +987,25 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
+.factory('Client_Fields', function() {
+  return {
+    dateFields: function() { return []; },
+    saveFields: function() {
+      return [ 'Fathers Name', 'Grandfathers Name', 'Number of males', 'Number of females',
+        'Education', 'Address', 'Email', 'MaritalStatus_cd_Marital Status', 'Country',
+        'Region', 'Zone', 'Woreda', 'Kebele', 'UniquePlaceName' ];
+    },
+    codeFields: function() {
+      return {
+        'MaritalStatus_cd_Marital Status': function(dt) {
+          return dt['MaritalStatus_cd_Marital Status'];
+        }
+      };
+    },
+    skipFields: function() { return {}; }
+  };
+} )
+
 .factory('Client_NextOfKin', function() {
   return {
     dateFields: function() { return [ 'dateOfBirth' ]; },
@@ -1001,7 +1014,16 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         'Relationship_cd_Relationship', 'Gender_cd_Gender', 'Country', 'Region', 'Zone',
         'Woreda', 'Kebele', 'UniquePlaceName' ];
     },
-    codeFields: function() { return [ 'Relationship_cd_Relationship', 'Gender_cd_Gender' ]; },
+    codeFields: function() {
+      return {
+        'Relationship_cd_Relationship': function(dt) {
+          return dt['Relationship_cd_Relationship'];
+        },
+        'Gender_cd_Gender': function(dt) {
+          return dt['Gender_cd_Gender'];
+        }
+      };
+    },
     skipFields: function() { return {}; }
   };
 } )
