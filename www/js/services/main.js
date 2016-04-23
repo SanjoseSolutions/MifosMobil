@@ -121,12 +121,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     } );
   };
 
-  authHttp.saveOffline = function(url, data, config, rid) {
+  authHttp.saveOffline = function(url, data, config, rid, method) {
     config = config || {};
     config.headers = config.headers || {};
     config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
     var cmd = {
-      'method': 'post',
+      'method': method || 'post',
       'url': url,
       'data': data,
       'config': config
@@ -488,6 +488,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     get: function(name, id, fn_dtable) {
+      var k = 'dt.' + name + '.' + id;
+      var fdata = Cache.getObject(k);
+      if (fdata) {
+        fn_dtable(fdata);
+        return;
+      }
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         fn_dtable(data);
@@ -496,10 +502,16 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     get_one: function(name, id, fn_dtrow, fn_fail) {
       var k = 'dt.' + name + '.' + id;
       var fdata = Cache.getObject(k);
-      if (fdata && fdata.length) {
-        logger.log("DATATABLE: " + k + " from Cache");
-        var fields = fdata[0];
-        fn_dtrow(fields, name);
+      if (fdata) {
+        var fields;
+        if (fdata instanceof Object) {
+          fields = fdata;
+        } else if (fdata instanceof Array) {
+          fields = fdata[0];
+        }
+        if (fields) {
+          fn_dtrow(fields, name);
+        }
         return;
       }
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
@@ -550,8 +562,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_fail(response);
       } );
     },
-    saveOffline: function(name, fields, rid) {
-      authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid);
+    saveOffline: function(name, fields, rid, method) {
+      method = method || 'post';
+      authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid, method);
     }
   };
 } ] )
@@ -1235,14 +1248,15 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
 .factory('Customers', function(authHttp, baseUrl, Clients, DataTables, logger) {
   return {
-    get_full: function(id, fn_customer) {
+    get_full: function(id, fn_customer, decode) {
+      decode = null==decode && true;
       Clients.get(id, function(client) {
         fn_customer(client);
         var dts = Clients.dataTables();
         angular.forEach(dts, function(dt) {
           logger.log("Client DataTable:" + dt + " for #" + id);
           DataTables.get_one(dt, id, function(fields, dt) {
-            client[dt] = DataTables.decode(fields);
+            client[dt] = decode ? DataTables.decode(fields) : fields;
             logger.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
           } );

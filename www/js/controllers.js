@@ -1086,7 +1086,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   Customers.get_full(clientId, function(client) {
     FormHelper.prepareForm(Clients, client);
     $scope.client = client;
-  } );
+  }, false );
 
   // x
   $scope.toggleExtraFields = function() {
@@ -1112,7 +1112,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           "locale": "en",
           "dateFormat": "yyyy-MM-dd"
         } );
-        if (!dtrow) {
+        if (clientId.match('T[0-9]\+$')) {
+          var method = 'post';
+          if (dtrow) {
+            method = 'put';
+          }
+          var cid = client.cid;
+          logger.log('OFFLINE PARTIAL Datatables ' + dt + ' ' + method + ' called');
+          DataTables.saveOffline(dt, client[dt], cid, method);
+        } else if (!dtrow) {
           DataTables.save(dt, clientId, client[dt], function(data) {
             logger.log("Added datatables data: " + JSON.stringify(data));
             $scope.message = {
@@ -1243,6 +1251,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         $state.go('tab.client-detail', { 'clientId': new_client.id } );
       }, 3000);
     }, function(new_client) {
+      // offline client save
       var cid = new_client.cid;
       angular.forEach(cdts, function(dt) {
         var dfields = null;
