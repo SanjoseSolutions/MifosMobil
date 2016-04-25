@@ -77,8 +77,9 @@ select {
         <div class="item item-input-inset">
           <span class="input-label">Date of Birth:</span>
           <label class="item-input-wrapper">
-            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
+            <input type="date" size="15" placeholder="dd/mm/yy" title="Max. D.O.B. {{maxDOB}}" ng-model="client.dateOfBirth" ng-maxlength="maxDOB" required>
           </label>
+          <!-- span>Max. D.O.B. {{maxDOB}}</span -->
         </div>
         <div class="item item-input-inset">
           <span class="input-label">Mobile:</span>
