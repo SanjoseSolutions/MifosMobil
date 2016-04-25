@@ -84,14 +84,16 @@
         <!-- "extremelysimple@kmayra.org" -->
       </ion-item>
 
-      <ion-item class="item"> <!-- item-button" -->
-        <!-- button class="button button-small button-positive leftBtn">
+      <ion-item class="item item-icon centered"> <!-- item-button" -->
+        <!-- button class="button button-small button-positive leftBtn" ng-show="client.mobileNo">
           Write SMS <i class="icon ion-ios-email-outline"></i>
         </button -->
-        <strong class="positive">{{client.mobileNo || "9876543210"}}</strong>
+        <i class="icon ion-android-call" ng-show="!client.mobileNo"></i>
+        <strong class="positive">{{client.mobileNo || "Not Set"}}</strong>
         <!--span class="centered">{{client.mobileNo || "9876543210"}}</span -->
         <a class="button button-small button-positive rightBtn"
-            ng-href="tel:{{client.mobileNo}}">
+            ng-href="tel:{{client.mobileNo}}"
+            ng-show="client.mobileNo">
           <i class="icon ion-android-call"></i> Make Call
         </a>
       </ion-item>
