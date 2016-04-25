@@ -526,6 +526,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     } );
   };
   $scope.$on('$ionicView.enter', function(e) {
+    logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
       $scope.client = client;
       logger.log('Client status: ' + JSON.stringify(client['status']));

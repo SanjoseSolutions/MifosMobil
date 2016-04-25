@@ -514,7 +514,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           for(n in fields) {
             if (n.match(/_cd_/)) {
               var v = fields[n];
-              if (v.match(/^\d+/)) {
+              if (v && 'string' == typeof(v) && v.match(/^\d+$/)) {
                 fields[n] = parseInt(v);
               }
             }
