@@ -25,7 +25,7 @@
  *  - StaffCtrl: Staff List
  *  - StaffDetailCtrl: Staff detail
  *  - ClientsCtrl: Client List Tab
- *  - ClientDetailCtrl: Client Details
+ *  - ClientViewCtrl: Client Details
  *  - ClientNextOfKinCtrl: Client Next of Kin
  *  - ClientEditCtrl: Client Edit
  */
@@ -467,7 +467,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 })
 
-.controller('ClientDetailCtrl', function($scope, $stateParams, Clients, $ionicPopup,
+.controller('ClientViewCtrl', function($scope, $stateParams, Clients, $ionicPopup,
     Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
@@ -1246,6 +1246,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
         } else if ('Client_Fields' == dt) {
           dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
+          HashUtil.copy(dfields, {locale: 'en'});
         }
         DataTables.save(dt, new_client.id, dfields, function(data) {
           logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
@@ -1271,6 +1272,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
         } else if ('Client_Fields' == dt) {
           dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
+          HashUtil.copy(dfields, {locale: 'en'});
         }
         logger.log("Going to call DT.saveOffline");
         DataTables.saveOffline(dt, new_client.id, dfields, cid);
@@ -1321,7 +1323,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }
     $scope.num_inactiveClients = 0;
     var role = Session.role;
-    $scope.uname = Session.uname;
+    $scope.uname = Session.uname || Session.username();
+    $scope.loginTime = Session.loggedInTime();
     $scope.role = role;
     switch (role) {
       case "Admin":

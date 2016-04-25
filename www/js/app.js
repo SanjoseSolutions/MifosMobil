@@ -182,7 +182,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     views: {
       'tab-clients': {
         templateUrl: 'templates/client-detail.html',
-        controller: 'ClientDetailCtrl'
+        controller: 'ClientViewCtrl'
       }
     }
   })

@@ -334,6 +334,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
   session.reset = function() {
     session = Cache.getObject('session');
+    var username = Cache.get('username');
+    session.uname = username;
+    var roles = Roles.getRoles();
+    var role = roles[0];
+    session.role = role;
     return authHttp.resetAuthHeader();
   };
 
@@ -697,7 +702,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
-      logger.log(h_offices);
       var offices = HashUtil.to_a(h_offices);
       if (offices.length) {
         fn_offices(offices);
@@ -753,7 +757,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var s_clients = {};
       Clients.query(function(clients) {
         clients.map(function(c) {
-          logger.log(c);
           var oid = c.officeId;
           s_clients[oid] = s_clients[oid] || 0;
           ++s_clients[oid];
