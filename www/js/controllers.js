@@ -80,6 +80,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           '<p><center><h4>Welcome <strong>' + auth.username + '</strong></h4></center></p>',
         scope: $scope
       } );
+      $timeout(function() {
+        loginPopup.close();
+      }, 1000);
       $state.go('tab.dashboard');
     }, function(response) {
       logger.log("Login failed. Got:"+response.status);
@@ -213,7 +216,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil,
+.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, Formatter, HashUtil,
     SACCO_Fields, logger) {
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
@@ -223,10 +226,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.saveSacco = function(office) {
     $scope.btnDisabled = true;
     var sfs = Office.saveFields;
-    var ofields = FormHelper.preSaveForm(Office, office, false);
+    var ofields = Formatter.preSaveForm(Office, office, false);
     logger.log("SACCO data: " + JSON.stringify(ofields));
     var dtn = "SACCO_Fields";
-    var fields = FormHelper.preSaveForm(SACCO_Fields, office[dtn], false);
+    var fields = Formatter.preSaveForm(SACCO_Fields, office[dtn], false);
     logger.log("DataTable " + dtn + " Fields: " + JSON.stringify(fields));
     Office.save(ofields, function(new_office) {
       var officeId = new_office.id;
@@ -268,9 +271,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('SACCOEditCtrl', [ '$scope', '$stateParams', 'Office', 'SACCO',
-    'FormHelper', 'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
+    'Formatter', 'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
   function($scope, $stateParams, Office,
-    SACCO, FormHelper, DataTables, DateUtil, logger, SACCO_Fields) {
+    SACCO, Formatter, DataTables, DateUtil, logger, SACCO_Fields) {
   var officeId = $stateParams.saccoId;
   logger.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
@@ -281,18 +284,18 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
   SACCO.get_full(officeId, function(sacco) {
     logger.log("SACCO:" + JSON.stringify(sacco));
-    FormHelper.prepareForm(Office, sacco);
+    Formatter.prepareForm(Office, sacco);
     $scope.sacco = sacco;
   } );
   $scope.saveSacco = function(office) {
     $scope.btnDisabled = true;
-    var ofields = FormHelper.preSaveForm(Office, office);
+    var ofields = Formatter.preSaveForm(Office, office);
     officeId = officeId || $stateParams.saccoId;
     logger.log("Attempting update office #" + officeId + " :: " + JSON.stringify(ofields));
     Office.update(officeId, ofields, function(eOffice) {
       var msg = "Successfully edited SACCO:"+officeId;
       var fld = "joiningDate";
-      var sacco = FormHelper.preSaveForm(SACCO_Fields, office.SACCO_Fields);
+      var sacco = Formatter.preSaveForm(SACCO_Fields, office.SACCO_Fields);
       DataTables.get_one('SACCO_Fields', officeId, function(sfields, dt) {
         if (sfields) {
           DataTables.update('SACCO_Fields', officeId, sacco, function(fields) {
@@ -401,7 +404,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } ] )
 
-.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts, logger) {
+.controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings,
+    SavingsAccounts, LoanAccounts, logger, $ionicLoading) {
+
+  $ionicLoading.show({template: 'Loading..'});
+  setTimeout(function() {$ionicLoading.hide();},3000);
 
   $scope.$on('$ionicView.enter', function(e) {
     SavingsAccounts.query(function(data) {
@@ -430,10 +437,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         client_loans[clientId] = totalOutstanding + loanAmt;
       }
       $scope.clientOutstanding = client_loans;
+      setTimeout(function() {$ionicLoading.hide();},1500);
     } );
 
     Clients.query(function(clients) {
       process_data(clients);
+      $ionicLoading.hide();
     } );
   } );
 
@@ -528,11 +537,16 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
+      if (clientId.match(/^T[0-9]+$/)) {
+        Clients.preShow(client);
+      }
       $scope.client = client;
       logger.log('Client status: ' + JSON.stringify(client['status']));
       $scope.client.pending = (client['status']['value'] == 'Pending');
       $scope.client.dateOfBirth = DateUtil.localDate(client.dateOfBirth);
-      $scope.client.createdOnDate = DateUtil.localDate(client.timeline.submittedOnDate);
+      if (client.timeline) {
+        $scope.client.createdOnDate = DateUtil.localDate(client.timeline.submittedOnDate);
+      }
       var gname = client.gender.name || "male";
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
       logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
@@ -1073,8 +1087,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
-      Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
+.controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil, $state,
+      Clients, ClientImages, DateUtil, DataTables, Codes, Formatter, SACCO, logger) {
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
@@ -1087,7 +1101,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     } );
     Customers.get_full(clientId, function(client) {
       logger.log("Going to call client #"+clientId+" edit prepareForm");
-      FormHelper.prepareForm(Clients, client);
+      Formatter.prepareForm(Clients, client);
       logger.log("Client to edit: " + JSON.stringify(client));
       $scope.client = client;
     }, false);
@@ -1108,18 +1122,20 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.saveClient = function(client) {
     $scope.btnDisabled = true;
-    var cfields = FormHelper.preSaveForm(Clients, client);
+    var cfields = Formatter.preSaveForm(Clients, client);
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
     var i = 0, len = cdts.length;
     for(; i < len; ++i) {
       var dt = cdts[i];
       DataTables.get_one(dt, clientId, function(dtrow, dt) {
-        client[dt] = client[dt] || {};
-        HashUtil.copy(client[dt], {
-          "locale": "en",
-          "dateFormat": "yyyy-MM-dd"
-        } );
+        var dfields;
+        if ('Client_NextOfKin' == dt) {
+          dfields = Formatter.preSaveForm(Client_NextOfKin, client[dt], false);
+        } else if ('Client_Fields' == dt) {
+          dfields = Formatter.preSaveForm(Client_Fields, client[dt], false);
+          HashUtil.copy(dfields, {locale: 'en'});
+        }
         if (clientId.match('T[0-9]\+$')) {
           var method = 'post';
           if (dtrow) {
@@ -1127,9 +1143,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           }
           var cid = client.cid;
           logger.log('OFFLINE PARTIAL Datatables ' + dt + ' ' + method + ' called');
-          DataTables.saveOffline(dt, clientId, client[dt], cid, method);
+          DataTables.saveOffline(dt, clientId, dfields, cid, method);
         } else if (!dtrow) {
-          DataTables.save(dt, clientId, client[dt], function(data) {
+          DataTables.save(dt, clientId, dfields, function(data) {
             logger.log("Added datatables data: " + JSON.stringify(data));
             $scope.message = {
               "type": "info",
@@ -1149,7 +1165,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
             logger.log("Failed to add datatables data: " + response.status);
           } );
         } else {
-          DataTables.update(dt, clientId, client[dt], function(data) {
+          DataTables.update(dt, clientId, dfields, function(data) {
             $scope.message = {
               "type": "info",
               "text": "Saved client #" + clientId + " " + dt + "."
@@ -1175,17 +1191,25 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         }
       } );
     }
+    logger.log('Going to call client edit');
     Clients.update(clientId, cfields, function(eclient) {
       logger.log("Save client success");
       $scope.message = {
         "type": "info",
-        "text": "Client with id #" + eclient.clientId + " saved"
+        "text": "Client with id #" + clientId + " saved"
       };
-    }, function(data) {
+      setTimeout(function() {
+        $state.go('tab.client-detail', { 'clientId': clientId } );
+      }, 1500);
+    }, function(eclient) {
+      logger.log('Client offline edit invoked');
       $scope.message = {
         "type": "info",
-        "text": "Client edit request accepted: #" + data.id
+        "text": "Client edit request accepted: #" + clientId
       };
+      setTimeout(function() {
+        $state.go('tab.client-detail', { 'clientId': clientId } );
+      }, 1500);
     }, function(response) {
       var errors = response.data.errors;
       var errmsg = errors ? errors.map(function(e) {
@@ -1200,10 +1224,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('ClientRegCtrl', [ '$scope', 'Clients', 'ClientImages', 'DateUtil', '$state',
-  'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
+  'HashUtil', 'DataTables', 'Codes', 'SACCO', 'Formatter', 'logger', 'Cache', 'Client_NextOfKin',
   'Client_Fields',
     function($scope, Clients, ClientImages, DateUtil, $state,
-      HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin,
+      HashUtil, DataTables, Codes, SACCO, Formatter, logger, Cache, Client_NextOfKin,
       Client_Fields) {
   // x
   $scope.toggleExtraFields = function() {
@@ -1221,7 +1245,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.data = { "op": "Register" };
   $scope.saveClient = function(client) {
     $scope.btnDisabled = true;
-    var cfields = FormHelper.preSaveForm(Clients, client, false);
+    var cfields = Formatter.preSaveForm(Clients, client, false);
     var rstat = $scope.rolestat;
     if (rstat.isManagement || rstat.isAdmin) {
       cfields["active"] = true;
@@ -1244,9 +1268,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           continue;
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
-          dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
+          dfields = Formatter.preSaveForm(Client_NextOfKin, client[dt], false);
         } else if ('Client_Fields' == dt) {
-          dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
+          dfields = Formatter.preSaveForm(Client_Fields, client[dt], false);
           HashUtil.copy(dfields, {locale: 'en'});
         }
         DataTables.save(dt, new_client.id, dfields, function(data) {
@@ -1259,7 +1283,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       }
       setTimeout(function() {
         $state.go('tab.client-detail', { 'clientId': new_client.id } );
-      }, 3000);
+      }, 1500);
     }, function(new_client) {
       // offline client save
       var cid = new_client.cid;
@@ -1270,9 +1294,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           continue;
         var dfields = null;
         if ('Client_NextOfKin' == dt) {
-          dfields = FormHelper.preSaveForm(Client_NextOfKin, client[dt], false);
+          dfields = Formatter.preSaveForm(Client_NextOfKin, client[dt], false);
         } else if ('Client_Fields' == dt) {
-          dfields = FormHelper.preSaveForm(Client_Fields, client[dt], false);
+          dfields = Formatter.preSaveForm(Client_Fields, client[dt], false);
           HashUtil.copy(dfields, {locale: 'en'});
         }
         logger.log("Going to call DT.saveOffline");
@@ -1284,7 +1308,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       };
       setTimeout(function() {
         $state.go('tab.client-detail', { 'clientId': new_client.id } );
-      }, 3000);
+      }, 1500);
     }, function(response) {
       logger.warn("Client create fail(" + response.status + ") RESPONSE:"
         + JSON.stringify(response.data));
@@ -1308,29 +1332,39 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   }, function(sus) {} );
 } ] )
 
-.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
-    'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
-    '$ionicPopup', 'logger', 'Clients', function($rootScope, $scope, authHttp,
-    baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
+.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log',
+    'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading',
+    '$ionicPopup', 'logger', 'Clients', function($rootScope, $scope, authHttp, $log,
+    baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil, $ionicLoading,
     $ionicPopup, logger, Clients) {
 
   var session = null;
 
   $scope.$on('$ionicView.enter', function(e) {
+    $ionicLoading.show({template: 'Loading..'});
+    if (null == session) {
+      logger.log("Loading session..");
+      session = Session.get();
+      $rootScope.session = session;
+    }
     if (!authHttp.getAuthHeader()) {
       if (!Session.reset()) {
+        $log.info('Failed to reset session');
         $rootScope.$broadcast('resetSession');
+      } else {
+        $log.info('Dashboard controller reset session');
       }
     }
     $scope.num_inactiveClients = 0;
-    var role = Session.role;
+    var role = Session.getRole();
     $scope.uname = Session.uname || Session.username();
     $scope.loginTime = Session.loggedInTime();
     $scope.role = role;
+    $log.info("Role is " + role);
     switch (role) {
       case "Admin":
         SACCO.query_full(function(data) {
-          logger.log("Fetched SACCOs");
+          $log.info("Fetched SACCOs");
           $scope.num_saccos = data.length;
         } );
       case "Management":
@@ -1339,17 +1373,16 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         } );
       case "Staff":
         Customers.query_full(function(clients) {
-          logger.log("Fetched " + clients.length + "Clients");
+          $log.info("Fetched " + clients.length + "Clients");
           $scope.num_clients = clients.length;
+          setTimeout(function() {
+            $ionicLoading.hide();
+          }, 2000);
         } );
         Clients.query_inactive(function(iClients) {
           $scope.num_inactiveClients = iClients.totalFilteredRecords;
+          $ionicLoading.hide();
         } );
-    }
-    if (null == session) {
-      logger.log("Loading session..");
-      session = Session.get();
-      $rootScope.session = session;
     }
   } );
 

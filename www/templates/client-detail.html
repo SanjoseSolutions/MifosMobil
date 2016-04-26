@@ -30,7 +30,7 @@
         <p><b>Marital Status:</b> {{client.Client_Fields["Marital Status"] || "Not set"}}</p>
         <p><b>D.O.B:</b> {{client.dateOfBirth}}</p>
         <p><b>Office:</b> {{client.officeName}}</p>
-        <p><b>Created:</b> {{client.createdOnDate}}</p>
+        <p ng-show="client.createdOnDate"><b>Created:</b> {{client.createdOnDate}}</p>
       </div>
 
       <div class="button-bar">

@@ -150,6 +150,16 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
         dest[k] = src[k];
       }
     },
+    diff: function(neo, old) {
+      // fields in neo changed or not in old
+      var res = {};
+      for(var k in neo) {
+        if (!old[k] || old[k] != neo[k]) {
+          res[k] = neo[k];
+        }
+      }
+      return res;
+    },
     nextKey: function(obj) {
       var id = 1;
       for(var k in obj) {
