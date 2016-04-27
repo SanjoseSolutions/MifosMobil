@@ -539,7 +539,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
-      if (true || clientId.match(/^T[0-9]+$/)) {
+      if (clientId.match(/^T[0-9]+$/)) {
         Clients.preShow(client);
       }
       $scope.client = client;

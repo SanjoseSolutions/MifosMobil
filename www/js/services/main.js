@@ -1125,11 +1125,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       for(; i < len; ++i) {
         var k = keys[i];
         var kId = k + 'Id';
-        if (client[kId] != null) {
+        fid = client[kId];
+        if (fid != null) {
           var codeNm = k[0].toUpperCase() + k.substr(1);
-          client[k] = { id: client[kId] };
+          client[k] = { id: fid };
           logger.log("Finding client " + k + " in Codes:" + codeNm);
-          Codes.getCodeValue(codeNm, v, function(name) {
+          Codes.getCodeValue(codeNm, fid, function(name) {
             client[k]['name'] = name;
             logger.log("Setting client[" + k + "]" + " to " + JSON.stringify(client[k]));
           } );
