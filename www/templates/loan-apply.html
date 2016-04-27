@@ -12,7 +12,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<ion-view view-title="Apply for Loan">
+<ion-view view-title="Apply for Loan" ng-init="init()">
   <ion-content ng-controller="LoansAccCreateCtrl">
   <form name="loanAccCreateForm" novalidate>
 
@@ -54,9 +54,8 @@
           <div class="input-label">Select Product 
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
-          <select name="productId" required>
-            <option> Vehicle </option>
-            <option> House </option>
+          <select name="productId" ng-model="XYZ.productId" ng-repeat="products in productList" ng-change="SelectproductID(products.id,products.name)"required>
+            <option  >{{products.name}}</option>
           </select>
         </label>
       </ion-item>
@@ -113,7 +112,7 @@
       <div class="item item-input-inset">
         <span class="input-label">No. of Repayments :</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="10" ng-minlength="3" name="repaymentsNo"
+          <input type="tel" size="10" ng-minlength="1" name="repaymentsNo"
             placeholder="Enter the value" ng-model="XYZ.repaymentsNo">
         </label>
       </div>
@@ -143,20 +142,20 @@
   
   <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
   <script id="popup-template-html" type="text/ng-template">
-    <label> Product </label> : <strong>Product Name</strong>
-    <br /><label> Submitted on</label> : Date
-    <br /><label> Loan Purpose </label>: Brief_Reason
-    <br /><label> Disbursement </label>: Date
+    <label> Product </label> : <strong>{{ProductName}}</strong>
+    <br /><label> Submitted on</label> : {{SubmittedDate}}
+    <br /><label> Loan Purpose </label>: {{XYZ.loanPurpose}}
+    <br /><label> Disbursement </label>: {{disbursemantDate}}
     <br /><label> Principal Amount </label>: {{XYZ.principalAmount}}
           <i class="icon ion-social-bitcoin"></i>
     <br /><label> Loan Term </label>: {{XYZ.loanTerm}} Months
     <br /><label> No of Repaymants </label>: {{XYZ.repaymentsNo}}
 
     <br /><label style="text-aling='center';"><strong>Interest Details</strong></label>
-    <br /><label> Rate </label> : %
-    <br /><label> Method </label> : Decline Balance
-    <br /><label> Repayment Frequency </label> : Every xxx
-    <br /><label> Charges</label> : xyz <i class="icon ion-social-bitcoin"></i>
+    <br /><label> Rate </label> : {{onSelectionLoanData.interestRatePerPeriod}}%
+    <br /><label> Method </label> : {{onSelectionLoanData.interestType.value}}
+    <br /><label> Repayment Frequency </label> : Every {{onSelectionLoanData.repaymentFrequencyType.value}}
+    <br /><label> Charges</label> : {{onSelectionLoanData.charges}} <i class="icon ion-social-bitcoin"></i>
   </script>
   </ion-content>
 </ion-view>

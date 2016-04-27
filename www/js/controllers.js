@@ -144,6 +144,8 @@ angular.module('starter.controllers', ['ngCordova'])
       logger.log("Going offline");
     } );
 
+
+  
   $rootScope.$on('$cordovaNetwork:online',
     function(e, ns) {
       //$rootScope.isOnline = true;
@@ -524,11 +526,11 @@ angular.module('starter.controllers', ['ngCordova'])
               var sav = $scope.savings;
               logger.log("Going to save account: " + JSON.stringify(sav));
               SavingsAccounts.save(sav, function(new_sav) {
-                logger.log("Savings created!");
+                logger.log("Loan created!");
               }, function(sav) {
-                logger.log("Savings accepted");
+                logger.log("Loan accepted");
               }, function(response) {
-                logger.log("Savings create failed");
+                logger.log("Loan failed");
               } );
             }
           }
@@ -655,14 +657,54 @@ angular.module('starter.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('LoansAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,
     $ionicPopup, $timeout, logger) {
+  var id = $stateParams.id;
+  $scope.init= function(){
+    console.log("==========",id);
+    LoanAccounts.retrieveLoanDetails(id, function(data){
+      console.log(data);
+      $scope.productList = data.productOptions;
+    });
+  };
+
+  $scope.SelectproductID = function(productid,productName){
+    console.log("===",productName);
+    $scope.ProductName = productName
+    console.log(productid);;
+    LoanAccounts.retrieveLoanDetailsViaProductID(id,productid, function(data){
+      console.log(data);
+      $scope.onSelectionLoanData = data;
+    });
+  };
 
   $scope.loanApply = function()  {
     // TO DO :
     // Check the parameters' list
     
     $scope.data = $scope.XYZ;
+    console.log($scope.data);
+    var days= Date.parse($scope.XYZ.openingDate);
+
+    var date = new Date($scope.XYZ.openingDate),
+        mnth = ("0" + (date.getMonth()+1)).slice(-2),
+        day  = ("0" + date.getDate()).slice(-2),
+         year = ("0" + date.getYear()).slice(-2);
+         var hello =  DateUtil.localDate($scope.XYZ.openingDate);
+         console.log(hello);
+       $scope.SubmittedDate = day+"/"+mnth+"/"+year;
+
+       console.log($scope.SubmittedDate);
+       
+      var date = new Date($scope.XYZ.disbursemantDate),
+        mnth = ("0" + (date.getMonth()+1)).slice(-2),
+        day  = ("0" + date.getDate()).slice(-2),
+         year = ("0" + date.getYear()).slice(-2);
+       $scope.disbursemantDate = day+"/"+mnth+"/"+year;
+       console.log($scope.disbursemantDate);
+
+
+
     var myPopup = $ionicPopup.show({
       title: '<strong>Loan Application</strong>',
       /* This Url takes you to a script with the same ID Name in index.html */
@@ -683,8 +725,10 @@ angular.module('starter.controllers', ['ngCordova'])
               //don't allow the user to close unless the user enters a value
               e.preventDefault();
             } else {
-              // Returning a value will cause the promise to resolve with the given value.
-              return $scope.data; // true;
+              console.log("====cancel==button tapped");
+              console.log($scope.data);
+              $scope.saveLoanApplication($scope.data);
+              return $scope.data;
             }
           }
         }
@@ -703,6 +747,45 @@ angular.module('starter.controllers', ['ngCordova'])
     }, 15000);
 
   };
+
+  $scope.saveLoanApplication = function(data){
+    console.log(data);
+    console.log("====saveLoanApplication=====,data");
+      $scope.arrey = [];
+      $scope.loneData = {};
+      $scope.loneData = {
+        dateFormat : "dd/MM/yy",
+        locale : "en",
+        clientId : id,
+        productId : $scope.onSelectionLoanData.loanProductId,
+        principal: data.principalAmount,
+        loanTermFrequency: data.loanTerm,
+        loanTermFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
+        loanType: "individual",
+        numberOfRepayments: data.repaymentsNo,
+        repaymentEvery: $scope.onSelectionLoanData.repaymentEvery,
+        repaymentFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
+        interestRatePerPeriod: $scope.onSelectionLoanData.interestRatePerPeriod,
+        amortizationType: $scope.onSelectionLoanData.amortizationType.id,
+        interestType: $scope.onSelectionLoanData.interestType.id,
+        interestCalculationPeriodType: $scope.onSelectionLoanData.interestCalculationPeriodType.id,
+        transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
+        expectedDisbursementDate: $scope.disbursemantDate,
+        submittedOnDate: $scope.SubmittedDate,
+        linkAccountId : "3",
+        maxOutstandingLoanBalance:"35000",
+        disbursementData:$scope.arrey
+      };
+    LoanAccounts.createLoan($scope.loneData, function(data){
+      console.log(data);
+    },function(sav) {
+      logger.log("Savings accepted");
+    }, function(response) {
+      logger.log("Savings create failed");
+    });
+
+  };
+
 } )
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger) {
@@ -1063,7 +1146,7 @@ angular.module('starter.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', function($rootScope, $scope, authHttp,
     baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-    $ionicPopup, logger) {
+    $ionicPopup, logger, $window, $ionicHistory) {
 
   var session = null;
 
@@ -1107,6 +1190,9 @@ angular.module('starter.controllers', ['ngCordova'])
         // "logout()" Can be Called here
         logger.log('Logout Confirmed!');
         Session.logout();
+        $window.localStorage.clear();
+        $ionicHistory.clearCache();
+        $ionicHistory.clearHistory();
       } else {
         logger.log('Logout Cancelled!');
       }

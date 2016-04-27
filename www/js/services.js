@@ -108,12 +108,12 @@ angular.module('starter.services', ['ngCordova'] )
   var authHttp = {};
 
   $http.defaults.headers.common['Fineract-Platform-TenantId'] = Settings.tenant;
-	$http.defaults.headers.common['Accept'] = '*/*';
-	$http.defaults.headers.common['Content-type'] = 'application/json';
+  $http.defaults.headers.common['Accept'] = '*/*';
+  $http.defaults.headers.common['Content-type'] = 'application/json';
 
   authHttp.setAuthHeader = function(key) {
     $http.defaults.headers.common.Authorization = 'Basic ' + key;
-		logger.log("Authorization header set.");
+    logger.log("Authorization header set.");
   };
 
   authHttp.clearAuthHeader = function() {
@@ -1276,6 +1276,32 @@ angular.module('starter.services', ['ngCordova'] )
           fn_res(response.data);
         }, function(response) {
           fn_err(response);
+        } );
+    },
+    retrieveLoanDetails: function(id, fn_account) {
+      authHttp.get(baseUrl + '/loans/template/' + '?templateType=individual&clientId='+id)
+        .then(function(response) {
+          fn_account(response.data);
+        } );
+    },
+    retrieveLoanDetailsViaProductID: function(id,productID,fn_account) {
+      authHttp.get(baseUrl + '/loans/template/' + '?templateType=individual&clientId='+id + '&productId=' +productID)
+        .then(function(response) {
+          fn_account(response.data);
+        } );
+    },
+    createLoan: function(createLoanData, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans', createLoanData, {},
+        function(response) {
+          var data = response.data;
+          if (response.status == 202) {
+            fn_offline(data);
+          } else {
+            fn_success(data);
+          }
+        },
+        function(response) {
+          fn_fail(response);
         } );
     }
   };
