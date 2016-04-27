@@ -1279,10 +1279,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           logger.log("GOT CACHED CLIENT");
           var cid = old_client.cid;
           if (cid != null) {
-            var dClient = HashUtil.diff(client, old_client);
-            logger.log('OFFLINE TEMP client cid:' + cid + '::' + JSON.stringify(dClient));
+            clients[id] = client;
+            logger.log('OFFLINE TEMP client cid:' + cid + '::' + JSON.stringify(client));
             Cache.setObject('h_clients', clients);
-            authHttp.saveOffline(baseUrl + '/clients/:resourceId', dClient, {}, cid, 'put');
+            authHttp.saveOffline(baseUrl + '/clients/:resourceId', client, {}, cid, 'put');
             logger.log('CLIENT #'+id+' offline edit command saved');
             fn_offline(client);
             return;
