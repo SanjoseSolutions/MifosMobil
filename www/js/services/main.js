@@ -1006,11 +1006,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           if (!v) {
             continue;
           }
-          logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
             v = DateUtil.toISODateString(v);
+            logger.log("Changed JSDate " + df + " to " + v);
           }
-          logger.log("Got date " + df + "=" + v);
           sObject[df] = v;
         }
         sObject.dateFormat = "yyyy-MM-dd";
@@ -1116,24 +1115,25 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
     },
     preShow: function(client) {
+      if (client["officeId"]) {
+        var hOffices = Cache.getObject('h_offices') || {};
+        var office = hOffices[client["officeId"]];
+        logger.log("Got client officeName: " + office.name);
+        client['officeName'] = office.name;
+      }
       var keys = ['gender', 'clientType', 'clientClassification'], i = 0, len = keys.length;
       for(; i < len; ++i) {
         var k = keys[i];
         var kId = k + 'Id';
-        if (client[kId]) {
+        if (client[kId] != null) {
           var codeNm = k[0].toUpperCase() + k.substr(1);
           client[k] = { id: client[kId] };
           logger.log("Finding client " + k + " in Codes:" + codeNm);
           Codes.getCodeValue(codeNm, v, function(name) {
             client[k]['name'] = name;
+            logger.log("Setting client[" + k + "]" + " to " + JSON.stringify(client[k]));
           } );
         }
-      }
-      if (client.officeId) {
-        var hOffices = Cache.getObject('h_offices');
-        var officeName = hOffices[client.officeId];
-        logger.log("Got client officeName: " + officeName);
-        client['officeName'] = officeName;
       }
     },
     dataTables: function() {

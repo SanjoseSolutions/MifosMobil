@@ -431,8 +431,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         var loan = data[i];
         var clientId = loan.clientId;
         var summary = loan.summary;
-        logger.log("Loan summary: " + JSON.stringify(summary));
-        var loanAmt = summary.totalOutstanding;
+        if (summary != null) {
+          logger.log("Loan summary: " + JSON.stringify(summary));
+          var loanAmt = summary ? summary.totalOutstanding : null;
+        }
         var totalOutstanding = client_loans[clientId] || 0;
         client_loans[clientId] = totalOutstanding + loanAmt;
       }
@@ -537,7 +539,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
-      if (clientId.match(/^T[0-9]+$/)) {
+      if (true || clientId.match(/^T[0-9]+$/)) {
         Clients.preShow(client);
       }
       $scope.client = client;
@@ -1087,8 +1089,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil, $state,
-      Clients, ClientImages, DateUtil, DataTables, Codes, Formatter, SACCO, logger) {
+.controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
+      $state, Clients, ClientImages, Client_Fields, Client_NextOfKin, DateUtil,
+      DataTables, Codes, Formatter, SACCO, logger) {
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
@@ -1131,9 +1134,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       DataTables.get_one(dt, clientId, function(dtrow, dt) {
         var dfields;
         if ('Client_NextOfKin' == dt) {
-          dfields = Formatter.preSaveForm(Client_NextOfKin, client[dt], false);
+          dfields = Formatter.preSaveForm(Client_NextOfKin, client[dt], true);
         } else if ('Client_Fields' == dt) {
-          dfields = Formatter.preSaveForm(Client_Fields, client[dt], false);
+          dfields = Formatter.preSaveForm(Client_Fields, client[dt], true);
           HashUtil.copy(dfields, {locale: 'en'});
         }
         if (clientId.match('T[0-9]\+$')) {
@@ -1373,7 +1376,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         } );
       case "Staff":
         Customers.query_full(function(clients) {
-          $log.info("Fetched " + clients.length + "Clients");
+          $log.info("Fetched " + clients.length + " Clients");
           $scope.num_clients = clients.length;
           setTimeout(function() {
             $ionicLoading.hide();
