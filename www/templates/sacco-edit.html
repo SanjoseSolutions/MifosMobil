@@ -40,15 +40,32 @@
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
 
+      <ion-item class="item item-divider">
+        <label>Office Details</label>
+      </ion-item>
+
       <ion-list-item class="item item-input-inset">
         <span class="input-label">
           Sacco Name
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-           <input type="text" name="name" placeholder="Enter the SACCO's Name" ng-model="sacco.name" required ng-minlength="3">
+          <input type="text" name="name" placeholder="Enter the SACCO's Name"
+              ng-model="sacco.name" ng-minlength="3" size="25" autofocus required />
         </label>
       </ion-list-item>
+
+        <!-- label class="item item-input item-input-wrapper item-stacked-label"-->
+      <ion-item class="item item-input item-stacked-label">
+        <label class="item item-input-wrapper item-stacked-label">
+          <span class="input-label">
+            Cooperative Licence Registration Number
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>          
+          <input type="text" name="coopLicRegNo" placeholder="Enter the Licence Number" size="40" ng-minlength="3"
+              ng-model="sacco.SACCO_Fields['License Registration No']" required />
+        </label>
+      </ion-item>
 
       <label class="item item-input item-select">
         <div class="input-label">
@@ -81,7 +98,7 @@
 
       <div class="item item-input-inset">
         <label class="item item-input item-stacked-label">
-          <span class="input-label">Location</span>
+          <span class="input-label centered">Geo-Location</span>
           <div class="row">
             <div class="col col-50">
               <label class="item-input-wrapper">
@@ -98,7 +115,7 @@
       </div> <!-- End of item-input-inset -->
 
       <div class="item item-divider"> <!-- input-inset -->
-        <span class="input-label">Office Full Address:</span>
+        <label>Office Full Address</label>
       </div>
 
       <div class="item item-input-inset">
@@ -131,6 +148,12 @@
           <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model="sacco.SACCO_Fields.Kebele">
         </label>
       </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Unique Place Name :</span>
+        <label class="item-input-wrapper">
+          <input type="text" name="UniquePlaceName" placeholder="Enter Unique Place's Name" ng-model="sacco.SACCO_Fields.UniquePlaceName">
+        </label>
+      </div>   
 
       <ion-list-item class="padding">
         <span ng-show="message"class="ion-{{message.type}}">{{message.text}}</span>
@@ -145,4 +168,3 @@
   </form>
   </ion-content>
 </ion-view>
-
