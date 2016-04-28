@@ -1292,9 +1292,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
-    '$ionicPopup', 'logger', 'Clients', function($rootScope, $scope, authHttp,
-    baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-    $ionicPopup, logger, Clients) {
+    '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
+    function($rootScope, $scope, authHttp,
+      baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
+      $ionicPopup, SavingsProducts, logger, Clients) {
 
   var session = null;
 
@@ -1302,6 +1303,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     if (!authHttp.getAuthHeader()) {
       $rootScope.$broadcast('sessionExpired');
     }
+    SavingsProducts.fetch_all(function(prods) {
+      logger.log("Got savings " + prods.length + " products");
+    });
     $scope.num_inactiveClients = 0;
     var role = Session.role;
     $scope.uname = Session.uname;

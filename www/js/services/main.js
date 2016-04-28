@@ -1290,7 +1290,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('SavingsProducts', function(authHttp, baseUrl, logger) {
+.factory('SavingsProducts', function(authHttp, baseUrl, Cache, logger) {
   return {
     get: function(id, fn_sav_prod) {
       authHttp.get(baseUrl + '/savingsproducts/' + id)
@@ -1299,10 +1299,19 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     },
     query: function(fn_sav_prods) {
+      var products = Cache.getObject('savingsproducts');
+      if (products) {
+        fn_sav_prods(products);
+      } else {
+        this.fetch_all(fn_sav_prods);
+      }
+    },
+    fetch_all: function(fn_sav_prods) {
       authHttp.get(baseUrl + '/savingsproducts')
         .then(function(response) {
           var data = response.data;
           logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          Cache.setObject('savingsproducts', data);
           fn_sav_prods(data);
         } );
     }
