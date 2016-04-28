@@ -16,17 +16,17 @@
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
+// 'mifosmobil' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-// 'starter.services' is found in services.js
-// 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova'])
+// 'mifosmobil.services' is found in services.js
+// 'mifosmobil.controllers' is found in controllers.js
+angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.services', 'mifosmobil.utilities', 'ngCordova'])
 /* below lines are used by camera app but seem to prevent login
 .config(function($compileProvider) {
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 } )
 */
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope, $state, $log) { // $rootScope, $state, $log
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -39,8 +39,33 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleDefault();
     }
   });
+  // Fix : SubHeader for tabs template for Android
+  $rootScope.$on('$stateChangeSuccess', function () {
+    $log.log($state.current.name);
+    var tabs = angular.element(document.querySelector(".tabs-top"));
+    //Important!!!! Put the state name you want this script to run on.  
+    //change 'tab.chats' to state you want run on
+    if ($state.current.name == "tab.sacco-list") {
+      tabs.addClass('subheader');
+    }
+    else if ($state.current.name == "tab.staff") {
+      tabs.addClass('subheader');
+    }
+    else if ($state.current.name == "tab.clients") {
+      tabs.addClass('subheader');
+    }
+    else {
+      tabs.removeClass('subheader');
+    }
+  });
+  //
 })
 
+.config(function($ionicConfigProvider) {
+  if(!ionic.Platform.isIOS()) { 
+    $ionicConfigProvider.scrolling.jsScrolling(false);
+  }
+})
 
 .config(function($stateProvider, $urlRouterProvider) {
 
@@ -139,6 +164,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
+  .state('tab.iclients', {
+    url: '/clients/inactive',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/tab-inactiveClients.html',
+        controller: 'InactiveClientsCtrl'
+      }
+    }
+  } )
   .state('tab.client-detail', {
     url: '/clients/:clientId',
     views: {
@@ -163,6 +197,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       'tab-clients': {
         templateUrl: 'templates/saving-open.html',
         controller: 'SavingsAccCreateCtrl'
+      }
+    }
+  } )
+  .state('tab.client-documents', {
+    url: '/clients/:id/docs',
+    views: {
+      'tab-clients': {
+        templateUrl: 'templates/documents.html',
+        controller: 'DocumentCtrl'
       }
     }
   } )

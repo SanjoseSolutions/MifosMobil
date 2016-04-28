@@ -64,6 +64,14 @@ ion-content {
     font-style: italic;
 }
 
+.briefInfo {
+  margin:0px 5px;
+}
+
+.centered {
+  text-align: center;
+}
+
 ion-content  {
 /* background-color:lightgrey;  */
 }
@@ -73,21 +81,52 @@ label, .label {
   color: #558;
 }
 
-.item, ion-item {
-  margin: 0px;
-  padding: 2px 3px;
+/*.item, ion-item {
+  margin: 2px; 
+  padding: 2px 5px;
   border: none;
   font-family:corsiva;
-  /*  font-style:italic;  */  
 }
-
+*/
 .rightBtn {
   float: right;
-  width: 20%;
 }
 select {
   width: 100%;
 }
 input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:focus, textarea:focus{
   background-color: lightblue;
+}
+
+/* Fix : SubHeader for tabs template for Android */
+.tabs-top.subheader > .tabs {
+  top: 90px; 
+}
+
+.iClient>.item-content {  /* ion-content { */
+  background-color: #EEE8D6 !important;  /* #E5E5E5; */
+}
+/*login page logo center*/
+.image-center {
+  margin: auto;
+  display: block;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+.custom.item-avatar > img:first-child {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 0;
+}
+
+.item-avatar.custom {
+    padding-left: 150px;
+    min-height: 150px;
+}
+
+.no-text-wrap .item {
+  white-space: normal;
 }
