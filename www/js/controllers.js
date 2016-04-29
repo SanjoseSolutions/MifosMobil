@@ -748,11 +748,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
               var sav = $scope.savings;
               logger.log("Going to save account: " + JSON.stringify(sav));
               SavingsAccounts.save(sav, function(new_sav) {
-                logger.log("Loan created!");
+                logger.log("Savings created!");
               }, function(sav) {
-                logger.log("Loan accepted");
+                logger.log("Savings accepted");
               }, function(response) {
-                logger.log("Loan failed");
+                logger.log("Savings failed");
               } );
             }
           }
@@ -1001,9 +1001,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     LoanAccounts.createLoan($scope.loneData, function(data){
       console.log(data);
     },function(sav) {
-      logger.log("Savings accepted");
+      logger.log("Loan Applied");
     }, function(response) {
-      logger.log("Savings create failed");
+      logger.log("Loan Application failed");
     });
 
   };
