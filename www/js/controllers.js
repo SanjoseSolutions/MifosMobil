@@ -883,17 +883,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $ionicPopup, $timeout, logger) {
   var id = $stateParams.id;
   $scope.init= function(){
-    console.log("==========",id);
     LoanAccounts.retrieveLoanDetails(id, function(data){
       console.log(data);
       $scope.productList = data.productOptions;
+      $scope.loanOfficerOptions = data.loanOfficerOptions
     });
   };
 
   $scope.SelectproductID = function(productid,productName){
-    console.log("===",productName);
     $scope.ProductName = productName
-    console.log(productid);;
     LoanAccounts.retrieveLoanDetailsViaProductID(id,productid, function(data){
       console.log(data);
       $scope.onSelectionLoanData = data;
@@ -947,7 +945,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
               //don't allow the user to close unless the user enters a value
               e.preventDefault();
             } else {
-              console.log("====cancel==button tapped");
               console.log($scope.data);
               $scope.saveLoanApplication($scope.data);
               return $scope.data;
@@ -972,7 +969,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.saveLoanApplication = function(data){
     console.log(data);
-    console.log("====saveLoanApplication=====,data");
       $scope.arrey = [];
       $scope.loneData = {};
       $scope.loneData = {
@@ -981,6 +977,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         clientId : id,
         productId : $scope.onSelectionLoanData.loanProductId,
         principal: data.principalAmount,
+        loanOfficerId: data.loanOfficer,
         loanTermFrequency: data.loanTerm,
         loanTermFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
         loanType: "individual",
@@ -994,7 +991,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
-        linkAccountId : "3",
+        linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
         maxOutstandingLoanBalance:"35000",
         disbursementData:$scope.arrey
       };
@@ -1389,25 +1386,25 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var role = Session.role;
     $scope.uname = Session.uname;
     $scope.role = role;
-    switch (role) {
-      case "Admin":
-        SACCO.query_full(function(data) {
-          logger.log("Fetched SACCOs");
-          $scope.num_saccos = data.length;
-        } );
-      case "Management":
-        Staff.query(function(staff) {
-          $scope.num_staff = staff.length;
-        } );
-      case "Staff":
-        Customers.query_full(function(clients) {
-          logger.log("Fetched " + clients.length + "Clients");
-          $scope.num_clients = clients.length;
-        } );
-        Clients.query_inactive(function(iClients) {
-          $scope.num_inactiveClients = iClients.totalFilteredRecords;
-        } );
-    }
+    // switch (role) {
+    //   case "Admin":
+    //     SACCO.query_full(function(data) {
+    //       logger.log("Fetched SACCOs");
+    //       $scope.num_saccos = data.length;
+    //     } );
+    //   case "Management":
+    //     Staff.query(function(staff) {
+    //       $scope.num_staff = staff.length;
+    //     } );
+    //   case "Staff":
+    //     Customers.query_full(function(clients) {
+    //       logger.log("Fetched " + clients.length + "Clients");
+    //       $scope.num_clients = clients.length;
+    //     } );
+    //     Clients.query_inactive(function(iClients) {
+    //       $scope.num_inactiveClients = iClients.totalFilteredRecords;
+    //     } );
+    // }
     if (null == session) {
       logger.log("Loading session..");
       session = Session.get();
