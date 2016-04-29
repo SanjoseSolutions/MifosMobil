@@ -889,10 +889,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     });
   };
 
-  $scope.SelectproductID = function(productid,productName){
-    $scope.ProductName = productName
-    LoanAccounts.retrieveLoanDetailsViaProductID(id,productid, function(data){
-      console.log(data);
+  $scope.SelectproductID = function(productid){
+    $scope.ProductName = productid.name
+    LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
       $scope.onSelectionLoanData = data;
     });
   };
@@ -1382,25 +1381,25 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var role = Session.role;
     $scope.uname = Session.uname;
     $scope.role = role;
-    // switch (role) {
-    //   case "Admin":
-    //     SACCO.query_full(function(data) {
-    //       logger.log("Fetched SACCOs");
-    //       $scope.num_saccos = data.length;
-    //     } );
-    //   case "Management":
-    //     Staff.query(function(staff) {
-    //       $scope.num_staff = staff.length;
-    //     } );
-    //   case "Staff":
-    //     Customers.query_full(function(clients) {
-    //       logger.log("Fetched " + clients.length + "Clients");
-    //       $scope.num_clients = clients.length;
-    //     } );
-    //     Clients.query_inactive(function(iClients) {
-    //       $scope.num_inactiveClients = iClients.totalFilteredRecords;
-    //     } );
-    // }
+    switch (role) {
+      case "Admin":
+        SACCO.query_full(function(data) {
+          logger.log("Fetched SACCOs");
+          $scope.num_saccos = data.length;
+        } );
+      case "Management":
+        Staff.query(function(staff) {
+          $scope.num_staff = staff.length;
+        } );
+      case "Staff":
+        Customers.query_full(function(clients) {
+          logger.log("Fetched " + clients.length + "Clients");
+          $scope.num_clients = clients.length;
+        } );
+        Clients.query_inactive(function(iClients) {
+          $scope.num_inactiveClients = iClients.totalFilteredRecords;
+        } );
+    }
     if (null == session) {
       logger.log("Loading session..");
       session = Session.get();
