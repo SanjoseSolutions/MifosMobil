@@ -884,7 +884,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   var id = $stateParams.id;
   $scope.init= function(){
     LoanAccounts.retrieveLoanDetails(id, function(data){
-      console.log(data);
       $scope.productList = data.productOptions;
       $scope.loanOfficerOptions = data.loanOfficerOptions
     });
@@ -903,7 +902,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     // Check the parameters' list
     
     $scope.data = $scope.XYZ;
-    console.log($scope.data);
     var days= Date.parse($scope.XYZ.openingDate);
 
     var date = new Date($scope.XYZ.openingDate),
@@ -968,7 +966,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   };
 
   $scope.saveLoanApplication = function(data){
-    console.log(data);
       $scope.arrey = [];
       $scope.loneData = {};
       $scope.loneData = {
@@ -996,7 +993,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         disbursementData:$scope.arrey
       };
     LoanAccounts.createLoan($scope.loneData, function(data){
-      console.log(data);
     },function(sav) {
       logger.log("Loan Applied");
     }, function(response) {
