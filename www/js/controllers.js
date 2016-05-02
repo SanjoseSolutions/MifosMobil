@@ -711,22 +711,16 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
  $scope.savings= {};
  $scope.init = function() {
-  console.log("iniitasdasdasdasdsadsdas");
    SavingsProducts.query(function(products) {
      logger.log("Got products: " + products.length);
-     console.log("==============",products);
      $scope.products = products;
    } );
  };
 
-
   $scope.prodChanged = function(product) {
-    console.log(product);
-
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
       SavingsAccounts.getClientSavingForm(product.id,function(data) {
-        console.log(data);
         $scope.prefilledDataToSaveForm = data;
         $scope.filedOfficerOptions = data.fieldOfficerOptions;
     } );
@@ -734,11 +728,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.filedoOficerChange = function(officer) {
     $scope.savings.filedOfficer = officer.id;
-    console.log("===",$scope.savings.filedOfficer);
   };
 
  $scope.savingCreate = function()  {
-  console.log($scope.savings);
   var date = new Date($scope.savings.submittedOnDate),
         mnth = ("0" + (date.getMonth()+1)).slice(-2),
         day  = ("0" + date.getDate()).slice(-2),
@@ -764,7 +756,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
              e.preventDefault();
              //don't allow the user to close the popup if empty
            } else {
-            console.log($scope.savings);
              $scope.savingAccount($scope.savings);
              return $scope.savings;
            }
@@ -774,8 +765,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
    });
 
     $scope.savingAccount = function(saving){
-      console.log(saving);
-
       $scope.savingAccountData = {
         allowOverdraft: $scope.prefilledDataToSaveForm.allowOverdraft,
         charges: $scope.prefilledDataToSaveForm.charges,
@@ -798,7 +787,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       }; 
       logger.log("Going to save account: " + JSON.stringify($scope.savingAccountData));
       SavingsAccounts.save($scope.savingAccountData, function(new_sav) {
-        console.log("saved");
        logger.log("Savings created!");
       }, function(sav) {
        logger.log("Savings accepted");
