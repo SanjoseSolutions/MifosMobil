@@ -125,6 +125,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     config = config || {};
     config.headers = config.headers || {};
     config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
+    method = method || 'post';
     var cmd = {
       'method': method || 'post',
       'url': url,
@@ -136,7 +137,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     subcmds.push(cmd);
     commands[rid]['commands'] = subcmds;
     Cache.setObject('commands', commands);
-    logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + JSON.stringify(cmd));
+    if (url.match(/images/)) {
+      data = data.substr(0, 10) + '...';
+    }
+    logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + method + ':' + url + '::' + data);
   };
 
   authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
@@ -166,7 +170,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
                 var attr = matches[1];
                 scmd['url'] = url.replace(':' + attr, rdata[attr]);
               }
-              logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
+              logger.log("CACHED SUBCOMMAND READ: " + scmd['url']);
               commands.push(scmd);
             }
           }

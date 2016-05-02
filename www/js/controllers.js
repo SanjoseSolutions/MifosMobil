@@ -1141,7 +1141,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         }
         if (clientId.match('T[0-9]\+$')) {
           var method = 'post';
-          if (dtrow) {
+          if (!HashUtil.isEmpty(dtrow)) {
             method = 'put';
           }
           var cid = client.cid;
