@@ -91,6 +91,11 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
 } ] )
 
 .factory('DateUtil', function() {
+  var lpadZero = function(i) {
+    if (i <= 9) { return "0" + i; }
+    return "" + i;
+  };
+
   return {
     isoDateStr: function(a_date) {
       var dd = a_date[2];
@@ -124,6 +129,13 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
     },
     toISODateString: function(dt) {
       return dt.toISOString().substr(0,10);
+    },
+    toDateString: function(dt) {
+      if (dt instanceof Date) {
+        var a = [ dt.getFullYear(), lpadZero(1+dt.getMonth()), lpadZero(dt.getDate()) ];
+        return a.join('-');
+      }
+      return dt;
     }
   };
 } )

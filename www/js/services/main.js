@@ -1011,7 +1011,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
             continue;
           }
           if (v instanceof Date) {
-            v = DateUtil.toISODateString(v);
+            v = DateUtil.toDateString(v);
             logger.log("Changed JSDate " + df + " to " + v);
           }
           sObject[df] = v;
