@@ -26,6 +26,11 @@
   margin-top: 0;
   margin-bottom: 0;
 }
+.prodName {
+  font-family: Arial;
+  font-size:0.75rem;
+  font-weight: bold;  
+}
 </style>
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-nav-buttons side="right">
@@ -205,23 +210,23 @@
     </div>
 
     <div class="card">
-      <div class="item item-divider">
+      <ion-item class="item item-divider">
         Financial Summary
-      </div>
+      </ion-item>
       <div class="item item-text-wrap no-padding">
           <ion-item>
              <label>Savings Accounts:</label>
              <span ng-hide="client.savingsAccounts">(None)</span>
               <a href="#/tab/clients/{{client.id}}/savings-apply" class="button positive rightBtn">
-                Apply
+                <strong>Apply</strong>
               </a>
              <table style="width:95%">
              <tbody>
               <tr ng-repeat="sac in client.savingsAccounts">
-                <td width="30%"><strong>{{sac.productName}}</strong></td>
-                <td><a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></td>
-                <td><span class="icon ion-social-bitcoin">{{sac.accountBalance}}</span></td>
-                <td><a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></td>
+                <td width="20%" class="prodName">{{sac.productName}}</td>
+                <td><p>|<a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></p></td>
+                <td><p>| <i class="icon ion-social-bitcoin"></i>{{sac.accountBalance}}</p></td>
+                <td><p> |<a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></p></td>
               </tr>
              </tbody>
              </table>
@@ -233,7 +238,7 @@
             <span ng-hide="client.loanAccounts.length">(None)</span>
             <a href="#/tab/clients/{{client.id}}/loan-apply"
                 class="button button-positive rightBtn">
-              Apply
+              <strong>Apply</strong>
             </a>
             <br />
             <table style="width:95%">
@@ -247,12 +252,15 @@
             </tbody>
             </table>
           </ion-item>
+
       </div>
-      <!-- ion-item>
+      <ion-item>
         <label>Share Holdings:</label>
-        {{client.NumShares || "0"}}
-        <a href="#/tab/#" class="button positive rightBtn"> <strong> Buy </strong> </a>
-      </ion-item -->
+        {{client.NumShares || "(None)"}}
+        <a href="#/tab/clients/{{client.id}}/buy-shares" class="button calm rightBtn">
+          <strong> Buy </strong>
+        </a>
+      </ion-item>
     </div>
 
   </ion-content>
