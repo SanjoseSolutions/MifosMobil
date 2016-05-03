@@ -77,7 +77,7 @@ ion-content  {
 }
 
 label, .label {
-  font-size:1.1rem;
+/*  font-size:1.1rem; */
   color: #558;
 }
 
@@ -88,6 +88,9 @@ label, .label {
   font-family:corsiva;
 }
 */
+.leftBtn {
+  float: left;
+}
 .rightBtn {
   float: right;
 }
