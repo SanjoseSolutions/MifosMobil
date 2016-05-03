@@ -53,6 +53,22 @@
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </button>
       </ion-item>
+
+      <div class="list card">
+	      <ion-item ng-show="client.pending && (rolestat.isAdmin || rolestat.isManagement)">
+	        <ion-button-bar>
+	          <button class="button button-assertive left" ng-click="rejectLoan(client)">
+	            Reject
+	            <i class="icon ion-close-round"></i>
+	          </button>
+	          <button class="button button-positive right" ng-click="approveLoan(client)">
+	            Approve
+	            <i class="icon ion-android-checkmark-circle"></i>
+	          </button>
+	        </ion-button-bar>
+	      </ion-item>
+	    </div>
+
     </div>
 
   </ion-content>
