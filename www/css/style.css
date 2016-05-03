@@ -117,14 +117,14 @@ input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:f
 }
 
 .custom.item-avatar > img:first-child {
-    max-width: 120px;
-    max-height: 120px;
-    border-radius: 0;
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 0;
 }
 
 .item-avatar.custom {
-    padding-left: 150px;
-    min-height: 150px;
+  padding-left: 150px;
+  min-height: 150px;
 }
 
 .no-text-wrap .item {

@@ -769,7 +769,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
               "name": data[i].name
             } );
           }   
-
 //        logger.log("No. of SUs: " + sunions.length);
           fn_sunions(sunions);
         }
