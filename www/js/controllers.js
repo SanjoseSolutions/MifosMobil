@@ -148,7 +148,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('TabsCtrl', function($scope, $rootScope, Session, logger,
-    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
+    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue, Clients) {
 
   $rootScope.$on('$cordovaNetwork:offline', 
     function(e, ns) {
@@ -182,7 +182,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           template: 'All commands are done!',
           scope: $scope
         } );
-      } );
+      }, Clients.fetch );
     } );
 
   $rootScope.$on('sessionExpired', function() {
@@ -405,7 +405,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } ] )
 
 .controller('ClientsCtrl', function($scope, Clients, ClientImages, Settings,
-    SavingsAccounts, LoanAccounts, logger, $ionicLoading) {
+    SavingsAccounts, LoanAccounts, logger, $ionicLoading, $ionicScrollDelegate) {
 
   $ionicLoading.show({template: 'Loading..'});
   setTimeout(function() {$ionicLoading.hide();},3000);
@@ -457,6 +457,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       process_data(clients);
       $scope.$broadcast('scroll.refreshComplete');
     } );
+  };
+
+  $scope.scrollBottom = function() {
+    $ionicScrollDelegate.scrollBottom();
+  };
+
+  $scope.scrollTop = function() {
+    $ionicScrollDelegate.scrollTop();
   };
 
   function process_data(clients) {

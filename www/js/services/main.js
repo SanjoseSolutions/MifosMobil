@@ -143,7 +143,18 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + method + ':' + url + '::' + data);
   };
 
-  authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
+  authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final, fetch_client) {
+    var clients = Cache.getObject('h_clients');
+    var cids = Object.keys(clients);
+    var i = 0; len = cids.length;
+    var nclients = {};
+    for(; i < len; ++i) {
+      var k = cids[i];
+      if (/^T\d+$/.test(k)) {
+        var client = clients[k];
+        nclients[client.cid] = k;
+      }
+    }
     var commands = Cache.getObject('commands');
     logger.log("LOADED CACHED COMMANDS: " + commands.length);
     if (commands.length == 0) return;
@@ -160,6 +171,21 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       $http[method](url, data, config)
         .then(function(response) {
           var rdata = response.data;
+          var nk = nclients[cmdIndex];
+          if (nk) {
+            logger.log("Offline Client created by cmd index " + cmdIndex);
+            var clients = Cache.getObject('h_clients');
+            delete clients[nk];
+            Cache.setObject('h_clients', clients);
+            if ('post' == method && /clients$/.test(url)) {
+              var resId = rdata['resourceId'];
+              logger.log("Adding new client id " + resId);
+              fetch_client(resId, function(new_client) {
+                clients[resId] = new_client;
+                Cache.setObject('h_clients', clients);
+              } );
+            }
+          }
           if (subcmds) {
             logger.log("Got subcommands #=" + subcmds.length);
             for(var i = 0; i < subcmds.length; ++i) {
@@ -174,13 +200,15 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
               commands.push(scmd);
             }
           }
-          fn_success(); //method, url, data, response)
+          fn_success(); //method, url, data, response
+          cmdIndex++;
         }, function(response) {
           logger.log("Failed offline cmd " + method +  " to "
             + url +  ": " + response.status
             + " :: " + JSON.stringify(response.data));
           results.push(response.data);
-          fn_fail(); //method, url, data, response);
+          fn_fail(); //method, url, data, response
+          cmdIndex++;
         } )
         .finally(function() {
           if (commands.length) {
