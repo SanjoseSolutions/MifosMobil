@@ -26,7 +26,7 @@ button {
 }
 </style>
 
-<ion-view view-title="Staff : {{staff.fullname}}">
+<ion-view view-title="Staff List: {{staff.fullname}}">
   <ion-content class="padding"> <!-- style="background-color:grey;" -->
     <div class="list card" style="clear:both;"> <!-- height:223px -->
       <div class="item item-divider item-avatar">
@@ -34,30 +34,32 @@ button {
         <!-- staff.fullname = firstname + ' ' + staff.lastname -->
         <!-- displayName = staff.lastname + ', ' + firstname -->
       </div>
-    	<img ng-src="img/Staff-Male-1.jpeg"
-        style="width: 150px; height: 150px; float: left; margin-horizontal: 5px">
+    	<!-- img ng-src="img/Staff-Male-1.jpeg"
+        style="width: 150px; height: 150px; float: left; margin-horizontal: 5px" -->
       <ion-list style="margin-left: 10px">
         <!-- h4>{{staff.fullname}}</h4 -->
         <ion-item>
-          <strong>Staff ID:</strong>{{staff.id}}
-        </ion-item>
-        <ion-item>
-          <label class="icon ion-android-call" title="Mobile">
-          </label> {{staff.mobileNo || "9876543210"}}
+          <img ng-src="img/Staff-Male-1.jpeg"
+        style="width: 150px; height: 150px; float: left; margin-right: 5px">
+          <p><strong>Staff ID:</strong>{{staff.id}}</p>
+          <p>
+            <label class="icon ion-android-call" title="Mobile">
+            </label> {{staff.mobileNo || "9876543210"}}
+          </p><br />
+          <p>
+            <strong>Joining Date</strong>:<br />
+            {{staff.joiningDt || "Unspecified"}}
+          </p>
+          <p>
+            <strong>Office's Name </strong>:<br />
+            {{staff.officeName || "Unspecified" }}
+          </p>
         </ion-item>
         <!-- ion-item>
           <label>Gender :</label> Male {{staff.gender}}
         </ion-item -->
-    	  <ion-item>
-          <strong>Joining Date</strong>: {{staff.joiningDt || "Unspecified"}}
-        </ion-item>
-        <ion-item>
-          <label>Office's Name </label>:<br />
-          {{staff.officeName || "Unspecified" }}
-        </ion-item>
         <ion-item class="item item-divider">
-          <span style="padding-left:1px;" class="icon ion-ios-email-outline" title="Email">
-          </span> :
+          <span class="icon ion-ios-email-outline" title="Email"></span> :
           <label> <!-- style="font-size:0.9rem" -->
             {{ staff.email || "staffusername@kmayra.org" }}
           </label>
