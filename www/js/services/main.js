@@ -160,7 +160,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     if (commands.length == 0) return;
     fn_init(commands.length);
     var results = [];
-    var cmdIndex = 0;
+    $rootScope.cmdIndex = 0;
     var runNextCmd = function() {
       cmd = commands.shift();
       var method = cmd['method'];
@@ -168,56 +168,72 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var data = cmd['data'];
       var config = cmd['config'];
       var subcmds = cmd['commands'];
-      $http[method](url, data, config)
-        .then(function(response) {
-          var rdata = response.data;
-          var nk = nclients[cmdIndex];
-          if (nk) {
-            logger.log("Offline Client created by cmd index " + cmdIndex);
-            var clients = Cache.getObject('h_clients');
-            delete clients[nk];
-            Cache.setObject('h_clients', clients);
-            if ('post' == method && /clients$/.test(url)) {
-              var resId = rdata['resourceId'];
-              logger.log("Adding new client id " + resId);
-              fetch_client(resId, function(new_client) {
-                clients[resId] = new_client;
-                Cache.setObject('h_clients', clients);
-              } );
+      var successCallback = function(rdata) {
+        if (subcmds) {
+          logger.log("Got subcommands #=" + subcmds.length);
+          for(var i = 0; i < subcmds.length; ++i) {
+            var scmd = subcmds[i];
+            var url = scmd['url'];
+            var matches = url.match(/:([a-zA-Z]+)/);
+            if (matches) {
+              var attr = matches[1];
+              scmd['url'] = url.replace(':' + attr, rdata[attr]);
             }
+            logger.log("CACHED SUBCOMMAND READ: " + scmd['url']);
+            commands.push(scmd);
           }
-          if (subcmds) {
-            logger.log("Got subcommands #=" + subcmds.length);
-            for(var i = 0; i < subcmds.length; ++i) {
-              var scmd = subcmds[i];
-              var url = scmd['url'];
-              var matches = url.match(/:([a-zA-Z]+)/);
-              if (matches) {
-                var attr = matches[1];
-                scmd['url'] = url.replace(':' + attr, rdata[attr]);
-              }
-              logger.log("CACHED SUBCOMMAND READ: " + scmd['url']);
-              commands.push(scmd);
-            }
-          }
-          fn_success(); //method, url, data, response
-          cmdIndex++;
-        }, function(response) {
-          logger.log("Failed offline cmd " + method +  " to "
-            + url +  ": " + response.status
-            + " :: " + JSON.stringify(response.data));
-          results.push(response.data);
-          fn_fail(); //method, url, data, response
-          cmdIndex++;
-        } )
-        .finally(function() {
-          if (commands.length) {
-            setTimeout(runNextCmd, 1000);
-          } else {
-            Cache.setObject('commands', []);
-            fn_final();
-          }
+        }
+        fn_success(); //method, url, data, response
+      };
+
+      var updateClientHash = function(rdata) {
+        var resId = rdata['resourceId'];
+        logger.log("Adding new client id " + resId);
+        var clients = Cache.getObject('h_clients');
+        delete clients[nk];
+        fetch_client(resId, function(new_client) {
+          clients[resId] = new_client;
+          Cache.setObject('h_clients', clients);
         } );
+      };
+
+      var failureCallback = function(response) {
+        logger.log("Failed offline cmd " + method +  " to "
+          + url +  ": " + response.status
+          + " :: " + JSON.stringify(response.data));
+        results.push(response.data);
+        fn_fail(); //method, url, data, response
+      };
+
+      var promise = $http[method](url, data, config);
+
+      var cmdIndex = $rootScope.cmdIndex;
+      var nk = nclients[cmdIndex];
+      if (nk) {
+        logger.log("Offline Client created by cmd index " + cmdIndex +
+          ' method ' + method + ' url: ' + url);
+        if ('post' == method && /clients$/.test(url)) {
+          promise = promise.then(function(response) {
+            var rdata = response.data;
+            updateClientHash(rdata);
+            successCallback(rdata);
+          }, failureCallback );
+        } else {
+          promise = promise.then(function(response) {
+            successCallback(response.data);
+          }, failureCallback );
+        }
+      }
+
+      promise.finally(function() {
+        $rootScope.cmdIndex++;
+        if (commands.length) {
+          setTimeout(runNextCmd, 1000);
+        } else {
+          Cache.setObject('commands', []);
+          fn_final();
+        }
+      } );
     };
     setTimeout(runNextCmd, 1000);
   };
