@@ -124,10 +124,12 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
     getPastDate: function(years) {
     	var dt = new Date();
     	dd = dt.getDate();
-    	mm = dt.getMonth()+1;
+    	mm = dt.getMonth(); //+1;
     	yy = dt.getFullYear() - years;
-    	return [yy, mm, dd].join('-');
-    	// return yy +'-'+ mm +'-'+ dd;
+    	//return [yy, mm, dd].join('-');
+      //return yy +'-'+ mm +'-'+ dd;
+      dt = new Date(yy, mm, dd);
+      return dt;
     }
   };
 } )

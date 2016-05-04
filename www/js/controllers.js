@@ -1278,6 +1278,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.maxDOB = DateUtil.getPastDate(14);
   console.log("\nMax DOB: " + $scope.maxDOB);
+  
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
