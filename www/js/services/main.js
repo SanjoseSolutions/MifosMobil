@@ -1506,6 +1506,36 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
+.factory('ShareProducts', function(authHttp, baseUrl, Cache, logger) {
+  return {
+    url: baseUrl + '/products/share',
+    get: function(id, fn_sh_prod) {
+      authHttp.get(this.url + '/' + id)
+        .then(function(response) {
+          fn_sh_prod(response.data);
+        } );
+    },
+    query: function(fn_sh_prods) {
+      var products = Cache.getObject('shareproducts');
+      if (products) {
+        fn_sh_prods(products);
+      } else {
+        this.fetch_all(function(data) {
+          fn_sh_prods(data.pageItems);
+        } );
+      }
+    },
+    fetch_all: function(fn_sh_prods) {
+      authHttp.get(this.url)
+        .then(function(response) {
+          var data = response.data;
+          Cache.setObject('shareproducts', data.pageItems);
+          fn_sh_prods(data);
+        } );
+    }
+  }
+} )
+
 .factory('Shares', function(authHttp, baseUrl) {
   return {
     url: baseUrl + '/account/share',
