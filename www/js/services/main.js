@@ -1475,19 +1475,24 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
    *  2. fn_img(img) callback function for image
    */
   return {
-    get: function(id, fn_img) {
-      authHttp.get(baseUrl + '/clients/' + id + '/images', {
-        'Accept': 'text/plain'
-      } ).then(function(response) {
-        logger.log("Image for client " + id + " received. Size: " + response.data.length);
-        fn_img(response.data);
-      } );
-    },
     getB64: function(id, fn_img) {
       authHttp.get(baseUrl + '/clients/' + id + '/images', {
-        'Accept': 'application/octet-stream'
+        headers: {
+          'Content-Type': 'text/plain',
+          'Accept': 'text/plain'
+        }
       } ).then(function(response) {
-        logger.log("Image for client " + id + " received[b64]. Size: " + response.data.length);
+        var rdata = response.data;
+        var left = rdata.substr(0, 22);
+        logger.log("Image for client " + id + " received[b64]:" + left + ". Size: " + rdata.length);
+        fn_img(rdata);
+      } );
+    },
+    get: function(id, fn_img) {
+      authHttp.get(baseUrl + '/clients/' + id + '/images', {
+        headers: { 'Accept': 'application/octet-stream' }
+      } ).then(function(response) {
+        logger.log("Image for client " + id + " received. Size: " + response.data.length);
         fn_img(response.data);
       } );
     },
