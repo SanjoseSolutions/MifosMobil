@@ -122,6 +122,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       return dt.toISOString().substr(0,10);
     },
     getPastDate: function(years) {
+      console.log("uClient Min Age: "+ years);
     	var dt = new Date();
     	dd = dt.getDate();
     	mm = dt.getMonth(); //+1;

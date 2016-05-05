@@ -1148,8 +1148,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 .controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
       Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
 
-  $scope.maxDOB = DateUtil.getPastDate(14);
-  console.log("\nMax DOB: " + $scope.maxDOB);
+  $scope.clientMinRequiredAge=14;
+  console.log("Client Min Age: " + $scope.clientMinRequiredAge);
+  $scope.maxDOB = DateUtil.getPastDate($scope.clientMinRequiredAge);
+  console.log("Max DOB: " + $scope.maxDOB);
+
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
