@@ -1375,10 +1375,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
-    '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
+    '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts',
     function($rootScope, $scope, authHttp,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-      $ionicPopup, SavingsProducts, logger, Clients) {
+      $ionicPopup, SavingsProducts, logger, Clients, ShareProducts) {
 
   var session = null;
 
@@ -1388,6 +1388,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         $rootScope.$broadcast('resetSession');
       }
     }
+    ShareProducts.fetch_all(function(prods) {
+      logger.log("Got share products: " + prods.totalFilteredRecords + " products");
+      logger.log(JSON.stringify(prods.pageItems));
+    } );
     SavingsProducts.fetch_all(function(prods) {
       logger.log("Got savings " + prods.length + " products");
     });
