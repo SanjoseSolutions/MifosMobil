@@ -61,16 +61,20 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Gender:</span>
+          <span class="input-label">Gender
+            <sup><i class="icon ion-asterisk assertive"></i></sup>:
+          </span>
           <label class="item-input-wrapper">
-            <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders">
+            <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders" required>
             </select>
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Marital Status :</span>
+          <span class="input-label">Marital Status
+            <sup><i class="icon ion-asterisk assertive"></i></sup>:
+          </span>
           <label class="item-input-wrapper">
-            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus" required>
             </select>
           </label>
         </div>
