@@ -87,9 +87,11 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Date of Birth:</span>
+          <span class="input-label">Date of Birth
+            <sup><i class="icon ion-asterisk assertive"></i></sup>:
+          </span>
           <label class="item-input-wrapper">
-            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth" required>
           </label>
         </div>
         <div class="item item-input-inset">
