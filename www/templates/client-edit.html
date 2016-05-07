@@ -39,6 +39,14 @@ select {
       
       <div class="list card">
         <div class="item item-input-inset">
+          <span class="input-label">Title:
+          </span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.Client_Fields.Title" ng-options="t.id as t.name for t in codes.ClientTitles" required>
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">
             First Name
             <sup><i class="icon ion-asterisk assertive"></i></sup> :

@@ -1372,6 +1372,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     get_codevalues: function(fn_codes) {
       var codes = {};
+      Codes.getValues("ClientTitle", function(tcodes) {
+        codes.ClientTitles = tcodes;
+      } );
       Codes.getValues("Gender", function(gcodes) {
         codes.genders = gcodes;
       } );
@@ -1677,6 +1680,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     "Gender": 4,
     "ClientClassification": 17,
     "Relationship": 26,
+    "ClientTitle": 28,
     "ClientType": 16,
     "MaritalStatus": 27
   };
