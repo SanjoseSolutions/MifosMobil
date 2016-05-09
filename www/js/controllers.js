@@ -722,12 +722,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.savings.productName = product.name;
       SavingsAccounts.getClientSavingForm(product.id,function(data) {
         $scope.prefilledDataToSaveForm = data;
-        $scope.filedOfficerOptions = data.fieldOfficerOptions;
+        $scope.fieldOfficerOptions = data.fieldOfficerOptions;
     } );
   };
 
-  $scope.filedoOficerChange = function(officer) {
-    $scope.savings.filedOfficer = officer.id;
+  $scope.fieldoOficerChange = function(officer) {
+    $scope.savings.fieldOfficer = officer.id;
   };
 
  $scope.savingCreate = function()  {
@@ -769,7 +769,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         allowOverdraft: $scope.prefilledDataToSaveForm.allowOverdraft,
         charges: $scope.prefilledDataToSaveForm.charges,
         productId: $scope.prefilledDataToSaveForm.savingsProductId,
-        fieldOfficerId: saving.filedOfficer,
+        fieldOfficerId: saving.fieldOfficer,
         locale: "en",
         dateFormat: "dd/mm/yy",
         submittedOnDate: saving.SubmittedDate,
@@ -1017,7 +1017,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
-        linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
+        //inkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
         maxOutstandingLoanBalance:"35000",
         disbursementData:$scope.arrey
       };
