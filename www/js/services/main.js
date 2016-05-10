@@ -1372,6 +1372,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     },
     query: function(fn_sav_prods) {
+      console.log("=====");
       var products = Cache.getObject('savingsproducts');
       if (products) {
         fn_sav_prods(products);
@@ -1400,6 +1401,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     },
     query: function(fn_accts) {
+      console.log("======service=====");
       logger.log("SavingsAccounts.query called");
       authHttp.get(baseUrl + '/savingsaccounts')
         .then(function(response) {
@@ -1446,6 +1448,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_err(response);
         } );
     },
+    getClientSavingForm: function(productID,fn_sav_prods) {
+     authHttp.get(baseUrl + '/savingsaccounts/template?clientId=3&staffInSelectedOfficeOnly=true&productId='+productID)
+       .then(function(response) {
+         var data = response.data;
+         logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+         fn_sav_prods(data);
+       } );
+    }
   };
 } )
 
