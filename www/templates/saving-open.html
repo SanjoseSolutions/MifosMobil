@@ -21,7 +21,7 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup>
           : Mandatory fields
       </div>
-      <ion-item>
+      <ion-item ng-show="message || savingAccCreateForm.$invalid">
         <!-- div ng-hide="savingAccCreateForm.name.$pristine">
           <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.required">
             SACCO Name is required
@@ -43,23 +43,20 @@
             Submit Date is required
           </span>
         </div>
-      </ion-item>
-
-      <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
 
-      <ion-item>
-        <label class="item item-input item-select">
-          <div class="input-label">
-            Select Product
-            <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          </div>
-          <select name="productID" ng-model="savings.productId" ng-change="prodChanged()"
-            required ng-options="p.id as p.name for p in products">
-          </select>
+      <div class="item item-input-inset">
+        <div class="input-label" style="float:left">
+          Product
+          <sup><i class="icon ion-asterisk assertive"></i></sup>:
+        </div>
+        <label class="item-input-wrapper" style="width:11em; float:right">
+        <select name="productID" ng-model="savings.productId" ng-change="prodChanged()"
+          required ng-options="p.id as p.name for p in products">
+        </select>
         </label>
-      </ion-item>
+      </div>
 
       <div class="item item-input-inset">
         <span class="input-label">Date Submitted:</span>
