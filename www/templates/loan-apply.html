@@ -54,10 +54,7 @@
           <div class="input-label">Select Product{{XYZ.productId}}
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
-          <select  ng-model="XYZ.productId" ng-options="item as item.name for item in productList"></select>
           <select name="productId" ng-model="XYZ.productId" ng-options="products as products.name for products in productList" value="{{products}}" ng-change="SelectproductID(XYZ.productId)" required>
-          </select>
-            <option >{{products.name}}</option>
           </select>
         </label>
       </ion-item>

@@ -13,7 +13,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <ion-view view-title="Open Saving Account">
-  <ion-content ng-controller="SavingsAccCreateCtrl">
+  <ion-content ng-init="init()">
   <form name="SavingAccCreateForm" novalidate>
 
     <div class="list padding">
@@ -52,8 +52,9 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup>:
         </div>
         <label class="item-input-wrapper" style="width:11em; float:right">
-        <select name="productID" ng-model="savings.productId" ng-change="prodChanged()"
-          required ng-options="p.id as p.name for p in products">
+        <select name="productId" ng-model="savings.productId" required
+          ng-options="p as p.name for p in products" value="{{p}}"
+          ng-change="prodChanged(savings.productId)">
         </select>
         </label>
       </div>
@@ -65,13 +66,24 @@
             size="15" ng-model="savings.submittedOnDate" required>
         </label>
       </div>
-      <div class="item item-input-inset">
+      <ion-item>
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Field Officer :
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </div>
+          <select name="productID" ng-model="savings.fieldOfficer" ng-change="fieldoOficerChange(savings.fieldOfficer)" value="{{p}}"
+            required ng-options="p as p.displayName for p in fieldOfficerOptions">
+          </select>
+        </label>
+      </ion-item>
+      <!-- <div class="item item-input-inset">
         <span class="input-label">Field Officer :</span>
         <label class="item-input-wrapper">
           <input type="text" size="20" ng-minlength="3" name="fieldOfficer"
             placeholder="Field Officer's Name" ng-model="savings.fieldOfficerId">
         </label>
-      </div>
+      </div> -->
       <div class="item item-input-inset">
         <span class="input-label">
           Minimum Balance
@@ -107,14 +119,14 @@
   </form>
   <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
   <script id="popup-template-html" type="text/ng-template">
-    <label> Product </label> : <strong>Product Name</strong>
-    <br /><label> Submitted on</label> : Date
-    <br /><label> Initial Deposit </label>: {{XYZ.initialDeposit}}
+    <label> Product </label> : <strong>{{savings.productName}}</strong>
+    <br /><label> Submitted on</label> : {{savings.SubmittedDate}}
+    <br /><label> Initial Deposit </label>: {{savings.minRequiredOpeningBalance}}
           <i class="icon ion-social-bitcoin"></i>
     <br /><label style="text-aling='center';"><strong>Interest Details</strong></label>
-    <br /><label> Percentage </label> : x %
-    <br /><label> Posting Period</label> : Quarterly
-    <br /><label> Charges</label> : xyz <i class="icon ion-social-bitcoin"></i>
+    <br /><label> Percentage </label> : {{prefilledDataToSaveForm.nominalAnnualInterestRate}} %
+    <br /><label> Posting Period</label> : {{prefilledDataToSaveForm.interestPostingPeriodType.value}}
+    <br /><label> Charges</label> : {{prefilledDataToSaveForm.charges}} <i class="icon ion-social-bitcoin"></i>
   </script>
   </ion-content>
 </ion-view>
