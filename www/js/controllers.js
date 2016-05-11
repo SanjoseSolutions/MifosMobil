@@ -32,6 +32,10 @@
 
 angular.module('mifosmobil.controllers', ['ngCordova'])
 
+// To listen for when this page is active (for example, to refresh data),
+// listen for the $ionicView.enter event: $scope.$on('$ionicView.enter', function(e) {
+//});
+
 .controller('MainCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork',
     'logger', 'CommandQueue', '$state', function($rootScope, $scope, Session,
     $cordovaNetwork, logger, CommandQueue, $state) {
@@ -48,13 +52,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   };
 } ] )
 
-// With the new view caching in Ionic, Controllers are only called
-// when they are recreated or on app start, instead of every page change.
-// To listen for when this page is active (for example, to refresh data),
-// listen for the $ionicView.enter event:
-//
-//$scope.$on('$ionicView.enter', function(e) {
-//});
 .controller('AnonCtrl', function($rootScope, $scope, Session, $cordovaNetwork,
     $ionicHistory, $ionicPopup, $timeout, $state, Cache, logger) {
 
@@ -154,8 +151,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("Going offline");
     } );
 
-
-  
   $rootScope.$on('$cordovaNetwork:online',
     function(e, ns) {
       //$rootScope.isOnline = true;
@@ -635,7 +630,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.modal.hide();
     };
 
-
     $scope.downloadDoc = function(doc) {
         var server = baseUrl + '/clients/'+ clientId + '/documents/' + doc.id + '/attachment?tenantIdentifier=' + Settings.tenant;
         var path = cordova.file.externalRootDirectory + doc.name;
@@ -707,23 +701,33 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
-   SavingsProducts, $ionicPopup, $timeout, logger) {
+    SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO) {
 
- $scope.savings= {};
- $scope.init = function() {
-   SavingsProducts.query(function(products) {
-     logger.log("Got products: " + products.length);
-     $scope.products = products;
-   } );
- };
+  $scope.savings= {};
+
+  $scope.init = function() {
+    Clients.get($stateParams.id, function(client) {
+      $scope.client = client;
+    } );
+    SavingsProducts.query(function(products) {
+      logger.log("Got products: " + products.length);
+      $scope.products = products;
+    } );
+    SACCO.get_staff($scope.client.officeId, function(staff) {
+      logger.log("Staff for office: " + JSON.stringify(staff));
+      $scope.fieldOfficerOptions = staff;
+    } );
+  };
 
   $scope.prodChanged = function(product) {
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
+    $scope.savings.minRequiredOpeningBalance = product.minRequiredOpeningBalance;
+    if ($cordovaNetwork.isOnline()) {
       SavingsAccounts.getClientSavingForm(product.id,function(data) {
         $scope.prefilledDataToSaveForm = data;
-        $scope.fieldOfficerOptions = data.fieldOfficerOptions;
-    } );
+      } );
+    }
   };
 
   $scope.fieldoOficerChange = function(officer) {

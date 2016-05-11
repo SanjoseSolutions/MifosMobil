@@ -762,6 +762,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         Cache.setObject('h_offices', offices);
       }
     },
+    get_staff: function(id, fn_staff) {
+      var staff = Cache.getObject('staff');
+      var ostaff = staff.filter(function(s) {
+        return s.officeId == id
+      } );
+      fn_staff(ostaff);
+    },
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
         var sunions = [];
@@ -1449,12 +1456,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     },
     getClientSavingForm: function(productID,fn_sav_prods) {
-     authHttp.get(baseUrl + '/savingsaccounts/template?clientId=3&staffInSelectedOfficeOnly=true&productId='+productID)
-       .then(function(response) {
-         var data = response.data;
-         logger.log("SavingsProducts.query got: " + JSON.stringify(data));
-         fn_sav_prods(data);
-       } );
+      authHttp.get(baseUrl + '/savingsaccounts/template?clientId=3&staffInSelectedOfficeOnly=true&productId='+productID)
+        .then(function(response) {
+          var data = response.data;
+          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          fn_sav_prods(data);
+        } );
     }
   };
 } )
