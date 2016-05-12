@@ -700,8 +700,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }
 })
 
-.controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
-    SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO) {
+.controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts, HashUtil,
+    SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO, DateUtil) {
 
   $scope.savings= {};
 
@@ -709,17 +709,21 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     Clients.get($stateParams.id, function(client) {
       $scope.client = client;
     } );
-    SavingsProducts.query(function(products) {
-      logger.log("Got products: " + products.length);
-      $scope.products = products;
-    } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.fieldOfficerOptions = staff;
     } );
+    SavingsProducts.query(function(products) {
+      logger.log("Got products: " + products.length);
+      $scope.prodHash = HashUtil.from_a(products);
+      $scope.products = products;
+    } );
   };
 
-  $scope.prodChanged = function(product) {
+  $scope.prodChanged = function(productId) {
+    if (!productId) return; // if null
+    var product = $scope.prodHash[productId];
+    $scope.product = product;
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
     $scope.savings.minRequiredOpeningBalance = product.minRequiredOpeningBalance;
@@ -730,86 +734,84 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }
   };
 
-  $scope.fieldoOficerChange = function(officer) {
-    $scope.savings.fieldOfficer = officer.id;
-  };
+  $scope.savingCreate = function()  {
+    var myPopup = $ionicPopup.show( {
+      title: '<strong>Savings Account Application</strong>',
+      /* This Url takes you to a script with the same ID Name in index.html */
+      templateUrl: 'popup-template-html',
+      scope: $scope, // null,
+      buttons: [ {
+        text: 'Cancel',
+        type: 'button-default', //'button-clear',
+        onTap: function(e) {
+          // e.preventDefault() will stop the popup from closing when tapped.
+          return "Popup Canceled"; // false;
+        }
+      },
+      {
+        text: '<b>Save</b>',
+        type: 'button-positive',
+        onTap: function(e) {
+          if (!$scope.savings) {
+            e.preventDefault();
+            logger.log("Savings data unavailable");
+            //don't allow the user to close the popup if empty
+          } else {
+            logger.log("Got savings data about to apply");
+            $scope.savingAccount($scope.savings);
+            return $scope.savings;
+          }
+        }
+      } ]
+    } );
 
- $scope.savingCreate = function()  {
-  var date = new Date($scope.savings.submittedOnDate),
-        mnth = ("0" + (date.getMonth()+1)).slice(-2),
-        day  = ("0" + date.getDate()).slice(-2),
-         year = ("0" + date.getYear()).slice(-2);
-       $scope.savings.SubmittedDate = day+"/"+mnth+"/"+year; 
-   var myPopup = $ionicPopup.show({
-     title: '<strong>Saving Account Creation</strong>',
-     /* This Url takes you to a script with the same ID Name in index.html */
-     templateUrl: 'popup-template-html',
-     scope: $scope, // null,
-     buttons: [
-       { text: 'Cancel',
-         type: 'button-default', //'button-clear',
-         onTap: function(e) {
-           // e.preventDefault() will stop the popup from closing when tapped.
-           return "Popup Canceled"; // false;
-         }
-       },
-       { text: '<b>Save</b>',
-         type: 'button-positive',
-         onTap: function(e) {
-           if (!$scope.savings) {
-             e.preventDefault();
-             //don't allow the user to close the popup if empty
-           } else {
-             $scope.savingAccount($scope.savings);
-             return $scope.savings;
-           }
-         }
-       }
-     ]
-   });
+    $scope.savingAccount = function(saving) {
 
-    $scope.savingAccount = function(saving){
-      $scope.savingAccountData = {
-        allowOverdraft: $scope.prefilledDataToSaveForm.allowOverdraft,
-        charges: $scope.prefilledDataToSaveForm.charges,
-        productId: $scope.prefilledDataToSaveForm.savingsProductId,
-        fieldOfficerId: saving.fieldOfficer,
+      var product = $scope.product;
+
+      var savingAccountData = {
+        allowOverdraft: product.allowOverdraft,
+        charges: product.charges, // nullable
+        productId: saving.productId,
+        fieldOfficerId: saving.fieldOfficerId,
         locale: "en",
-        dateFormat: "dd/mm/yy",
-        submittedOnDate: saving.SubmittedDate,
-        enforceMinRequiredBalance: $scope.prefilledDataToSaveForm.enforceMinRequiredBalance,
-        interestCompoundingPeriodType: $scope.prefilledDataToSaveForm.interestCompoundingPeriodType.id,
-        interestPostingPeriodType: $scope.prefilledDataToSaveForm.interestPostingPeriodType.id,
-        interestCalculationType: $scope.prefilledDataToSaveForm.interestCalculationType.id,
-        interestCalculationDaysInYearType: $scope.prefilledDataToSaveForm.interestCalculationDaysInYearType.id,
-        minRequiredOpeningBalance: $scope.prefilledDataToSaveForm.minRequiredOpeningBalance,
+        dateFormat: "yyyy-MM-dd", // prefer ISO
+        submittedOnDate: DateUtil.toISODateString(saving.submittedOnDate),
+        enforceMinRequiredBalance: product.enforceMinRequiredBalance,
+        interestCompoundingPeriodType: product.interestCompoundingPeriodType.id,
+        interestPostingPeriodType: product.interestPostingPeriodType.id,
+        interestCalculationType: product.interestCalculationType.id,
+        interestCalculationDaysInYearType: product.interestCalculationDaysInYearType.id,
+        minRequiredOpeningBalance: product.minRequiredOpeningBalance,
         minRequiredBalance: saving.minRequiredOpeningBalance,
-        clientId: $scope.prefilledDataToSaveForm.clientId,
-        withdrawalFeeForTransfers: $scope.prefilledDataToSaveForm.withdrawalFeeForTransfers,
-        withHoldTax: $scope.prefilledDataToSaveForm.withHoldTax,
-        nominalAnnualInterestRate: $scope.prefilledDataToSaveForm.nominalAnnualInterestRate
+        clientId: $scope.client.id,
+        withdrawalFeeForTransfers: product.withdrawalFeeForTransfers,
+        withHoldTax: product.withHoldTax,
+        nominalAnnualInterestRate: product.nominalAnnualInterestRate
       }; 
-      logger.log("Going to save account: " + JSON.stringify($scope.savingAccountData));
-      SavingsAccounts.save($scope.savingAccountData, function(new_sav) {
-       logger.log("Savings created!");
+      logger.log("Going to save account: " + JSON.stringify(savingAccountData));
+      SavingsAccounts.save(savingAccountData, function(new_sav) {
+        logger.log("Savings created!");
+        alert("Applied for savings account #" + new_sav.resourceId);
       }, function(sav) {
-       logger.log("Savings accepted");
+        logger.log("Savings accepted");
+        alert("Savings application submitted offline");
       }, function(response) {
-       logger.log("Savings failed");
+        logger.log("Savings failed");
       } );
     };
-   myPopup.then(function(res) {
-     logger.log('Received : ' + '"' + res + '"');
-     // Insert the appropriate Code here
-     // to process the Received Data for Saving Account Creation
-   });
 
-   $timeout(function() {
-     logger.log("Popup TimeOut");
-     myPopup.close();
-   }, 15000);
- };
+    myPopup.then(function(res) {
+      logger.log('Received : ' + '"' + res + '"');
+      // Insert the appropriate Code here
+      // to process the Received Data for Saving Account Creation
+    });
 
+    $timeout(function() {
+      logger.log("Popup TimeOut");
+      myPopup.close();
+    }, 10000);
+  };
 } )
 
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
