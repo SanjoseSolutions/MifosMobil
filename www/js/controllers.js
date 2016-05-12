@@ -42,6 +42,20 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } ] )
 
+.controller('SettingsCtrl', function($scope, $stateParams, DataTables,$translate) {
+
+  if(localStorage.getItem('language') == null){
+    $scope.language = "locale-en";
+  }else{
+    $scope.language = localStorage.getItem('language');
+  }
+  
+  $scope.languageChange = function(languageID){
+    $translate.use(languageID)
+    localStorage.setItem('language', languageID);
+  }
+} )
+
 .controller('LogsCtrl', [ '$rootScope', '$scope', function($rootScope, $scope) {
   $scope.log = {
     messages: $rootScope.messages
@@ -145,7 +159,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('TabsCtrl', function($scope, $rootScope, Session, logger,
-    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
+    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue,$translate) {
 
   $rootScope.$on('$cordovaNetwork:offline', 
     function(e, ns) {
@@ -155,6 +169,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     } );
 
 
+    $scope.switchLanguage = function(key) {
+      console.log("-----");
+     $translate.use(key);
+    }
   
   $rootScope.$on('$cordovaNetwork:online',
     function(e, ns) {
