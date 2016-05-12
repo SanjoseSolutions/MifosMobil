@@ -709,6 +709,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts,
    SavingsProducts, $ionicPopup, $timeout, logger) {
 
+  var id = $stateParams.id;
+
  $scope.savings= {};
  $scope.init = function() {
    SavingsProducts.query(function(products) {
@@ -720,14 +722,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.prodChanged = function(product) {
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
-      SavingsAccounts.getClientSavingForm(product.id,function(data) {
+      SavingsAccounts.getClientSavingForm(product.id,id,function(data) {
         $scope.prefilledDataToSaveForm = data;
         $scope.fieldOfficerOptions = data.fieldOfficerOptions;
     } );
   };
 
   $scope.fieldoOficerChange = function(officer) {
-    $scope.savings.fieldOfficer = officer.id;
+    $scope.savings.fieldOfficerID = officer.id;
   };
 
  $scope.savingCreate = function()  {
@@ -765,11 +767,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
    });
 
     $scope.savingAccount = function(saving){
+      console.log(saving);
       $scope.savingAccountData = {
         allowOverdraft: $scope.prefilledDataToSaveForm.allowOverdraft,
         charges: $scope.prefilledDataToSaveForm.charges,
         productId: $scope.prefilledDataToSaveForm.savingsProductId,
-        fieldOfficerId: saving.fieldOfficer,
+        fieldOfficerId: saving.fieldOfficerID,
         locale: "en",
         dateFormat: "dd/mm/yy",
         submittedOnDate: saving.SubmittedDate,
@@ -1017,7 +1020,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
-        //inkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
+        //linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
         maxOutstandingLoanBalance:"35000",
         disbursementData:$scope.arrey
       };
@@ -1177,6 +1180,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
       Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
+
+  $scope.clientMinRequiredAge=14;
+  console.log("Client Min Age: " + $scope.clientMinRequiredAge);
+  $scope.maxDOB = DateUtil.getPastDate($scope.clientMinRequiredAge);
+  console.log("Max DOB: " + $scope.maxDOB);
+
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
@@ -1302,7 +1311,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
     function($scope, Clients, ClientImages, DateUtil, $state,
       HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
-  // x
+
+  $scope.maxDOB = DateUtil.getPastDate(14);
+  console.log("\nMax DOB: " + $scope.maxDOB);
+  
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;
