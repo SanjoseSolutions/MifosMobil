@@ -742,7 +742,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   };
 
 /* Merge Conflict
-<<<< HEAD
+<<< HEAD
 } ] )
 
 .controller('SavingsAccountCtrl', [ '$scope', '$stateParams', 'SavingsAccounts', '$ionicPopup', '$timeout', 'logger',
@@ -1206,10 +1206,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } ] )
 
-.controller('ClientEditCtrl', [ '$scope', '$stateParams', 'Customers', 'HashUtil', 'Clients',
-   'ClientImages', 'DateUtil', 'DataTables', 'Codes', 'FormHelper', 'SACCO', 'logger', 
-    function($scope, $stateParams, Customers, HashUtil, Clients,
-    ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
+.controller('ClientEditCtrl', [ '$scope', '$stateParams', 'Customers', 'HashUtil',
+   'Clients','ClientImages', 'DateUtil', 'DataTables', 'Codes', 'FormHelper', 'SACCO', 'logger', 
+    function($scope, $stateParams, Customers, HashUtil,
+    Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
 
   $scope.clientMinRequiredAge=14;
   console.log("Client Min Age: " + $scope.clientMinRequiredAge);
@@ -1340,9 +1340,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     function($scope, Clients, ClientImages, DateUtil, $state, 
     HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
 
-  $scope.maxDOB = DateUtil.getPastDate(14);
-  console.log("\nMax DOB: " + $scope.maxDOB);
->>>>>>> 682171d461a0324709caa4dadec39b95883b3414
+  $scope.clientMinRequiredAge=14;
+  console.log("Client Min Age: " + $scope.clientMinRequiredAge);
+  $scope.maxDOB = DateUtil.getPastDate($scope.clientMinRequiredAge);
+  console.log("Max DOB: " + $scope.maxDOB);
   
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
