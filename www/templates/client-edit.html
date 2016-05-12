@@ -39,6 +39,14 @@ select {
       
       <div class="list card">
         <div class="item item-input-inset">
+          <span class="input-label">Title:
+          </span>
+          <label class="item-input-wrapper">
+            <select ng-model="client.Client_Fields.Title" ng-options="t.id as t.name for t in codes.ClientTitles" required>
+            </select>
+          </label>
+        </div>
+        <div class="item item-input-inset">
           <span class="input-label">
             First Name
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
@@ -61,23 +69,29 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Gender:</span>
+          <span class="input-label">Gender
+            <sup><i class="icon ion-asterisk assertive"></i></sup>:
+          </span>
           <label class="item-input-wrapper">
-            <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders">
+            <select ng-model="client.genderId" ng-options="g.id as g.name for g in codes.genders" required>
             </select>
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Marital Status :</span>
+          <span class="input-label">Marital Status
+            <sup><i class="icon ion-asterisk assertive"></i></sup>:
+          </span>
           <label class="item-input-wrapper">
-            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus">
+            <select ng-model="client.Client_Fields['MaritalStatus_cd_Marital Status']" ng-options="mStat.id as mStat.name for mStat in codes.MaritalStatus" required>
             </select>
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Date of Birth:</span>
+          <span class="input-label">Date of Birth
+            <sup><i class="icon ion-asterisk assertive"></i></sup>:
+          </span>
           <label class="item-input-wrapper">
-            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth" required>
           </label>
         </div>
         <div class="item item-input-inset">
