@@ -77,7 +77,7 @@ ion-content  {
 }
 
 label, .label {
-  font-size:1.1rem;
+/*  font-size:1.1rem; */
   color: #558;
 }
 
@@ -88,8 +88,17 @@ label, .label {
   font-family:corsiva;
 }
 */
+.leftBtn {
+  float: left;
+}
 .rightBtn {
   float: right;
+}
+.leftBtn {
+  float: left;
+}
+.w20 {
+  width:20%;
 }
 select {
   width: 100%;
@@ -102,10 +111,11 @@ input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:f
 .tabs-top.subheader > .tabs {
   top: 90px; 
 }
-
+/* Inactive Clients' background */
 .iClient>.item-content {  /* ion-content { */
   background-color: #EEE8D6 !important;  /* #E5E5E5; */
 }
+
 /*login page logo center*/
 .image-center {
   margin: auto;
@@ -117,14 +127,14 @@ input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:f
 }
 
 .custom.item-avatar > img:first-child {
-    max-width: 120px;
-    max-height: 120px;
-    border-radius: 0;
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 0;
 }
 
 .item-avatar.custom {
-    padding-left: 150px;
-    min-height: 150px;
+  padding-left: 150px;
+  min-height: 150px;
 }
 
 .no-text-wrap .item {

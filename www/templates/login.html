@@ -25,7 +25,7 @@
         <ion-item>
           <ion-label for="username">Username : </ion-label>
           <input type="text" name="username" id="username" ng-model="cred.username"
-            placeholder="Your k-Mayra username" ng-minlength="5" required />
+            placeholder="Your k-Mayra username" ng-minlength="5" required autofocus/>
         </ion-item>
 
         <ion-item>
@@ -49,7 +49,7 @@
             <span class="ion-log-in"></span>
           </button>
         </ion-item>
-        <!-- CAN BE REUSED TO ALLOW PASSWORD RESET THROUGH THE APP USING THE K-MAYRA EMAIL
+        <!-- CAN BE REUSED TO ALLOW PASSWORD RESET THROUGH THE APP USING THE K-MAYRA EMAIL ONLY
         ion-item class="text-center" ng-hide="1">
           Forgot your password ?
           <br />

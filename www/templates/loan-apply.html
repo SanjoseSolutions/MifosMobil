@@ -12,6 +12,11 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+<style type="text/css">
+select, input[type=text] {
+  width:50%;
+}
+</style>
 <ion-view view-title="Apply for Loan" ng-init="init()">
   <ion-content ng-controller="LoansAccCreateCtrl">
   <form name="loanAccCreateForm" novalidate>
@@ -21,15 +26,23 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup>
           : Mandatory fields
       </div>
-      <ion-item>
-        <!-- div ng-hide="loanAccCreateForm.name.$pristine">
+      <!-- ion-item>
+        <div ng-hide="loanAccCreateForm.name.$pristine">
           <span class="ion-warn" ng-show="loanAccCreateForm.name.$error.required">
             SACCO Name is required
           </span>
           <span class="ion-warn" ng-show="loanAccCreateForm.name.$error.minlength">
             SACCO Name must be at least 3 characters
           </span>
-        </div -->
+        </div>
+      </ion-item -->
+
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
+
+      <ion-item class="item">
+
         <div ng-show="loanAccCreateForm.productId.$error.required">
           <span class="ion-warn">Product is required</span>
         </div>
@@ -43,21 +56,23 @@
             Submit Date is required
           </span>
         </div>
-      </ion-item>
 
-      <ion-item ng-show="message">
-        <span class="ion-{{message.type}}">{{message.text}}</span>
-      </ion-item>
 
-      <ion-item>
         <label class="item item-input item-select">
-          <div class="input-label">Select Product{{XYZ.productId}}
+          <div class="input-label">Select Product
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
+          <!-- select  ng-model="XYZ.productId" ng-options="item as item.name for item in productList"></select -->
           <select name="productId" ng-model="XYZ.productId" ng-options="products as products.name for products in productList" value="{{products}}" ng-change="SelectproductID(XYZ.productId)" required>
+            <option >{{products.name}}</option>
           </select>
         </label>
       </ion-item>
+
+      <!-- select name="loanOfficer" ng-model="XYZ.loanOfficer">
+        <option ng-repeat="loanOfficer in loanOfficerOptions" value="{{loanOfficer.id}}">{{loanOfficer.displayName}}</option>
+      </select -->
+      
       <div class="item item-input-inset">
         <span class="input-label">Date Submitted:</span>
         <label class="item-input-wrapper">
@@ -65,10 +80,22 @@
             size="15" ng-model="XYZ.openingDate" required>
         </label>
       </div>
+
+      <!-- ion-item>
+        <label class="item item-input item-select">
+          <div class="input-label">Loan Officer :
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </div>
+          <select name="productId" required>
+            <option> O1 </option>
+            <option> O2 </option>
+          </select>
+        </label>
+      </ion-item -->
+
       <ion-item>
         <label class="item item-input item-select">
-          <div class="input-label">Loan Officer:
-          </div>
+          <div class="input-label">Loan Officer:</div>
           <select name="loanOfficer" ng-model="XYZ.loanOfficer">
             <option ng-repeat="loanOfficer in loanOfficerOptions" value="{{loanOfficer.id}}">{{loanOfficer.displayName}}</option>
           </select>
@@ -77,7 +104,7 @@
       <div class="item item-input-inset">
         <span class="input-label">Loan Purpose :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="20" ng-minlength="3" name="loanPurpose"
+          <input type="text" size="10" ng-minlength="3" name="loanPurpose"
             placeholder="Reason for taking this Loan"
             ng-model="XYZ.loanPurpose">
         </label>
@@ -88,7 +115,7 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-          <input type="date" size="15" name="disbursemantDate"
+          <input type="date" name="disbursemantDate"
               placeholder="Format: yyyy-mm-dd"
               ng-model="XYZ.disbursemantDate" required>
         </label>
