@@ -55,7 +55,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 //
 //$scope.$on('$ionicView.enter', function(e) {
 //});
-.controller('AnonCtrl', function($rootScope, $scope, Session, $cordovaNetwork,
+.controller('AnonCtrl', [ '$rootScope', '$scope', 'Session', '$cordovaNetwork',
+    '$ionicHistory', '$ionicPopup', '$timeout', '$state', 'Cache', 'logger',
+    function($rootScope, $scope, Session, $cordovaNetwork,
     $ionicHistory, $ionicPopup, $timeout, $state, Cache, logger) {
 
   $scope.cred = {};
@@ -142,10 +144,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }, 15000);
 
   };
-})
+} ] )
 
-.controller('TabsCtrl', function($scope, $rootScope, Session, logger,
-    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
+.controller('TabsCtrl', [ '$scope', '$rootScope', 'Session', 'logger', 'Roles',
+    'Cache', '$cordovaNetwork', 'authHttp', '$ionicPopup', 'CommandQueue',
+    function($scope, $rootScope, Session, logger, Roles,
+    Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
 
   $rootScope.$on('$cordovaNetwork:offline', 
     function(e, ns) {
@@ -154,8 +158,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("Going offline");
     } );
 
-
-  
   $rootScope.$on('$cordovaNetwork:online',
     function(e, ns) {
       //$rootScope.isOnline = true;
@@ -213,10 +215,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
       //document.addEventListener('offline', 
   } );
-} )
+} ] )
 
-.controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, FormHelper, HashUtil,
-    SACCO_Fields, logger) {
+.controller('SACCORegCtrl', ['$scope', 'SACCO', 'Office', 'DataTables', 'FormHelper', 'HashUtil', 'SACCO_Fields', 'logger', 
+    function($scope, SACCO, Office, DataTables, FormHelper, HashUtil, SACCO_Fields, logger) {
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
     $scope.data.sunions = data;
@@ -266,12 +268,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("SACCO create failed: " + JSON.stringify(response));
     } );
   };
-} )
+} ] )
 
-.controller('SACCOEditCtrl', [ '$scope', '$stateParams', 'Office', 'SACCO',
-    'FormHelper', 'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
-  function($scope, $stateParams, Office,
-    SACCO, FormHelper, DataTables, DateUtil, logger, SACCO_Fields) {
+.controller('SACCOEditCtrl', [ '$scope', '$stateParams', 'Office', 'SACCO', 'FormHelper',
+    'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
+    function($scope, $stateParams, Office, SACCO, FormHelper, DataTables, DateUtil, logger, SACCO_Fields) {
+
   var officeId = $stateParams.saccoId;
   logger.log("SACCO Edit invoked: " + officeId);
   SACCO.query_sacco_unions(function(data) {
@@ -362,7 +364,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } ] )
 
-.controller('SACCOViewCtrl', function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
+.controller('SACCOViewCtrl', [ '$scope', '$stateParams', 'SACCO', 'DateUtil', 'DataTables', 'logger',
+    function($scope, $stateParams, SACCO, DateUtil, DataTables, logger) {
+
   $scope.data = {};
   $scope.$on('$ionicView.enter', function(e) {
     var saccoId = $stateParams.saccoId;
@@ -371,7 +375,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.data = sacco;
     } );
   } );
-} )
+} ] )
 
 .controller('StaffCtrl', [ '$scope', 'Staff', function($scope, Staff) {
   Staff.query(function(staff) {
@@ -402,7 +406,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } ] )
 
-.controller('ClientsCtrl', [ '$scope', 'Clients', 'ClientImages', 'Settings', 'SavingsAccounts', 'LoanAccounts', 'logger',
+.controller('ClientsCtrl', ['$scope', 'Clients', 'ClientImages', 'Settings', 'SavingsAccounts', 'LoanAccounts', 'logger',
     function($scope, Clients, ClientImages, Settings, SavingsAccounts, LoanAccounts, logger) {
 
   $scope.$on('$ionicView.enter', function(e) {
@@ -468,10 +472,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   }
 } ] )
 
-.controller('ClientDetailCtrl', [ '$scope', '$stateParams', 'Clients', '$ionicPopup',
-    'Customers', 'ClientImages', 'DateUtil', 'DataTables', 'Codes', 'SACCO', 'logger', 'Camera', '$cordovaPrinter',
-    function($scope, $stateParams, Clients, $ionicPopup,
-    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
+.controller('ClientDetailCtrl', [ '$scope', '$stateParams', 'Clients', '$ionicPopup','Customers', 
+    'ClientImages', 'DateUtil', 'DataTables', 'Codes', 'SACCO', 'logger', 'Camera', '$cordovaPrinter',
+    function($scope, $stateParams, Clients, $ionicPopup, Customers,
+    ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
+
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
   $scope.client = {};
@@ -778,46 +783,48 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
      ]
    });
 
-    $scope.savingAccount = function(saving){
-      $scope.savingAccountData = {
-        allowOverdraft: $scope.prefilledDataToSaveForm.allowOverdraft,
-        charges: $scope.prefilledDataToSaveForm.charges,
-        productId: $scope.prefilledDataToSaveForm.savingsProductId,
-        fieldOfficerId: saving.fieldOfficer,
-        locale: "en",
-        dateFormat: "dd/mm/yy",
-        submittedOnDate: saving.SubmittedDate,
-        enforceMinRequiredBalance: $scope.prefilledDataToSaveForm.enforceMinRequiredBalance,
-        interestCompoundingPeriodType: $scope.prefilledDataToSaveForm.interestCompoundingPeriodType.id,
-        interestPostingPeriodType: $scope.prefilledDataToSaveForm.interestPostingPeriodType.id,
-        interestCalculationType: $scope.prefilledDataToSaveForm.interestCalculationType.id,
-        interestCalculationDaysInYearType: $scope.prefilledDataToSaveForm.interestCalculationDaysInYearType.id,
-        minRequiredOpeningBalance: $scope.prefilledDataToSaveForm.minRequiredOpeningBalance,
-        minRequiredBalance: saving.minRequiredOpeningBalance,
-        clientId: $scope.prefilledDataToSaveForm.clientId,
-        withdrawalFeeForTransfers: $scope.prefilledDataToSaveForm.withdrawalFeeForTransfers,
-        withHoldTax: $scope.prefilledDataToSaveForm.withHoldTax,
-        nominalAnnualInterestRate: $scope.prefilledDataToSaveForm.nominalAnnualInterestRate
-      }; 
-      logger.log("Going to save account: " + JSON.stringify($scope.savingAccountData));
-      SavingsAccounts.save($scope.savingAccountData, function(new_sav) {
-       logger.log("Savings created!");
-      }, function(sav) {
-       logger.log("Savings accepted");
-      }, function(response) {
-       logger.log("Savings failed");
-      } );
-    };
-   myPopup.then(function(res) {
-     logger.log('Received : ' + '"' + res + '"');
-     // Insert the appropriate Code here
-     // to process the Received Data for Saving Account Creation
-   });
+  $scope.savingAccount = function(saving){
+    $scope.savingAccountData = {
+      allowOverdraft: $scope.prefilledDataToSaveForm.allowOverdraft,
+      charges: $scope.prefilledDataToSaveForm.charges,
+      productId: $scope.prefilledDataToSaveForm.savingsProductId,
+      fieldOfficerId: saving.fieldOfficer,
+      locale: "en",
+      dateFormat: "dd/mm/yy",
+      submittedOnDate: saving.SubmittedDate,
+      enforceMinRequiredBalance: $scope.prefilledDataToSaveForm.enforceMinRequiredBalance,
+      interestCompoundingPeriodType: $scope.prefilledDataToSaveForm.interestCompoundingPeriodType.id,
+      interestPostingPeriodType: $scope.prefilledDataToSaveForm.interestPostingPeriodType.id,
+      interestCalculationType: $scope.prefilledDataToSaveForm.interestCalculationType.id,
+      interestCalculationDaysInYearType: $scope.prefilledDataToSaveForm.interestCalculationDaysInYearType.id,
+      minRequiredOpeningBalance: $scope.prefilledDataToSaveForm.minRequiredOpeningBalance,
+      minRequiredBalance: saving.minRequiredOpeningBalance,
+      clientId: $scope.prefilledDataToSaveForm.clientId,
+      withdrawalFeeForTransfers: $scope.prefilledDataToSaveForm.withdrawalFeeForTransfers,
+      withHoldTax: $scope.prefilledDataToSaveForm.withHoldTax,
+      nominalAnnualInterestRate: $scope.prefilledDataToSaveForm.nominalAnnualInterestRate
+    }; 
+    logger.log("Going to save account: " + JSON.stringify($scope.savingAccountData));
+    SavingsAccounts.save($scope.savingAccountData, function(new_sav) {
+     logger.log("Savings created!");
+    }, function(sav) {
+     logger.log("Savings accepted");
+    }, function(response) {
+     logger.log("Savings failed");
+    } );
+  };
 
-   $timeout(function() {
-     logger.log("Popup TimeOut");
-     myPopup.close();
-   }, 15000);
+  myPopup.then(function(res) {
+   logger.log('Received : ' + '"' + res + '"');
+   // Insert the appropriate Code here
+   // to process the Received Data for Saving Account Creation
+  });
+
+  $timeout(function() {
+   logger.log("Popup TimeOut");
+   myPopup.close();
+  }, 15000);
+
  };
 
 // } )
@@ -930,8 +937,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } ] )
 
-.controller('LoansAccCreateCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'DateUtil', '$ionicPopup', '$timeout', 'logger',
-    function($scope, $stateParams, LoanAccounts,DateUtil, $ionicPopup, $timeout, logger) {
+.controller('LoansAccCreateCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'DateUtil', '$ionicPopup', '$timeout', 'logger',
+    function($scope, $stateParams, LoanAccounts, DateUtil, $ionicPopup, $timeout, logger) {
 
   var id = $stateParams.id;
   $scope.init= function(){
@@ -1180,6 +1187,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('ClientNextOfKinCtrl', [ '$scope', '$stateParams', 'Customers', 'DateUtil', 'DataTables', 'logger', 
     function($scope, $stateParams, Customers, DateUtil, DataTables, logger) {
+
   var clientId = $stateParams.clientId;
   logger.log("ClientNextOfKinCtrl invoked for client #" + clientId);
   Customers.get_full(clientId, function(client) {
@@ -1200,8 +1208,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('ClientEditCtrl', [ '$scope', '$stateParams', 'Customers', 'HashUtil', 'Clients',
    'ClientImages', 'DateUtil', 'DataTables', 'Codes', 'FormHelper', 'SACCO', 'logger', 
-    function($scope, $stateParams, Customers, HashUtil, Clients, ClientImages,
-      DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
+    function($scope, $stateParams, Customers, HashUtil, Clients,
+    ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
 
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
@@ -1323,9 +1331,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } ] )
 
 .controller('ClientRegCtrl', [ '$scope', 'Clients', 'ClientImages', 'DateUtil', '$state',
-  'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
+    'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
     function($scope, Clients, ClientImages, DateUtil, $state, 
-      HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
+    HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
   
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
@@ -1426,7 +1434,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.codes.offices = saccos;
   }, function(sus) {} );
 } ] )
-
 
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', 'baseUrl', 'Cache', 'Session', 'Customers',
    'Staff', 'SACCO', 'HashUtil', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts',
