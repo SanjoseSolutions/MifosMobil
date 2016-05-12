@@ -120,6 +120,17 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
     },
     toISODateString: function(dt) {
       return dt.toISOString().substr(0,10);
+    },
+    getPastDate: function(years) {
+      console.log("uClient Min Age: "+ years);
+    	var dt = new Date();
+    	dd = dt.getDate();
+    	mm = dt.getMonth(); //+1;
+    	yy = dt.getFullYear() - years;
+    	//return [yy, mm, dd].join('-');
+      //return yy +'-'+ mm +'-'+ dd;
+      dt = new Date(yy, mm, dd);
+      return dt;
     }
   };
 } )

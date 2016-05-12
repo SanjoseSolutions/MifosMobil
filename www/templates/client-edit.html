@@ -79,11 +79,27 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Date of Birth:</span>
+          <span class="input-label">
+            Date of Birth
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
           <label class="item-input-wrapper">
-            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth">
+            <input type="date" name="clientDOB" placeholder="Format: dd/mm/yyyy" title="Max D.O.B. {{maxDOB}}"
+                ng-model="client.dateOfBirth" max="{{ maxDOB | date:'yyyy-MM-dd' }}" required />
           </label>
         </div>
+        <div class="item" ng-show="clientEditForm.clientDOB.$dirty && clientEditForm.clientDOB.$invalid">
+          <span class="label" ng-show="clientEditForm.clientDOB.$error.required">Client's D.O.B. is required</span>
+          <span class="label" ng-show="clientEditForm.clientDOB.$error.max">Client's Age Not Eligible</span>
+          <!-- span class="label" ng-show="clientEditForm.clientDOB.$error.max">Client : {{client.MinRequiredAge}} years old Minimum</span -->
+        </div>
+        <!-- div class="item item-input-inset">
+          <span class="input-label">TEST Date of Birth:</span>
+          <label class="item-input-wrapper">
+            <input type="date" size="15" placeholder="dd/mm/yy" ng-model="client.dateOfBirth"
+                max="2000-01-02"> < ! - - min="2000-01-02" max="1979-12-31" - - >
+          </label>
+        </div -->
         <div class="item item-input-inset">
           <span class="input-label">Mobile:</span>
           <label class="item-input-wrapper">
