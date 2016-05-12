@@ -20,9 +20,9 @@ navigation history that also transitions its views in and out.
 
 
 
-<ion-side-menus enable-menu-with-back-views="false">
+<ion-side-menus enable-menu-with-back-views="true">
   <ion-side-menu-content>
-    <ion-nav-bar class="bar-stable">
+    <ion-nav-bar class="bar-positive">
       <ion-nav-back-button></ion-nav-back-button>
       <ion-nav-buttons side="left">
         <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
@@ -33,7 +33,7 @@ navigation history that also transitions its views in and out.
     <!-- TABS -->
     <ion-tabs class="tabs-icon-top tabs-color-active-positive">
       <!-- Home Tab -->
-      <ion-tab title="Home" href="#/tab/dashboard" icon-off="ion-ios-home-outline" icon-on="ion-ios-home">
+      <ion-tab title="{{'label.heading.home' | translate}}" href="#/tab/dashboard" icon-off="ion-ios-home-outline" icon-on="ion-ios-home">
         <ion-nav-view name="tab-dashboard"></ion-nav-view>
       </ion-tab>
 
@@ -44,13 +44,13 @@ navigation history that also transitions its views in and out.
       </ion-tab>
 
       <!-- Staff Tab -->
-      <ion-tab title="Staff" icon-off="ion-happy-outline" icon-on="ion-happy" href="#/tab/staff"
+      <ion-tab title="{{'guarantor.staff' | translate}}" icon-off="ion-happy-outline" icon-on="ion-happy" href="#/tab/staff"
         ng-if="rolestat.isManagement" ng-show="{{rolestat.isManagement}}">
         <ion-nav-view name="tab-staff"></ion-nav-view>
       </ion-tab>
 
       <!-- Clients Tab -->
-      <ion-tab title="Clients" icon-off="ion-ios-people-outline" icon-on="ion-ios-people" href="#/tab/clients"
+      <ion-tab title="{{'label.input.clients' | translate}}" icon-off="ion-ios-people-outline" icon-on="ion-ios-people" href="#/tab/clients"
         ng-if="rolestat.isStaff" ng-show="{{rolestat.isStaff}}">
         <ion-nav-view name="tab-clients"></ion-nav-view>
       </ion-tab>
@@ -65,22 +65,25 @@ navigation history that also transitions its views in and out.
 
   <!-- Side Menu (left) -->
   <ion-side-menu side="left">
-    <ion-header-bar class="bar-stable">
+    <ion-header-bar class="bar-positive">
       <h1 class="title">Menu</h1>
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item menu-close href="#/tab/dashboard">
-          Home
+        <ion-item menu-close href="#/tab/dashboard" class="item-icon-left">
+         <i class="icon ion-ios-home-outline"></i>  {{'label.heading.home' | translate}}
         </ion-item>
-        <ion-item menu-close href="#/tab/saccos">
-          SACCOs
+        <ion-item menu-close href="#/tab/saccos" class="item-icon-left">
+          <i class="icon ion-ios-briefcase-outline"></i> SACCOs
         </ion-item>
-        <ion-item menu-close href="#/tab/staff">
-          Staff
+        <ion-item menu-close href="#/tab/staff" class="item-icon-left">
+          <i class="icon ion-happy-outline"></i>{{'guarantor.staff' | translate}}
         </ion-item>
-        <ion-item menu-close href="#/tab/clients">
-          Clients
+        <ion-item menu-close href="#/tab/clients" class="item-icon-left">
+          <i class="icon ion-ios-people-outline"></i>{{'label.input.clients' | translate}}
+        </ion-item>
+        <ion-item menu-close href="#/tab/settings" class="item-icon-left">
+          <i class="icon ion-ios-gear-outline"></i>{{'label.heading.settings' | translate}}
         </ion-item>
       </ion-list>
     </ion-content>

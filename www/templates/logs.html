@@ -12,28 +12,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<style>
-div.col {
-  font-size: 60%;
-}
-.log {
-  border: 1px solid #446;
-  color: #446;
-}
-.info {
-  border: 1px solid #555;
-  color: #555;
-}
-.warn {
-  border: 1px solid #642;
-  color: #642;
-}
-</style>
 <ion-view view-title="Logs">
-  <div ng-hide="log.messages">
-    No log messages!
-  </div>
-  <ion-content ng-show="log.messages">
+  <ion-content >
     <div class="row {{message.type}}" ng-repeat="message in log.messages">
       <div class="col col-25">
         {{message.time}}
