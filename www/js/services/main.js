@@ -1074,12 +1074,15 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     saveFields: function() {
       return [ 'Fathers Name', 'Grandfathers Name', 'Number of males', 'Number of females',
         'Education', 'Address', 'Email', 'MaritalStatus_cd_Marital Status', 'Country',
-        'Region', 'Zone', 'Wereda', 'Kebele', 'UniquePlaceName' ];
+        'ClientTitle_cd_Title', 'Region', 'Zone', 'Wereda', 'Kebele', 'UniquePlaceName' ];
     },
     codeFields: function() {
       return {
         'MaritalStatus_cd_Marital Status': function(dt) {
           return dt['MaritalStatus_cd_Marital Status'];
+        },
+        'ClientTitle_cd_Title': function(dt) {
+          return dt['ClientTitle_cd_Title'];
         }
       };
     },

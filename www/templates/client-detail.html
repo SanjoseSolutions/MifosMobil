@@ -25,7 +25,7 @@
 
       <div class="item item-avatar custom">
         <img ng-src="{{client.face}}">
-        <h2>{{client.displayName}}</h2>
+        <h2>{{client.Client_Fields.Title}} {{client.displayName}}</h2>
         <p><b>Gender:</b>{{client.gender.name}}</p>
         <p><b>Marital Status:</b> {{client.Client_Fields["Marital Status"] || "Not set"}}</p>
         <p><b>D.O.B:</b> {{client.dateOfBirth}}</p>
