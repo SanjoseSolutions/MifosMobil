@@ -36,7 +36,8 @@
   <ion-content class="has-subheader">
     <ion-list>
 
-      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right" ng-repeat="s in staff | filter : searchQuery" type="item-text-wrap" href="#/tab/staff/{{s.id}}">
+      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right"
+          ng-repeat="s in staff | filter : searchQuery" type="item-text-wrap" href="#/tab/staff/{{s.id}}">
         <img ng-src="{{'img/staff-placeholder-Male.jpg'}}">
         <div class="fullname">
           <h2>{{s.firstname}} {{s.lastname}}</h2>
