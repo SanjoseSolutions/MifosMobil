@@ -158,7 +158,7 @@
       <ion-list-item class="padding">
         <span ng-show="message"class="ion-{{message.type}}">{{message.text}}</span>
         <button class="button button-block button-positive"
-            ng-click="saveSacco(sacco)" ng-disabled="saccoForm.$invalid">
+            ng-click="saveSacco(sacco)" ng-disabled="btnDisabled || saccoForm.$invalid">
           <h4>Save</h4>
         </button>
       </ion-list-item>

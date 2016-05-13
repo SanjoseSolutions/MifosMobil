@@ -91,6 +91,11 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
 } ] )
 
 .factory('DateUtil', function() {
+  var lpadZero = function(i) {
+    if (i <= 9) { return "0" + i; }
+    return "" + i;
+  };
+
   return {
     isoDateStr: function(a_date) {
       var dd = a_date[2];
@@ -104,10 +109,14 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       return dt;
     },
     isoDate: function(a_date) {
+      var dtStr;
       if (a_date instanceof Array) {
-        var dtStr = this.isoDateStr(a_date);
-        var dt = new Date(dtStr);
-        return dt;
+        dtStr = this.isoDateStr(a_date);
+      } else if (typeof(a_date) == 'string') {
+        dtStr = a_date;
+      }
+      if (dtStr) {
+        return new Date(dtStr);
       }
       return a_date;
     },
@@ -120,6 +129,13 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
     },
     toISODateString: function(dt) {
       return dt.toISOString().substr(0,10);
+    },
+    toDateString: function(dt) {
+      if (dt instanceof Date) {
+        var a = [ dt.getFullYear(), lpadZero(1+dt.getMonth()), lpadZero(dt.getDate()) ];
+        return a.join('-');
+      }
+      return dt;
     }
   };
 } )
@@ -145,6 +161,16 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       for(var k in src) {
         dest[k] = src[k];
       }
+    },
+    diff: function(neo, old) {
+      // fields in neo changed or not in old
+      var res = {};
+      for(var k in neo) {
+        if (!old[k] || old[k] != neo[k]) {
+          res[k] = neo[k];
+        }
+      }
+      return res;
     },
     nextKey: function(obj) {
       var id = 1;
