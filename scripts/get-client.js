@@ -6,16 +6,21 @@ var headers = {
     'Authorization': 'Basic bWlmb3M6a2Z0ZWNoMTIz'
 };
 
-var clientId = "4"; // ToDo: remove hard coding
+var argv = process.argv;
+if (argv.length < 3) {
+  console.error("Usage: " + argv.join(" ") + " clientId");
+  return;
+}
+
+var clientId = argv[2];
 
 request( {
-  url: baseUrl + "/staff" + clientId,
+  url: baseUrl + "/clients/" + clientId,
   headers: headers,
 }, function(error, response, body) {
   if (error) {
     console.log("Error: " + error);
   } else {
-    console.log("Success!");
     if (!(body instanceof Object)) {
       body = JSON.parse(body);
     }

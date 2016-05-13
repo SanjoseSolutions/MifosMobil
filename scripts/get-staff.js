@@ -6,14 +6,19 @@ var headers = {
     'Authorization': 'Basic bWlmb3M6a2Z0ZWNoMTIz'
 };
 
+var argv = process.argv;
+var url = baseUrl + '/staff';
+if (argv.length >= 3) {
+  url = url + '/' + argv[2];
+}
+
 request( {
-  url: baseUrl + "/staff",
+  url: url,
   headers: headers,
 }, function(error, response, body) {
   if (error) {
-    console.log("Error: " + error);
+    console.error("Error: " + error);
   } else {
-    console.log("Success!");
     if (!(body instanceof Object)) {
       body = JSON.parse(body);
     }
