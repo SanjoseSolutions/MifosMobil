@@ -1,0 +1,8 @@
+before_script:
+  - npm -g install ionic cordova
+  - ionic add platform android
+  - npm install
+
+build:
+  - ionic build android
+
