@@ -727,7 +727,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
     $scope.savings.minRequiredOpeningBalance = product.minRequiredOpeningBalance;
-    if ($cordovaNetwork.isOnline()) {
+    if (false && $cordovaNetwork.isOnline()) {
       SavingsAccounts.getClientSavingForm(product.id,function(data) {
         $scope.prefilledDataToSaveForm = data;
       } );
@@ -792,12 +792,17 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("Going to save account: " + JSON.stringify(savingAccountData));
       SavingsAccounts.save(savingAccountData, function(new_sav) {
         logger.log("Savings created!");
-        alert("Applied for savings account #" + new_sav.resourceId);
-      }, function(sav) {
+        alert("Applied for savings account #" + new_sav.resourceId +
+          ". Currently pending approval and activation");
+        $timeout(function() {
+          $state.go('tab.client-savings', { 'id': new_sav.id } );
+        }, 3000);
+      }, function(new_sav) {
         logger.log("Savings accepted");
-        alert("Savings application submitted offline");
+        alert("Savings application submitted offline." +
+          " Pending sync, approval and activation");
       }, function(response) {
-        logger.log("Savings failed");
+        logger.log("Savings application failed");
       } );
     };
 
@@ -1027,7 +1032,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         maxOutstandingLoanBalance:"35000",
         disbursementData:$scope.arrey
       };
-    LoanAccounts.createLoan($scope.loneData, function(data){
+    LoanAccounts.save($scope.loneData, function(new_loan){
+      $timeout(function() {
+        $state.go('tab.client-loan', { 'id': new_loan.id } );
+      }, 3000);
     },function(sav) {
       logger.log("Loan Applied");
     }, function(response) {

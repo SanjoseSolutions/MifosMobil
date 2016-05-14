@@ -1400,16 +1400,20 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 } )
 
 .factory('SavingsAccounts', function(authHttp, baseUrl, logger) {
+  var fetch_account = function(accountNo, fn_sac) {
+    authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
+      .then(function(response) {
+        fn_sac(response.data);
+      } );
+  };
   return {
-    get: function(accountNo, fn_sac) {
-      authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
-        .then(function(response) {
-          fn_sac(response.data);
-        } );
-    },
+    get: fetch_account,
     query: function(fn_accts) {
       console.log("======service=====");
       logger.log("SavingsAccounts.query called");
+      this.fetch_all(fn_accts);
+    },
+    fetch_all: function(fn_accts) {
       authHttp.get(baseUrl + '/savingsaccounts')
         .then(function(response) {
           var data = response.data;
@@ -1421,10 +1425,29 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.post(baseUrl + '/savingsaccounts', fields, {},
         function(response) {
           var data = response.data;
-          if (response.status == 202) {
-            fn_offline(data);
+          if (202 === response.status) { /*
+            clients = Cache.getObject('h_clients') || {};
+            var id = HashUtil.nextKey(clients);
+            client["id"] = id;
+            clients[id] = client;
+            client["displayName"] = get_displayName(client);
+            client["cid"] = response.cid;
+            Cache.setObject('h_clients', clients); */
+            fn_offline(fields);
           } else {
-            fn_success(data);
+            /* clients = Cache.getObject('h_clients') || {};
+            logger.log("Created client resp: "+JSON.stringify(response.data));
+            var data = response.data;
+            var id = data.resourceId;
+            fetch_client(id, function(new_client) {
+              clients[id] = new_client;
+              Cache.setObject('h_clients', clients);
+              fn_client(new_client);
+            } ); */
+            var id = data.resourceId
+            fetch_account(id, function(new_account) {
+              fn_success(new_account);
+            } );
           }
         },
         function(response) {
@@ -1467,13 +1490,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 } )
 
 .factory('LoanAccounts', function(authHttp, baseUrl, logger) {
+  var fetch_account = function(accountNo, fn_lac) {
+    authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
+      .then(function(response) {
+        fn_lac(response.data);
+      } );
+  };
   return {
-    get: function(accountNo, fn_account) {
-      authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
-        .then(function(response) {
-          fn_account(response.data);
-        } );
-    },
+    get: fetch_account,
     query: function(fn_accounts) {
       logger.log("LoanAccounts query called");
       authHttp.get(baseUrl + '/loans')
@@ -1506,14 +1530,17 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_account(response.data);
         } );
     },
-    createLoan: function(createLoanData, fn_success, fn_offline, fn_fail) {
-      authHttp.post(baseUrl + '/loans', createLoanData, {},
+    save: function(loanData, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans', loanData, {},
         function(response) {
           var data = response.data;
           if (response.status == 202) {
-            fn_offline(data);
+            fn_offline(loanData);
           } else {
-            fn_success(data);
+            var id = data.resourceId;
+            fetch_account(id, function(loan) {
+              fn_success(loan);
+            } );
           }
         },
         function(response) {
