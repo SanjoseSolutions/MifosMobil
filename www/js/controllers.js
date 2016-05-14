@@ -46,6 +46,20 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } ] )
 
+.controller('SettingsCtrl', function($scope, $stateParams, DataTables,$translate) {
+
+  if(localStorage.getItem('language') == null){
+    $scope.language = "locale-en";
+  }else{
+    $scope.language = localStorage.getItem('language');
+  }
+  
+  $scope.languageChange = function(languageID){
+    $translate.use(languageID)
+    localStorage.setItem('language', languageID);
+  }
+} )
+
 .controller('LogsCtrl', [ '$rootScope', '$scope', function($rootScope, $scope) {
   $scope.log = {
     messages: $rootScope.messages
@@ -142,7 +156,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('TabsCtrl', function($scope, $rootScope, Session, logger,
-    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue) {
+    Roles, Cache, $cordovaNetwork, authHttp, $ionicPopup, CommandQueue,$translate) {
 
   $rootScope.$on('$cordovaNetwork:offline', 
     function(e, ns) {
@@ -151,6 +165,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("Going offline");
     } );
 
+    $scope.switchLanguage = function(key) {
+      console.log("-----");
+     $translate.use(key);
+    }
+  
   $rootScope.$on('$cordovaNetwork:online',
     function(e, ns) {
       //$rootScope.isOnline = true;
@@ -703,7 +722,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 .controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts, HashUtil, $state,
     SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO, DateUtil) {
 
-  $scope.savings= {};
+  var id = $stateParams.id;
+
+ $scope.savings= {};
 
   $scope.init = function() {
     Clients.get($stateParams.id, function(client) {
@@ -728,7 +749,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.savings.productName = product.name;
     $scope.savings.minRequiredOpeningBalance = product.minRequiredOpeningBalance;
     if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
-      SavingsAccounts.getClientSavingForm(product.id,function(data) {
+      SavingsAccounts.getClientSavingForm(product.id,id,function(data) {
         $scope.prefilledDataToSaveForm = data;
       } );
     }
@@ -1031,7 +1052,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
-        //inkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
+        //linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
         maxOutstandingLoanBalance:"35000",
         disbursementData:$scope.arrey
       };
@@ -1194,6 +1215,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('ClientEditCtrl', function($scope, $stateParams, Customers, HashUtil,
       Clients, ClientImages, DateUtil, DataTables, Codes, FormHelper, SACCO, logger) {
+
+  $scope.clientMinRequiredAge=14;
+  console.log("Client Min Age: " + $scope.clientMinRequiredAge);
+  $scope.maxDOB = DateUtil.getPastDate($scope.clientMinRequiredAge);
+  console.log("Max DOB: " + $scope.maxDOB);
+
   var clientId = $stateParams.clientId;
   logger.log("Looking to edit client:"+clientId);
   $scope.data = { "op": "Edit" };
@@ -1319,7 +1346,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   'HashUtil', 'DataTables', 'Codes', 'SACCO', 'FormHelper', 'logger', 'Cache', 'Client_NextOfKin',
     function($scope, Clients, ClientImages, DateUtil, $state,
       HashUtil, DataTables, Codes, SACCO, FormHelper, logger, Cache, Client_NextOfKin) {
-  // x
+
+  $scope.maxDOB = DateUtil.getPastDate(14);
+  console.log("\nMax DOB: " + $scope.maxDOB);
+  
   $scope.toggleExtraFields = function() {
     $scope.extraFields = $scope.extraFields ? false : true;
     $scope.nextOfKin = ($scope.nextOfKin === true) ? false : false;

@@ -832,7 +832,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
               "name": data[i].name
             } );
           }   
-
 //        logger.log("No. of SUs: " + sunions.length);
           fn_sunions(sunions);
         }
@@ -1478,13 +1477,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_err(response);
         } );
     },
-    getClientSavingForm: function(productID,fn_sav_prods) {
-      authHttp.get(baseUrl + '/savingsaccounts/template?clientId=3&staffInSelectedOfficeOnly=true&productId='+productID)
-        .then(function(response) {
-          var data = response.data;
-          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
-          fn_sav_prods(data);
-        } );
+    getClientSavingForm: function(productID,cilentID,fn_sav_prods) {
+     authHttp.get(baseUrl + '/savingsaccounts/template?clientId='+cilentID+'&staffInSelectedOfficeOnly=true&productId='+productID)
+       .then(function(response) {
+         var data = response.data;
+         logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+         fn_sav_prods(data);
+       } );
     }
   };
 } )

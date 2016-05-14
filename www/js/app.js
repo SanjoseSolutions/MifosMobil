@@ -20,7 +20,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'mifosmobil.services' is found in services.js
 // 'mifosmobil.controllers' is found in controllers.js
-angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.services', 'mifosmobil.utilities', 'ngCordova'])
+angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.services', 'mifosmobil.utilities', 'ngCordova','pascalprecht.translate'])
 /* below lines are used by camera app but seem to prevent login
 .config(function($compileProvider) {
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
@@ -71,8 +71,28 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   }
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider,$translateProvider) {
 
+  if(localStorage.getItem('language') == null){
+    $translateProvider.useStaticFilesLoader({
+      prefix: 'locales/',
+      suffix: '.json'
+    })
+    .registerAvailableLanguageKeys(['locale-en', 'locale-id', 'locale-es','locale-br','locale-cs','locale-fr','locale-hi','locale-ka','locale-km','locale-lo','locale-oc','locale-pl','locale-pt','locale-sv','locale-uk','locale-vi','locale-zh_CN'], {})
+    .preferredLanguage('locale-en')
+    .fallbackLanguage('locale-en')
+    .useSanitizeValueStrategy('escapeParameters');
+  }else{
+    $translateProvider.useStaticFilesLoader({
+      prefix: 'locales/',
+      suffix: '.json'
+    })
+    .registerAvailableLanguageKeys(['locale-en', 'locale-id', 'locale-es','locale-br','locale-cs','locale-fr','locale-hi','locale-ka','locale-km','locale-lo','locale-oc','locale-pl','locale-pt','locale-sv','locale-uk','locale-vi','locale-zh_CN'], {})
+    .preferredLanguage(localStorage.getItem('language'))
+    .fallbackLanguage(localStorage.getItem('language'))
+    .useSanitizeValueStrategy('escapeParameters');
+  }
+  
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
@@ -308,6 +328,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     url: '/logs',
     templateUrl: 'templates/logs.html',
     controller: 'LogsCtrl'
+  } )
+
+  .state('tab.settings', {
+    url: '/settings',
+    views: {
+      'tab-dashboard': {
+        templateUrl: 'templates/settings.html',
+        controller: 'SettingsCtrl'
+      }
+    }
   } )
 
   .state('tab.dashboard', {
