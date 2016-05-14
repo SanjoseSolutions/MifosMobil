@@ -53,7 +53,7 @@
         </div>
         <label class="item-input-wrapper" style="width:11em; float:right">
         <select name="productId" ng-model="savings.productId" required
-          ng-options="p as p.name for p in products" value="{{p}}"
+          ng-options="p.id as p.name for p in products"
           ng-change="prodChanged(savings.productId)">
         </select>
         </label>
@@ -72,7 +72,9 @@
             Field Officer :
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
-            <select name="productID" ng-model="savings.fieldOfficer" ng-change="fieldoOficerChange(savings.fieldOfficer)" value="{{p}}"required ng-options="p as p.displayName for p in fieldOfficerOptions"></select>
+          <select name="fieldOffireId" ng-model="savings.fieldOfficerId"
+            required ng-options="o.id as o.displayName for o in fieldOfficerOptions">
+          </select>
         </label>
       </ion-item>
       <!-- <div class="item item-input-inset">
@@ -117,6 +119,7 @@
   </form>
   <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
   <script id="popup-template-html" type="text/ng-template">
+    <p>Savings account application data:</p>
     <label> Product </label> : <strong>{{savings.productName}}</strong>
     <br /><label> Submitted on</label> : {{savings.SubmittedDate}}
     <br /><label> Initial Deposit </label>: {{savings.minRequiredOpeningBalance}}
