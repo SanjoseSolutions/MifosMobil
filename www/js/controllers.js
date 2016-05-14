@@ -700,7 +700,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }
 })
 
-.controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts, HashUtil,
+.controller('SavingsAccCreateCtrl', function($scope, $stateParams, SavingsAccounts, HashUtil, $state,
     SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO, DateUtil) {
 
   $scope.savings= {};
@@ -727,7 +727,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
     $scope.savings.minRequiredOpeningBalance = product.minRequiredOpeningBalance;
-    if (false && $cordovaNetwork.isOnline()) {
+    if ($cordovaNetwork.isOnline()) {
       SavingsAccounts.getClientSavingForm(product.id,function(data) {
         $scope.prefilledDataToSaveForm = data;
       } );
@@ -925,7 +925,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,
-    $ionicPopup, $timeout, logger) {
+    $state, $ionicPopup, $timeout, logger) {
   var id = $stateParams.id;
   $scope.init= function(){
     LoanAccounts.retrieveLoanDetails(id, function(data){
