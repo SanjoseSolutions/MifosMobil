@@ -39,6 +39,9 @@ label {
       <ion-item>
         <label>Account Type:</label> {{data.productName || "Unspecified"}}
       </ion-item>
+      <ion-item ng-show="data.status">
+        <label>Account Status:</label> {{data.status || "Unspecified"}}
+      </ion-item>
       <ion-item>
         <label>Account Balance:</label> {{data.accountBalance || "Unspecified"}}
       </ion-item>

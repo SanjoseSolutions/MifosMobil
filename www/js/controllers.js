@@ -727,7 +727,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     logger.log("Product was changed");
     $scope.savings.productName = product.name;
     $scope.savings.minRequiredOpeningBalance = product.minRequiredOpeningBalance;
-    if ($cordovaNetwork.isOnline()) {
+    if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
       SavingsAccounts.getClientSavingForm(product.id,function(data) {
         $scope.prefilledDataToSaveForm = data;
       } );
@@ -792,7 +792,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("Going to save account: " + JSON.stringify(savingAccountData));
       SavingsAccounts.save(savingAccountData, function(new_sav) {
         logger.log("Savings created!");
-        alert("Applied for savings account #" + new_sav.resourceId +
+        alert("Applied for savings account #" + new_sav.id +
           ". Currently pending approval and activation");
         $timeout(function() {
           $state.go('tab.client-savings', { 'id': new_sav.id } );
@@ -827,6 +827,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
     $scope.data.productName = sac.savingsProductName;
+    if ('active' !== sac.status.value) {
+      $scope.data['status'] = sac.status.value;
+    }
     var summary = sac.summary;
     $scope.data.accountBalance = summary ? summary.accountBalance : 0;
   } );
