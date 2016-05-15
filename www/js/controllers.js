@@ -1137,22 +1137,47 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('SharesBuyCtrl',
-    function($scope, $stateParams, /* SavingsAccounts,  */
-     $ionicPopup, $timeout, logger) {
+.controller('SharesBuyCtrl', 
+    function($scope, $stateParams, ShareProducts, Clients,
+     $ionicPopup, $timeout, logger, Shares) {
 
-  $scope.data = {
-      price: 100,
-      noOfShares: 0,
-      amount: 0
-  }
+  $scope.init = function() {
+    $scope.data = {
+      requestedShares: 0
+    };
+    var clientId = $stateParams.id;
+    $scope.share = {
+      clientId: clientId
+    };
+    logger.log("Client ID: " + clientId);
+    Clients.get_accounts(clientId, function(accounts) {
+      var saccounts = accounts["savingsAccounts"] || [];
+      var i=0, n=saccounts.length;
+      logger.log("Got total " + n + " savings accounts");
+      var asaccounts = [];
+      for(;i < n; i++) {
+        sac = saccounts[i];
+        logger.log("SAVINGS ACCOUNT STATUS: " + JSON.stringify(sac['status']));
+        if (sac['status']['active']) {
+          logger.log("FOUND ACTIVE SAVINGS ACCOUNT");
+          asaccounts.push({
+            id: sac['id'],
+            accountNo: sac['accountNo']
+          });
+        }
+      }
+      logger.log("Got " + asaccounts.length + " active accounts");
+      $scope.data.activeSavingsAccounts = asaccounts;
+    } );
+    ShareProducts.get_first(function(share_product) {
+      //logger.log("Loaded product: " + JSON.stringify(share_product));
+      $scope.product = share_product;
+    } );
+  };
 
   $scope.sharesBuy = function()  {
-    // TO DO :
-    // Check the parameters' list
-
-    $scope.data.amount = $scope.data.noOfShares * $scope.data.price;
-
+    var product = $scope.product;
+    $scope.amount = ($scope.share.requestedShares||0) * $scope.share.unitPrice;
     var myPopup = $ionicPopup.show({
       title: '<strong>Shares Buy</strong>',
       /* This Url takes you to a script with the same ID Name in index.html */
@@ -1169,12 +1194,29 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         { text: '<b>Buy</b>',
           type: 'button-positive',
           onTap: function(e) {
-            if (!$scope.data.noOfShares) {
+            if (!$scope.share.requestedShares) {
               e.preventDefault();
               //don't allow the user to close the popup if empty
             } else {
               // Returning a value will cause the promise to resolve with the given value.
-              return $scope.data; // true;
+              var share = $scope.share;
+              share['locale'] = 'en';
+              share['dateFormat'] = 'yyyy-MM-dd';
+              var date = new Date();
+              var dt = date.toISOString().substr(0,10);
+              share['applicationDate'] = dt;
+              share['submittedDate'] = dt;
+              share['charges'] = []; // currently no charges
+              share['productId'] = product.id;
+              Shares.save(share, function(new_share) {
+                alert("Share application success: " + new_share.resourceId + ". Pending approval.");
+              }, function(response) {
+                alert("Share application accepted (offline). Pending sync and approval");
+              }, function(err) {
+                alert("Failure share application");
+              } );
+
+              return true; // true;
             }
           }
         }

@@ -1251,7 +1251,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/clients/' + id + '/accounts')
         .then(function(response) {
           var accounts = response.data;
-          accounts.share_count = parseInt(Math.random()*11);
           fn_accts(accounts);
         } );
     }
@@ -1549,14 +1548,29 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('ShareProducts', function(authHttp, baseUrl, Cache, logger) {
+.factory('ShareProducts', function(authHttp, baseUrl, Cache, logger, $q) {
+  var url = baseUrl + '/products/share';
   return {
-    url: baseUrl + '/products/share',
-    get: function(id, fn_sh_prod) {
-      authHttp.get(this.url + '/' + id)
+    fetch_one: function(id, fn_sh_prod) {
+      authHttp.get(url + '/' + id)
         .then(function(response) {
-          fn_sh_prod(response.data);
+          var data = response.data;
+          fn_sh_prod(data);
         } );
+    },
+    get: function(id, fn_sh_prod) {
+      var products = Cache.getObject('shareproducts');
+      var i=0, n=products.length;
+      for(; i < n; i++) {
+        var prod = products[i];
+        prod.id = id;
+        fn_sh_prod(prod);
+      }
+    },
+    get_first: function(fn_sh_prod) {
+      this.query(function(prods) {
+        fn_sh_prod(prods[0]);
+      } );
     },
     query: function(fn_sh_prods) {
       var products = Cache.getObject('shareproducts');
@@ -1569,21 +1583,35 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
     },
     fetch_all: function(fn_sh_prods) {
-      authHttp.get(this.url)
+      authHttp.get(url)
         .then(function(response) {
           var data = response.data;
-          Cache.setObject('shareproducts', data.pageItems);
+          var prods = data.pageItems;
+          var promises = [];
+          var share_products = [];
+          var i = 0, n = prods.length;
+          for(; i < n; i++) {
+            promises.push(authHttp.get(url + '/' + prods[i].id)
+              .then(function(response) {
+                var data = response.data;
+                share_products.push(data);
+              } ));
+          }
+          $q.all(promises).then(function() {
+            logger.log("All products loaded: " + JSON.stringify(share_products));
+            Cache.setObject('shareproducts', share_products);
+          } );
           fn_sh_prods(data);
         } );
     }
   }
 } )
 
-.factory('Shares', function(authHttp, baseUrl) {
+.factory('Shares', function(authHttp, baseUrl, logger) {
   return {
-    url: baseUrl + '/account/share',
-    get: function(clientId, fn_shares) {
-      logger.log("Shares called for:"+clientId);
+    url: baseUrl + '/accounts/share',
+    get: function(accountId, fn_shares) {
+      logger.log("Shares called for:"+accountId);
     },
     query: function(fn_shares) {
       logger.log("Shares called");
@@ -1600,7 +1628,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_shares(share);
         },
         function(err_resp) {
-          logger.log("Failed to create shares");
+          logger.log("Failed to create share");
         } );
     },
     update: function(id, sfields, fn_shares, fn_offline, fn_fail) {
