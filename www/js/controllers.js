@@ -1518,6 +1518,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts.fetch_all(function(prods) {
       logger.log("Got savings " + prods.length + " products");
     });
+    SavingsAccounts.query(function(saccts) {
+      var pendingSavingsAccounts = saccts.filter(function(a) {
+        return a.status.submittedAndPendingApproval
+      } );
+      logger.log("SAVINGS ACCOUNTS: " + pendingSavingsAccounts.length);
+      $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
+    } );
     $scope.num_inactiveClients = 0;
     var role = Session.role;
     $scope.uname = Session.uname;
