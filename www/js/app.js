@@ -202,7 +202,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     views: {
       'menuContent': {
         templateUrl: 'templates/client-detail.html',
-        controller: 'ClientDetailCtrl'
+        controller: 'ClientViewCtrl'
       }
     }
   })

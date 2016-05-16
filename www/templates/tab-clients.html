@@ -23,10 +23,12 @@
   </ion-nav-buttons>
 
   <div class="bar bar-subheader item-input-inset">
+    <i style="font-size:130%" class="icon ion-skip-backward" ng-click="scrollTop()"></i>
     <label class="item-input-wrapper">
       <i class="icon ion-search placeholder-icon"></i>
       <input type="search" ng-model="searchQuery" placeholder="Search ..." />
     </label>
+    <i style="font-size:130%" class="icon ion-skip-forward" ng-click="scrollBottom()"></i>
   </div>
 
   <ion-content class="has-subheader">
