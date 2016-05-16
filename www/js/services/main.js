@@ -1397,7 +1397,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   }
 } )
 
-.factory('SavingsAccounts', function(authHttp, baseUrl, logger) {
+.factory('SavingsAccounts', function(authHttp, baseUrl, logger, HashUtil, Cache) {
   var fetch_account = function(accountNo, fn_sac) {
     authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
       .then(function(response) {
@@ -1405,18 +1405,35 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
   };
   return {
-    get: fetch_account,
+    fetch: fetch_account,
+    get: function(accountNo, fn_sac) {
+      var accounts = Cache.getObject('h_savingsaccounts');
+      var account = accounts[accountNo];
+      if (account != null) {
+        fn_sac(account);
+      } else {
+        fetch_account(accountNo, fn_sac);
+      }
+    },
     query: function(fn_accts) {
-      console.log("======service=====");
       logger.log("SavingsAccounts.query called");
-      this.fetch_all(fn_accts);
+      var accounts = Cache.getObject('h_savingsaccounts');
+      if (accounts) {
+        fn_accts(HashUtil.to_a(accounts));
+      } else {
+        this.fetch_all(fn_accts);
+      }
     },
     fetch_all: function(fn_accts) {
       authHttp.get(baseUrl + '/savingsaccounts')
         .then(function(response) {
           var data = response.data;
           logger.log("Got " + data.totalFilteredRecords + " savings accounts.");
-          fn_accts(data.pageItems);
+          var accounts = data.pageItems;
+          var h_accts = HashUtil.from_a(accounts);
+          logger.log("ACcounts hash: " + JSON.stringify(h_accts));
+          Cache.setObject('h_savingsaccounts', h_accts);
+          fn_accts(accounts);
         } );
     },
     save: function(fields, fn_success, fn_offline, fn_fail) {

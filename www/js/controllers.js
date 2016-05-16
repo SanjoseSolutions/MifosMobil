@@ -848,7 +848,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   SavingsAccounts.get(id, function(sac) {
     $scope.data.accountNo = sac.accountNo;
     $scope.data.productName = sac.savingsProductName;
-    if ('active' !== sac.status.value) {
+    if ('Active' != sac.status.value) {
       $scope.data['status'] = sac.status.value;
       $scope.data.interestRate = sac.nominalAnnualInterestRate;
       $scope.data.interestCompoundingPeriod = sac.interestCompoundingPeriodType.value;
