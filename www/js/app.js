@@ -330,6 +330,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     controller: 'LogsCtrl'
   } )
 
+  .state('tab.dashboard-pending-savings', {
+    url: '/dashboard/pending-savings',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/savings-accounts.html',
+        controller: 'PendingSavingsCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {

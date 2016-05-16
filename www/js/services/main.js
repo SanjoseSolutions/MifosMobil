@@ -1567,6 +1567,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   var fetch_account = function(accountNo, fn_sac) {
     authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
       .then(function(response) {
+        var accounts = Cache.getObject('h_savingsaccounts');
+        var account = accounts[accountNo];
+        if (account) {
+          accounts[accountNo] = response.data;
+        }
+        Cache.setObject('h_savingsaccounts', accounts);
         fn_sac(response.data);
       } );
   };
@@ -1589,6 +1595,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } else {
         this.fetch_all(fn_accts);
       }
+    },
+    query_pending: function(fn_pending_accts) {
+      this.query(function(accounts) {
+        var pAccts = accounts.filter(function(a) {
+          return a.status.submittedAndPendingApproval
+        } );
+        fn_pending_accts(pAccts);
+      } );
     },
     fetch_all: function(fn_accts) {
       authHttp.get(baseUrl + '/savingsaccounts')
@@ -1653,10 +1667,37 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           var data = response.data;
           fn_res(data);
         }, function(response) {
-          fn_offline(response);
-        }, function(response) {
           logger.log("Failed to deposit. Received " + response.status);
           fn_err(response);
+        } );
+    },
+    approve: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '?command=approve',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    reject: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '?command=reject',
+        data, {}, function(response) {
+          fn_success(response);
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    activate: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '?command=activate',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+        }, function(response) {
+          fn_fail(response);
         } );
     },
     getClientSavingForm: function(productID,cilentID,fn_sav_prods) {

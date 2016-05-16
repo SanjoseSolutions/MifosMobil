@@ -114,7 +114,7 @@ td {
           </tr>
           <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && num_inactiveClients">
             <td>
-              <div> Pending Approval: </div>
+              <div>Clients Pending Approval: </div>
             </td>
             <td> {{num_inactiveClients}} </td>
             <td> 
@@ -129,7 +129,7 @@ td {
             </td>
             <td>{{ pendingSavingsAccountsCount }}</td>
             <td>
-              <a href="#/tab/savingsAccounts/inactive">
+              <a href="#/tab/dashboard/pending-savings" class="button button-small noVertPadd">
                 Review
               </a>
             </td>

@@ -230,6 +230,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
       //document.addEventListener('offline', 
   } );
+
+
+  $scope.logout = function() {
+    Session.logout();
+  };
 } )
 
 .controller('SACCORegCtrl', function($scope, SACCO, Office, DataTables, Formatter, HashUtil,
@@ -537,7 +542,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     Clients.activate(id, DateUtil.toISODateString(dt), function(response) {
       $scope.client.pending = false;
       $ionicPopup.alert( {
-        titel: "Success",
+        title: "Success",
         template: "Succesfully approved client"
       } );
       logger.log("Succesfully approved client");
@@ -554,7 +559,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     Clients.reject(id, fields, function(response) {
       $scope.client.pending = false;
       $ionicPopup.alert( {
-        titel: "Rejected",
+        title: "Rejected",
         template: "Client #" + id + " rejected"
       } );
       logger.log("Client #" + id + " rejected");
@@ -868,11 +873,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('SavingsAccountCtrl', function($scope, $stateParams, SavingsAccounts,
-    $ionicPopup, $timeout, logger) {
+    $ionicPopup, $timeout, logger, HashUtil, DateUtil) {
   var id = $stateParams.id;
   logger.log("SavingsAccountsCtrl for " + id);
   $scope.data = {id: id};
-  SavingsAccounts.get(id, function(sac) {
+  $scope.init = function(sac) {
     $scope.data.accountNo = sac.accountNo;
     $scope.data.productName = sac.savingsProductName;
     if ('Active' != sac.status.value) {
@@ -884,7 +889,53 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }
     var summary = sac.summary;
     $scope.data.accountBalance = summary ? summary.accountBalance : 0;
-  } );
+  };
+  SavingsAccounts.get(id, $scope.init);
+  $scope.approveAccount = function() {
+    var data = {
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    var dt = new Date();
+    dt = DateUtil.toISODateString(dt);
+    var approveData = { approvedOnDate: dt };
+    HashUtil.copy(approveData, data);
+    var showFailedApprove = function() {
+      $ionicPopup.alert( {
+        title: "Failure",
+        template: "Approval failed"
+      } );
+    };
+    SavingsAccounts.approve(id, approveData, function(account) {
+      var activateData = { activatedOnDate: dt };
+      HashUtil.copy(activateData, data);
+      SavingsAccounts.activate(id, activateData, function(account) {
+        $scope.init(account);
+        $scope.data.status = null;
+        $ionicPopup.alert( {
+          title: "Success",
+          template: "Approved Account"
+        } );
+      }, function(response) {
+        showFailedApprove();
+      } );        
+    }, function(response) {
+      showFailedApprove();
+    } );
+  };
+  $scope.rejectAccount = function() {
+    SavingsAccounts.reject(id, function(response) {
+      $ionicPopup.alert( {
+        title: "Rejected",
+        template: "Account Rejected"
+      } );
+    }, function(response) {
+      $ionicPopup.alert( {
+        title: "Failure",
+        template: "Rejection failed"
+      } );
+    } );
+  };
   $scope.makeDeposit = function() {
     $scope.deposit = {};
     $ionicPopup.show( {
@@ -1541,10 +1592,19 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   }, function(sus) {} );
 } ] )
 
-.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log',
+.controller('PendingSavingsCtrl', [ '$scope', 'SavingsAccounts', 'logger',
+    function($scope, SavingsAccounts, logger) {
+
+  SavingsAccounts.query_pending(function(pAccts) {
+    $scope.accounts = pAccts;
+  } );
+
+} ] )
+
+.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
     '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts',
-    function($rootScope, $scope, authHttp, $log,
+    function($rootScope, $scope, authHttp, $log, SavingsAccounts,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
       $ionicLoading, $ionicPopup, SavingsProducts, logger, Clients, ShareProducts) {
 
@@ -1572,10 +1632,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts.fetch_all(function(prods) {
       logger.log("Got savings " + prods.length + " products");
     });
-    SavingsAccounts.query(function(saccts) {
-      var pendingSavingsAccounts = saccts.filter(function(a) {
-        return a.status.submittedAndPendingApproval
-      } );
+    SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
       logger.log("SAVINGS ACCOUNTS: " + pendingSavingsAccounts.length);
       $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
     } );
