@@ -43,6 +43,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
 } ] )
 
 .factory('Cache', ['logger', function(logger) {
+  console.log("dsadasda");
   var index = {};
   var lastSync = null;
   var get_cached = function(key) {
@@ -55,6 +56,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       index[key] = 1;
     },
     'getObject': function(key) {
+      console.log("========++++");
       var str = localStorage.getItem(key);
       return str ? JSON.parse(str) : null;
     },

@@ -755,21 +755,28 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO, DateUtil) {
 
   var id = $stateParams.id;
-
+  console.log("asdasdasdasdas");
  $scope.savings= {};
 
   $scope.init = function() {
+    console.log("sadasdasdsadsad");
     Clients.get($stateParams.id, function(client) {
+      console.log(client);
       $scope.client = client;
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log("saving")
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.fieldOfficerOptions = staff;
     } );
+    console.log("dawdasdasdsadas");
     SavingsProducts.query(function(products) {
+      console.log("dawdasdasdsa====das");
       logger.log("Got products: " + products.length);
       $scope.prodHash = HashUtil.from_a(products);
+      console.log($scope.prodHash);
       $scope.products = products;
+      console.log(products);
     } );
   };
 
@@ -821,7 +828,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.savingAccount = function(saving) {
 
       var product = $scope.product;
-
+      console.log(product);
       var savingAccountData = {
         allowOverdraft: product.allowOverdraft,
         charges: product.charges, // nullable
@@ -1030,21 +1037,47 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,
-    $state, $ionicPopup, $timeout, logger) {
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,HashUtil,$cordovaNetwork,
+    $state, $ionicPopup, $timeout, logger,Clients,SACCO) {
   var id = $stateParams.id;
   $scope.init= function(){
-    LoanAccounts.retrieveLoanDetails(id, function(data){
-      $scope.productList = data.productOptions;
-      $scope.loanOfficerOptions = data.loanOfficerOptions
+    Clients.get($stateParams.id, function(client) {
+      console.log(client);
+      $scope.client = client;
+    } );
+    SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log("SACCO");
+      logger.log("Staff for office: " + JSON.stringify(staff));
+      $scope.loanOfficerOptions = staff;
+    } );
+
+    // LoanAccounts.retrieveLoanDetails(id, function(data){
+    //   $scope.productList = data.productOptions;
+    //   $scope.loanOfficerOptions = data.loanOfficerOptions
+    // });
+    LoanAccounts.getProductData(function(data){
+      console.log(data);
+      $scope.prodHash = HashUtil.from_a(data);
+      console.log('================',$scope.prodHash);
+      $scope.productList = data;
+      //$scope.loanOfficerOptions = data.loanOfficerOptions
     });
   };
 
   $scope.SelectproductID = function(productid){
-    $scope.ProductName = productid.name
-    LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
-      $scope.onSelectionLoanData = data;
-    });
+    console.log(productid);
+    $scope.productData = productid;
+    if (!productid) return; // if null
+
+    console.log("=asd=asd=as");
+    $scope.ProductName = productid.name;
+    $scope.loanProductId = productid.id;
+    if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
+      console.log("====");
+      LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
+        $scope.onSelectionLoanData = data;
+      });
+    }
   };
 
   $scope.loanApply = function()  {
@@ -1112,26 +1145,29 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   };
 
   $scope.saveLoanApplication = function(data){
+    var product = $scope.productData;
+    console.log(product);
+
       $scope.arrey = [];
       $scope.loneData = {};
       $scope.loneData = {
         dateFormat : "dd/MM/yy",
         locale : "en",
         clientId : id,
-        productId : $scope.onSelectionLoanData.loanProductId,
+        productId : $scope.loanProductId,
         principal: data.principalAmount,
         loanOfficerId: data.loanOfficer,
         loanTermFrequency: data.loanTerm,
-        loanTermFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
+        loanTermFrequencyType: product.repaymentFrequencyType.id,
         loanType: "individual",
         numberOfRepayments: data.repaymentsNo,
-        repaymentEvery: $scope.onSelectionLoanData.repaymentEvery,
-        repaymentFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
-        interestRatePerPeriod: $scope.onSelectionLoanData.interestRatePerPeriod,
-        amortizationType: $scope.onSelectionLoanData.amortizationType.id,
-        interestType: $scope.onSelectionLoanData.interestType.id,
-        interestCalculationPeriodType: $scope.onSelectionLoanData.interestCalculationPeriodType.id,
-        transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
+        repaymentEvery: product.repaymentEvery,
+        repaymentFrequencyType: product.repaymentFrequencyType.id,
+        interestRatePerPeriod: product.interestRatePerPeriod,
+        amortizationType: product.amortizationType.id,
+        interestType: product.interestType.id,
+        interestCalculationPeriodType: product.interestCalculationPeriodType.id,
+        transactionProcessingStrategyId: product.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
         //linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
@@ -1144,6 +1180,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       }, 3000);
     },function(sav) {
       logger.log("Loan Applied");
+      alert("Loan application submitted offline." +
+          " Pending sync, approval and activation");
     }, function(response) {
       logger.log("Loan Application failed");
     });
@@ -1603,10 +1641,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
-    '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts',
+    '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
+    'ShareProducts', 'LoanAccounts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-      $ionicLoading, $ionicPopup, SavingsProducts, logger, Clients, ShareProducts) {
+      $ionicLoading, $ionicPopup, SavingsProducts, logger, Clients, 
+      ShareProducts, LoanAccounts) {
 
   var session = null;
 
@@ -1636,12 +1676,17 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("SAVINGS ACCOUNTS: " + pendingSavingsAccounts.length);
       $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
     } );
+    LoanAccounts.fetch_all(function(prods) {
+      console.log(prods);
+      logger.log("Got loans " + prods.length + " products");
+    });
+
     $scope.num_inactiveClients = 0;
     var role = Session.getRole();
     $scope.uname = Session.uname || Session.username();
     $scope.loginTime = Session.loggedInTime();
     $scope.role = role;
-    $log.info("Role is " + role);
+    // $log.info("Role is " + role);
     switch (role) {
       case "Admin":
         SACCO.query_full(function(data) {
