@@ -1582,20 +1582,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }
     if (null == session) {
       logger.log("Loading session..");
-      SACCO.query_full(function(data) {
-          logger.log("Fetched SACCOs");
-          $scope.num_saccos = data.length;
-        } );
-      Staff.query(function(staff) {
-          $scope.num_staff = staff.length;
-        } );
-       Customers.query_full(function(clients) {
-          logger.log("Fetched " + clients.length + "Clients");
-          $scope.num_clients = clients.length;
-        } );
-        Clients.query_inactive(function(iClients) {
-          $scope.num_inactiveClients = iClients.totalFilteredRecords;
-        } );
       session = Session.get();
       $rootScope.session = session;
     }
