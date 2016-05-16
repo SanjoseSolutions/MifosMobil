@@ -51,6 +51,7 @@ angular.module('starter.services', ['ngCordova'] )
 } ] )
 
 .factory('Cache', ['logger', function(logger) {
+  console.log("dsadasdasdasd");
   var index = {};
   var lastSync = null;
   return {
@@ -62,6 +63,7 @@ angular.module('starter.services', ['ngCordova'] )
       index[key] = 1;
     },
     'getObject': function(key) {
+      console.log("======sadasda");
       var str = localStorage.getItem(key);
       return str ? JSON.parse(str) : null;
     },

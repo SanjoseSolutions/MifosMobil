@@ -340,6 +340,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   session.login = function(auth, fn_success, fn_fail) {
 
     var onLogin = function(auth, data) {
+      var session = {};
       Cache.set('username', auth.username);
       session.uname = auth.username;
 
@@ -763,7 +764,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
     },
     get_staff: function(id, fn_staff) {
+      console.log(id);
       var staff = Cache.getObject('staff');
+      console.log(staff);
       var ostaff = staff.filter(function(s) {
         return s.officeId == id
       } );
@@ -1371,6 +1374,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 .factory('SavingsProducts', function(authHttp, baseUrl, Cache, logger) {
   return {
     get: function(id, fn_sav_prod) {
+      console.log("============+++++++++++++++++++++++",id);
       authHttp.get(baseUrl + '/savingsproducts/' + id)
         .then(function(response) {
           fn_sav_prod(response.data);
@@ -1519,6 +1523,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     retrieveLoanDetails: function(id, fn_account) {
       authHttp.get(baseUrl + '/loans/template/' + '?templateType=individual&clientId='+id)
         .then(function(response) {
+          Cache.setObject('loansproduct', response);
           fn_account(response.data);
         } );
     },

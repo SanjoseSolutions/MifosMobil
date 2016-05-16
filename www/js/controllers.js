@@ -723,21 +723,28 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO, DateUtil) {
 
   var id = $stateParams.id;
-
+  console.log("asdasdasdasdas");
  $scope.savings= {};
 
   $scope.init = function() {
+    console.log("sadasdasdsadsad");
     Clients.get($stateParams.id, function(client) {
+      console.log(client);
       $scope.client = client;
     } );
-    SACCO.get_staff($scope.client.officeId, function(staff) {
-      logger.log("Staff for office: " + JSON.stringify(staff));
-      $scope.fieldOfficerOptions = staff;
-    } );
+    // SACCO.get_staff($scope.client.officeId, function(staff) {
+    //   console.log("saving")
+    //   logger.log("Staff for office: " + JSON.stringify(staff));
+    //   $scope.fieldOfficerOptions = staff;
+    // } );
+    console.log("dawdasdasdsadas");
     SavingsProducts.query(function(products) {
+      console.log("dawdasdasdsa====das");
       logger.log("Got products: " + products.length);
       $scope.prodHash = HashUtil.from_a(products);
+      console.log($scope.prodHash);
       $scope.products = products;
+      console.log(products);
     } );
   };
 
@@ -952,6 +959,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $state, $ionicPopup, $timeout, logger) {
   var id = $stateParams.id;
   $scope.init= function(){
+    Clients.get($stateParams.id, function(client) {
+      console.log(client);
+      $scope.client = client;
+    } );
+    SACCO.get_staff($scope.client.officeId, function(staff) {
+      logger.log("Staff for office: " + JSON.stringify(staff));
+      $scope.fieldOfficerOptions = staff;
+    } );
     LoanAccounts.retrieveLoanDetails(id, function(data){
       $scope.productList = data.productOptions;
       $scope.loanOfficerOptions = data.loanOfficerOptions
@@ -959,10 +974,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   };
 
   $scope.SelectproductID = function(productid){
-    $scope.ProductName = productid.name
-    LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
-      $scope.onSelectionLoanData = data;
-    });
+    if (!productId) return; // if null
+    $scope.ProductName = productid.name;
+    if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
+      LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
+        $scope.onSelectionLoanData = data;
+      });
+    }
   };
 
   $scope.loanApply = function()  {
@@ -1494,10 +1512,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
-    '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts',
+    '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts','LoanAccounts',
     function($rootScope, $scope, authHttp,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
-      $ionicPopup, SavingsProducts, logger, Clients, ShareProducts) {
+      $ionicPopup, SavingsProducts, logger, Clients, ShareProducts,LoanAccounts) {
 
   var session = null;
 
@@ -1514,6 +1532,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts.fetch_all(function(prods) {
       logger.log("Got savings " + prods.length + " products");
     });
+    LoanAccounts.query(function(prods) {
+      console.log(prods);
+      logger.log("Got loans " + prods.length + " products");
+    });
+
     $scope.num_inactiveClients = 0;
     var role = Session.role;
     $scope.uname = Session.uname;
