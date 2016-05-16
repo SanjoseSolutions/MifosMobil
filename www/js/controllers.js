@@ -850,6 +850,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.data.productName = sac.savingsProductName;
     if ('active' !== sac.status.value) {
       $scope.data['status'] = sac.status.value;
+      $scope.data.interestRate = sac.nominalAnnualInterestRate;
+      $scope.data.interestCompoundingPeriod = sac.interestCompoundingPeriodType.value;
+      $scope.data.interestPostingPeriod = sac.interestPostingPeriodType.value;
+      $scope.data.interestCalculation = sac.interestCalculationType.value;
     }
     var summary = sac.summary;
     $scope.data.accountBalance = summary ? summary.accountBalance : 0;

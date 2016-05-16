@@ -1,5 +1,4 @@
 var request = require("request");
-var prompt = require('prompt');
 var baseUrl = "https://kifiya.openmf.org/fineract-provider/api/v1";
 var headers = {
     'Content-Type': 'application/json',
@@ -24,8 +23,6 @@ function getAccount(accountId) {
   } );
 }
 
-prompt.start();
-prompt.get(['accountId'], function(err, res) {
-  getAccount(res.accountId);
-} );
+accountId = process.argv[2];
+getAccount(accountId);
 
