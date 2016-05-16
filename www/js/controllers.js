@@ -732,11 +732,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       console.log(client);
       $scope.client = client;
     } );
-    // SACCO.get_staff($scope.client.officeId, function(staff) {
-    //   console.log("saving")
-    //   logger.log("Staff for office: " + JSON.stringify(staff));
-    //   $scope.fieldOfficerOptions = staff;
-    // } );
+    SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log("saving")
+      logger.log("Staff for office: " + JSON.stringify(staff));
+      $scope.fieldOfficerOptions = staff;
+    } );
     console.log("dawdasdasdsadas");
     SavingsProducts.query(function(products) {
       console.log("dawdasdasdsa====das");
@@ -796,7 +796,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.savingAccount = function(saving) {
 
       var product = $scope.product;
-
+      console.log(product);
       var savingAccountData = {
         allowOverdraft: product.allowOverdraft,
         charges: product.charges, // nullable
@@ -955,8 +955,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,
-    $state, $ionicPopup, $timeout, logger) {
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,HashUtil,$cordovaNetwork,
+    $state, $ionicPopup, $timeout, logger,Clients,SACCO) {
   var id = $stateParams.id;
   $scope.init= function(){
     Clients.get($stateParams.id, function(client) {
@@ -964,19 +964,34 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.client = client;
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log("SACCO");
       logger.log("Staff for office: " + JSON.stringify(staff));
-      $scope.fieldOfficerOptions = staff;
+      $scope.loanOfficerOptions = staff;
     } );
-    LoanAccounts.retrieveLoanDetails(id, function(data){
-      $scope.productList = data.productOptions;
-      $scope.loanOfficerOptions = data.loanOfficerOptions
+
+    // LoanAccounts.retrieveLoanDetails(id, function(data){
+    //   $scope.productList = data.productOptions;
+    //   $scope.loanOfficerOptions = data.loanOfficerOptions
+    // });
+    LoanAccounts.getProductData(function(data){
+      console.log(data);
+      $scope.prodHash = HashUtil.from_a(data);
+      console.log('================',$scope.prodHash);
+      $scope.productList = data;
+      //$scope.loanOfficerOptions = data.loanOfficerOptions
     });
   };
 
   $scope.SelectproductID = function(productid){
-    if (!productId) return; // if null
+    console.log(productid);
+    $scope.productData = productid;
+    if (!productid) return; // if null
+
+    console.log("=asd=asd=as");
     $scope.ProductName = productid.name;
+    $scope.loanProductId = productid.id;
     if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
+      console.log("====");
       LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
         $scope.onSelectionLoanData = data;
       });
@@ -1048,26 +1063,29 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   };
 
   $scope.saveLoanApplication = function(data){
+    var product = $scope.productData;
+    console.log(product);
+
       $scope.arrey = [];
       $scope.loneData = {};
       $scope.loneData = {
         dateFormat : "dd/MM/yy",
         locale : "en",
         clientId : id,
-        productId : $scope.onSelectionLoanData.loanProductId,
+        productId : $scope.loanProductId,
         principal: data.principalAmount,
         loanOfficerId: data.loanOfficer,
         loanTermFrequency: data.loanTerm,
-        loanTermFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
+        loanTermFrequencyType: product.repaymentFrequencyType.id,
         loanType: "individual",
         numberOfRepayments: data.repaymentsNo,
-        repaymentEvery: $scope.onSelectionLoanData.repaymentEvery,
-        repaymentFrequencyType: $scope.onSelectionLoanData.repaymentFrequencyType.id,
-        interestRatePerPeriod: $scope.onSelectionLoanData.interestRatePerPeriod,
-        amortizationType: $scope.onSelectionLoanData.amortizationType.id,
-        interestType: $scope.onSelectionLoanData.interestType.id,
-        interestCalculationPeriodType: $scope.onSelectionLoanData.interestCalculationPeriodType.id,
-        transactionProcessingStrategyId: $scope.onSelectionLoanData.transactionProcessingStrategyId,
+        repaymentEvery: product.repaymentEvery,
+        repaymentFrequencyType: product.repaymentFrequencyType.id,
+        interestRatePerPeriod: product.interestRatePerPeriod,
+        amortizationType: product.amortizationType.id,
+        interestType: product.interestType.id,
+        interestCalculationPeriodType: product.interestCalculationPeriodType.id,
+        transactionProcessingStrategyId: product.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
         //linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
@@ -1080,6 +1098,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       }, 3000);
     },function(sav) {
       logger.log("Loan Applied");
+      alert("Loan application submitted offline." +
+          " Pending sync, approval and activation");
     }, function(response) {
       logger.log("Loan Application failed");
     });
@@ -1532,7 +1552,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts.fetch_all(function(prods) {
       logger.log("Got savings " + prods.length + " products");
     });
-    LoanAccounts.query(function(prods) {
+    LoanAccounts.fetch_all(function(prods) {
       console.log(prods);
       logger.log("Got loans " + prods.length + " products");
     });
@@ -1541,27 +1561,41 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var role = Session.role;
     $scope.uname = Session.uname;
     $scope.role = role;
-    // switch (role) {
-    //   case "Admin":
-    //     SACCO.query_full(function(data) {
-    //       logger.log("Fetched SACCOs");
-    //       $scope.num_saccos = data.length;
-    //     } );
-    //   case "Management":
-    //     Staff.query(function(staff) {
-    //       $scope.num_staff = staff.length;
-    //     } );
-    //   case "Staff":
-    //     Customers.query_full(function(clients) {
-    //       logger.log("Fetched " + clients.length + "Clients");
-    //       $scope.num_clients = clients.length;
-    //     } );
-    //     Clients.query_inactive(function(iClients) {
-    //       $scope.num_inactiveClients = iClients.totalFilteredRecords;
-    //     } );
-    // }
+    switch (role) {
+      case "Admin":
+        SACCO.query_full(function(data) {
+          logger.log("Fetched SACCOs");
+          $scope.num_saccos = data.length;
+        } );
+      case "Management":
+        Staff.query(function(staff) {
+          $scope.num_staff = staff.length;
+        } );
+      case "Staff":
+        Customers.query_full(function(clients) {
+          logger.log("Fetched " + clients.length + "Clients");
+          $scope.num_clients = clients.length;
+        } );
+        Clients.query_inactive(function(iClients) {
+          $scope.num_inactiveClients = iClients.totalFilteredRecords;
+        } );
+    }
     if (null == session) {
       logger.log("Loading session..");
+      SACCO.query_full(function(data) {
+          logger.log("Fetched SACCOs");
+          $scope.num_saccos = data.length;
+        } );
+      Staff.query(function(staff) {
+          $scope.num_staff = staff.length;
+        } );
+       Customers.query_full(function(clients) {
+          logger.log("Fetched " + clients.length + "Clients");
+          $scope.num_clients = clients.length;
+        } );
+        Clients.query_inactive(function(iClients) {
+          $scope.num_inactiveClients = iClients.totalFilteredRecords;
+        } );
       session = Session.get();
       $rootScope.session = session;
     }
