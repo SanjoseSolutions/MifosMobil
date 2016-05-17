@@ -206,6 +206,15 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
       }
     }
   })
+  .state('tab.client-share', {
+    url: '/share/:id',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/share-view.html',
+        controller: 'ShareViewCtrl'
+      }
+    }
+  } )
   .state('tab.client-shares-buy', {
     url: '/clients/:id/shares-buy',
     views: {

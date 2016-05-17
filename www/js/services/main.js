@@ -1155,7 +1155,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         for(var atype in accounts) {
           var k = 'client.' + id + '.' + atype;
           //logger.log("Caching account " + k);
-          Cache.setObject(k, accounts[atype]);
+          var accts = accounts[atype];
+          Cache.setObject(k, accts);
+          var i=0; n=accts.length;
+          for(; i<n; ++i) {
+            var acct = accts[i];
+            var k = 'share.' + acct.id;
+            Cache.setObject(k, acct);
+          }
         }
         fn_accts(accounts);
       } );
@@ -1886,11 +1893,25 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   }
 } )
 
-.factory('Shares', function(authHttp, baseUrl, logger) {
+.factory('Shares', function(authHttp, baseUrl, Cache, logger) {
   return {
     url: baseUrl + '/accounts/share',
-    get: function(accountId, fn_shares) {
-      logger.log("Shares called for:"+accountId);
+    get: function(id, fn_shares) {
+      logger.log("Shares called for:"+id);
+      var share = Cache.getObject('share.' + id);
+      if (share) {
+        logger.log("Got cache share:" + JSON.stringify(share));
+        fn_shares(share);
+      } else {
+        authHttp.get(this.url + '/' + id)
+          .then(function(response) {
+            var share = response.data;
+            logger.log('Got share: ' + share);
+            fn_shares(share);
+          }, function(response) {
+            logger.log("Failed to get share:"+response.status);
+          } );
+      }
     },
     query: function(fn_shares) {
       logger.log("Shares called");
