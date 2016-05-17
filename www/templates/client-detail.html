@@ -224,9 +224,9 @@
              <tbody>
               <tr ng-repeat="sac in client.savingsAccounts">
                 <td width="20%" class="prodName">{{sac.productName}}</td>
-                <td><p>|<a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></p></td>
-                <td><p>| <i class="icon ion-social-bitcoin"></i>{{sac.accountBalance}}</p></td>
-                <td><p> |<a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></p></td>
+                <td><p><a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></p></td>
+                <td><p> <i class="icon ion-social-bitcoin"></i>{{sac.accountBalance}}</p></td>
+                <td><p><a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></p></td>
               </tr>
              </tbody>
              </table>

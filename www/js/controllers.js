@@ -582,44 +582,44 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
       logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
     } );
+    Clients.get_accounts(clientId, 'savingsAccounts', function(savingsAccounts) {
+      var sacs = savingsAccounts.map(function(sac) {
+        return {
+          "id": sac.id,
+          "accountNo": sac.accountNo,
+          "productName": sac.productName,
+          "accountBalance": sac.accountBalance
+        };
+      } );
+      var totalSavings = savingsAccounts.reduce(function(sum, account) {
+        return sum + account.accountBalance;
+      }, 0);
+      logger.log("Total Savings: " + totalSavings);
+      $scope.client.savingsAccounts = sacs;
+      $scope.client.TotalSavings = totalSavings;
+    } );
+    Clients.get_accounts(clientId, 'loanAccounts', function(loanAccounts) {
+      logger.log("Loan Accounts:" + JSON.stringify(loanAccounts));
+      var lacs = loanAccounts.map(function(lac) {
+        return {
+          "id": lac.id,
+          "accountNo": lac.accountNo,
+          "productName": lac.productName,
+          "loanBalance": lac.loanBalance
+        };
+      } );
+      var totalLoans = loanAccounts.reduce(function(sum, account) {
+        return sum + account.loanBalance;
+      }, 0);
+      logger.log("Total Loans Bal: " + totalLoans);
+      $scope.client.TotalLoans = totalLoans;
+      $scope.client.loanAccounts = lacs;
+    } );
     setTimeout(function(e) {
       ClientImages.getB64(clientId, function(img_data) {
         $scope.client.face = img_data;
       } );
     }, 1000);
-  } );
-  Clients.get_accounts(clientId, function(accounts) {
-    var savingsAccounts = accounts["savingsAccounts"] || [];
-    var sacs = savingsAccounts.map(function(sac) {
-      return {
-        "id": sac.id,
-        "accountNo": sac.accountNo,
-        "productName": sac.productName,
-        "accountBalance": sac.accountBalance
-      };
-    } );
-    var totalSavings = savingsAccounts.reduce(function(sum, account) {
-      return sum + account.accountBalance;
-    }, 0);
-    logger.log("Total Savings: " + totalSavings);
-    $scope.client.savingsAccounts = sacs;
-    $scope.client.TotalSavings = totalSavings;
-    var loanAccounts = accounts["loanAccounts"] || [];
-    logger.log("Loan Accounts:" + JSON.stringify(loanAccounts));
-    var lacs = loanAccounts.map(function(lac) {
-      return {
-        "id": lac.id,
-        "accountNo": lac.accountNo,
-        "productName": lac.productName,
-        "loanBalance": lac.loanBalance
-      };
-    } );
-    var totalLoans = loanAccounts.reduce(function(sum, account) {
-      return sum + account.loanBalance;
-    }, 0);
-    logger.log("Total Loans Bal: " + totalLoans);
-    $scope.client.TotalLoans = totalLoans;
-    $scope.client.loanAccounts = lacs;
   } );
 
   // Print Client Detail
@@ -1270,8 +1270,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       clientId: clientId
     };
     logger.log("Client ID: " + clientId);
-    Clients.get_accounts(clientId, function(accounts) {
-      var saccounts = accounts["savingsAccounts"] || [];
+    Clients.get_accounts(clientId, 'savingsAccounts', function(saccounts) {
       var i=0, n=saccounts.length;
       logger.log("Got total " + n + " savings accounts");
       var asaccounts = [];
@@ -1700,10 +1699,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       case "Staff":
         Customers.query_full(function(clients) {
           $log.info("Fetched " + clients.length + " Clients");
-          $scope.num_clients = clients.length;
+          var i = 0; n = clients.length;
+          $scope.num_clients = n;
           setTimeout(function() {
             $ionicLoading.hide();
           }, 2000);
+          for(; i < n; ++i) {
+            var clientId = clients[i].id;
+            Clients.get_all_accounts(clientId, function(accounts) {} );
+          }
         } );
         Clients.query_inactive(function(iClients) {
           $scope.num_inactiveClients = iClients.totalFilteredRecords;
