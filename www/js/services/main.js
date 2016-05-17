@@ -630,7 +630,21 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       logger.log('DT::' + name + ' cached ' + JSON.stringify(fields));
       method = method || 'post';
       authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid, method);
-    }
+    },
+    saveLoanAccountExtraFiled: function(data,id, fn_fields, fn_offline, fn_fail) {
+      var data2 = {};
+      data2.guarantors = data.guarantors;
+      data2.other_Collateral = data.otherCollateral;
+      authHttp.post(baseUrl + '/datatables/Loan_Fields/'+id, data2,{
+        "params": { "Guarantors": data2.guarantors,
+                    "other_Collateral": data2.otherCollateral
+                  }
+      }, function(response) {
+        console.log(response);
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
   };
 } ] )
 
