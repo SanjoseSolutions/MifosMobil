@@ -1192,7 +1192,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } )
 
-.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger) {
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,$location) {
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -1206,6 +1206,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.data.totalRepayment = summary.totalRepayment;
     }
   } );
+  $scope.viewTransactions = function(id){
+    $location.path("/tab/loan/"+id+"/transactions");
+  }
+
   $scope.makeRepayment = function() {
     $scope.repayment = {};
     $ionicPopup.show( {
