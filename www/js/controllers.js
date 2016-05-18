@@ -970,11 +970,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.deposit(id, params, function(data) {
             logger.log("Deposit successful!");
+            SavingsAccounts.get(id, $scope.init);
             $scope.message = {
               type: 'info',
               text: 'Deposit successful!'
             };
           }, function(res) {
+            SavingsAccounts.get(id, $scope.init);
             $scope.message = {
               type: 'info',
               text: 'Deposit accepted..'
@@ -1011,11 +1013,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.withdraw(id, params, function(data) {
             logger.log("Withdrawal successful!");
+            SavingsAccounts.get(id, $scope.init);
             $scope.message = {
               type: 'info',
               text: 'Withdrawal successful!'
             };
           }, function(res) {
+            SavingsAccounts.get(id, $scope.init);
             $scope.message = {
               type: 'info',
               text: 'Withdraw accepted'
@@ -1038,6 +1042,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   logger.log("SATransCtrl called with: " + id);
   $scope.data = {id: id};
   SavingsAccounts.get(id, function(sac) {
+    logger.log("GOT SAVINGS ACCOUNT: " + JSON.stringify(sac, null, 4));
     $scope.data.accountNo = sac.accountNo;
     $scope.data.transactions = sac.transactions;
   } );
@@ -1688,6 +1693,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts.fetch_all(function(prods) {
       logger.log("Got savings " + prods.length + " products");
     });
+    SavingsAccounts.query(function(sacs) {
+      sacs.forEach(function(sac) {
+        SavingsAccounts.fetch(sac.id, function(ac){} );
+      } );
+    } );
     SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
       logger.log("SAVINGS ACCOUNTS: " + pendingSavingsAccounts.length);
       $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
