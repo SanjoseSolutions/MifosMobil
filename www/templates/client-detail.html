@@ -252,14 +252,29 @@
             </tbody>
             </table>
           </ion-item>
+          <ion-item>
+            <label>Shares:</label>
+            <span ng-hide="client.shareAccounts.length">(None)</span>
+            <a href="#/tab/clients/{{client.id}}/shares-buy"
+                class="button positive rightBtn">
+              <strong>Apply</strong>
+            </a>
+            <br />
+            <table style="width:95%">
+            <tbody>
+              <tr ng-repeat="sac in client.shareAccounts">
+                <td width="30%"><strong>{{sac.productName}}</strong></td>
+                <td><a href="#/tab/share/{{sac.id}}">{{sac.accountNo}}</a></td>
+                <td>
+                  <span ng-show="sac.status.active" class="icon">{{sac.totalApprovedShares}}</span>
+                  <span ng-hide="sac.status.active">Inactive</span>
+                </td>
+              </tr>
+            </tbody>
+            </table>
+          </ion-item>
+
       </div>
-      <ion-item>
-        <label>Share Holdings:</label>
-        {{client.NumShares || "(None)"}}
-        <a href="#/tab/clients/{{client.id}}/buy-shares" class="button calm rightBtn">
-          <strong> Buy </strong>
-        </a>
-      </ion-item>
     </div>
 
   </ion-content>

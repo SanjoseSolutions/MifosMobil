@@ -36,7 +36,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
         type: 'log',
         text: msg
       } );
-//      $log[method](msg);
+      $log[method](msg);
     };
   } );
   return logger;

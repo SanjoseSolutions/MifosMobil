@@ -582,44 +582,60 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.client.face = "img/placeholder-" + gname.toLowerCase() + ".jpg";
       logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
     } );
+    Clients.get_accounts(clientId, 'savingsAccounts', function(savingsAccounts) {
+      var sacs = savingsAccounts.map(function(sac) {
+        return {
+          "id": sac.id,
+          "accountNo": sac.accountNo,
+          "productName": sac.productName,
+          "status": sac.status,
+          "accountBalance": sac.accountBalance
+        };
+      } );
+      var totalSavings = savingsAccounts.reduce(function(sum, account) {
+        return sum + account.accountBalance;
+      }, 0);
+      logger.log("Total Savings: " + totalSavings);
+      $scope.client.savingsAccounts = sacs;
+      $scope.client.TotalSavings = totalSavings;
+    } );
+    Clients.get_accounts(clientId, 'loanAccounts', function(loanAccounts) {
+      logger.log("Loan Accounts:" + JSON.stringify(loanAccounts));
+      var lacs = loanAccounts.map(function(lac) {
+        return {
+          "id": lac.id,
+          "accountNo": lac.accountNo,
+          "productName": lac.productName,
+          "status": lac.status,
+          "loanBalance": lac.loanBalance
+        };
+      } );
+      var totalLoans = loanAccounts.reduce(function(sum, account) {
+        return sum + account.loanBalance;
+      }, 0);
+      logger.log("Total Loans Bal: " + totalLoans);
+      $scope.client.TotalLoans = totalLoans;
+      $scope.client.loanAccounts = lacs;
+    } );
+    Clients.get_accounts(clientId, 'shareAccounts', function(shareAccounts) {
+      logger.log('Share accounts: ' + JSON.stringify(shareAccounts));
+      var shacs = shareAccounts.map(function(shac) {
+        return {
+          id: shac.id,
+          accountNo: shac.accountNo,
+          totalApprovedShares: shac.totalApprovedShares,
+          productId: shac.productId,
+          productName: shac.productName,
+          status: shac.status
+        };
+      } );
+      $scope.client.shareAccounts = shacs;
+    } );
     setTimeout(function(e) {
       ClientImages.getB64(clientId, function(img_data) {
         $scope.client.face = img_data;
       } );
     }, 1000);
-  } );
-  Clients.get_accounts(clientId, function(accounts) {
-    var savingsAccounts = accounts["savingsAccounts"] || [];
-    var sacs = savingsAccounts.map(function(sac) {
-      return {
-        "id": sac.id,
-        "accountNo": sac.accountNo,
-        "productName": sac.productName,
-        "accountBalance": sac.accountBalance
-      };
-    } );
-    var totalSavings = savingsAccounts.reduce(function(sum, account) {
-      return sum + account.accountBalance;
-    }, 0);
-    logger.log("Total Savings: " + totalSavings);
-    $scope.client.savingsAccounts = sacs;
-    $scope.client.TotalSavings = totalSavings;
-    var loanAccounts = accounts["loanAccounts"] || [];
-    logger.log("Loan Accounts:" + JSON.stringify(loanAccounts));
-    var lacs = loanAccounts.map(function(lac) {
-      return {
-        "id": lac.id,
-        "accountNo": lac.accountNo,
-        "productName": lac.productName,
-        "loanBalance": lac.loanBalance
-      };
-    } );
-    var totalLoans = loanAccounts.reduce(function(sum, account) {
-      return sum + account.loanBalance;
-    }, 0);
-    logger.log("Total Loans Bal: " + totalLoans);
-    $scope.client.TotalLoans = totalLoans;
-    $scope.client.loanAccounts = lacs;
   } );
 
   // Print Client Detail
@@ -1238,6 +1254,26 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
+.controller('ShareViewCtrl', function($scope, $stateParams, Shares) {
+
+  Shares.get($stateParams.id, function(share) {
+    $scope.data = {
+      id: share.id,
+      productName: share.productName,
+      totalApprovedShares: share.totalApprovedShares,
+      totalPendingForApprovalShares: share.totalPendingForApprovalShares,
+      status: share.status,
+      accountNo: share.accountNo
+    };
+  } );
+
+  $scope.approveShare = function(id) {
+  };
+
+  $scope.rejectShare = function(id) {
+  };
+} )
+
 .controller('SharesBuyCtrl', 
     function($scope, $stateParams, ShareProducts, Clients,
      $ionicPopup, $timeout, logger, Shares) {
@@ -1251,8 +1287,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       clientId: clientId
     };
     logger.log("Client ID: " + clientId);
-    Clients.get_accounts(clientId, function(accounts) {
-      var saccounts = accounts["savingsAccounts"] || [];
+    Clients.get_accounts(clientId, "savingsAccounts", function(saccounts) {
       var i=0, n=saccounts.length;
       logger.log("Got total " + n + " savings accounts");
       var asaccounts = [];
