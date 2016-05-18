@@ -771,28 +771,20 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     SavingsProducts, $ionicPopup, $timeout, logger, $cordovaNetwork, Clients, SACCO, DateUtil) {
 
   var id = $stateParams.id;
-  console.log("asdasdasdasdas");
  $scope.savings= {};
 
   $scope.init = function() {
-    console.log("sadasdasdsadsad");
     Clients.get($stateParams.id, function(client) {
-      console.log(client);
       $scope.client = client;
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
-      console.log("saving")
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.fieldOfficerOptions = staff;
     } );
-    console.log("dawdasdasdsadas");
     SavingsProducts.query(function(products) {
-      console.log("dawdasdasdsa====das");
       logger.log("Got products: " + products.length);
       $scope.prodHash = HashUtil.from_a(products);
-      console.log($scope.prodHash);
       $scope.products = products;
-      console.log(products);
     } );
   };
 
@@ -842,9 +834,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     } );
 
     $scope.savingAccount = function(saving) {
-
       var product = $scope.product;
-      console.log(product);
       var savingAccountData = {
         allowOverdraft: product.allowOverdraft,
         charges: product.charges, // nullable
@@ -1054,42 +1044,31 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,HashUtil,$cordovaNetwork,
-    $state, $ionicPopup, $timeout, logger,Clients,SACCO) {
+    $state, $ionicPopup, $timeout, logger,Clients,SACCO,DataTables) {
   var id = $stateParams.id;
   $scope.init= function(){
+    $scope.XYZ = {};
     Clients.get($stateParams.id, function(client) {
-      console.log(client);
       $scope.client = client;
+      $scope.XYZ.memberName = client.displayName;
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
-      console.log("SACCO");
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.loanOfficerOptions = staff;
     } );
-
-    // LoanAccounts.retrieveLoanDetails(id, function(data){
-    //   $scope.productList = data.productOptions;
-    //   $scope.loanOfficerOptions = data.loanOfficerOptions
-    // });
     LoanAccounts.getProductData(function(data){
-      console.log(data);
       $scope.prodHash = HashUtil.from_a(data);
-      console.log('================',$scope.prodHash);
       $scope.productList = data;
       //$scope.loanOfficerOptions = data.loanOfficerOptions
     });
   };
 
   $scope.SelectproductID = function(productid){
-    console.log(productid);
     $scope.productData = productid;
     if (!productid) return; // if null
-
-    console.log("=asd=asd=as");
     $scope.ProductName = productid.name;
     $scope.loanProductId = productid.id;
     if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
-      console.log("====");
       LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
         $scope.onSelectionLoanData = data;
       });
@@ -1107,14 +1086,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         day  = ("0" + date.getDate()).slice(-2),
          year = ("0" + date.getYear()).slice(-2);
        $scope.SubmittedDate = day+"/"+mnth+"/"+year;
-       console.log($scope.SubmittedDate);
        
       var date = new Date($scope.XYZ.disbursemantDate),
         mnth = ("0" + (date.getMonth()+1)).slice(-2),
         day  = ("0" + date.getDate()).slice(-2),
          year = ("0" + date.getYear()).slice(-2);
        $scope.disbursemantDate = day+"/"+mnth+"/"+year;
-       console.log($scope.disbursemantDate);
 
 
 
@@ -1138,7 +1115,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
               //don't allow the user to close unless the user enters a value
               e.preventDefault();
             } else {
-              console.log($scope.data);
               $scope.saveLoanApplication($scope.data);
               return $scope.data;
             }
@@ -1162,8 +1138,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
   $scope.saveLoanApplication = function(data){
     var product = $scope.productData;
-    console.log(product);
-
       $scope.arrey = [];
       $scope.loneData = {};
       $scope.loneData = {
@@ -1201,6 +1175,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     }, function(response) {
       logger.log("Loan Application failed");
     });
+    DataTables.saveLoanAccountExtraFiled(data,id, function(data) {
+      logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
+    }, function(response) {
+      logger.log("Accepted for offline: " + JSON.stringify(response));
+    }, function(response) {
+      logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
+    } );
 
   };
 
@@ -1306,7 +1287,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       clientId: clientId
     };
     logger.log("Client ID: " + clientId);
-    Clients.get_accounts(clientId, 'savingsAccounts', function(saccounts) {
+    Clients.get_accounts(clientId, "savingsAccounts", function(saccounts) {
       var i=0, n=saccounts.length;
       logger.log("Got total " + n + " savings accounts");
       var asaccounts = [];
@@ -1735,15 +1716,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       case "Staff":
         Customers.query_full(function(clients) {
           $log.info("Fetched " + clients.length + " Clients");
-          var i = 0; n = clients.length;
-          $scope.num_clients = n;
+          $scope.num_clients = clients.length;
           setTimeout(function() {
             $ionicLoading.hide();
           }, 2000);
-          for(; i < n; ++i) {
-            var clientId = clients[i].id;
-            Clients.get_all_accounts(clientId, function(accounts) {} );
-          }
         } );
         Clients.query_inactive(function(iClients) {
           $scope.num_inactiveClients = iClients.totalFilteredRecords;

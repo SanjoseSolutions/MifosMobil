@@ -604,6 +604,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     save: function(name, id, fields, fn_fields, fn_offline, fn_fail) {
+      console.log(name);
+      console.log(id);
+      console.log(fields);
+      console.log(Settings.tenant);
       authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
@@ -630,7 +634,22 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       logger.log('DT::' + name + ' cached ' + JSON.stringify(fields));
       method = method || 'post';
       authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid, method);
-    }
+    },
+    saveLoanAccountExtraFiled: function(data,id, fn_fields, fn_offline, fn_fail) {
+      var data2 = {
+        "Guarantors": data.guarantors,
+        "other Collateral": data.otherCollateral
+      };
+      authHttp.post(baseUrl + '/datatables/Loan_Fields/'+id, data2,{
+        "params": { "Guarantors": data2.guarantors,
+                    "other Collateral": data2.otherCollateral
+                  }
+      }, function(response) {
+        console.log(response);
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
   };
 } ] )
 
