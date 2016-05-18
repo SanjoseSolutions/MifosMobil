@@ -1716,10 +1716,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       case "Staff":
         Customers.query_full(function(clients) {
           $log.info("Fetched " + clients.length + " Clients");
-          $scope.num_clients = clients.length;
+          var i = 0; n = clients.length;
+          $scope.num_clients = n;
           setTimeout(function() {
             $ionicLoading.hide();
           }, 2000);
+          for(; i < n; ++i) {
+            var clientId = clients[i].id;
+            Clients.get_all_accounts(clientId, function(accounts) {} );
+          }
         } );
         Clients.query_inactive(function(iClients) {
           $scope.num_inactiveClients = iClients.totalFilteredRecords;
