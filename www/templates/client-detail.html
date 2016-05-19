@@ -34,9 +34,9 @@
 </style>
 <ion-view view-title="Client: {{client.displayName}}">
   <ion-nav-buttons side="right">
-      <a class="button button-outline button-icon rightBtn"
-          href="#/tab/clients/{{client.id}}/edit" title="Edit Client Infos">
-        <i class="icon ion-edit"> Edit</i>
+      <a class="button button-icon rightBtn"
+           title="Edit Client Infos" ng-click="openMoreOptions.show($event)">
+        <i class="icon ion-more"></i>
       </a>
   </ion-nav-buttons>
   <ion-content id="client-details">
