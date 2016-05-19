@@ -209,7 +209,11 @@
       </ion-item>
     </div>
 
-    <div class="card">
+    <a class="button button-block button-stable" ng-click="showFinancialSummay()">
+      <label><i class="ion-ios-gear-outline">Manage Accounts</i></label>
+    </a>
+
+    <div class="card" ng-if="financialSummary">
       <ion-item class="item item-divider">
         Financial Summary
       </ion-item>
