@@ -1804,6 +1804,37 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
+.factory('LoanProducts', function(authHttp, baseUrl, Cache, logger) {
+  return {
+    get: function(id, fn_loan_prod) {
+      console.log("============+++++++++++++++++++++++",id);
+      authHttp.get(baseUrl + '/loanproducts/' + id)
+        .then(function(response) {
+          fn_loan_prod(response.data);
+        } );
+    },
+    query: function(fn_loan_prods) {
+      console.log("=====");
+      var products = Cache.getObject('loanproducts');
+      if (products) {
+        fn_loan_prods(products);
+      } else {
+        this.fetch_all(fn_loan_prods);
+      }
+    },
+    fetch_all: function(fn_loan_prods) {
+      authHttp.get(baseUrl + '/loanproducts')
+        .then(function(response) {
+          var data = response.data;
+          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          Cache.setObject('loanproducts', data);
+          fn_loan_prods(data);
+        } );
+    }
+  }
+} )
+
+
 .factory('LoanAccounts', function(authHttp, baseUrl, logger,Cache) {
   var fetch_account = function(accountNo, fn_lac) {
     authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')

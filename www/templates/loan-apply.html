@@ -66,21 +66,16 @@ select, input[type=text] {
 
 
         <label class="item item-input item-select">
-          <div class="input-label">Select Product
+          <div class="input-label">Product
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
           <!-- select  ng-model="loan.productId" ng-options="item as item.name for item in productList"></select -->
-          <select name="productId" ng-model="loan.productId" ng-options="products as products.name for products in productList" value="{{products}}" ng-change="SelectproductID(loan.productId)" required>
-            <option >{{products.name}}</option>
+          <select name="productId" ng-model="loan.productId" ng-options="product.id as product.name for product in productList" ng-change="prodChanged(loan.productId)" required>
           </select>
         </label>
       </ion-item>
 
 
-      <!-- select name="loanOfficer" ng-model="loan.loanOfficer">
-        <option ng-repeat="loanOfficer in loanOfficerOptions" value="{{loanOfficer.id}}">{{loanOfficer.displayName}}</option>
-      </select -->
-      
       <div class="item item-input-inset">
         <span class="input-label">Date Submitted:</span>
         <label class="item-input-wrapper">
@@ -104,8 +99,8 @@ select, input[type=text] {
       <ion-item>
         <label class="item item-input item-select">
           <div class="input-label">Loan Officer:</div>
-          <select name="loanOfficer" ng-model="loan.loanOfficer">
-            <option ng-repeat="loanOfficer in loanOfficerOptions" value="{{loanOfficer.id}}">{{loanOfficer.displayName}}</option>
+          <select name="loanOfficer" ng-model="loan.loanOfficerId"
+            ng-options="o.id as o.displayName for o in loanOfficerOptions">
           </select>
         </label>
       </ion-item>
