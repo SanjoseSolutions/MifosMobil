@@ -1070,13 +1070,17 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,HashUtil,$cordovaNetwork,
-    $state, $ionicPopup, $timeout, logger,Clients,SACCO,DataTables) {
+    $state, $ionicPopup, $timeout, logger, Clients, SACCO, DataTables, Codes) {
+
   var id = $stateParams.id;
   $scope.init= function(){
-    $scope.XYZ = {};
+    Codes.getValues("Loan purpose", function(pcodes) {
+      $scope.loanPurposes = pcodes;
+    } );
+    $scope.loan = {};
     Clients.get($stateParams.id, function(client) {
       $scope.client = client;
-      $scope.XYZ.memberName = client.displayName;
+      $scope.loan.memberName = client.displayName;
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
       logger.log("Staff for office: " + JSON.stringify(staff));
@@ -1105,15 +1109,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     // TO DO :
     // Check the parameters' list
     
-    $scope.data = $scope.XYZ;
-    var days= Date.parse($scope.XYZ.openingDate);
-    var date = new Date($scope.XYZ.openingDate),
+    $scope.data = $scope.loan;
+    var days= Date.parse($scope.loan.openingDate);
+    var date = new Date($scope.loan.openingDate),
         mnth = ("0" + (date.getMonth()+1)).slice(-2),
         day  = ("0" + date.getDate()).slice(-2),
          year = ("0" + date.getYear()).slice(-2);
        $scope.SubmittedDate = day+"/"+mnth+"/"+year;
        
-      var date = new Date($scope.XYZ.disbursemantDate),
+      var date = new Date($scope.loan.disbursemantDate),
         mnth = ("0" + (date.getMonth()+1)).slice(-2),
         day  = ("0" + date.getDate()).slice(-2),
          year = ("0" + date.getYear()).slice(-2);

@@ -1830,11 +1830,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     fetch_all: function(fn_sav_prods) {
-      authHttp.get(baseUrl + '/loanproducts')
+      authHttp.get(baseUrl + '/loans')
         .then(function(response) {
           var data = response.data;
-          logger.log("loanproducts.query got: " + JSON.stringify(data));
-          Cache.setObject('loanproducts', data);
+          logger.log("loanaccounts.query got: " + JSON.stringify(data));
+          Cache.setObject('loanaccounts', data);
           fn_sav_prods(data);
         } );
     },
@@ -2041,6 +2041,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     "Relationship": 26,
     "ClientTitle": 28,
     "ClientType": 16,
+    "Loan purpose": 3,
     "MaritalStatus": 27
   };
 
