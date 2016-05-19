@@ -520,6 +520,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.openMoreOptions = popover;
   });
 
+  $scope.financialSummary = false;
+  $scope.showFinancialSummay = function(){
+    $scope.financialSummary = !$scope.financialSummary;
+  }
+  
   $scope.getPhoto = function() {
     logger.log('Getting camera');
     Camera.getPicture( {
