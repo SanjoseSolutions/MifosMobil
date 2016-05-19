@@ -508,10 +508,18 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 })
 
 .controller('ClientViewCtrl', function($scope, $stateParams, Clients, $ionicPopup,
-    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter) {
+    Customers, ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter,$ionicPopover) {
   var clientId = $stateParams.clientId;
   logger.log("Looking for client:"+clientId);
   $scope.client = {};
+
+  //initialsze more options popover
+  $ionicPopover.fromTemplateUrl('templates/client-more-options.html', {
+    scope: $scope,
+  }).then(function(popover) {
+    $scope.openMoreOptions = popover;
+  });
+
   $scope.getPhoto = function() {
     logger.log('Getting camera');
     Camera.getPicture( {
@@ -535,6 +543,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log(err);
     } );
   };
+  
   $scope.approveClient = function(client) {
     var id = client.id;
     logger.log("Called Client approve for #" + id);
@@ -1199,7 +1208,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } )
 
-.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger) {
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,$location) {
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -1213,6 +1222,10 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.data.totalRepayment = summary.totalRepayment;
     }
   } );
+  $scope.viewTransactions = function(id){
+    $location.path("/tab/loan/"+id+"/transactions");
+  }
+
   $scope.makeRepayment = function() {
     $scope.repayment = {};
     $ionicPopup.show( {
