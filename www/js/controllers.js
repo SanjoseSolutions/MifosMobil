@@ -1078,9 +1078,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.loanPurposes = pcodes;
     } );
     $scope.loan = {};
-    Clients.get($stateParams.id, function(client) {
+    Clients.get(id, function(client) {
       $scope.client = client;
       $scope.loan.memberName = client.displayName;
+    } );
+    Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
+      $scope.linkAccounts = savingsAccounts.map(function(a) {
+        a.name = a.accountNo + ' (' + a.productName + ')';
+        return a;
+      } );
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
       logger.log("Staff for office: " + JSON.stringify(staff));

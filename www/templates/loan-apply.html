@@ -160,8 +160,8 @@ select, input[type=text] {
       <div class="item item-input-inset">
         <span class="input-label">Own Savings:</span>
         <label class="item-input-wrapper">
-          <input type="tel" size="10" ng-minlength="1" name="ownSavings"
-            placeholder="Enter the value" ng-model="loan.ownSavings">
+          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts">
+          </select>
         </label>
       </div>
       <div class="item item-input-inset">
