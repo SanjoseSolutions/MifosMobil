@@ -134,6 +134,16 @@ td {
               </a>
             </td>
           </tr>
+          <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && pendingLoanAccountsCount">
+            <td><div>Pending Loan Accounts:</div>
+            </td>
+            <td>{{ pendingLoanAccountsCount }}</td>
+            <td>
+              <a href="#/tab/dashboard/pending-loans" class="button button-small noVertPadd">
+                Review
+              </a>
+            </td>
+          </tr>
           <!-- FOR SAVINGS, LOANS, SHARES, etc
             <tr>
             <td colspan="2"></td>

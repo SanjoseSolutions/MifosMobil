@@ -1638,6 +1638,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_sac(response.data);
       } );
   };
+  var get_trans = function(id, transId, fn_trans) {
+    authHttp.get(baseUrl + '/savingsaccounts/' + id + '/transactions/' + transId)
+      .then(function(resp) {
+        fn_trans(resp.data);
+      } );
+  };
   return {
     fetch: fetch_account,
     get: function(accountNo, fn_sac) {
@@ -1711,13 +1717,26 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_fail(response);
         } );
     },
+    get_trans: get_trans,
     withdraw: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=withdrawal',
         params, {}, function(response) {
           var data = response.data;
-          fn_res(data);
-        }, function(response) {
-          fn_offline(response);
+          if (202 == response.status) {
+            var sacsHash = Cache.get('h_savingsaccounts');
+            var bal = sacsHash[id]['summary']['accountBalance'], amt = params.transactionAmount;
+            if (bal < amt) {
+              sacsHash[id]['summary']['accountBalance'] = bal - amt;
+              Cache.setObject('h_savingsaccounts', sacsHash);
+            }
+            fn_offline(params);
+            return;
+          }
+          var transId = data.resourceId;
+          logger.log("Transaction #" + transId);
+          get_trans(id, transId, function(trans) {
+            fn_res(trans);
+          } );
         }, function(response) {
           logger.log("Failed to withdraw. Received " + response.status);
           fn_err(response);
@@ -1727,7 +1746,19 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=deposit',
         params, {}, function(response) {
           var data = response.data;
-          fn_res(data);
+          if (202 == response.status) {
+            var sacsHash = Cache.get('h_savingsaccounts');
+            sacsHash[id]['summary']['accountBalance'] += params.transactionAmount;
+            logger.log("New balance: " + sacsHash[id]['summary']['accountBalance']);
+            Cache.setObject('h_savingsaccounts', sacsHash);
+            fn_offline(params);
+            return;
+          }
+          var transId = data.resourceId;
+          logger.log("Transaction #" + transId);
+          get_trans(id, transId, function(trans) {
+            fn_res(trans);
+          } );
         }, function(response) {
           logger.log("Failed to deposit. Received " + response.status);
           fn_err(response);
@@ -1790,6 +1821,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_accounts(data.pageItems);
         } );
     },
+    query_pending: function(fn_pending_accts) {
+      this.query(function(accounts) {
+        var pAccts = accounts.filter(function(a) {
+          return !a.status.active
+        } );
+        fn_pending_accts(pAccts);
+      } );
+    },
     fetch_all: function(fn_sav_prods) {
       authHttp.get(baseUrl + '/loanproducts')
         .then(function(response) {
@@ -1831,6 +1870,34 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/loans/template/' + '?templateType=individual&clientId='+id + '&productId=' +productID)
         .then(function(response) {
           fn_account(response.data);
+        } );
+    },
+    approve: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=approve',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    reject: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=reject',
+        data, {}, function(response) {
+          fn_success(response);
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    disburse: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=disburse',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
         } );
     },
     save: function(loanData, fn_success, fn_offline, fn_fail) {

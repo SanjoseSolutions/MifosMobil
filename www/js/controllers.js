@@ -917,7 +917,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var summary = sac.summary;
     $scope.data.accountBalance = summary ? summary.accountBalance : 0;
   };
-  SavingsAccounts.get(id, $scope.init);
+  $scope.$on('$ionicView.enter', function(e) {
+    SavingsAccounts.get(id, $scope.init);
+  } );
   $scope.approveAccount = function() {
     var data = {
       locale: 'en',
@@ -963,6 +965,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       } );
     } );
   };
+  var updateBalance = function(data) {
+    var bal = data.runningBalance;
+    logger.log("Running balance: " + bal);
+    $scope.data.accountBalance = bal;
+  };
   $scope.makeDeposit = function() {
     $scope.deposit = {};
     $ionicPopup.show( {
@@ -984,13 +991,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.deposit(id, params, function(data) {
             logger.log("Deposit successful!");
-            SavingsAccounts.get(id, $scope.init);
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Deposit successful!'
             };
-          }, function(res) {
-            SavingsAccounts.get(id, $scope.init);
+          }, function(data) {
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Deposit accepted..'
@@ -1027,13 +1034,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.withdraw(id, params, function(data) {
             logger.log("Withdrawal successful!");
-            SavingsAccounts.get(id, $scope.init);
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Withdrawal successful!'
             };
-          }, function(res) {
-            SavingsAccounts.get(id, $scope.init);
+          }, function(data) {
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Withdraw accepted'
@@ -1206,7 +1213,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } )
 
-.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,$location) {
+.controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,
+    HashUtil, DateUtil, $location) {
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -1214,6 +1222,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.data.accountNo = lac.accountNo;
     $scope.data.productName = lac.loanProductName;
     $scope.data.principal = lac.principal;
+    $scope.data.status = lac.status;
     var summary = lac.summary;
     if (summary) {
       $scope.data.totalOutstanding = summary.totalOutstanding;
@@ -1223,6 +1232,65 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   $scope.viewTransactions = function(id){
     $location.path("/tab/loan/"+id+"/transactions");
   }
+
+  $scope.approveAccount = function() {
+    var data = {
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    var dt = new Date();
+    dt = DateUtil.toISODateString(dt);
+    var approveData = { approvedOnDate: dt };
+    HashUtil.copy(approveData, data);
+    var showFailedApprove = function() {
+      $ionicPopup.alert( {
+        title: "Failure",
+        template: "Approval failed"
+      } );
+    };
+    LoanAccounts.approve(id, approveData, function(account) {
+      $ionicPopup.alert( {
+        title: "Success",
+        template: "Approved Account"
+      } );
+    }, function(response) {
+      showFailedApprove();
+    } );
+  };
+  $scope.rejectAccount = function() {
+    LoanAccounts.reject(id, function(response) {
+      $ionicPopup.alert( {
+        title: "Rejected",
+        template: "Account Rejected"
+      } );
+    }, function(response) {
+      $ionicPopup.alert( {
+        title: "Failure",
+        template: "Rejection failed"
+      } );
+    } );
+  };
+  $scope.disburseLoan = function() {
+    var data = {
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    var dt = new Date();
+    dt = DateUtil.toISODateString(dt);
+    data['actualDisbursementDate'] = dt;
+    LoanAccounts.disburse(id, data, function(account) {
+      $scope.data.status.active = true;
+      $ionicPopup.alert( {
+        title: 'Disbursed',
+        template: 'Loan disbursed!'
+      } );
+    }, function(response) {
+      $ionicPopup.alert( {
+        title: 'Failure',
+        template: 'Disbursal failed'
+      } );
+    } );
+  };
 
   $scope.makeRepayment = function() {
     $scope.repayment = {};
@@ -1678,6 +1746,15 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 } ] )
 
+.controller('PendingLoanCtrl', [ '$scope', 'LoanAccounts', 'logger',
+    function($scope, LoanAccounts, logger) {
+
+  LoanAccounts.query_pending(function(pAccts) {
+    $scope.accounts = pAccts;
+  } );
+
+} ] )
+
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
     '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
@@ -1717,8 +1794,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       } );
     } );
     SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
-      logger.log("SAVINGS ACCOUNTS: " + pendingSavingsAccounts.length);
       $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
+    } );
+    LoanAccounts.query_pending(function(pendingLoanAccounts) {
+      logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
+      $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
     } );
     LoanAccounts.fetch_all(function(prods) {
       console.log(prods);

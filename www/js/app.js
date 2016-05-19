@@ -349,6 +349,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dashboard-pending-loans', {
+    url: '/dashboard/pending-loans',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/loan-accounts.html',
+        controller: 'PendingLoanCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {
