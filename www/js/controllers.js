@@ -903,7 +903,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     var summary = sac.summary;
     $scope.data.accountBalance = summary ? summary.accountBalance : 0;
   };
-  SavingsAccounts.get(id, $scope.init);
+  $scope.$on('$ionicView.enter', function(e) {
+    SavingsAccounts.get(id, $scope.init);
+  } );
   $scope.approveAccount = function() {
     var data = {
       locale: 'en',
@@ -949,6 +951,11 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       } );
     } );
   };
+  var updateBalance = function(data) {
+    var bal = data.runningBalance;
+    logger.log("Running balance: " + bal);
+    $scope.data.accountBalance = bal;
+  };
   $scope.makeDeposit = function() {
     $scope.deposit = {};
     $ionicPopup.show( {
@@ -970,13 +977,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.deposit(id, params, function(data) {
             logger.log("Deposit successful!");
-            SavingsAccounts.get(id, $scope.init);
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Deposit successful!'
             };
-          }, function(res) {
-            SavingsAccounts.get(id, $scope.init);
+          }, function(data) {
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Deposit accepted..'
@@ -1013,13 +1020,13 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
           SavingsAccounts.withdraw(id, params, function(data) {
             logger.log("Withdrawal successful!");
-            SavingsAccounts.get(id, $scope.init);
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Withdrawal successful!'
             };
-          }, function(res) {
-            SavingsAccounts.get(id, $scope.init);
+          }, function(data) {
+            updateBalance(data);
             $scope.message = {
               type: 'info',
               text: 'Withdraw accepted'

@@ -1638,6 +1638,12 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_sac(response.data);
       } );
   };
+  var get_trans = function(id, transId, fn_trans) {
+    authHttp.get(baseUrl + '/savingsaccounts/' + id + '/transactions/' + transId)
+      .then(function(resp) {
+        fn_trans(resp.data);
+      } );
+  };
   return {
     fetch: fetch_account,
     get: function(accountNo, fn_sac) {
@@ -1711,13 +1717,26 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_fail(response);
         } );
     },
+    get_trans: get_trans,
     withdraw: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=withdrawal',
         params, {}, function(response) {
           var data = response.data;
-          fn_res(data);
-        }, function(response) {
-          fn_offline(response);
+          if (202 == response.status) {
+            var sacsHash = Cache.get('h_savingsaccounts');
+            var bal = sacsHash[id]['summary']['accountBalance'], amt = params.transactionAmount;
+            if (bal < amt) {
+              sacsHash[id]['summary']['accountBalance'] = bal - amt;
+              Cache.setObject('h_savingsaccounts', sacsHash);
+            }
+            fn_offline(params);
+            return;
+          }
+          var transId = data.resourceId;
+          logger.log("Transaction #" + transId);
+          get_trans(id, transId, function(trans) {
+            fn_res(trans);
+          } );
         }, function(response) {
           logger.log("Failed to withdraw. Received " + response.status);
           fn_err(response);
@@ -1727,7 +1746,19 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=deposit',
         params, {}, function(response) {
           var data = response.data;
-          fn_res(data);
+          if (202 == response.status) {
+            var sacsHash = Cache.get('h_savingsaccounts');
+            sacsHash[id]['summary']['accountBalance'] += params.transactionAmount;
+            logger.log("New balance: " + sacsHash[id]['summary']['accountBalance']);
+            Cache.setObject('h_savingsaccounts', sacsHash);
+            fn_offline(params);
+            return;
+          }
+          var transId = data.resourceId;
+          logger.log("Transaction #" + transId);
+          get_trans(id, transId, function(trans) {
+            fn_res(trans);
+          } );
         }, function(response) {
           logger.log("Failed to deposit. Received " + response.status);
           fn_err(response);
