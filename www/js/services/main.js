@@ -1821,6 +1821,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_accounts(data.pageItems);
         } );
     },
+    query_pending: function(fn_pending_accts) {
+      this.query(function(accounts) {
+        var pAccts = accounts.filter(function(a) {
+          return a.status.pendingApproval
+        } );
+        fn_pending_accts(pAccts);
+      } );
+    },
     fetch_all: function(fn_sav_prods) {
       authHttp.get(baseUrl + '/loanproducts')
         .then(function(response) {
@@ -1862,6 +1870,24 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/loans/template/' + '?templateType=individual&clientId='+id + '&productId=' +productID)
         .then(function(response) {
           fn_account(response.data);
+        } );
+    },
+    approve: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=approve',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    reject: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=reject',
+        data, {}, function(response) {
+          fn_success(response);
+        }, function(response) {
+          fn_fail(response);
         } );
     },
     save: function(loanData, fn_success, fn_offline, fn_fail) {

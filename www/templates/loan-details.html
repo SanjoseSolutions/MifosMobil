@@ -39,34 +39,33 @@
       <ion-item>
         <label> Loan Repayment:</label> {{data.totalRepayment || "0"}}
       </ion-item>
-      <ion-item class="item-divider">
+    <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
+      <ion-button-bar>
+        <button class="button button-assertive leftBtn"
+            ng-click="rejectAccount(data)">
+          Reject
+          <i class="icon ion-close-round"></i>
+        </button>
+        <button class="button button-positive rightBtn"
+            ng-click="approveAccount(data)">
+          Approve
+          <i class="icon ion-android-checkmark-circle"></i>
+        </button>
+      </ion-button-bar>
+    </ion-item>
+      <ion-item class="item-divider" ng-show="data.status.active">
         <p class="centered"> ACTIONS </p>
       </ion-item>
-      <ion-item>
+      <ion-item ng-show="data.status.active">
         <p class="centered">
           <a href="" class="button button-positive" ng-click="makeRepayment()">Make Repayment</a>
         </p>
       </ion-item>
-      <ion-item>
+      <ion-item ng-show="data.status.active">
         <button class="button button-block button-dark" ng-click="viewTransactions(data.id)" >
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </button>
       </ion-item>
-
-      <div class="list card">
-	      <ion-item ng-show="client.pending && (rolestat.isAdmin || rolestat.isManagement)">
-	        <ion-button-bar>
-	          <button class="button button-assertive left" ng-click="rejectLoan(client)">
-	            Reject
-	            <i class="icon ion-close-round"></i>
-	          </button>
-	          <button class="button button-positive right" ng-click="approveLoan(client)">
-	            Approve
-	            <i class="icon ion-android-checkmark-circle"></i>
-	          </button>
-	        </ion-button-bar>
-	      </ion-item>
-	    </div>
 
     </div>
 
