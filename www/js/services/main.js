@@ -1824,7 +1824,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     query_pending: function(fn_pending_accts) {
       this.query(function(accounts) {
         var pAccts = accounts.filter(function(a) {
-          return a.status.pendingApproval
+          return !a.status.active
         } );
         fn_pending_accts(pAccts);
       } );
@@ -1886,6 +1886,16 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.post(baseUrl + '/loans/' + id + '?command=reject',
         data, {}, function(response) {
           fn_success(response);
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    disburse: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=disburse',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
         }, function(response) {
           fn_fail(response);
         } );

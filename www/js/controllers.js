@@ -1209,7 +1209,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 } )
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,
-    DateUtil, $location) {
+    HashUtil, DateUtil, $location) {
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
@@ -1244,7 +1244,6 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       } );
     };
     LoanAccounts.approve(id, approveData, function(account) {
-      $scope.data.status = null;
       $ionicPopup.alert( {
         title: "Success",
         template: "Approved Account"
@@ -1263,6 +1262,27 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $ionicPopup.alert( {
         title: "Failure",
         template: "Rejection failed"
+      } );
+    } );
+  };
+  $scope.disburseLoan = function() {
+    var data = {
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    var dt = new Date();
+    dt = DateUtil.toISODateString(dt);
+    data['actualDisbursementDate'] = dt;
+    LoanAccounts.disburse(id, data, function(account) {
+      $scope.data.status.active = true;
+      $ionicPopup.alert( {
+        title: 'Disbursed',
+        template: 'Loan disbursed!'
+      } );
+    }, function(response) {
+      $ionicPopup.alert( {
+        title: 'Failure',
+        template: 'Disbursal failed'
       } );
     } );
   };

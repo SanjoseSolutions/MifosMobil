@@ -42,13 +42,18 @@
     <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
       <ion-button-bar>
         <button class="button button-assertive leftBtn"
-            ng-click="rejectAccount(data)">
+            ng-click="rejectAccount()" ng-show="data.status.pendingApproval">
           Reject
           <i class="icon ion-close-round"></i>
         </button>
         <button class="button button-positive rightBtn"
-            ng-click="approveAccount(data)">
+            ng-click="approveAccount()" ng-show="data.status.pendingApproval">
           Approve
+          <i class="icon ion-android-checkmark-circle"></i>
+        </button>
+        <button class="button button-positive rightBtn"
+            ng-click="disburseLoan()" ng-show="data.status.waitingForDisbursal">
+          Disburse
           <i class="icon ion-android-checkmark-circle"></i>
         </button>
       </ion-button-bar>
