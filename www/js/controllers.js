@@ -1069,11 +1069,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,HashUtil,$cordovaNetwork,
-    $state, $ionicPopup, $timeout, logger, Clients, SACCO, DataTables, Codes) {
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,
+    DateUtil, HashUtil, $cordovaNetwork, $state, $ionicPopup, $timeout, logger,
+    Clients, SACCO, DataTables, Codes, LoanProducts) {
 
   var id = $stateParams.id;
-  $scope.init= function(){
+  $scope.init = function() {
     Codes.getValues("Loan purpose", function(pcodes) {
       $scope.loanPurposes = pcodes;
     } );
@@ -1083,7 +1084,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.loan.memberName = client.displayName;
     } );
     Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
-      $scope.linkAccounts = savingsAccounts.map(function(a) {
+      $scope.linkAccounts = savingsAccounts.filter(function(a) {
+        return a.status.active;
+      } ).map(function(a) {
         a.name = a.accountNo + ' (' + a.productName + ')';
         return a;
       } );
@@ -1092,23 +1095,20 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.loanOfficerOptions = staff;
     } );
-    LoanAccounts.getProductData(function(data){
-      $scope.prodHash = HashUtil.from_a(data);
-      $scope.productList = data;
-      //$scope.loanOfficerOptions = data.loanOfficerOptions
-    });
+    LoanProducts.query(function(prods) {
+      $scope.prodHash = HashUtil.from_a(prods);
+      $scope.productList = prods;
+    } );
   };
 
-  $scope.SelectproductID = function(productid){
-    $scope.productData = productid;
-    if (!productid) return; // if null
-    $scope.ProductName = productid.name;
-    $scope.loanProductId = productid.id;
-    if (!ionic.Platform.isWebView() && $cordovaNetwork.isOnline()) {
-      LoanAccounts.retrieveLoanDetailsViaProductID(id,productid.id, function(data){
-        $scope.onSelectionLoanData = data;
-      });
-    }
+  $scope.prodChanged = function(prodId) {
+    var prodHash = $scope.prodHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.prodHash[prodId];
+    $scope.productData = prod;
+    $scope.loan.principalAmount = prod.principal;
+    $scope.loan.loanTerm = prod.repaymentEvery;
+    $scope.loan.repaymentsNo = prod.numberOfRepayments;
   };
 
   $scope.loanApply = function()  {
@@ -1168,26 +1168,25 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $timeout(function() {
       logger.log("Popup TimeOut");
       myPopup.close(); //close the popup after 15 seconds for some reason
-    }, 15000);
+    }, 5000);
 
   };
 
   $scope.saveLoanApplication = function(data){
     var product = $scope.productData;
-      $scope.arrey = [];
-      $scope.loneData = {};
-      $scope.loneData = {
+    var loan = $scope.loan;
+      var loanData = {
         dateFormat : "dd/MM/yy",
         locale : "en",
         clientId : id,
-        productId : $scope.loanProductId,
-        principal: data.principalAmount,
-        loanOfficerId: data.loanOfficer,
-        loanTermFrequency: data.loanTerm,
+        productId : $scope.loan.productId,
+        principal: loan.principalAmount,
+        loanOfficerId: loan.loanOfficerId,
+        loanTermFrequency: loan.repaymentsNo,
         loanTermFrequencyType: product.repaymentFrequencyType.id,
         loanType: "individual",
-        numberOfRepayments: data.repaymentsNo,
-        repaymentEvery: product.repaymentEvery,
+        numberOfRepayments: loan.repaymentsNo,
+        repaymentEvery: loan.loanTerm,
         repaymentFrequencyType: product.repaymentFrequencyType.id,
         interestRatePerPeriod: product.interestRatePerPeriod,
         amortizationType: product.amortizationType.id,
@@ -1196,11 +1195,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         transactionProcessingStrategyId: product.transactionProcessingStrategyId,
         expectedDisbursementDate: $scope.disbursemantDate,
         submittedOnDate: $scope.SubmittedDate,
-        //linkAccountId : "3",    // hardcoded has to link with saving accounts which user creates
         maxOutstandingLoanBalance:"35000",
-        disbursementData:$scope.arrey
+        disbursementData:[]
       };
-    LoanAccounts.save($scope.loneData, function(new_loan){
+      var linkAccountId = $scope.loan.linkAccountId;
+      if (linkAccountId) {
+        loanData['linkAccountId'] = linkAccountId;
+      }
+    LoanAccounts.save(loanData, function(new_loan){
       $timeout(function() {
         $state.go('tab.client-loan', { 'id': new_loan.id } );
       }, 3000);
@@ -1209,7 +1211,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       alert("Loan application submitted offline." +
           " Pending sync, approval and activation");
     }, function(response) {
-      logger.log("Loan Application failed");
+      alert("Loan application failed");
+      var errs = response.data.errors;
+      logger.log("Loan Application failed:" + JSON.stringify(errs, null, 2));
     });
     DataTables.saveLoanAccountExtraFiled(data,id, function(data) {
       logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
@@ -1259,6 +1263,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       } );
     };
     LoanAccounts.approve(id, approveData, function(account) {
+      $scope.data.status.pendingApproval = false;
+      $scope.data.status.waitingForDisbursal = true;
       $ionicPopup.alert( {
         title: "Success",
         template: "Approved Account"

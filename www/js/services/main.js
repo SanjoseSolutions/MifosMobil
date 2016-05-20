@@ -1804,7 +1804,38 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('LoanAccounts', function(authHttp, baseUrl, logger,Cache) {
+.factory('LoanProducts', function(authHttp, baseUrl, Cache, logger) {
+  return {
+    get: function(id, fn_loan_prod) {
+      console.log("============+++++++++++++++++++++++",id);
+      authHttp.get(baseUrl + '/loanproducts/' + id)
+        .then(function(response) {
+          fn_loan_prod(response.data);
+        } );
+    },
+    query: function(fn_loan_prods) {
+      console.log("=====");
+      var products = Cache.getObject('loanproducts');
+      if (products) {
+        fn_loan_prods(products);
+      } else {
+        this.fetch_all(fn_loan_prods);
+      }
+    },
+    fetch_all: function(fn_loan_prods) {
+      authHttp.get(baseUrl + '/loanproducts')
+        .then(function(response) {
+          var data = response.data;
+          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          Cache.setObject('loanproducts', data);
+          fn_loan_prods(data);
+        } );
+    }
+  }
+} )
+
+
+.factory('LoanAccounts', function(authHttp, baseUrl, logger, HashUtil, Cache) {
   var fetch_account = function(accountNo, fn_lac) {
     authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
       .then(function(response) {
@@ -1812,14 +1843,24 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
   };
   return {
-    get: fetch_account,
+    fetch: fetch_account,
+    get: function(id, fn_lac) {
+      var accounts = Cache.getObject('h_loans');
+      var loan = accounts[id];
+      if (loan) {
+        fn_lac(loan);
+      } else {
+        fetch_account(id, fn_lac);
+      }
+    },
     query: function(fn_accounts) {
       logger.log("LoanAccounts query called");
-      authHttp.get(baseUrl + '/loans')
-        .then(function(response) {
-          var data = response.data;
-          fn_accounts(data.pageItems);
-        } );
+      var accounts = Cache.getObject('h_loans');
+      if (accounts) {
+        fn_accounts(HashUtil.to_a(accounts));
+      } else {
+        this.fetch_all(fn_accounts);
+      }
     },
     query_pending: function(fn_pending_accts) {
       this.query(function(accounts) {
@@ -1829,13 +1870,14 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_pending_accts(pAccts);
       } );
     },
-    fetch_all: function(fn_sav_prods) {
+    fetch_all: function(fn_loans) {
       authHttp.get(baseUrl + '/loans')
         .then(function(response) {
           var data = response.data;
-          logger.log("loanaccounts.query got: " + JSON.stringify(data));
-          Cache.setObject('loanaccounts', data);
-          fn_sav_prods(data);
+          var accounts = data.pageItems;
+          var h_loans = HashUtil.from_a(accounts);
+          Cache.setObject('h_loans', h_loans);
+          fn_loans(accounts);
         } );
     },
     getProductData: function(fn_sav_prods) {
