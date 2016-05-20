@@ -1225,10 +1225,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,
     HashUtil, DateUtil, $location) {
+  console.log("dsadasdasd===");
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
   LoanAccounts.get(id, function(lac) {
+    $scope.accountData = lac;
+    $scope.data.expectedDisbursementDate = DateUtil.localDate(lac.timeline.expectedDisbursementDate);
+    $scope.data.submittedOnDate = DateUtil.localDate(lac.timeline.submittedOnDate);
     $scope.data.accountNo = lac.accountNo;
     $scope.data.productName = lac.loanProductName;
     $scope.data.principal = lac.principal;
@@ -1777,7 +1781,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   var session = null;
 
   $scope.$on('$ionicView.enter', function(e) {
-    $ionicLoading.show({template: 'Loading..'});
+    //$ionicLoading.show({template: 'Loading..'});
     if (null == session) {
       logger.log("Loading session..");
       session = Session.get();
@@ -1822,32 +1826,32 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $scope.role = role;
     // $log.info("Role is " + role);
     switch (role) {
-      case "Admin":
-        SACCO.query_full(function(data) {
-          $log.info("Fetched SACCOs");
-          $scope.num_saccos = data.length;
-        } );
-      case "Management":
-        Staff.query(function(staff) {
-          $scope.num_staff = staff.length;
-        } );
-      case "Staff":
-        Customers.query_full(function(clients) {
-          $log.info("Fetched " + clients.length + " Clients");
-          var i = 0; n = clients.length;
-          $scope.num_clients = n;
-          setTimeout(function() {
-            $ionicLoading.hide();
-          }, 2000);
-          for(; i < n; ++i) {
-            var clientId = clients[i].id;
-            Clients.get_all_accounts(clientId, function(accounts) {} );
-          }
-        } );
-        Clients.query_inactive(function(iClients) {
-          $scope.num_inactiveClients = iClients.totalFilteredRecords;
-          $ionicLoading.hide();
-        } );
+      // case "Admin":
+      //   SACCO.query_full(function(data) {
+      //     $log.info("Fetched SACCOs");
+      //     $scope.num_saccos = data.length;
+      //   } );
+      // case "Management":
+      //   Staff.query(function(staff) {
+      //     $scope.num_staff = staff.length;
+      //   } );
+      // case "Staff":
+      //   Customers.query_full(function(clients) {
+      //     $log.info("Fetched " + clients.length + " Clients");
+      //     var i = 0; n = clients.length;
+      //     $scope.num_clients = n;
+      //     setTimeout(function() {
+      //       $ionicLoading.hide();
+      //     }, 2000);
+      //     for(; i < n; ++i) {
+      //       var clientId = clients[i].id;
+      //       Clients.get_all_accounts(clientId, function(accounts) {} );
+      //     }
+      //   } );
+      //   Clients.query_inactive(function(iClients) {
+      //     $scope.num_inactiveClients = iClients.totalFilteredRecords;
+      //     $ionicLoading.hide();
+      //   } );
     }
   } );
 
