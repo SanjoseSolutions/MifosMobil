@@ -1,0 +1,27 @@
+<ion-view view-title="{{'label.heading.settings' | translate}}">
+  <ion-content>
+  <label class="item item-input item-select">
+    <div class="input-label">
+      {{"label.heading.language" | translate}}
+    </div>
+    <select  ng-model="language" ng-change="languageChange(language)">
+      <option value="locale-en">English</option>
+      <option value="locale-es">Spanish</option>
+      <option value="locale-br">Breton</option>
+      <option value="locale-id">Indonesian</option>
+      <option value="locale-cs">Czech</option>
+      <option value="locale-fr">French</option>
+      <!-- <option value="locale-hi">Hindi</option> -->
+      <option value="locale-ka">Georgian</option>
+      <option value="locale-km">Khmer</option>
+      <option value="locale-lo">Lao</option>
+      <option value="locale-oc">Occitan</option>
+      <option value="locale-pt">Portuguese</option>
+      <option value="locale-sv">Swedish</option>
+      <option value="locale-uk">Ukrainian</option>
+      <option value="locale-vi">Vietnamese</option>
+      <option value="locale-zh_CN">Chinese</option>
+    </select>
+  </label>
+  </ion-content>
+</ion-view>

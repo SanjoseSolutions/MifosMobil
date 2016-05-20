@@ -21,7 +21,7 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup>
           : Mandatory fields
       </div>
-      <ion-item>
+      <ion-item ng-show="message || savingAccCreateForm.$invalid">
         <!-- div ng-hide="savingAccCreateForm.name.$pristine">
           <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.required">
             SACCO Name is required
@@ -43,33 +43,21 @@
             Submit Date is required
           </span>
         </div>
-      </ion-item>
-
-      <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
 
-      <ion-item>
-        <label class="item item-input item-select">
-          <div class="input-label">Select Product
-            <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          </div>
-          <select name="productId" ng-model="savings.productId" ng-options="p as p.name for p in products" value="{{p}}" ng-change="prodChanged(savings.productId)" required>
-          </select>
+      <div class="item item-input-inset">
+        <div class="input-label" style="float:left">
+          Product
+          <sup><i class="icon ion-asterisk assertive"></i></sup>:
+        </div>
+        <label class="item-input-wrapper" style="width:11em; float:right">
+        <select name="productId" ng-model="savings.productId" required
+          ng-options="p as p.name for p in products" value="{{p}}"
+          ng-change="prodChanged(savings.productId)">
+        </select>
         </label>
-      </ion-item>
-
-      <!-- <ion-item>
-        <label class="item item-input item-select">
-          <div class="input-label">
-            Select Product
-            <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          </div>
-          <select name="productID" ng-model="savings.productId" ng-change="prodChanged(p)" value="{{p}}"
-            required ng-options="p.id as p.name for p in products">
-          </select>
-        </label>
-      </ion-item> -->
+      </div>
 
       <div class="item item-input-inset">
         <span class="input-label">Date Submitted:</span>
@@ -84,9 +72,7 @@
             Field Officer :
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </div>
-          <select name="productID" ng-model="savings.fieldOfficer" ng-change="fieldoOficerChange(savings.fieldOfficer)" value="{{p}}"
-            required ng-options="p as p.displayName for p in fieldOfficerOptions">
-          </select>
+            <select name="productID" ng-model="savings.fieldOfficer" ng-change="fieldoOficerChange(savings.fieldOfficer)" value="{{p}}"required ng-options="p as p.displayName for p in fieldOfficerOptions"></select>
         </label>
       </ion-item>
       <!-- <div class="item item-input-inset">

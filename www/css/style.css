@@ -94,6 +94,12 @@ label, .label {
 .rightBtn {
   float: right;
 }
+.leftBtn {
+  float: left;
+}
+.w20 {
+  width:20%;
+}
 select {
   width: 100%;
 }
@@ -105,10 +111,11 @@ input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, select:f
 .tabs-top.subheader > .tabs {
   top: 90px; 
 }
-
+/* Inactive Clients' background */
 .iClient>.item-content {  /* ion-content { */
   background-color: #EEE8D6 !important;  /* #E5E5E5; */
 }
+
 /*login page logo center*/
 .image-center {
   margin: auto;

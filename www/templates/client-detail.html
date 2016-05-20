@@ -18,19 +18,56 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
+<style type="text/css">
+.myEdit {
+  height: 50%;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.prodName {
+  font-family: Arial;
+  font-size:0.75rem;
+  font-weight: bold;  
+}
+</style>
 <ion-view view-title="Client: {{client.displayName}}">
+  <ion-nav-buttons side="right">
+      <a class="button button-outline button-icon rightBtn"
+          href="#/tab/clients/{{client.id}}/edit" title="Edit Client Infos">
+        <i class="icon ion-edit"> Edit</i>
+      </a>
+  </ion-nav-buttons>
   <ion-content id="client-details">
+    <!-- a href="#/tab/clients/{{client.id}}/edit" class="button button-block w20 rightBtn">
+      <label><i class="ion-edit"></i></label>
+    </a -->
 
-    <div class="list card">
+    <div class="list card" style="clear:both;">
+      <!-- To Prevent long Name to be cut -->
+      <ion-item class="item item-divider">
+        <label class="positive">{{client.displayName}}</label>
+        <!-- a href="#/tab/clients/{{client.id}}/edit"
+            class="button button-clear button-positive w20 rightBtn icon ion-edit myEdit"
+            style='clear:both;'>  float:right; font-size: 1rem;' &nbsp;  + Edit >
+            < ! - - label><i class="ion-edit"> Edit</i></label >
+        </a -->
+      </ion-item>
 
       <div class="item item-avatar custom">
         <img ng-src="{{client.face}}">
-        <h2>{{client.displayName}}</h2>
-        <p><b>Gender:</b>{{client.gender.name}}</p>
+        <!-- h2>{{client.displayName}}</h2 -->   
+        <p><b>Gender</b>:{{client.gender.name}}</p>
         <p><b>Marital Status:</b> {{client.Client_Fields["Marital Status"] || "Not set"}}</p>
         <p><b>D.O.B:</b> {{client.dateOfBirth}}</p>
-        <p><b>Office:</b> {{client.officeName}}</p>
+        <!-- To Prevent long names to be cut -->
+        <p><b>Office:</b> # {{client.officeId}} <br /> {{client.officeName}}</p>
         <p><b>Created:</b> {{client.createdOnDate}}</p>
+        <p><b>Membership :</b>
+          <!-- i class="icon ion-person-add"></i -->
+          {{ client.clientType.name || "Not set" }}</p>
+        <!-- p><label><i class="icon ion-android-call"></i></label> {{client.mobileNo || "9876543210"}}</p -->
       </div>
 
       <div class="button-bar">
@@ -38,13 +75,34 @@
           Photo </a>
         <a ng-click="print()" class="button button-clear button-positive icon ion-printer">
           Print </a>
+        <!-- a class="button button-clear button-positive icon ion-document">
+          Upload</a -->
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-clear button-positive icon ion-edit">Edit</a>
       </div>
 
     </div>
     <div class="list card no-text-wrap">
+      <ion-item class="item item-icon-left">
+        <!-- ion-ios-email-outline" -->
+        <label class="icon ion-email"></label>
+        {{client.Client_Fields.Email || "Not set" }}
+        <!-- "extremelysimple@kmayra.org" -->
+      </ion-item>
 
-        <ion-item class="item item-icon-left">
+      <ion-item title="Mobile" class="item item-icon-left centered"> <!-- item-button" -->
+        <!-- button class="button button-small button-positive leftBtn" ng-show="client.mobileNo">
+          Write SMS <i class="icon ion-ios-email-outline"></i>
+        </button -->
+        <i class="icon ion-android-call"></i> <!-- ng-show="!client.mobileNo"></i -->
+        <strong class="positive">{{client.mobileNo || "Not Set"}}</strong>
+        <!--span class="centered">{{client.mobileNo || "9876543210"}}</span -->
+        <a class="button button-small button-positive rightBtn"
+            ng-href="tel:{{client.mobileNo}}"
+            ng-show="client.mobileNo">
+          <!-- i class="icon ion-android-call"></i -->
+          Make Call
+        </a>
+        <!-- ion-item class="item item-icon-left">
           <i class="icon ion-email"></i>
           {{client.Client_Fields.Email || "Not set" }}
         </ion-item>
@@ -54,31 +112,31 @@
         <ion-item href="#" class="item item-icon-left">
           <i class="icon ion-person-add"></i>
           Membership: {{ client.clientType.name || "Not set" }}
-        </ion-item>
-        <ion-item>
-          <label class="icon ion-android-call" title="Mobile">
-	        </label> {{client.mobileNo || "9876543210"}}
-        </ion-item> 
+        </ion-item -->
+
       <!-- /ion-list -->
     </div>
     <div class="list card">
+      <ion-item class="item item-icon">
+        <label>Education <i class="icon ion-university"></i> </label>:
+        {{client.Client_Fields.Education || "Not set"}}
+      </ion-item>    
       <ion-item>
-        <label>Education <i class="icon ion-university"></i>:
-        </label>{{client.Client_Fields.Education || "Not set"}}
+        <label>Occupation</label>:
+        {{client.clientClassification.name || "Not set"}}
       </ion-item>
-      <ion-item>
-        <label>Occupation:
-        </label>{{client.clientClassification.name || "Not set"}}
-      </ion-item>
+      <!-- /ion-list -->
+    </div>
+    <div class="list card">        
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/docs" class="button button-block">
           <i class="ion-document-text"> Documents</i></a>
       </ion-item>
+      
       <!-- Family Member Size -->
-      <ion-item class="item-divider"> 
-        <label>
-          Family Size &amp; Details
-          <i class="icon icon-right ion-ios-people"></i>
+      <ion-item class="item-divider item-icon-right"> 
+        <label> Family Size &amp; Details
+          <i class="icon ion-ios-people"></i>
         </label>
       </ion-item>
       <ion-item>
@@ -93,13 +151,10 @@
           </div>
         </div>
       </ion-item>
-      
       <ion-item>
-        <label> Fathers Name:</label>
-        {{client.Client_Fields["Fathers Name"] || "Not set"}}
-      </ion-item>
-      <ion-item>
-        <label> Grandfathers Name: </label>
+        <label>Father's Name</label>:
+        {{client.Client_Fields["Fathers Name"] || "Not set"}} <br />
+        <label>Gd Father's Name</label>:
         {{client.Client_Fields["Grandfathers Name"] || "Not set"}}
       </ion-item>
       <ion-item>
@@ -108,53 +163,45 @@
             class="button button-small button-positive button-outline button-icon icon-right ion-search">
           {{client.Client_NextOfKin.Fullname || "Unspecified"}}
         </a>
-        <!-- button class="button button-small rightBtn">
-          <i class="icon ion-edit"></i>
-          Edit
-        </button -->
       </ion-item>
-      <ion-item class="item item-divider">
+      <ion-item class="item item-divider item-icon-right">
         <label> Client's Address <i class="icon ion-ios-home"></i></label>
       </ion-item>
       <ion-item>
-        {{client.Client_Fields.Address || "Not set" }}
+        {{client.Client_Fields.Address || "Address Field Not set" }}
         <!-- "45, Av. de la Rue, Bourguignon, France" -->
       </ion-item>
-      <ion-item>
-        <label>Country</label>: {{client.Client_Fields.Country}}
-      </ion-item>
-      <ion-item>
-        <label>Region</label>: {{client.Client_Fields.Region}}
-      </ion-item>
-      <ion-item>
-        <label>Zone</label>: {{client.Client_Fields.Zone}}
-      </ion-item>
-      <ion-item>
-        <label>Wereda</label>: {{client.Client_Fields.Wereda}}
-      </ion-item>
-      <ion-item>
-        <label>Kebele</label>: {{client.Client_Fields.Kebele}}
-      </ion-item>
-      <ion-item>
-        <label>Unique Place Name</label>: {{client.Client_Fields.UniquePlaceName}}
+      <ion-item class="item item-body">
+        <label>Country</label>:
+        {{client.Client_Fields.Country || "Not set" }} <br />
+        <label>Region</label>:
+        {{client.Client_Fields.Region || "Not set" }} <br />
+        <label>Zone</label>:
+        {{client.Client_Fields.Zone || "Not set" }} <br />
+        <label>Wereda</label>:
+        {{client.Client_Fields.Wereda || "Not set" }} <br />
+        <label>Kebele</label>:
+        {{client.Client_Fields.Kebele || "Not set" }} <br />
+        <label>Unique Place Name</label>:<br />
+        {{client.Client_Fields.UniquePlaceName || "Not set" }}
       </ion-item>
       <ion-item>
         <a href="#/tab/clients/{{client.id}}/edit" class="button button-block">
-          <i class="ion-edit"> Edit Info</i>
+          <label><i class="ion-edit"> Edit Info</i></label>
         </a>
       </ion-item>
     </div>
 
-    
-
     <div class="list card">
       <ion-item ng-show="client.pending && (rolestat.isAdmin || rolestat.isManagement)">
         <ion-button-bar>
-          <button class="button button-assertive left" ng-click="rejectClient(client)">
+          <button class="button button-assertive leftBtn"
+              ng-click="rejectClient(client)">
             Reject
             <i class="icon ion-close-round"></i>
           </button>
-          <button class="button button-positive right" ng-click="approveClient(client)">
+          <button class="button button-positive rightBtn"
+              ng-click="approveClient(client)">
             Approve
             <i class="icon ion-android-checkmark-circle"></i>
           </button>
@@ -163,23 +210,23 @@
     </div>
 
     <div class="card">
-      <div class="item item-divider">
-        Account Summary
-      </div>
+      <ion-item class="item item-divider">
+        Financial Summary
+      </ion-item>
       <div class="item item-text-wrap no-padding">
           <ion-item>
              <label>Savings Accounts:</label>
              <span ng-hide="client.savingsAccounts">(None)</span>
               <a href="#/tab/clients/{{client.id}}/savings-apply" class="button positive rightBtn">
-                Apply
+                <strong>Apply</strong>
               </a>
              <table style="width:95%">
              <tbody>
               <tr ng-repeat="sac in client.savingsAccounts">
-                <td width="30%"><strong>{{sac.productName}}</strong></td>
-                <td><a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></td>
-                <td><span class="icon ion-social-bitcoin">{{sac.accountBalance}}</span></td>
-                <td><a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></td>
+                <td width="20%" class="prodName">{{sac.productName}}</td>
+                <td><p>|<a href="#/tab/savingsAccount/{{sac.id}}">{{sac.accountNo}}</a></p></td>
+                <td><p>| <i class="icon ion-social-bitcoin"></i>{{sac.accountBalance}}</p></td>
+                <td><p> |<a href="#/tab/savingsAccount/{{sac.id}}/transactions">Transactions</a></p></td>
               </tr>
              </tbody>
              </table>
@@ -191,7 +238,7 @@
             <span ng-hide="client.loanAccounts.length">(None)</span>
             <a href="#/tab/clients/{{client.id}}/loan-apply"
                 class="button button-positive rightBtn">
-              Apply
+              <strong>Apply</strong>
             </a>
             <br />
             <table style="width:95%">
@@ -205,12 +252,15 @@
             </tbody>
             </table>
           </ion-item>
+
       </div>
-      <!-- ion-item>
+      <ion-item>
         <label>Share Holdings:</label>
-        {{client.NumShares || "0"}}
-        <a href="#/tab/#" class="button positive rightBtn"> <strong> Buy </strong> </a>
-      </ion-item -->
+        {{client.NumShares || "(None)"}}
+        <a href="#/tab/clients/{{client.id}}/buy-shares" class="button calm rightBtn">
+          <strong> Buy </strong>
+        </a>
+      </ion-item>
     </div>
 
   </ion-content>
