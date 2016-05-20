@@ -42,8 +42,8 @@
 
       <ion-item ng-class="{'iClient': !client.active}"
           class="item item-remove-animate item-avatar item-icon-left item-icon-right"
-          ng-repeat="client in clients | filter : searchQuery" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
-        <img ng-src="{{client.face}}">
+          ng-repeat="client in clients | filter : searchQuery" type="item-text-wrap" href="#/tab/clients/{{client.id}}" ng-if="client.status.value != 'Rejected'">
+        <img ng-src="{{client.face}}" >
         <h2>#{{client.id}}: {{client.displayName}}</h2>
         <p> 
           <!-- {{client.fullname}} -->
