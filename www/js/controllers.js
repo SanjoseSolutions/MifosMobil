@@ -1274,7 +1274,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     } );
   };
   $scope.rejectAccount = function() {
-    LoanAccounts.reject(id, function(response) {
+    var data = {
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    data['rejectedOnDate'] = DateUtil.toISODateString(new Date());
+    LoanAccounts.reject(id, data, function(response) {
+      $scope.data.status.pendingApproval = false;
+      $scope.data.status.value = "Rejected";
       $ionicPopup.alert( {
         title: "Rejected",
         template: "Account Rejected"

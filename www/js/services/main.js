@@ -1917,6 +1917,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     approve: function(id, data, fn_success, fn_fail) {
       authHttp.post(baseUrl + '/loans/' + id + '?command=approve',
         data, {}, function(response) {
+          if (202 == response.status) {
+            var loans = Cache.getObject('h_loans');
+            loans[id]['status']['pendingApproval'] = true;
+            loans[id]['status']['waitingForDisbursal'] = false;
+            Cache.setObject('h_loans', loans);
+            return;
+          }
           fetch_account(id, function(account) {
             fn_success(account);
           } );
