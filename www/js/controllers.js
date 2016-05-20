@@ -1069,11 +1069,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
   } );
 } )
 
-.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,DateUtil,HashUtil,$cordovaNetwork,
-    $state, $ionicPopup, $timeout, logger, Clients, SACCO, DataTables, Codes, LoanProducts) {
+.controller('LoansAccCreateCtrl', function($scope, $stateParams, LoanAccounts,
+    DateUtil, HashUtil, $cordovaNetwork, $state, $ionicPopup, $timeout, logger,
+    Clients, SACCO, DataTables, Codes, LoanProducts) {
 
   var id = $stateParams.id;
-  $scope.init= function(){
+  $scope.init = function() {
     Codes.getValues("Loan purpose", function(pcodes) {
       $scope.loanPurposes = pcodes;
     } );
@@ -1083,7 +1084,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       $scope.loan.memberName = client.displayName;
     } );
     Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
-      $scope.linkAccounts = savingsAccounts.map(function(a) {
+      $scope.linkAccounts = savingsAccounts.filter(function(a) {
+        return a.status.active;
+      } ).map(function(a) {
         a.name = a.accountNo + ' (' + a.productName + ')';
         return a;
       } );
@@ -1165,7 +1168,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     $timeout(function() {
       logger.log("Popup TimeOut");
       myPopup.close(); //close the popup after 15 seconds for some reason
-    }, 15000);
+    }, 5000);
 
   };
 
@@ -1179,12 +1182,12 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
         productId : $scope.loan.productId,
         principal: loan.principalAmount,
         loanOfficerId: loan.loanOfficerId,
-        loanTermFrequency: loan.loanTerm,
+        loanTermFrequency: loan.repaymentsNo,
         loanTermFrequencyType: product.repaymentFrequencyType.id,
         loanType: "individual",
-//        numberOfRepayments: loan.repaymentsNo,
-//        repaymentEvery: product.repaymentEvery,
-//        repaymentFrequencyType: product.repaymentFrequencyType.id,
+        numberOfRepayments: loan.repaymentsNo,
+        repaymentEvery: loan.loanTerm,
+        repaymentFrequencyType: product.repaymentFrequencyType.id,
         interestRatePerPeriod: product.interestRatePerPeriod,
         amortizationType: product.amortizationType.id,
         interestType: product.interestType.id,
@@ -1208,7 +1211,9 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       alert("Loan application submitted offline." +
           " Pending sync, approval and activation");
     }, function(response) {
-      logger.log("Loan Application failed");
+      alert("Loan application failed");
+      var errs = response.data.errors;
+      logger.log("Loan Application failed:" + JSON.stringify(errs, null, 2));
     });
     DataTables.saveLoanAccountExtraFiled(data,id, function(data) {
       logger.log("Saved datatable " + dt + " data: " + JSON.stringify(data));
@@ -1258,6 +1263,8 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
       } );
     };
     LoanAccounts.approve(id, approveData, function(account) {
+      $scope.data.status.pendingApproval = false;
+      $scope.data.status.waitingForDisbursal = true;
       $ionicPopup.alert( {
         title: "Success",
         template: "Approved Account"
