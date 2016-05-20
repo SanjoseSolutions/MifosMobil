@@ -1229,10 +1229,14 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,
     HashUtil, DateUtil, $location) {
+  console.log("dsadasdasd===");
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
   LoanAccounts.get(id, function(lac) {
+    $scope.accountData = lac;
+    $scope.data.expectedDisbursementDate = DateUtil.localDate(lac.timeline.expectedDisbursementDate);
+    $scope.data.submittedOnDate = DateUtil.localDate(lac.timeline.submittedOnDate);
     $scope.data.accountNo = lac.accountNo;
     $scope.data.productName = lac.loanProductName;
     $scope.data.principal = lac.principal;
