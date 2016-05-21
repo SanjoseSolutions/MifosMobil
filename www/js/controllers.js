@@ -420,7 +420,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
 .controller('InactiveClientsCtrl', [ '$scope', 'Clients', function($scope, Clients) {
   $scope.$on('$ionicView.enter', function(e) {
     Clients.query_inactive(function(iClients) {
-      $scope.clients = iClients.pageItems;
+      $scope.clients = iClients;
     } );
   } );
 } ] )
@@ -1858,7 +1858,7 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
           }
         } );
         Clients.query_inactive(function(iClients) {
-          $scope.num_inactiveClients = iClients.totalFilteredRecords;
+          $scope.num_inactiveClients = iClients.length;
           $ionicLoading.hide();
         } );
     }

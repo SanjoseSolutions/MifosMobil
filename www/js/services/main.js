@@ -1263,10 +1263,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       if (clients) {
         logger.log("Got cached clients: " + typeof(clients));
         if (!HashUtil.isEmpty(clients)) {
-          var a_clients = [];
-          for(var id in clients) {
-            a_clients.push(clients[id]);
-          }
+          var a_clients = HashUtil.to_a(clients);
           process_clients(a_clients);
           logger.log("Clients.query got "+a_clients.length+" cached clients");
         }
@@ -1292,19 +1289,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     query_inactive: function(fn_iClients) {
       logger.log("Going to call inactive clients");
-      var iClients = Cache.getObject('iClients');
-      if (iClients != null) {
-        return {
-          totalFilteredRecords: iClients.length,
-          pageItems: iClients
-        };
-      }
-      authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
-      .then(function(response) {
-        var data = response.data;
-        iClients = data.pageItems || [];
-        Cache.setObject('iClients', iClients);
-        fn_iClients(data);
+      this.query(function(clients) {
+        var iClients = clients.filter(function(c) {
+          return c.status.value != 'Active';
+        } );
+        fn_iClients(iClients);
       } );
     },
     remove: function(id) {
@@ -1734,6 +1723,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           }
           var transId = data.resourceId;
           logger.log("Transaction #" + transId);
+          fetch_account(id, function(account){
+            logger.log("Updated cached account");
+          } );
           get_trans(id, transId, function(trans) {
             fn_res(trans);
           } );
@@ -1756,6 +1748,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           }
           var transId = data.resourceId;
           logger.log("Transaction #" + transId);
+          fetch_account(id, function(account){
+            logger.log("Updated cached account");
+          } );
           get_trans(id, transId, function(trans) {
             fn_res(trans);
           } );
