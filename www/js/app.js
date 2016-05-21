@@ -359,6 +359,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dasbboard-active-clients', {
+    url: '/dashboard/active-clients',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/active-clients.html',
+        controller: 'ActiveClientsCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {

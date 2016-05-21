@@ -1,0 +1,82 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<style>
+/*
+#chart table,
+#chart table th,
+#chart table td {
+  border-style: solid;
+  border-color: #889;
+}
+*/
+#chart table tr {
+  margin: 0;
+}
+#chart table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+#chart table th,
+#chart table td {
+  padding: 0 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #889;
+}
+</style>
+<ion-view view-title="Active Client Report">
+<ion-content>
+<ion-item-list>
+  <div class="card" style="height:300px;overflow:scroll" ng-show="data.show_saccos">
+  <ion-item ng-repeat="s in data.saccos">
+    <label>
+      <input type="checkbox" checklist-model="data.sel_saccos" checklist-value="s.id" />
+      <span>#{{ s.id }}: </span>
+      <span>{{ s.name }}</span>
+    </label>
+  </ion-item>
+  </div>
+  <ion-item>
+    <ion-button-bar>
+    <button class="button button-calm" ng-click="toggleSaccos()">
+      Show/Hide SACCOs
+    </button>
+    <button class="button button-positive rightBtn" ng-click="generateChart()" value="Generate Chart">
+      Generate Chart
+    </button>
+    </ion-button-bar>
+  </ion-item>
+  <div class="item" id="chart">
+    <table ng-show="data.sels">
+      <thead>
+        <tr>
+        <th>SACCO</th>
+        <th>Male</th>
+        <th>Female</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="s in data.sels">
+          <th>{{s.name}}</th>
+          <td>{{data.activeCount.Male[s.name]}}</td>
+          <td>{{data.activeCount.Female[s.name]}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <svg></svg>
+  </div>
+</ion-item-list>
+</ion-content>
+</ion-view>

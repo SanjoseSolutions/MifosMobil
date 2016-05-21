@@ -30,7 +30,7 @@
  *  - ClientEditCtrl: Client Edit
  */
 
-angular.module('mifosmobil.controllers', ['ngCordova'])
+angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 // To listen for when this page is active (for example, to refresh data),
 // listen for the $ionicView.enter event: $scope.$on('$ionicView.enter', function(e) {
@@ -1885,4 +1885,78 @@ angular.module('mifosmobil.controllers', ['ngCordova'])
     });
   };
 } ] )
+
+.controller('ActiveClientsCtrl', function($scope, SACCO, Clients, logger, Cache) {
+
+  SACCO.query(function(saccos) {
+    $scope.data = {saccos: saccos, show_saccos: true};
+  } );
+
+  $scope.toggleSaccos = function() {
+    $scope.data.show_saccos = !$scope.data.show_saccos;
+  };
+
+  $scope.generateChart = function() {
+    var oHash = {};
+    var sel_saccos = $scope.data.sel_saccos || [];
+    var h_offices = Cache.getObject('h_offices');
+    var sels = [];
+    sel_saccos.forEach(function(s) {
+      oHash[s] = true;
+      sels.push(s, h_offices[s]);
+    } );
+    $scope.data.sels = sels;
+    Clients.query(function(clients) {
+      var series = {};
+      var oNames = {};
+      clients.forEach(function(c) {
+        if (oHash[c.officeId] && c.active) {
+          var g = c.gender;
+          if (g && g.name) {
+            series[g.name] = series[g.name] || {};
+            series[g.name][c.officeName] = series[g.name][c.officeName] || 0;
+            series[g.name][c.officeName]++;
+          }
+        }
+      } );
+      $scope.data.activeCount = series;
+      var data = [];
+      for(var gname in series) {
+        var gs = series[gname];
+        var values = [];
+        for(var oname in gs) {
+          values.push( {
+            label: oname,
+            value: gs[oname]
+          } );
+        }
+        var datum = {
+          key: gname,
+          values: values
+        };
+        data.push(datum);
+      }
+      $scope.data.show_saccos = false;
+      //logger.log("Got data: " + JSON.stringify(data, null, 2));
+      nv.addGraph(function() {
+        var chart = nv.models.multiBarHorizontalChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .margin({top: 10, right: 20, bottom: 10, left: 220})
+          .showValues(true)
+//          .tooltips(true)
+//          .transitionDuration(350)
+          .showControls(true);
+
+        chart.yAxis.tickFormat(d3.format(',.2f'));
+        d3.select('#chart svg')
+          .datum(data)
+          .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+      } );
+    } );
+  };
+} )
 ;
