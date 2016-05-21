@@ -1932,6 +1932,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         }
         var datum = {
           key: gname,
+          color: (data.length ? "#ffbb11" : "#0022bb"),
           values: values
         };
         data.push(datum);
@@ -1942,13 +1943,17 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         var chart = nv.models.multiBarHorizontalChart()
           .x(function(d) { return d.label })
           .y(function(d) { return d.value })
-          .margin({top: 10, right: 20, bottom: 10, left: 220})
+          .height(300)
+          .margin({top: 30, right: 20, bottom: 20, left: 140})
           .showValues(true)
+          .showControls(false)
 //          .tooltips(true)
 //          .transitionDuration(350)
-          .showControls(true);
+//          .showControls(true)
+          ;
 
         chart.yAxis.tickFormat(d3.format(',.2f'));
+//        chart.rotateLabels(-45);
         d3.select('#chart svg')
           .datum(data)
           .call(chart);

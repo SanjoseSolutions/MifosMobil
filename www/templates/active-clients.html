@@ -14,26 +14,33 @@
 -->
 <style>
 /*
-#chart table,
-#chart table th,
-#chart table td {
+#report table,
+#report table th,
+#report table td {
   border-style: solid;
   border-color: #889;
 }
 */
-#chart table tr {
+#report table tr {
   margin: 0;
 }
-#chart table {
+#report table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-#chart table th,
-#chart table td {
+#report table thead th {
+  background-color: #11205f;
+  color: #fef;
+}
+#report table th,
+#report table td {
   padding: 0 10px;
   border-width: 1px;
   border-style: solid;
   border-color: #889;
+}
+#chart {
+  height: 350px;
 }
 </style>
 <ion-view view-title="Active Client Report">
@@ -51,15 +58,16 @@
   <ion-item>
     <ion-button-bar>
     <button class="button button-calm" ng-click="toggleSaccos()">
-      Show/Hide SACCOs
+      <span ng-show="data.show_saccos">Hide SACCOs</span>
+      <span ng-hide="data.show_saccos">Show SACCOs</span>
     </button>
     <button class="button button-positive rightBtn" ng-click="generateChart()" value="Generate Chart">
       Generate Chart
     </button>
     </ion-button-bar>
   </ion-item>
-  <div class="item" id="chart">
-    <table ng-show="data.sels">
+  <ion-item id="report" ng-show="data.sels">
+    <table>
       <thead>
         <tr>
         <th>SACCO</th>
@@ -75,6 +83,8 @@
         </tr>
       </tbody>
     </table>
+  </ion-item>
+  <div class="item" id="chart" ng-show="data.sels">
     <svg></svg>
   </div>
 </ion-item-list>
