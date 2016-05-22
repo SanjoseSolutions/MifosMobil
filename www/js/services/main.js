@@ -125,6 +125,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     config = config || {};
     config.headers = config.headers || {};
     config.headers["Fineract-Platform-TenantId"] = Settings.tenant;
+    method = method || 'post';
     var cmd = {
       'method': method || 'post',
       'url': url,
@@ -136,16 +137,30 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     subcmds.push(cmd);
     commands[rid]['commands'] = subcmds;
     Cache.setObject('commands', commands);
-    logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + JSON.stringify(cmd));
+    if (url.match(/images/)) {
+      data = data.substr(0, 10) + '...';
+    }
+    logger.log("Subcommand #"+subcmds.length+" of cmd " + rid + " cached: " + method + ':' + url + '::' + data);
   };
 
-  authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final) {
+  authHttp.runCommands = function(fn_init, fn_success, fn_fail, fn_final, fetch_client) {
+    var clients = Cache.getObject('h_clients');
+    var cids = Object.keys(clients);
+    var i = 0; len = cids.length;
+    var nclients = {};
+    for(; i < len; ++i) {
+      var k = cids[i];
+      if (/^T\d+$/.test(k)) {
+        var client = clients[k];
+        nclients[client.cid] = k;
+      }
+    }
     var commands = Cache.getObject('commands');
     logger.log("LOADED CACHED COMMANDS: " + commands.length);
     if (commands.length == 0) return;
     fn_init(commands.length);
     var results = [];
-    var cmdIndex = 0;
+    $rootScope.cmdIndex = 0;
     var runNextCmd = function() {
       cmd = commands.shift();
       var method = cmd['method'];
@@ -153,39 +168,72 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var data = cmd['data'];
       var config = cmd['config'];
       var subcmds = cmd['commands'];
-      $http[method](url, data, config)
-        .then(function(response) {
-          var rdata = response.data;
-          if (subcmds) {
-            logger.log("Got subcommands #=" + subcmds.length);
-            for(var i = 0; i < subcmds.length; ++i) {
-              var scmd = subcmds[i];
-              var url = scmd['url'];
-              var matches = url.match(/:([a-zA-Z]+)/);
-              if (matches) {
-                var attr = matches[1];
-                scmd['url'] = url.replace(':' + attr, rdata[attr]);
-              }
-              logger.log("CACHED SUBCOMMAND READ: " + JSON.stringify(scmd));
-              commands.push(scmd);
+      var successCallback = function(rdata) {
+        if (subcmds) {
+          logger.log("Got subcommands #=" + subcmds.length);
+          for(var i = 0; i < subcmds.length; ++i) {
+            var scmd = subcmds[i];
+            var url = scmd['url'];
+            var matches = url.match(/:([a-zA-Z]+)/);
+            if (matches) {
+              var attr = matches[1];
+              scmd['url'] = url.replace(':' + attr, rdata[attr]);
             }
+            logger.log("CACHED SUBCOMMAND READ: " + scmd['url']);
+            commands.push(scmd);
           }
-          fn_success(); //method, url, data, response)
-        }, function(response) {
-          logger.log("Failed offline cmd " + method +  " to "
-            + url +  ": " + response.status
-            + " :: " + JSON.stringify(response.data));
-          results.push(response.data);
-          fn_fail(); //method, url, data, response);
-        } )
-        .finally(function() {
-          if (commands.length) {
-            setTimeout(runNextCmd, 1000);
-          } else {
-            Cache.setObject('commands', []);
-            fn_final();
-          }
+        }
+        fn_success(); //method, url, data, response
+      };
+
+      var updateClientHash = function(rdata) {
+        var resId = rdata['resourceId'];
+        logger.log("Adding new client id " + resId);
+        var clients = Cache.getObject('h_clients');
+        delete clients[nk];
+        fetch_client(resId, function(new_client) {
+          clients[resId] = new_client;
+          Cache.setObject('h_clients', clients);
         } );
+      };
+
+      var failureCallback = function(response) {
+        logger.log("Failed offline cmd " + method +  " to "
+          + url +  ": " + response.status
+          + " :: " + JSON.stringify(response.data));
+        results.push(response.data);
+        fn_fail(); //method, url, data, response
+      };
+
+      var promise = $http[method](url, data, config);
+
+      var cmdIndex = $rootScope.cmdIndex;
+      var nk = nclients[cmdIndex];
+      if (nk) {
+        logger.log("Offline Client created by cmd index " + cmdIndex +
+          ' method ' + method + ' url: ' + url);
+        if ('post' == method && /clients$/.test(url)) {
+          promise = promise.then(function(response) {
+            var rdata = response.data;
+            updateClientHash(rdata);
+            successCallback(rdata);
+          }, failureCallback );
+        } else {
+          promise = promise.then(function(response) {
+            successCallback(response.data);
+          }, failureCallback );
+        }
+      }
+
+      promise.finally(function() {
+        $rootScope.cmdIndex++;
+        if (commands.length) {
+          setTimeout(runNextCmd, 1000);
+        } else {
+          Cache.setObject('commands', []);
+          fn_final();
+        }
+      } );
     };
     setTimeout(runNextCmd, 1000);
   };
@@ -325,19 +373,23 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 
   $rootScope.$on('resetSession', function() {
-    if (!session.reset()) {
-      $rootScope.$broadcast('sessionExpired');
-    }
+    $rootScope.$broadcast('sessionExpired');
   } );
 
   session.reset = function() {
     session = Cache.getObject('session');
+    var username = Cache.get('username');
+    session.uname = username;
+    var roles = Roles.getRoles();
+    var role = roles[0];
+    session.role = role;
     return authHttp.resetAuthHeader();
   };
 
   session.login = function(auth, fn_success, fn_fail) {
 
     var onLogin = function(auth, data) {
+      var session = {};
       Cache.set('username', auth.username);
       session.uname = auth.username;
 
@@ -402,6 +454,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     } );
   };
 
+  session.getRole = function() {
+    var roles = Roles.getRoles();
+    return roles.length ? roles[0] : null;
+  };
+
   session.hasRole = function(r) {
     logger.log("Session::hasRole called for :" + r);
     var roles = Cache.get('roles');
@@ -437,7 +494,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 
   session.isAuthenticated = function() {
-    return (session.username() != null && session.username() != '');
+    var username = Cache.get('username');
+    return (username != null && username != '');
   };
 
   session.isAuthorized = function() {
@@ -501,13 +559,17 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var k = 'dt.' + name + '.' + id;
       var fdata = Cache.getObject(k);
       if (fdata) {
-        var fields;
-        if (fdata instanceof Object) {
-          fields = fdata;
-        } else if (fdata instanceof Array) {
-          fields = fdata[0];
-        }
+        logger.log("DATATABLE: " + k + " from Cache");
+        var fields = (fdata instanceof Array) ? fdata[0] : fdata;
         if (fields) {
+          for(n in fields) {
+            if (n.match(/_cd_/)) {
+              var v = fields[n];
+              if (v && 'string' == typeof(v) && v.match(/^\d+$/)) {
+                fields[n] = parseInt(v);
+              }
+            }
+          }
           fn_dtrow(fields, name);
         }
         return;
@@ -540,6 +602,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     save: function(name, id, fields, fn_fields, fn_offline, fn_fail) {
+      console.log(name);
+      console.log(id);
+      console.log(fields);
+      console.log(Settings.tenant);
       authHttp.post(baseUrl + '/datatables/' + name + '/' + id, fields, {
         "params": { "tenantIdentifier": Settings.tenant }
       }, function(response) {
@@ -560,10 +626,28 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_fail(response);
       } );
     },
-    saveOffline: function(name, fields, rid, method) {
+    saveOffline: function(name, id, fields, rid, method) {
+      var k = 'dt.' + name + '.' + id;
+      Cache.setObject(k, fields);
+      logger.log('DT::' + name + ' cached ' + JSON.stringify(fields));
       method = method || 'post';
       authHttp.saveOffline(baseUrl + '/datatables/' + name + '/:resourceId', fields, {}, rid, method);
-    }
+    },
+    saveLoanAccountExtraFiled: function(data,id, fn_fields, fn_offline, fn_fail) {
+      var data2 = {
+        "Guarantors": data.guarantors,
+        "other Collateral": data.otherCollateral
+      };
+      authHttp.post(baseUrl + '/datatables/Loan_Fields/'+id, data2,{
+        "params": { "Guarantors": data2.guarantors,
+                    "other Collateral": data2.otherCollateral
+                  }
+      }, function(response) {
+        console.log(response);
+      }, function(response) {
+        fn_fail(response);
+      } );
+    },
   };
 } ] )
 
@@ -574,7 +658,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       return [ "joiningDate", "Latitude", "Longitude", "Country", "Region",
         "Zone", "Wereda", "Kebele", "UniquePlaceName", "License Registration No" ];
     },
-    codeFields: function() { return []; },
+    codeFields: function() { return {}; },
     skipFields: function() { return {}; }
   };
 } )
@@ -598,7 +682,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     saveFields: function() {
       return ["openingDate", "name", "parentId"];
     },
-    codeFields: function() { return []; },
+    codeFields: function() { return {}; },
     skipFields: function() { return {} },
     prepareForm: function(office) {
       var sfs = this.saveFields;
@@ -642,13 +726,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     update: function(id, fields, fn_office, fn_offline, fn_fail) {
-      if (id.match('T[0-9]\+$')) {
+      if (id.match('^T[0-9]\+$')) {
         CachedHash.update('h_offices', id, function(office) {
           var cid = office.cid;
           HashUtil.copy(office, fields);
           if (cid) {
             HashUtil.copy(office, fields);
-            authHttp.replaceData(cid, office);
+            authHttp.saveOffline(baseUrl + '/offices/:resourceId', office, {}, cid, 'put');
             fn_office(office);
           } else {
             fn_fail(office);
@@ -689,7 +773,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     query: function(fn_offices) {
       var h_offices = Cache.getObject('h_offices') || {};
-      logger.log(h_offices);
       var offices = HashUtil.to_a(h_offices);
       if (offices.length) {
         fn_offices(offices);
@@ -743,7 +826,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       var s_clients = {};
       Clients.query(function(clients) {
         clients.map(function(c) {
-          logger.log(c);
           var oid = c.officeId;
           s_clients[oid] = s_clients[oid] || 0;
           ++s_clients[oid];
@@ -758,6 +840,16 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
         Cache.setObject('h_offices', offices);
       }
+    },
+    get_staff: function(id, fn_staff) {
+      console.log(id);
+      console.log("asdsad");
+      var staff = Cache.getObject('staff');
+      console.log(staff);
+      var ostaff = staff.filter(function(s) {
+        return s.officeId == id
+      } );
+      fn_staff(ostaff);
     },
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -910,7 +1002,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   }
 } ] )
 
-.factory('FormHelper', [ 'DateUtil', 'logger', function(DateUtil, logger) {
+.factory('Formatter', [ 'DateUtil', 'logger', function(DateUtil, logger) {
   return {
     prepareForm: function(type, object) {
       var sfs = type.saveFields().concat(type.dataTables());
@@ -939,9 +1031,36 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         }
       }
     },
+    preShow: function(type, object) {
+      var rObj = {};
+      var dfs = type.dateFields();
+      var cfs = type.codeFields();
+      var dfHash = {}, i = 0, len = dfs.length;
+      for(; i < len; ++i) {
+        dfHash[dfs[i]] = 1;
+      }
+      for(var k in object) {
+        var fn = cfs[k];
+        var v = object[k];
+        if (fn) {
+          if (v) {
+            rObj[k] = v;
+          } else {
+            rObj[k] = fn(object);
+          }
+        } else if (v) {
+          if (dfHash[k]) {
+            rObj[k] = DateUtil.isoDate(v);
+          } else {
+            rObj[k] = v;
+          }
+        }
+      }
+      return rObj;
+    },
     preSaveForm: function(type, object, isUpdate) {
       if (isUpdate == null) isUpdate = true;
-      logger.log("Called FormHelper.preSaveForm with " + JSON.stringify(object));
+      logger.log("Called Formatter.preSaveForm with " + JSON.stringify(object));
       var sObject = new Object();
       var skf = type.skipFields();
       var svf = type.saveFields();
@@ -961,11 +1080,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           if (!v) {
             continue;
           }
-          logger.log("Got date " + df + "=" + v);
           if (v instanceof Date) {
-            v = DateUtil.toISODateString(v);
+            v = DateUtil.toDateString(v);
+            logger.log("Changed JSDate " + df + " to " + v);
           }
-          logger.log("Got date " + df + "=" + v);
           sObject[df] = v;
         }
         sObject.dateFormat = "yyyy-MM-dd";
@@ -976,6 +1094,28 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
+.factory('Client_Fields', function() {
+  return {
+    dateFields: function() { return []; },
+    saveFields: function() {
+      return [ 'Fathers Name', 'Grandfathers Name', 'Number of males', 'Number of females',
+        'Education', 'Address', 'Email', 'MaritalStatus_cd_Marital Status', 'Country',
+        'ClientTitle_cd_Title', 'Region', 'Zone', 'Wereda', 'Kebele', 'UniquePlaceName' ];
+    },
+    codeFields: function() {
+      return {
+        'MaritalStatus_cd_Marital Status': function(dt) {
+          return dt['MaritalStatus_cd_Marital Status'];
+        },
+        'ClientTitle_cd_Title': function(dt) {
+          return dt['ClientTitle_cd_Title'];
+        }
+      };
+    },
+    skipFields: function() { return {}; }
+  };
+} )
+
 .factory('Client_NextOfKin', function() {
   return {
     dateFields: function() { return [ 'dateOfBirth' ]; },
@@ -984,7 +1124,16 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         'Relationship_cd_Relationship', 'Gender_cd_Gender', 'Country', 'Region', 'Zone',
         'Woreda', 'Kebele', 'UniquePlaceName' ];
     },
-    codeFields: function() { return [ 'Relationship_cd_Relationship', 'Gender_cd_Gender' ]; },
+    codeFields: function() {
+      return {
+        'Relationship_cd_Relationship': function(dt) {
+          return dt['Relationship_cd_Relationship'];
+        },
+        'Gender_cd_Gender': function(dt) {
+          return dt['Gender_cd_Gender'];
+        }
+      };
+    },
     skipFields: function() { return {}; }
   };
 } )
@@ -1015,6 +1164,26 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     return dName;
   };
   
+  var fetch_client_accounts = function(id, fn_accts) {
+    authHttp.get(baseUrl + '/clients/' + id + '/accounts')
+      .then(function(response) {
+        var accounts = response.data;
+        for(var atype in accounts) {
+          var k = 'client.' + id + '.' + atype;
+          //logger.log("Caching account " + k);
+          var accts = accounts[atype];
+          Cache.setObject(k, accts);
+          var i=0; n=accts.length;
+          for(; i<n; ++i) {
+            var acct = accts[i];
+            var k = 'share.' + acct.id;
+            Cache.setObject(k, acct);
+          }
+        }
+        fn_accts(accounts);
+      } );
+  };
+
   return {
     dateFields: function() {
       return ["dateOfBirth", "activationDate"];
@@ -1039,6 +1208,29 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         },
         "maritalStatusId": function(client) {
           return client.maritalStatus.id;
+        }
+      }
+    },
+    preShow: function(client) {
+      if (client["officeId"]) {
+        var hOffices = Cache.getObject('h_offices') || {};
+        var office = hOffices[client["officeId"]];
+        logger.log("Got client officeName: " + office.name);
+        client['officeName'] = office.name;
+      }
+      var keys = ['gender', 'clientType', 'clientClassification'], i = 0, len = keys.length;
+      for(; i < len; ++i) {
+        var k = keys[i];
+        var kId = k + 'Id';
+        fid = client[kId];
+        if (fid != null) {
+          var codeNm = k[0].toUpperCase() + k.substr(1);
+          client[k] = { id: fid };
+          logger.log("Finding client " + k + " in Codes:" + codeNm);
+          Codes.getCodeValue(codeNm, fid, function(name) {
+            client[k]['name'] = name;
+            logger.log("Setting client[" + k + "]" + " to " + JSON.stringify(client[k]));
+          } );
         }
       }
     },
@@ -1068,10 +1260,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       if (clients) {
         logger.log("Got cached clients: " + typeof(clients));
         if (!HashUtil.isEmpty(clients)) {
-          var a_clients = [];
-          for(var id in clients) {
-            a_clients.push(clients[id]);
-          }
+          var a_clients = HashUtil.to_a(clients);
           process_clients(a_clients);
           logger.log("Clients.query got "+a_clients.length+" cached clients");
         }
@@ -1097,10 +1286,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     query_inactive: function(fn_iClients) {
       logger.log("Going to call inactive clients");
-      var iClients = Cache.getObject('h_iClients') || {};
-      authHttp.get(baseUrl + '/clients?sqlSearch=status_enum=100')
-      .then(function(response) {
-        fn_iClients(response.data);
+      this.query(function(clients) {
+        var iClients = clients.filter(function(c) {
+          return c.status.value != 'Active';
+        } );
+        fn_iClients(iClients);
       } );
     },
     remove: function(id) {
@@ -1167,16 +1357,19 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     },
     update: function(id, client, fn_client, fn_offline, fn_fail) {
-      if (id.match('T[0-9]\+$')) {
+      if (id.match('^T[0-9]\+$')) {
+        logger.log('OFFLINE TEMP ID client found: ' + id);
         clients = Cache.getObject('h_clients');
-        var client = clients[id];
-        if (client) {
-          var cid = client.cid;
-          if (cid) {
-            HashUtil.copy(client, fields);
-            authHttp.replaceData(cid, client);
+        var old_client = clients[id];
+        if (old_client) {
+          logger.log("GOT CACHED CLIENT");
+          var cid = old_client.cid;
+          if (cid != null) {
+            authHttp.saveOffline(baseUrl + '/clients/:resourceId', client, {}, cid, 'put');
+            HashUtil.copy(old_client, client);
             Cache.setObject('h_clients', clients);
-            fn_client(client);
+            logger.log('CLIENT #'+id+' offline edit command saved');
+            fn_offline(client);
             return;
           }
         }
@@ -1217,6 +1410,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     get_codevalues: function(fn_codes) {
       var codes = {};
+      Codes.getValues("ClientTitle", function(tcodes) {
+        codes.ClientTitles = tcodes;
+      } );
       Codes.getValues("Gender", function(gcodes) {
         codes.genders = gcodes;
       } );
@@ -1237,13 +1433,30 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
       fn_codes(codes);
     },
-    get_accounts: function(id, fn_accts) {
-      authHttp.get(baseUrl + '/clients/' + id + '/accounts')
-        .then(function(response) {
-          var accounts = response.data;
-          accounts.share_count = parseInt(Math.random()*11);
-          fn_accts(accounts);
+    fetch_accounts: fetch_client_accounts,
+    get_accounts: function(id, atype, fn_accts, fn_fail) {
+      var k = 'client.' + id + '.' + atype;
+      var accounts = Cache.getObject(k);
+      if (accounts) {
+        fn_accts(accounts);
+      } else if (fn_fail != null) {
+        fn_fail();
+      }
+    },
+    get_all_accounts: function(id, fn_accts) {
+      var atypes = ['savingsAccounts', 'loanAccounts', 'shareAccounts'];
+      var i = 0;
+      var accounts = {};
+      while(i < 3) {
+        var atype = atypes[i++];
+        this.get_accounts(id, atype, function(accts) {
+          accounts[atype] = accts;
+        },  function() {
+          fetch_client_accounts(id, fn_accts);
+          return;
         } );
+      }
+      fn_accts(accounts);
     }
   };
 } ] )
@@ -1254,30 +1467,34 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     get_full: function(id, fn_customer, decode) {
       decode = null==decode && true;
       Clients.get(id, function(client) {
-        fn_customer(client);
-        var dts = Clients.dataTables();
-        angular.forEach(dts, function(dt) {
-          logger.log("Client DataTable:" + dt + " for #" + id);
+        var dts = Clients.dataTables(), i = 0, len = dts.length;
+        for(; i < len; ++i) {
+          var dt = dts[i];
+//          logger.log("Client DataTable:" + dt + " for #" + id);
           DataTables.get_one(dt, id, function(fields, dt) {
             client[dt] = decode ? DataTables.decode(fields) : fields;
             logger.log("Client #" + id + " " + dt +
               "::" + JSON.stringify(fields));
           } );
-        } );
+        }
+        fn_customer(client);
       } );
     },
     query_full: function(fn_customers) {
       Clients.query(function(clients) {
         fn_customers(clients);
-        for(var i = 0; i < clients.length; ++i) {
+        var i = 0, len = clients.length;
+        for(; i < len; ++i) {
           var client = clients[i];
           var id = client.id;
           var dts = Clients.dataTables();
-          angular.forEach(dts, function(dt) {
+          var i = 0, len = dts.length;
+          for(; i < len; ++i) {
+            var dt = dts[i];
             DataTables.get_one(dt, id, function(fields, dt) {
               client[dt] = DataTables.decode(fields);
             } );
-          } );
+          }
         }
       } );
     }
@@ -1317,19 +1534,24 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
    *  2. fn_img(img) callback function for image
    */
   return {
-    get: function(id, fn_img) {
-      authHttp.get(baseUrl + '/clients/' + id + '/images', {
-        'Accept': 'text/plain'
-      } ).then(function(response) {
-        logger.log("Image for client " + id + " received. Size: " + response.data.length);
-        fn_img(response.data);
-      } );
-    },
     getB64: function(id, fn_img) {
       authHttp.get(baseUrl + '/clients/' + id + '/images', {
-        'Accept': 'application/octet-stream'
+        headers: {
+          'Content-Type': 'text/plain',
+          'Accept': 'text/plain'
+        }
       } ).then(function(response) {
-        logger.log("Image for client " + id + " received[b64]. Size: " + response.data.length);
+        var rdata = response.data;
+        var left = rdata.substr(0, 22);
+        logger.log("Image for client " + id + " received[b64]:" + left + ". Size: " + rdata.length);
+        fn_img(rdata);
+      } );
+    },
+    get: function(id, fn_img) {
+      authHttp.get(baseUrl + '/clients/' + id + '/images', {
+        headers: { 'Accept': 'application/octet-stream' }
+      } ).then(function(response) {
+        logger.log("Image for client " + id + " received. Size: " + response.data.length);
         fn_img(response.data);
       } );
     },
@@ -1363,6 +1585,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 .factory('SavingsProducts', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
     get: function(id, fn_sav_prod) {
+      console.log("============+++++++++++++++++++++++",id);
       authHttp.get(baseUrl + '/savingsproducts/' + id)
         .then(function(response) {
           fn_sav_prod(response.data);
@@ -1389,45 +1612,124 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   }
 } ] )
 
-.factory('SavingsAccounts', [ 'authHttp', 'baseUrl', 'logger', function(authHttp, baseUrl, logger) {
+.factory('SavingsAccounts', [ 'authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
+    function(authHttp, baseUrl, logger, HashUtil, Cache) {
+
+  var fetch_account = function(accountNo, fn_sac) {
+    authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
+      .then(function(response) {
+        var accounts = Cache.getObject('h_savingsaccounts');
+        var account = accounts[accountNo];
+        if (account) {
+          accounts[accountNo] = response.data;
+        }
+        Cache.setObject('h_savingsaccounts', accounts);
+        fn_sac(response.data);
+      } );
+  };
+  var get_trans = function(id, transId, fn_trans) {
+    authHttp.get(baseUrl + '/savingsaccounts/' + id + '/transactions/' + transId)
+      .then(function(resp) {
+        fn_trans(resp.data);
+      } );
+  };
+
   return {
+    fetch: fetch_account,
     get: function(accountNo, fn_sac) {
-      authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
-        .then(function(response) {
-          fn_sac(response.data);
-        } );
+      var accounts = Cache.getObject('h_savingsaccounts');
+      var account = accounts[accountNo];
+      if (account != null) {
+        fn_sac(account);
+      } else {
+        fetch_account(accountNo, fn_sac);
+      }
     },
     query: function(fn_accts) {
-      console.log("======service=====");
       logger.log("SavingsAccounts.query called");
+      var accounts = Cache.getObject('h_savingsaccounts');
+      if (accounts) {
+        fn_accts(HashUtil.to_a(accounts));
+      } else {
+        this.fetch_all(fn_accts);
+      }
+    },
+    query_pending: function(fn_pending_accts) {
+      this.query(function(accounts) {
+        var pAccts = accounts.filter(function(a) {
+          return a.status.submittedAndPendingApproval
+        } );
+        fn_pending_accts(pAccts);
+      } );
+    },
+    fetch_all: function(fn_accts) {
       authHttp.get(baseUrl + '/savingsaccounts')
         .then(function(response) {
           var data = response.data;
           logger.log("Got " + data.totalFilteredRecords + " savings accounts.");
-          fn_accts(data.pageItems);
+          var accounts = data.pageItems;
+          var h_accts = HashUtil.from_a(accounts);
+//          logger.log("Accounts hash: " + JSON.stringify(h_accts));
+          Cache.setObject('h_savingsaccounts', h_accts);
+          fn_accts(accounts);
         } );
     },
     save: function(fields, fn_success, fn_offline, fn_fail) {
       authHttp.post(baseUrl + '/savingsaccounts', fields, {},
         function(response) {
           var data = response.data;
-          if (response.status == 202) {
-            fn_offline(data);
+          if (202 === response.status) { /*
+            clients = Cache.getObject('h_clients') || {};
+            var id = HashUtil.nextKey(clients);
+            client["id"] = id;
+            clients[id] = client;
+            client["displayName"] = get_displayName(client);
+            client["cid"] = response.cid;
+            Cache.setObject('h_clients', clients); */
+            fn_offline(fields);
           } else {
-            fn_success(data);
+            /* clients = Cache.getObject('h_clients') || {};
+            logger.log("Created client resp: "+JSON.stringify(response.data));
+            var data = response.data;
+            var id = data.resourceId;
+            fetch_client(id, function(new_client) {
+              clients[id] = new_client;
+              Cache.setObject('h_clients', clients);
+              fn_client(new_client);
+            } ); */
+            var id = data.resourceId
+            fetch_account(id, function(new_account) {
+              fn_success(new_account);
+            } );
           }
         },
         function(response) {
           fn_fail(response);
         } );
     },
+    get_trans: get_trans,
     withdraw: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=withdrawal',
         params, {}, function(response) {
           var data = response.data;
-          fn_res(data);
-        }, function(response) {
-          fn_offline(response);
+          if (202 == response.status) {
+            var sacsHash = Cache.get('h_savingsaccounts');
+            var bal = sacsHash[id]['summary']['accountBalance'], amt = params.transactionAmount;
+            if (bal < amt) {
+              sacsHash[id]['summary']['accountBalance'] = bal - amt;
+              Cache.setObject('h_savingsaccounts', sacsHash);
+            }
+            fn_offline(params);
+            return;
+          }
+          var transId = data.resourceId;
+          logger.log("Transaction #" + transId);
+          fetch_account(id, function(account){
+            logger.log("Updated cached account");
+          } );
+          get_trans(id, transId, function(trans) {
+            fn_res(trans);
+          } );
         }, function(response) {
           logger.log("Failed to withdraw. Received " + response.status);
           fn_err(response);
@@ -1437,12 +1739,54 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=deposit',
         params, {}, function(response) {
           var data = response.data;
-          fn_res(data);
-        }, function(response) {
-          fn_offline(response);
+          if (202 == response.status) {
+            var sacsHash = Cache.get('h_savingsaccounts');
+            sacsHash[id]['summary']['accountBalance'] += params.transactionAmount;
+            logger.log("New balance: " + sacsHash[id]['summary']['accountBalance']);
+            Cache.setObject('h_savingsaccounts', sacsHash);
+            fn_offline(params);
+            return;
+          }
+          var transId = data.resourceId;
+          logger.log("Transaction #" + transId);
+          fetch_account(id, function(account){
+            logger.log("Updated cached account");
+          } );
+          get_trans(id, transId, function(trans) {
+            fn_res(trans);
+          } );
         }, function(response) {
           logger.log("Failed to deposit. Received " + response.status);
           fn_err(response);
+        } );
+    },
+    approve: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '?command=approve',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    reject: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '?command=reject',
+        data, {}, function(response) {
+          fn_success(response);
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    activate: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '?command=activate',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+        }, function(response) {
+          fn_fail(response);
         } );
     },
     getClientSavingForm: function(productID,cilentID,fn_sav_prods) {
@@ -1456,21 +1800,91 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
-.factory('LoanAccounts', [ 'authHttp', 'baseUrl', 'logger', function(authHttp, baseUrl, logger) {
+// 'LoanAccounts' --> 'LoanProducts'
+.factory('LoanProducts', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
-    get: function(accountNo, fn_account) {
-      authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
+    get: function(id, fn_loan_prod) {
+      console.log("============+++++++++++++++++++++++",id);
+      authHttp.get(baseUrl + '/loanproducts/' + id)
         .then(function(response) {
-          fn_account(response.data);
+          fn_loan_prod(response.data);
         } );
+    },
+    query: function(fn_loan_prods) {
+      console.log("=====");
+      var products = Cache.getObject('loanproducts');
+      if (products) {
+        fn_loan_prods(products);
+      } else {
+        this.fetch_all(fn_loan_prods);
+      }
+    },
+    fetch_all: function(fn_loan_prods) {
+      authHttp.get(baseUrl + '/loanproducts')
+        .then(function(response) {
+          var data = response.data;
+          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          Cache.setObject('loanproducts', data);
+          fn_loan_prods(data);
+        } );
+    }
+  }
+} ] )
+
+.factory('LoanAccounts', ['authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
+    function(authHttp, baseUrl, logger, HashUtil, Cache) {
+  var fetch_account = function(accountNo, fn_lac) {
+    authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
+      .then(function(response) {
+        fn_lac(response.data);
+      } );
+  };
+  return {
+    fetch: fetch_account,
+    get: function(id, fn_lac) {
+      var accounts = Cache.getObject('h_loans');
+      var loan = accounts[id];
+      if (loan) {
+        fn_lac(loan);
+      } else {
+        fetch_account(id, fn_lac);
+      }
     },
     query: function(fn_accounts) {
       logger.log("LoanAccounts query called");
+      var accounts = Cache.getObject('h_loans');
+      if (accounts) {
+        fn_accounts(HashUtil.to_a(accounts));
+      } else {
+        this.fetch_all(fn_accounts);
+      }
+    },
+    query_pending: function(fn_pending_accts) {
+      this.query(function(accounts) {
+        var pAccts = accounts.filter(function(a) {
+          return !a.status.active
+        } );
+        fn_pending_accts(pAccts);
+      } );
+    },
+    fetch_all: function(fn_loans) {
       authHttp.get(baseUrl + '/loans')
         .then(function(response) {
           var data = response.data;
-          fn_accounts(data.pageItems);
+          var accounts = data.pageItems;
+          var h_loans = HashUtil.from_a(accounts);
+          Cache.setObject('h_loans', h_loans);
+          fn_loans(accounts);
         } );
+    },
+    getProductData: function(fn_sav_prods) {
+      console.log("=====");
+      var products = Cache.getObject('loanproducts');
+      if (products) {
+        fn_sav_prods(products);
+      } else {
+        this.fetch_all(fn_sav_prods);
+      }
     },
     repay: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/loans/' + id + '?command=repayment')
@@ -1487,6 +1901,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     retrieveLoanDetails: function(id, fn_account) {
       authHttp.get(baseUrl + '/loans/template/' + '?templateType=individual&clientId='+id)
         .then(function(response) {
+          Cache.setObject('loansproduct', response);
           fn_account(response.data);
         } );
     },
@@ -1496,14 +1911,52 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_account(response.data);
         } );
     },
-    createLoan: function(createLoanData, fn_success, fn_offline, fn_fail) {
-      authHttp.post(baseUrl + '/loans', createLoanData, {},
+    approve: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=approve',
+        data, {}, function(response) {
+          if (202 == response.status) {
+            var loans = Cache.getObject('h_loans');
+            loans[id]['status']['pendingApproval'] = true;
+            loans[id]['status']['waitingForDisbursal'] = false;
+            Cache.setObject('h_loans', loans);
+            return;
+          }
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    reject: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=reject',
+        data, {}, function(response) {
+          fn_success(response);
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    disburse: function(id, data, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=disburse',
+        data, {}, function(response) {
+          fetch_account(id, function(account) {
+            fn_success(account);
+          } );
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    save: function(loanData, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans', loanData, {},
         function(response) {
           var data = response.data;
           if (response.status == 202) {
-            fn_offline(data);
+            fn_offline(loanData);
           } else {
-            fn_success(data);
+            var id = data.resourceId;
+            fetch_account(id, function(loan) {
+              fn_success(loan);
+            } );
           }
         },
         function(response) {
@@ -1513,15 +1966,32 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
+.factory('ShareProducts', ['authHttp', 'baseUrl', 'Cache', 'logger', '$q',
+    function(authHttp, baseUrl, Cache, logger, $q) {
 
-.factory('ShareProducts', ['authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
+  var url = baseUrl + '/products/share';
+
   return {
-    url: baseUrl + '/products/share',
-    get: function(id, fn_sh_prod) {
-      authHttp.get(this.url + '/' + id)
+    fetch_one: function(id, fn_sh_prod) {
+      authHttp.get(url + '/' + id)
         .then(function(response) {
-          fn_sh_prod(response.data);
+          var data = response.data;
+          fn_sh_prod(data);
         } );
+    },
+    get: function(id, fn_sh_prod) {
+      var products = Cache.getObject('shareproducts');
+      var i=0, n=products.length;
+      for(; i < n; i++) {
+        var prod = products[i];
+        prod.id = id;
+        fn_sh_prod(prod);
+      }
+    },
+    get_first: function(fn_sh_prod) {
+      this.query(function(prods) {
+        fn_sh_prod(prods[0]);
+      } );
     },
     query: function(fn_sh_prods) {
       var products = Cache.getObject('shareproducts');
@@ -1534,10 +2004,24 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
     },
     fetch_all: function(fn_sh_prods) {
-      authHttp.get(this.url)
+      authHttp.get(url)
         .then(function(response) {
           var data = response.data;
-          Cache.setObject('shareproducts', data.pageItems);
+          var prods = data.pageItems;
+          var promises = [];
+          var share_products = [];
+          var i = 0, n = prods.length;
+          for(; i < n; i++) {
+            promises.push(authHttp.get(url + '/' + prods[i].id)
+              .then(function(response) {
+                var data = response.data;
+                share_products.push(data);
+              } ));
+          }
+          $q.all(promises).then(function() {
+            logger.log("All products loaded: " + JSON.stringify(share_products));
+            Cache.setObject('shareproducts', share_products);
+          } );
           fn_sh_prods(data);
         } );
     }
@@ -1546,9 +2030,23 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
 .factory('Shares', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
-    url: baseUrl + '/account/share',
-    get: function(clientId, fn_shares) {
-      logger.log("Shares called for:"+clientId);
+    url: baseUrl + '/accounts/share',
+    get: function(id, fn_shares) {
+      logger.log("Shares called for:"+id);
+      var share = Cache.getObject('share.' + id);
+      if (share) {
+        logger.log("Got cache share:" + JSON.stringify(share));
+        fn_shares(share);
+      } else {
+        authHttp.get(this.url + '/' + id)
+          .then(function(response) {
+            var share = response.data;
+            logger.log('Got share: ' + share);
+            fn_shares(share);
+          }, function(response) {
+            logger.log("Failed to get share:"+response.status);
+          } );
+      }
     },
     query: function(fn_shares) {
       logger.log("Shares called");
@@ -1565,7 +2063,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           fn_shares(share);
         },
         function(err_resp) {
-          logger.log("Failed to create shares");
+          logger.log("Failed to create share");
         } );
     },
     update: function(id, sfields, fn_shares, fn_offline, fn_fail) {
@@ -1590,7 +2088,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     "Gender": 4,
     "ClientClassification": 17,
     "Relationship": 26,
+    "ClientTitle": 28,
     "ClientType": 16,
+    "Loan purpose": 3,
     "MaritalStatus": 27
   };
 
@@ -1657,16 +2157,18 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
-.factory('MifosEntity', [ 'authHttp', 'DataTables', function(authHttp, DataTables) {
+.factory('MifosEntity', ['authHttp', 'DataTables', function(authHttp, DataTables) {
   var obj;
 
   return {
     init: function(config) {
       obj.name = config.name;
       var dataTables = config.dataTables;
-      angular.forEach(dataTables, function(dt) {
+      var i = 0, len = dataTables.length;
+      for(; i < len; ++i) {
+        dt = dataTables[i];
         obj[dt] = config[dt];
-      } );
+      }
       obj.fields = config.fields;
       obj.skipFields = config.skipFields;
     },

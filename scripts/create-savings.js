@@ -1,5 +1,4 @@
 var request = require("request");
-var prompt = require('prompt');
 var baseUrl = "https://kifiya.openmf.org/fineract-provider/api/v1";
 var headers = {
     'Content-Type': 'application/json',
@@ -7,16 +6,11 @@ var headers = {
     'Authorization': 'Basic bWlmb3M6a2Z0ZWNoMTIz'
 };
 
-prompt.start();
+var productId, clientId, officerId;
 
-console.log("Enter arguments");
-
-var productId, clientId;
-
-prompt.get(['productId', 'clientId'], function(err, result) {
-  if (err) { console.log("Error") }
-  createSaving(result);
-} );
+clientId = process.argv[2];
+productId = process.argv[3];
+officerId = process.argv[4];
 
 function setSubmitted(data, date) {
   var dt = date.toISOString().substr(0,10);
@@ -46,3 +40,12 @@ function createSaving(data) {
     }
   } );
 }
+
+var data = {
+  clientId: clientId,
+  productId: productId,
+  fieldOfficerId: officerId
+};
+
+createSaving(data);
+

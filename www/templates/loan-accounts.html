@@ -1,0 +1,52 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<style>
+.fullname {
+  padding-left: 5px;
+  margin-left: 5px;
+}
+</style>
+<ion-view view-title="Pending Loan Accounts">
+  <!-- ion-header-bar class="bar bar-dark">
+    <h2 class="title">Artist List</h2>
+  </ion-header-bar -->
+
+  <!-- <ion-nav-buttons side="right">
+      <a class="right button button-icon icon ion-person-stalker" href="#/tab/staff-register"></a>
+  </ion-nav-buttons> 
+
+  <div class="bar bar-subheader item-input-inset">
+    <label class="item-input-wrapper">
+      <i class="icon ion-search placeholder-icon"></i>
+      <input type="search" ng-model="searchQuery" placeholder="Search ..." />
+    </label>
+  </div> -->
+  <ion-content class="has-subheader">
+    <ion-list>
+
+      <ion-item class="item-remove-animate item-avatar item-icon-left item-icon-right"
+          ng-repeat="a in accounts" type="item-text-wrap" href="#/tab/loan/{{a.id}}">
+        <div class="fullname">
+          <h2>#{{a.clientId}} {{a.clientName}}</h2>
+        </div>
+        <p>{{a.loanProductName}} #{{a.accountNo}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-assertive" ng-click="remove(client)">
+          Delete
+        </ion-option-button>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

@@ -126,7 +126,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.sacco-list', {
     url: '/saccos',
     views: {
-      'tab-saccos': {
+      'menuContent': {
         templateUrl: 'templates/tab-saccos.html',
         controller: 'SACCOListCtrl'
       }
@@ -135,7 +135,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.sacco-view', {
     url: '/saccos/:saccoId',
     views: {
-      'tab-saccos': {
+      'menuContent': {
         templateUrl: 'templates/sacco-view.html',
         controller: 'SACCOViewCtrl'
       }
@@ -144,7 +144,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.sacco-edit', {
     url: '/saccos/:saccoId/edit',
     views: {
-      'tab-saccos': {
+      'menuContent': {
         templateUrl: 'templates/sacco-edit.html',
         controller: 'SACCOEditCtrl'
       }
@@ -153,7 +153,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.sacco-reg', {
     url: '/sacco-register',
     views: {
-      'tab-saccos': {
+      'menuContent': {
         templateUrl: 'templates/sacco-edit.html',
         controller: 'SACCORegCtrl'
       }
@@ -163,7 +163,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.staff', {
     url: '/staff',
     views: {
-      'tab-staff': {
+      'menuContent': {
         templateUrl: 'templates/tab-staff.html',
         controller: 'StaffCtrl'
       }
@@ -172,7 +172,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.staff-detail', {
     url: '/staff/:staffId',
     views: {
-      'tab-staff': {
+      'menuContent': {
         templateUrl: 'templates/staff-details.html',
         controller: 'StaffDetailCtrl'
       }
@@ -182,7 +182,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.clients', {
     url: '/clients',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/tab-clients.html',
         controller: 'ClientsCtrl'
       }
@@ -191,7 +191,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.iclients', {
     url: '/clients/inactive',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/tab-inactiveClients.html',
         controller: 'InactiveClientsCtrl'
       }
@@ -200,16 +200,25 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-detail', {
     url: '/clients/:clientId',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/client-detail.html',
-        controller: 'ClientDetailCtrl'
+        controller: 'ClientViewCtrl'
       }
     }
   })
+  .state('tab.client-share', {
+    url: '/share/:id',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/share-view.html',
+        controller: 'ShareViewCtrl'
+      }
+    }
+  } )
   .state('tab.client-shares-buy', {
     url: '/clients/:id/shares-buy',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/shares-buy.html',
         controller: 'SharesBuyCtrl'
       }
@@ -218,7 +227,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-sav-new', {
     url: '/clients/:id/savings-apply',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/saving-open.html',
         controller: 'SavingsAccCreateCtrl'
       }
@@ -227,7 +236,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-documents', {
     url: '/clients/:id/docs',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/documents.html',
         controller: 'DocumentCtrl'
       }
@@ -236,7 +245,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-savings', {
     url: '/savingsAccount/:id',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/savings-details.html',
         controller: 'SavingsAccountCtrl'
       }
@@ -245,7 +254,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-sav-trans', {
     url: '/savingsAccount/:id/transactions',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/savings-transactions-summary.html',
         controller: 'SATransCtrl'
       }
@@ -254,7 +263,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-loan-new', {
     url: '/clients/:id/loan-apply',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/loan-apply.html',
         controller: 'LoansAccCreateCtrl'
       }
@@ -263,7 +272,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-loan', {
     url: '/loan/:id',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/loan-details.html',
         controller: 'LoanAccountCtrl'
       }
@@ -272,7 +281,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-loan-trans', {
     url: '/loan/:id/transactions',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/loan-transactions-summary.html',
         controller: 'LoanTransCtrl'
       }
@@ -281,7 +290,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-edit', {
     url: '/clients/:clientId/edit',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/client-edit.html',
         controller: 'ClientEditCtrl'
       }
@@ -290,7 +299,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-reg', {
     url: '/client-register',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/client-edit.html',
         controller: 'ClientRegCtrl'
       }
@@ -299,7 +308,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.client-next-of-kin', {
     url: '/clients/:clientId/next-of-kin',
     views: {
-      'tab-clients': {
+      'menuContent': {
         templateUrl: 'templates/client-next-of-kin.html',
         controller: 'ClientNextOfKinCtrl'
       }
@@ -318,7 +327,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.dashboard-logs', {
     url: '/dashboard/logs',
     views: {
-      'tab-dashboard': {
+      'menuContent': {
         templateUrl: 'templates/logs.html',
         controller: 'LogsCtrl'
       }
@@ -330,10 +339,40 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     controller: 'LogsCtrl'
   } )
 
+  .state('tab.dashboard-pending-savings', {
+    url: '/dashboard/pending-savings',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/savings-accounts.html',
+        controller: 'PendingSavingsCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-pending-loans', {
+    url: '/dashboard/pending-loans',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/loan-accounts.html',
+        controller: 'PendingLoanCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dasbboard-active-clients', {
+    url: '/dashboard/active-clients',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/active-clients.html',
+        controller: 'ActiveClientsCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {
-      'tab-dashboard': {
+      'menuContent': {
         templateUrl: 'templates/settings.html',
         controller: 'SettingsCtrl'
       }
@@ -343,7 +382,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
   .state('tab.dashboard', {
     url: '/dashboard',
     views: {
-      'tab-dashboard': {
+      'menuContent': {
         templateUrl: 'templates/tab-dashboard.html',
         controller: 'DashboardCtrl'
       }

@@ -39,13 +39,43 @@ label {
       <ion-item>
         <label>Account Type:</label> {{data.productName || "Unspecified"}}
       </ion-item>
-      <ion-item>
+      <ion-item ng-show="data.status">
+        <label>Account Status:</label> {{data.status || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="data.status">
+        <label>Interest Rate:</label> {{data.interestRate || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="data.status">
+        <label>Interest Compounded:</label> {{data.interestCompoundingPeriod || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="data.status">
+        <label>Interest Posted:</label> {{data.interestPostingPeriod || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="data.status">
+        <label>Interest Method:</label> {{data.interestCalculation || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="data.status && (rolestat.isAdmin || rolestat.isManagement)">
+        <ion-button-bar>
+          <button class="button button-assertive leftBtn"
+              ng-click="rejectAccount(data)">
+            Reject
+            <i class="icon ion-close-round"></i>
+          </button>
+          <button class="button button-positive rightBtn"
+              ng-click="approveAccount(data)">
+            Approve & Activate
+            <i class="icon ion-android-checkmark-circle"></i>
+          </button>
+        </ion-button-bar>
+      </ion-item>
+
+      <ion-item ng-hide="data.status">
         <label>Account Balance:</label> {{data.accountBalance || "Unspecified"}}
       </ion-item>
-      <ion-item class="item-divider">
+      <ion-item class="item-divider" ng-hide="data.status">
         <p class="centered">ACTIONS</p>
       </ion-item>
-      <ion-item>
+      <ion-item ng-hide="data.status">
         <p class="centered">
           <a href="" class="button button-positive" ng-click="makeDeposit()"> Deposit </a>
           <a href="" class="button button-calm" ng-click="doWithdrawal()"> Withdraw </a>
@@ -54,8 +84,8 @@ label {
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
-      <ion-item>
-        <a class="button button-block button-dark" href="#/savingsAccount/{{data.id}}/transactions">
+      <ion-item ng-hide="data.status">
+        <a class="button button-block button-dark" href="#/tab/savingsAccount/{{data.id}}/transactions">
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </a>
       </ion-item>
