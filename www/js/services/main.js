@@ -1890,13 +1890,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
     },
     repay: function(id, params, fn_res, fn_offline, fn_err) {
-      authHttp.post(baseUrl + '/loans/' + id + '?command=repayment')
-        .then(function(response) {
+      authHttp.post(baseUrl + '/loans/' + id + '/transactions?command=repayment',
+        params, {}, function(response) {
           if (202 == response.status) {
             fn_offline(response);
             return;
           }
-          fn_res(response.data);
+          fetch_account(id, fn_res);
         }, function(response) {
           fn_err(response);
         } );

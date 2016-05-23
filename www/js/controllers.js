@@ -1233,7 +1233,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
-  LoanAccounts.get(id, function(lac) {
+  var update_loan = function(lac) {
     $scope.accountData = lac;
     $scope.data.expectedDisbursementDate = DateUtil.localDate(lac.timeline.expectedDisbursementDate);
     $scope.data.submittedOnDate = DateUtil.localDate(lac.timeline.submittedOnDate);
@@ -1252,7 +1252,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         return a.status.active;
       } );
     } );
-  } );
+  };
+  LoanAccounts.get(id, update_loan);
   $scope.viewTransactions = function(id){
     $location.path("/tab/loan/"+id+"/transactions");
   }
@@ -1335,11 +1336,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       buttons: [ {
         text: 'Cancel'
       }, {
-        text: 'Repayment',
+        text: 'Repay',
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.repayment.transAmount,
-            transactionDate: $scope.repayment.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.repayment.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1350,7 +1351,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               type: 'info',
               text: 'Repayment successful!'
             };
+            update_loan(data);
           }, function(res) {
+            $scope.data.totalRepayment += $scope.repayment.transAmount;
             $scope.message = {
               type: 'info',
               text: 'Repayment accepted..'
