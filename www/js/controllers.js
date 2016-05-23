@@ -280,9 +280,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 .controller('SACCORegCtrl', ['$scope', 'SACCO', 'Office', 'DataTables',
-    'FormHelper', 'Formatter', 'HashUtil', 'SACCO_Fields', 'logger',
-    function($scope, SACCO, Office, DataTables,
-    FormHelper, Formatter, HashUtil, SACCO_Fields, logger) {
+    'Formatter', 'HashUtil', 'SACCO_Fields', 'logger',
+    function($scope, SACCO, Office, DataTables, Formatter, HashUtil, SACCO_Fields, logger) {
 
   $scope.data = {};
   SACCO.query_sacco_unions(function(data) {
@@ -338,9 +337,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 .controller('SACCOEditCtrl', [ '$scope', '$stateParams', 'Office', 'SACCO',
-    'FormHelper', 'Formatter', 'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
+    'Formatter', 'DataTables', 'DateUtil', 'logger', 'SACCO_Fields',
     function($scope, $stateParams, Office, SACCO,
-    FormHelper, Formatter, DataTables, DateUtil, logger, SACCO_Fields) {
+    Formatter, DataTables, DateUtil, logger, SACCO_Fields) {
 
   var officeId = $stateParams.saccoId;
   logger.log("SACCO Edit invoked: " + officeId);
@@ -1636,10 +1635,10 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 .controller('ClientEditCtrl', ['$scope', '$stateParams', 'Customers', 'HashUtil',
     '$state', 'Clients','ClientImages', 'Client_Fields', 'Client_NextOfKin', 'DateUtil',
-    'DataTables', 'Codes', 'FormHelper', 'Formatter', 'SACCO', 'logger',
+    'DataTables', 'Codes', 'Formatter', 'SACCO', 'logger',
     function($scope, $stateParams, Customers, HashUtil,
     $state, Clients, ClientImages, Client_Fields, Client_NextOfKin, DateUtil,
-    DataTables, Codes, FormHelper, Formatter, SACCO, logger) {
+    DataTables, Codes, Formatter, SACCO, logger) {
 
   $scope.clientMinRequiredAge=14;
   console.log("Client Min Age: " + $scope.clientMinRequiredAge);
@@ -1779,7 +1778,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 .controller('ClientRegCtrl', [ '$scope', 'Clients', 'ClientImages', 'DateUtil', '$state', 'HashUtil',
-    'DataTables', 'Codes', 'SACCO', 'FormHelper', 'Formatter', 'logger', 'Cache', 'Client_NextOfKin', 'Client_Fields',
+    'DataTables', 'Codes', 'SACCO', 'Formatter', 'logger', 'Cache', 'Client_NextOfKin', 'Client_Fields',
     function($scope, Clients, ClientImages, DateUtil, $state, HashUtil,
     DataTables, Codes, SACCO, Formatter, logger, Cache, Client_NextOfKin, Client_Fields) {
 
