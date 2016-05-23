@@ -1228,7 +1228,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } )
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,
-    HashUtil, DateUtil, $location) {
+    Clients, HashUtil, DateUtil, $location) {
   console.log("dsadasdasd===");
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
@@ -1246,6 +1246,12 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.data.totalOutstanding = summary.totalOutstanding;
       $scope.data.totalRepayment = summary.totalRepayment;
     }
+    var clientId = lac.clientId;
+    Clients.get_accounts(clientId, 'loanAccounts', function(accounts) {
+      $scope.data.activeAccounts = accounts.filter(function(a) {
+        return a.status.active;
+      } );
+    } );
   } );
   $scope.viewTransactions = function(id){
     $location.path("/tab/loan/"+id+"/transactions");

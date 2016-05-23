@@ -80,6 +80,9 @@
       </div>
       
     <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
+      <div ng-if="data.activeAccounts.length">
+        <strong>Client already has {{data.activeAccounts.length}} active loans.</strong>
+      </div>
       <ion-button-bar>
         <button class="button button-assertive leftBtn"
             ng-click="rejectAccount()" ng-show="data.status.pendingApproval">
