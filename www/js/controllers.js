@@ -1338,16 +1338,16 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 .controller('LoanAccountCtrl', [ '$scope', '$stateParams', 'LoanAccounts',
-    '$ionicPopup', 'logger', 'HashUtil', 'DateUtil', '$location',
+    '$ionicPopup', 'logger', 'Clients', 'HashUtil', 'DateUtil', '$location',
     function($scope, $stateParams, LoanAccounts,
-    $ionicPopup, logger, HashUtil, DateUtil, $location) {
+    $ionicPopup, logger, Clients, HashUtil, DateUtil, $location) {
 
   console.log("dsadasdasd===");
 
   var id = $stateParams.id;
   logger.log("LoanAccountsCtrl for " + id);
   $scope.data = {id: id};
-  LoanAccounts.get(id, function(lac) {
+  var update_loan = function(lac) {
     $scope.accountData = lac;
     $scope.data.expectedDisbursementDate = DateUtil.localDate(lac.timeline.expectedDisbursementDate);
     $scope.data.submittedOnDate = DateUtil.localDate(lac.timeline.submittedOnDate);
@@ -1360,7 +1360,14 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.data.totalOutstanding = summary.totalOutstanding;
       $scope.data.totalRepayment = summary.totalRepayment;
     }
-  } );
+    var clientId = lac.clientId;
+    Clients.get_accounts(clientId, 'loanAccounts', function(accounts) {
+      $scope.data.activeAccounts = accounts.filter(function(a) {
+        return a.status.active;
+      } );
+    } );
+  };
+  LoanAccounts.get(id, update_loan);
   $scope.viewTransactions = function(id){
     $location.path("/tab/loan/"+id+"/transactions");
   }
@@ -1443,11 +1450,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       buttons: [ {
         text: 'Cancel'
       }, {
-        text: 'Repayment',
+        text: 'Repay',
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.repayment.transAmount,
-            transactionDate: $scope.repayment.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.repayment.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1458,7 +1465,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               type: 'info',
               text: 'Repayment successful!'
             };
+            update_loan(data);
           }, function(res) {
+            $scope.data.totalRepayment += $scope.repayment.transAmount;
             $scope.message = {
               type: 'info',
               text: 'Repayment accepted..'
@@ -1485,6 +1494,20 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   LoanAccounts.get(id, function(lac) {
     $scope.data.accountNo = lac.accountNo;
     $scope.data.transactions = lac.transactions;
+  } );
+} ] )
+
+.controller('LoanSchedCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
+    function($scope, $stateParams, LoanAccounts, logger) {
+
+  var id = $stateParams.id;
+  logger.log("LoanSchedCtrl called with: " + id);
+  $scope.data = {id: id};
+  LoanAccounts.get(id, function(lac) {
+    $scope.data.accountNo = lac.accountNo;
+    var schedule = lac.repaymentSchedule;
+    logger.log("Repayment schedule: " + JSON.stringify(schedule, null, 2));
+    $scope.data.repaymentSchedule = schedule;
   } );
 } ] )
 
@@ -1947,14 +1970,15 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
       $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
     } );
+    LoanAccounts.query(function(accounts) {
+      accounts.forEach(function(a) {
+        LoanAccounts.fetch(a.id, function(ac){} );
+      } );
+    } );
     LoanAccounts.query_pending(function(pendingLoanAccounts) {
       logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
       $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
     } );
-    LoanAccounts.fetch_all(function(prods) {
-      console.log(prods);
-      logger.log("Got loans " + prods.length + " products");
-    });
 
     $scope.num_inactiveClients = 0;
     var role = Session.getRole();
