@@ -216,34 +216,6 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     }, Clients.fetch );
   } );
 
-  $rootScope.$on('$cordovaNetwork:online', function(e, ns) {
-    //$rootScope.isOnline = true;
-    //$scope.session.takeOnline();
-    logger.log("Going back online.");
-    authHttp.runCommands(function(n) {
-      if (n == 0) return;
-      var msg = "Starting to execute " + n + " commands";
-      logger.log(msg);
-      var stPopup = $ionicPopup.alert( {
-        title: "Syncing",
-        template: msg,
-        scope: $scope
-      } );
-
-    }, function() {
-      logger("SUCCESS"); // + method + " " + url + " :: " + JSON.stringify(data));
-    }, function() {
-      logger("FAILURE"); //: " + method + " " + url + " : " + response.status + " :: " + JSON.stringify(data));
-    }, function() {
-      logger.log("All commands done!");
-      var rptPopup = $ionicPopup.alert( {
-        title: 'Offline Commands',
-        template: 'All commands are done!',
-        scope: $scope
-      } );
-    }, Clients.fetch );
-  } );
-
   $rootScope.$on('sessionExpired', function() {
     var notifyPopup = $ionicPopup.alert({
       title: 'Session expired',
