@@ -80,6 +80,9 @@
       </div>
       
     <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
+      <div ng-if="data.activeAccounts.length">
+        <strong>Client already has {{data.activeAccounts.length}} active loans.</strong>
+      </div>
       <ion-button-bar>
         <button class="button button-assertive leftBtn"
             ng-click="rejectAccount()" ng-show="data.status.pendingApproval">
@@ -110,6 +113,11 @@
         <button class="button button-block button-dark" ng-click="viewTransactions(data.id)" >
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </button>
+      </ion-item>
+      <ion-item ng-show="data.status.active">
+        <a href="#/tab/loan/{{data.id}}/schedule" class="button button-block button-calm">
+          Repayment Schedule<span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
+        </a>
       </ion-item>
 
     </div>
