@@ -1372,6 +1372,18 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 } )
 
+.controller('LoanSchedCtrl', function($scope, $stateParams, LoanAccounts, logger) {
+  var id = $stateParams.id;
+  logger.log("LoanSchedCtrl called with: " + id);
+  $scope.data = {id: id};
+  LoanAccounts.get(id, function(lac) {
+    $scope.data.accountNo = lac.accountNo;
+    var schedule = lac.repaymentSchedule;
+    logger.log("Repayment schedule: " + JSON.stringify(schedule, null, 2));
+    $scope.data.repaymentSchedule = schedule;
+  } );
+} )
+
 .controller('ShareViewCtrl', function($scope, $stateParams, Shares) {
 
   Shares.get($stateParams.id, function(share) {
@@ -1823,14 +1835,15 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
       $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
     } );
+    LoanAccounts.query(function(accounts) {
+      accounts.forEach(function(a) {
+        LoanAccounts.fetch(a.id, function(ac){} );
+      } );
+    } );
     LoanAccounts.query_pending(function(pendingLoanAccounts) {
       logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
       $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
     } );
-    LoanAccounts.fetch_all(function(prods) {
-      console.log(prods);
-      logger.log("Got loans " + prods.length + " products");
-    });
 
     $scope.num_inactiveClients = 0;
     var role = Session.getRole();

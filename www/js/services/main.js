@@ -1831,10 +1831,15 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
 
 .factory('LoanAccounts', function(authHttp, baseUrl, logger, HashUtil, Cache) {
-  var fetch_account = function(accountNo, fn_lac) {
-    authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
+  var fetch_account = function(id, fn_lac) {
+    logger.log("Called Loan fetch_account: " + id);
+    authHttp.get(baseUrl + '/loans/' + id + '?associations=transactions,repaymentSchedule')
       .then(function(response) {
-        fn_lac(response.data);
+        var loan = response.data;
+        var loans = Cache.getObject('h_loans');
+        loans[id] = loan;
+        Cache.setObject('h_loans', loans);
+        fn_lac(loan);
       } );
   };
   return {

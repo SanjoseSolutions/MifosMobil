@@ -287,6 +287,15 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
       }
     }
   } )
+  .state('tab.client-loan-sched', {
+    url: '/loan/:id/schedule',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/loan-sched.html',
+        controller: 'LoanSchedCtrl'
+      }
+    }
+  } )
   .state('tab.client-edit', {
     url: '/clients/:clientId/edit',
     views: {

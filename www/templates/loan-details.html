@@ -111,6 +111,11 @@
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </button>
       </ion-item>
+      <ion-item ng-show="data.status.active">
+        <a href="#/tab/loan/{{data.id}}/schedule" class="button button-block button-calm">
+          Repayment Schedule<span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
+        </a>
+      </ion-item>
 
     </div>
 
