@@ -43,7 +43,7 @@
   height: 350px;
 }
 </style>
-<ion-view view-title="Active Client Report">
+<ion-view view-title="{{data.reportTitle||'Active Client Report'}}">
 <ion-content>
 <ion-item-list>
   <div class="card" style="height:300px;overflow:scroll" ng-show="data.show_saccos">
@@ -78,8 +78,8 @@
       <tbody>
         <tr ng-repeat="s in data.sels">
           <th>{{s.name}}</th>
-          <td>{{data.activeCount.Male[s.name]}}</td>
-          <td>{{data.activeCount.Female[s.name]}}</td>
+          <td>{{data.stat.Male[s.name]}}</td>
+          <td>{{data.stat.Female[s.name]}}</td>
         </tr>
       </tbody>
     </table>
