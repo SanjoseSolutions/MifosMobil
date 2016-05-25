@@ -1865,7 +1865,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     query_pending: function(fn_pending_accts) {
       this.query(function(accounts) {
         var pAccts = accounts.filter(function(a) {
-          return !a.status.active
+          return a.status.pendingApproval
         } );
         fn_pending_accts(pAccts);
       } );
