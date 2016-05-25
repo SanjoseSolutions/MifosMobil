@@ -984,7 +984,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
-            transactionDate: $scope.deposit.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.deposit.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1027,7 +1027,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
-            transactionDate: $scope.withdrawal.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
