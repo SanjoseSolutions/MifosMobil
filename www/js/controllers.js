@@ -2078,7 +2078,10 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } )
 
-.controller('SavProdRptCtrl', function($scope, SACCO, SavingsProducts, SavingsAccounts, Cache, logger) {
+.controller('SavProdRptCtrl', function($scope, SACCO,
+    SavingsProducts, SavingsAccounts, LoanProducts, LoanAccounts,
+    Cache, logger) {
+
   SACCO.query(function(saccos) {
     $scope.data = {
       saccos: saccos
@@ -2089,12 +2092,15 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     var id = $scope.data.saccoId;
     var prods = [];
     SavingsProducts.query(function(products) {
-      $scope.data.products = products;
+      $scope.data.savings_products = products;
+    } );
+    LoanProducts.query(function(products) {
+      $scope.data.loan_products = products;
     } );
     SavingsAccounts.query(function(accounts) {
       var i=0, n=accounts.length;
       var h_clients = Cache.getObject('h_clients');
-      var prod_savings = { 'Male': {}, 'Female': {} };
+      var prod_accounts = { 'Male': {}, 'Female': {} };
       for(; i<n; ++i) {
         var account = accounts[i];
         var clientId = account.clientId;
@@ -2105,57 +2111,78 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         var officeId = client.officeId;
         var g = client.gender;
         var gname = g.name;
-        if (officeId == id) {
+        if (account.status.active && officeId == id) {
           var prodName = account.savingsProductName;
-          var savings = prod_savings[gname][prodName] || 0;
+          var savings = prod_accounts[gname][prodName] || 0;
           savings += account.summary.accountBalance;
-          prod_savings[gname][prodName] = savings;
+          prod_accounts[gname][prodName] = savings;
         }
       }
-      logger.log("prod Savings: " + JSON.stringify(prod_savings, null, 2));
-      $scope.data.stat = prod_savings;
-      var data = [];
-      var products = $scope.data.products;
-      for(var gName in prod_savings) {
-        var gsav = prod_savings[gName];
-        var values = [];
-        var i=0, n=products.length;
+      LoanAccounts.query(function(accounts) {
+        var i=0, n=accounts.length;
         for(; i<n; ++i) {
-          var pName = products[i].name;
-          values.push( {
-            label: pName,
-            value: (gsav[pName] || 0)
+          var account = accounts[i];
+          var clientId = account.clientId;
+          var client = h_clients[clientId];
+          if (!client) continue;
+          var officeId = client.officeId;
+          var g = client.gender;
+          var gname = g.name;
+          if (account.status.active && officeId == id) {
+            var prodName = account.loanProductName;
+            var loans = prod_accounts[gname][prodName] || 0;
+            loans += account.summary.totalOutstanding;
+            prod_accounts[gname][prodName] = loans;
+          }
+        }
+        logger.log("prod Accounts: " + JSON.stringify(prod_accounts, null, 2));
+        $scope.data.stat = prod_accounts;
+        var data = [];
+        var savings_products = $scope.data.savings_products;
+        var loan_products = $scope.data.loan_products;
+        var products = savings_products.concat(loan_products);
+        $scope.data.products = products;
+        for(var gName in prod_accounts) {
+          var gsav = prod_accounts[gName];
+          var values = [];
+          var i=0, n=products.length;
+          for(; i<n; ++i) {
+            var pName = products[i].name;
+            values.push( {
+              label: pName,
+              value: (gsav[pName] || 0)
+            } );
+          }
+          data.push( {
+            key: gName,
+            color: (data.length ? "#ffbb11" : "#0022bb"),
+            values: values
           } );
         }
-        data.push( {
-          key: gName,
-          color: (data.length ? "#ffbb11" : "#0022bb"),
-          values: values
+        $scope.data.show_saccos = false;
+        logger.log("Got data: " + JSON.stringify(data, null, 2));
+        nv.addGraph(function() {
+          var chart = nv.models.multiBarChart()
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .height(300)
+            .margin({top: 30, right: 20, bottom: 20, left: 50})
+  //          .showValues(true)
+            .showControls(false)
+  //          .tooltips(true)
+  //          .transitionDuration(350)
+  //          .showControls(true)
+            ;
+
+          chart.yAxis.tickFormat(d3.format(',.2f'));
+  //        chart.rotateLabels(-45);
+          d3.select('#chart svg')
+            .datum(data)
+            .call(chart);
+
+          nv.utils.windowResize(chart.update);
+          return chart;
         } );
-      }
-      $scope.data.show_saccos = false;
-      logger.log("Got data: " + JSON.stringify(data, null, 2));
-      nv.addGraph(function() {
-        var chart = nv.models.multiBarChart()
-          .x(function(d) { return d.label })
-          .y(function(d) { return d.value })
-          .height(300)
-          .margin({top: 30, right: 20, bottom: 20, left: 50})
-//          .showValues(true)
-          .showControls(false)
-//          .tooltips(true)
-//          .transitionDuration(350)
-//          .showControls(true)
-          ;
-
-        chart.yAxis.tickFormat(d3.format(',.2f'));
-//        chart.rotateLabels(-45);
-        d3.select('#chart svg')
-          .datum(data)
-          .call(chart);
-
-        nv.utils.windowResize(chart.update);
-        return chart;
       } );
     } );
   };
