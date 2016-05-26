@@ -43,30 +43,20 @@
   height: 350px;
 }
 </style>
-<ion-view view-title="Active Client Report">
+<ion-view view-title="{{data.reportTitle||'Active Client Report'}}">
 <ion-content>
 <ion-item-list>
-  <div class="card" style="height:300px;overflow:scroll" ng-show="data.show_saccos">
-  <ion-item ng-repeat="s in data.saccos">
-    <label>
-      <input type="checkbox" checklist-model="data.sel_saccos" checklist-value="s.id" />
-      <span>#{{ s.id }}: </span>
-      <span>{{ s.name }}</span>
-    </label>
-  </ion-item>
+  <div class="card item">
+    <select ng-model="data.saccoId" ng-options="s.id as s.name for s in data.saccos"></select>
   </div>
   <ion-item>
     <ion-button-bar>
-    <button class="button button-calm" ng-click="toggleSaccos()">
-      <span ng-show="data.show_saccos">Hide SACCOs</span>
-      <span ng-hide="data.show_saccos">Show SACCOs</span>
-    </button>
     <button class="button button-positive rightBtn" ng-click="generateChart()" value="Generate Chart">
       Generate Chart
     </button>
     </ion-button-bar>
   </ion-item>
-  <ion-item id="report" ng-show="data.sels">
+  <ion-item id="report" ng-show="data.products">
     <table>
       <thead>
         <tr>
@@ -76,15 +66,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="s in data.sels">
-          <th>{{s.name}}</th>
-          <td>{{data.activeCount.Male[s.name]}}</td>
-          <td>{{data.activeCount.Female[s.name]}}</td>
+        <tr ng-repeat="p in data.products">
+          <th>{{p.name}}</th>
+          <td>{{data.stat.Male[p.name]}}</td>
+          <td>{{data.stat.Female[p.name]}}</td>
         </tr>
       </tbody>
     </table>
   </ion-item>
-  <div class="item" id="chart" ng-show="data.sels">
+  <div class="item" id="chart" ng-show="data.products">
     <svg></svg>
   </div>
 </ion-item-list>

@@ -1,0 +1,92 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<style>
+/*
+#report table,
+#report table th,
+#report table td {
+  border-style: solid;
+  border-color: #889;
+}
+*/
+#report table tr {
+  margin: 0;
+}
+#report table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+#report table thead th {
+  background-color: #11205f;
+  color: #fef;
+}
+#report table th,
+#report table td {
+  padding: 0 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #889;
+}
+#chart {
+  height: 350px;
+}
+</style>
+<ion-view view-title="{{data.reportTitle||'Active Client Report'}}">
+<ion-content>
+<ion-item-list>
+  <div class="card" style="height:300px;overflow:scroll" ng-show="data.show_saccos">
+  <ion-item ng-repeat="s in data.saccos">
+    <label>
+      <input type="checkbox" checklist-model="data.sel_saccos" checklist-value="s.id" />
+      <span>#{{ s.id }}: </span>
+      <span>{{ s.name }}</span>
+    </label>
+  </ion-item>
+  </div>
+  <ion-item>
+    <ion-button-bar>
+    <button class="button button-calm" ng-click="toggleSaccos()">
+      <span ng-show="data.show_saccos">Hide SACCOs</span>
+      <span ng-hide="data.show_saccos">Show SACCOs</span>
+    </button>
+    <button class="button button-positive rightBtn" ng-click="generateChart()" value="Generate Chart">
+      Generate Chart
+    </button>
+    </ion-button-bar>
+  </ion-item>
+  <ion-item id="report" ng-show="data.sels">
+    <table>
+      <thead>
+        <tr>
+        <th>SACCO</th>
+        <th>Male</th>
+        <th>Female</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="s in data.sels">
+          <th>{{s.name}}</th>
+          <td>{{data.stat.Male[s.name]}}</td>
+          <td>{{data.stat.Female[s.name]}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </ion-item>
+  <div class="item" id="chart" ng-show="data.sels">
+    <svg></svg>
+  </div>
+</ion-item-list>
+</ion-content>
+</ion-view>

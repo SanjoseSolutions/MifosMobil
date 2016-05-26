@@ -14,7 +14,7 @@
 -->
 <ion-view view-title="Open Saving Account">
   <ion-content ng-init="init()">
-  <form name="SavingAccCreateForm" novalidate>
+  <form name="savingAccCreateForm" novalidate>
 
     <div class="list padding">
       <div class="Mandatory">
@@ -22,15 +22,12 @@
           : Mandatory fields
       </div>
       <ion-item ng-show="message || savingAccCreateForm.$invalid">
-        <!-- div ng-hide="savingAccCreateForm.name.$pristine">
-          <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.required">
-            SACCO Name is required
+        <div ng-hide="savingAccCreateForm.minBalancePaid.$pristine">
+          <span class="ion-warn" ng-show="savingAccCreateForm.minBalancePaid.$error.required">
+            Minimum Savings Deposit mush be paid
           </span>
-          <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.minlength">
-            SACCO Name must be at least 3 characters
-          </span>
-        </div -->
-        <div ng-show="savingAccCreateForm.productId.$error.required">
+        </div>
+        <div ng-show="!savingAccCreateForm.productId.$pristine && savingAccCreateForm.productId.$error.required">
           <span class="ion-warn">Product is required</span>
         </div>
         <div ng-hide="savingAccCreateForm.openingDate.$pristine">
@@ -93,6 +90,13 @@
           <input type="tel" size="10" ng-minlength="1" name="initialDeposit"
             placeholder="Enter the value" ng-model="savings.minRequiredOpeningBalance">
         </label> <i class="icon ion-social-bitcoin"> </i>
+      </div>
+
+      <div class="item item-input-inset">
+        <label>
+        <input type="checkbox" id="minBalancePaid" name="minBalancePaid" ng-model="savings.minBalancePaid" value="true" required>
+        <span>Minumum opening balance paid?</span>
+        </label>
       </div>
 
       <div class="list card" ng-show="productSelected">

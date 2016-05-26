@@ -845,6 +845,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 
   $scope.prodChanged = function(productId) {
+    console.log(productId);
     if (!productId) return; // if null
     var product = $scope.prodHash[productId];
     $scope.product = product;
@@ -1064,7 +1065,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
-            transactionDate: $scope.deposit.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.deposit.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1107,7 +1108,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
-            transactionDate: $scope.withdrawal.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1158,6 +1159,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   var id = $stateParams.id;
   $scope.init = function() {
     Codes.getValues("Loan purpose", function(pcodes) {
+      console.log("Loan purpose",pcodes);
+      $scope.loanPurposeHash = HashUtil.from_a(pcodes);
       $scope.loanPurposes = pcodes;
     } );
     $scope.loan = {};
@@ -1166,31 +1169,54 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.loan.memberName = client.displayName;
     } );
     Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
+      console.log('own savings',savingsAccounts);
       $scope.linkAccounts = savingsAccounts.filter(function(a) {
         return a.status.active;
       } ).map(function(a) {
         a.name = a.accountNo + ' (' + a.productName + ')';
         return a;
       } );
+      $scope.ownSavingHash = HashUtil.from_a($scope.linkAccounts);
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log('loan officer',staff);
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.loanOfficerOptions = staff;
     } );
     LoanProducts.query(function(prods) {
+      console.log('product',prods);
       $scope.prodHash = HashUtil.from_a(prods);
       $scope.productList = prods;
     } );
   };
 
   $scope.prodChanged = function(prodId) {
+    console.log(prodId);
     var prodHash = $scope.prodHash;
     //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
     var prod = $scope.prodHash[prodId];
+    console.log(prod);
     $scope.productData = prod;
     $scope.loan.principalAmount = prod.principal;
     $scope.loan.loanTerm = prod.repaymentEvery;
     $scope.loan.repaymentsNo = prod.numberOfRepayments;
+    $scope.loan.name = prod.name;
+  };
+
+   $scope.loanpurposeChanged = function(prodId) {
+    console.log(prodId);
+    var loanPurposeHash = $scope.loanPurposeHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.loanPurposeHash[prodId];
+    $scope.loan.loanPurposeName = prod.name;
+  };
+
+  $scope.ownSavingChanged = function(prodId) {
+    console.log(prodId);
+    var ownSavingHash = $scope.loanPurposeHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.ownSavingHash[prodId];
+    $scope.loan.ownSavingName = prod.productName;
   };
 
   $scope.loanApply = function()  {
@@ -1256,6 +1282,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   $scope.saveLoanApplication = function(data){
     var product = $scope.productData;
+    console.log(product);
     var loan = $scope.loan;
     var loanData = {
       dateFormat : "dd/MM/yy",
@@ -1903,12 +1930,12 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 } ] )
 
-.controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts', 
-    'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',  '$ionicLoading',
+.controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
+    'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading',
     '$ionicPopup', 'SavingsProducts', 'logger', 'Clients', 'ShareProducts', 'LoanAccounts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts,
-      baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil, $ionicLoading,
-      $ionicPopup, SavingsProducts, logger, Clients, ShareProducts, LoanAccounts) {
+    baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil, $ionicLoading,
+    $ionicPopup, SavingsProducts, logger, Clients, ShareProducts, LoanAccounts) {
 
   var session = null;
 
@@ -2024,7 +2051,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     var sels = [];
     sel_saccos.forEach(function(s) {
       oHash[s] = true;
-      sels.push(s, h_offices[s]);
+      sels.push(h_offices[s]);
     } );
     $scope.data.sels = sels;
     Clients.query(function(clients) {
@@ -2040,7 +2067,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
           }
         }
       } );
-      $scope.data.activeCount = series;
+      $scope.data.stat = series;
       var data = [];
       for(var gname in series) {
         var gs = series[gname];
@@ -2067,6 +2094,299 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
           .height(300)
           .margin({top: 30, right: 20, bottom: 20, left: 140})
           .showValues(true)
+          .showControls(false)
+//          .tooltips(true)
+//          .transitionDuration(350)
+//          .showControls(true)
+          ;
+
+        chart.yAxis.tickFormat(d3.format(',.2f'));
+//        chart.rotateLabels(-45);
+        d3.select('#chart svg')
+          .datum(data)
+          .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+      } );
+    } );
+  };
+} ] )
+
+.controller('TotalSavingsCtrl', ['$scope', 'SACCO', 'SavingsAccounts', 'Cache', 'logger',
+    function($scope, SACCO, SavingsAccounts, Cache, logger) {
+
+  SACCO.query(function(saccos) {
+    $scope.data = {saccos: saccos, show_saccos: true};
+    $scope.data.reportTitle = 'Total Savings Report';
+  } );
+
+  $scope.toggleSaccos = function() {
+    $scope.data.show_saccos = !$scope.data.show_saccos;
+  };
+
+  $scope.generateChart = function() {
+    var oHash = {};
+    var sel_saccos = $scope.data.sel_saccos || [];
+    var sels = [];
+    var h_offices = Cache.getObject('h_offices');
+    sel_saccos.forEach(function(s) {
+      oHash[s] = true;
+      sels.push(h_offices[s]);
+    } );
+    $scope.data.sels = sels;
+    var cHash = Cache.getObject('h_clients');
+    SavingsAccounts.query(function(accounts) {
+      var obal = {};
+      accounts.forEach(function(a) {
+        logger.log("ClientId: " + a.clientId);
+        var client = cHash[a.clientId];
+        if (!client) {
+          logger.log("Client missing in hash: " + a.clientId);
+          return;
+        }
+        var officeId = client.officeId;
+        if (oHash[officeId] && client.active) {
+          var gName = client.gender.name;
+          obal[gName] = obal[gName] || {};
+          var oName = client.officeName;
+          var tbal = obal[gName][oName] || 0;
+          var abal = a.summary.accountBalance;
+          logger.log("Client #" + a.clientId + " account #" + a.accountNo + " savings:" + abal);
+          tbal += abal;
+          obal[gName][oName] = tbal;
+        }
+      } );
+      $scope.data.stat = obal;
+      var data = [];
+      for(var gname in obal) {
+        var gs = obal[gname];
+        var values = [];
+        var i = 0, n = sels.length;
+        for(; i<n; ++i) {
+          var oname = sels[i].name;
+          var val = gs[oname] || 0;
+          values.push( {
+            label: oname,
+            value: val
+          } );
+        }
+        var datum = {
+          key: gname,
+          color: (data.length ? "#ffbb11" : "#0022bb"),
+          values: values
+        };
+        data.push(datum);
+      }
+      $scope.data.show_saccos = false;
+      logger.log("Got data: " + JSON.stringify(data, null, 2));
+      nv.addGraph(function() {
+        var chart = nv.models.multiBarChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .height(300)
+          .margin({top: 30, right: 20, bottom: 20, left: 50})
+//          .showValues(true)
+          .showControls(false)
+//          .tooltips(true)
+//          .transitionDuration(350)
+//          .showControls(true)
+          ;
+
+        chart.yAxis.tickFormat(d3.format(',.2f'));
+//        chart.rotateLabels(-45);
+        d3.select('#chart svg')
+          .datum(data)
+          .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+      } );
+    } );
+  };
+} ] )
+
+.controller('SavProdRptCtrl', ['$scope', 'SACCO', 'SavingsProducts',
+    'SavingsAccounts', 'LoanProducts', 'LoanAccounts', 'Cache', 'logger',
+    function($scope, SACCO, SavingsProducts,
+    SavingsAccounts, LoanProducts, LoanAccounts, Cache, logger) {
+
+  SACCO.query(function(saccos) {
+    $scope.data = {
+      saccos: saccos
+    };
+  } );
+
+  $scope.generateChart = function() {
+    var id = $scope.data.saccoId;
+    var prods = [];
+    SavingsProducts.query(function(products) {
+      $scope.data.savings_products = products;
+    } );
+    LoanProducts.query(function(products) {
+      $scope.data.loan_products = products;
+    } );
+    SavingsAccounts.query(function(accounts) {
+      var i=0, n=accounts.length;
+      var h_clients = Cache.getObject('h_clients');
+      var prod_accounts = { 'Male': {}, 'Female': {} };
+      for(; i<n; ++i) {
+        var account = accounts[i];
+        var clientId = account.clientId;
+        var client = h_clients[clientId];
+        if (!client) {
+          continue;
+        }
+        var officeId = client.officeId;
+        var g = client.gender;
+        var gname = g.name;
+        if (account.status.active && officeId == id) {
+          var prodName = account.savingsProductName;
+          var savings = prod_accounts[gname][prodName] || 0;
+          savings += account.summary.accountBalance;
+          prod_accounts[gname][prodName] = savings;
+        }
+      }
+      LoanAccounts.query(function(accounts) {
+        var i=0, n=accounts.length;
+        for(; i<n; ++i) {
+          var account = accounts[i];
+          var clientId = account.clientId;
+          var client = h_clients[clientId];
+          if (!client) continue;
+          var officeId = client.officeId;
+          var g = client.gender;
+          var gname = g.name;
+          if (account.status.active && officeId == id) {
+            var prodName = account.loanProductName;
+            var loans = prod_accounts[gname][prodName] || 0;
+            loans += account.summary.totalOutstanding;
+            prod_accounts[gname][prodName] = loans;
+          }
+        }
+        logger.log("prod Accounts: " + JSON.stringify(prod_accounts, null, 2));
+        $scope.data.stat = prod_accounts;
+        var data = [];
+        var savings_products = $scope.data.savings_products;
+        var loan_products = $scope.data.loan_products;
+        var products = savings_products.concat(loan_products);
+        $scope.data.products = products;
+        for(var gName in prod_accounts) {
+          var gsav = prod_accounts[gName];
+          var values = [];
+          var i=0, n=products.length;
+          for(; i<n; ++i) {
+            var pName = products[i].name;
+            values.push( {
+              label: pName,
+              value: (gsav[pName] || 0)
+            } );
+          }
+          data.push( {
+            key: gName,
+            color: (data.length ? "#ffbb11" : "#0022bb"),
+            values: values
+          } );
+        }
+        $scope.data.show_saccos = false;
+        logger.log("Got data: " + JSON.stringify(data, null, 2));
+        nv.addGraph(function() {
+          var chart = nv.models.multiBarChart()
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .height(300)
+            .margin({top: 30, right: 20, bottom: 20, left: 50})
+  //          .showValues(true)
+            .showControls(false)
+  //          .tooltips(true)
+  //          .transitionDuration(350)
+  //          .showControls(true)
+            ;
+
+          chart.yAxis.tickFormat(d3.format(',.2f'));
+  //        chart.rotateLabels(-45);
+          d3.select('#chart svg')
+            .datum(data)
+            .call(chart);
+
+          nv.utils.windowResize(chart.update);
+          return chart;
+        } );
+      } );
+    } );
+  };
+} ] )
+
+.controller('LoanOutstandingCtrl', ['$scope', 'SACCO', 'LoanAccounts', 'Cache', 'logger',
+    function($scope, SACCO, LoanAccounts, Cache, logger) {
+
+  SACCO.query(function(saccos) {
+    $scope.data = {saccos: saccos, show_saccos: true};
+    $scope.data.reportTitle = 'Loan Outstanding Report';
+  } );
+
+  $scope.toggleSaccos = function() {
+    $scope.data.show_saccos = !$scope.data.show_saccos;
+  };
+
+  $scope.generateChart = function() {
+    var oHash = {};
+    var sel_saccos = $scope.data.sel_saccos || [];
+    var sels = [];
+    var h_offices = Cache.getObject('h_offices');
+    sel_saccos.forEach(function(s) {
+      oHash[s] = true;
+      sels.push(h_offices[s]);
+    } );
+    $scope.data.sels = sels;
+    LoanAccounts.query(function(accounts) {
+      var loan_outstanding = { 'Male': {}, 'Female': {} };
+      var h_clients = Cache.getObject('h_clients');
+      var i=0, n=accounts.length;
+      for(; i<n; ++i) {
+        var account = accounts[i];
+        var clientId = account.clientId;
+        var client = h_clients[clientId];
+        if (!client) continue;
+        var officeId = client.officeId;
+        var g = client.gender;
+        var gname = g.name;
+        if (account.status.active && oHash[officeId]) {
+          var oName = h_offices[officeId].name;
+          var loans = loan_outstanding[gname][oName] || 0;
+          loans += account.summary.totalOutstanding;
+          loan_outstanding[gname][oName] = loans;
+        }
+      }
+      logger.log("prod Accounts: " + JSON.stringify(loan_outstanding, null, 2));
+      $scope.data.stat = loan_outstanding;
+      var data = [];
+      for(var gName in loan_outstanding) {
+        var gLO = loan_outstanding[gName];
+        var values = [];
+        var i = 0, n = sels.length;
+        for(; i<n; ++i) {
+          var oName = sels[i].name;
+          values.push( {
+            label: oName,
+            value: (gLO[oName] || 0)
+          } );
+        }
+        data.push( {
+          key: gName,
+          color: (data.length ? "#ffbb11" : "#0022bb"),
+          values: values
+        } );
+      }
+      logger.log("data: " + JSON.stringify(data, null, 2));
+      $scope.data.show_saccos = false;
+      nv.addGraph(function() {
+        var chart = nv.models.multiBarChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .height(300)
+          .margin({top: 30, right: 20, bottom: 20, left: 50})
+//          .showValues(true)
           .showControls(false)
 //          .tooltips(true)
 //          .transitionDuration(350)

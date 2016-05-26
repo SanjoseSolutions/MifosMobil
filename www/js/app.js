@@ -372,8 +372,38 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     url: '/dashboard/active-clients',
     views: {
       'menuContent': {
-        templateUrl: 'templates/active-clients.html',
+        templateUrl: 'templates/sacco-report.html',
         controller: 'ActiveClientsCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-total-savings', {
+    url: '/dashboard/total-savings',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'TotalSavingsCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-savings-prods', {
+    url: '/dashboard/savings-prods',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-one-report.html',
+        controller: 'SavProdRptCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-loan-outstanding', {
+    url: '/dashboard/loan-outstanding',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'LoanOutstandingCtrl'
       }
     }
   } )

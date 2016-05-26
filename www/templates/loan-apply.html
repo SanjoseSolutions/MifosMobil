@@ -102,13 +102,15 @@ select, input[type=text] {
           </select>
         </label>
       </ion-item>
+
       <div class="item item-input-inset">
         <span class="input-label">Loan Purpose :</span>
         <label class="item-input-wrapper">
-          <select name="loanPurpose" ng-model="loan.loanPurposeId" ng-options="p.id as p.name for p in loanPurposes">
+          <select name="loanPurpose" ng-model="loan.loanPurposeId" ng-options="p.id as p.name for p in loanPurposes" ng-change="loanpurposeChanged(loan.loanPurposeId)">
           </select>
         </label>
       </div>
+
       <div class="item item-input-inset">
         <span class="input-label">
           Disbursement Date
@@ -153,7 +155,7 @@ select, input[type=text] {
       <div class="item item-input-inset">
         <span class="input-label">Own Savings:</span>
         <label class="item-input-wrapper">
-          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts">
+          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts" ng-change="ownSavingChanged(loan.linkAccountId)">
           </select>
         </label>
       </div>
@@ -197,9 +199,9 @@ select, input[type=text] {
   
   <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
   <script id="popup-template-html" type="text/ng-template">
-    <label> Product </label> : <strong>{{ProductName}}</strong>
+    <label> Product </label> : <strong>{{loan.name}}</strong>
     <br /><label> Submitted on</label> : {{SubmittedDate}}
-    <br /><label> Loan Purpose </label>: {{loan.loanPurpose}}
+    <br /><label> Loan Purpose </label>: {{loan.loanPurposeName}}
     <br /><label> Disbursement </label>: {{disbursemantDate}}
     <br /><label> Principal Amount </label>: {{loan.principalAmount}}
           <i class="icon ion-social-bitcoin"></i>
@@ -207,10 +209,10 @@ select, input[type=text] {
     <br /><label> No of Repaymants </label>: {{loan.repaymentsNo}}
 
     <br /><label style="text-aling='center';"><strong>Interest Details</strong></label>
-    <br /><label> Rate </label> : {{onSelectionLoanData.interestRatePerPeriod}}%
-    <br /><label> Method </label> : {{onSelectionLoanData.interestType.value}}
-    <br /><label> Repayment Frequency </label> : Every {{onSelectionLoanData.repaymentFrequencyType.value}}
-    <br /><label> Charges</label> : {{onSelectionLoanData.charges}} <i class="icon ion-social-bitcoin"></i>
+    <br /><label> Rate </label> : {{productData.interestRatePerPeriod}}%
+    <br /><label> Method </label> : {{productData.interestType.value}}
+    <br /><label> Repayment Frequency </label> : Every {{productData.repaymentFrequencyType.value}}
+    <br /><label> Charges</label> : {{productData.charges}} <i class="icon ion-social-bitcoin"></i>
   </script>
   </ion-content>
 </ion-view>
