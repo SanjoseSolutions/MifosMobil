@@ -2188,4 +2188,90 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } )
 
+.controller('LoanOutstandingCtrl', function($scope, SACCO, LoanAccounts, Cache, logger) {
+  SACCO.query(function(saccos) {
+    $scope.data = {saccos: saccos, show_saccos: true};
+    $scope.data.reportTitle = 'Loan Outstanding Report';
+  } );
+
+  $scope.toggleSaccos = function() {
+    $scope.data.show_saccos = !$scope.data.show_saccos;
+  };
+
+  $scope.generateChart = function() {
+    var oHash = {};
+    var sel_saccos = $scope.data.sel_saccos || [];
+    var sels = [];
+    var h_offices = Cache.getObject('h_offices');
+    sel_saccos.forEach(function(s) {
+      oHash[s] = true;
+      sels.push(h_offices[s]);
+    } );
+    $scope.data.sels = sels;
+    LoanAccounts.query(function(accounts) {
+      var loan_outstanding = { 'Male': {}, 'Female': {} };
+      var h_clients = Cache.getObject('h_clients');
+      var i=0, n=accounts.length;
+      for(; i<n; ++i) {
+        var account = accounts[i];
+        var clientId = account.clientId;
+        var client = h_clients[clientId];
+        if (!client) continue;
+        var officeId = client.officeId;
+        var g = client.gender;
+        var gname = g.name;
+        if (account.status.active && oHash[officeId]) {
+          var oName = h_offices[officeId].name;
+          var loans = loan_outstanding[gname][oName] || 0;
+          loans += account.summary.totalOutstanding;
+          loan_outstanding[gname][oName] = loans;
+        }
+      }
+      logger.log("prod Accounts: " + JSON.stringify(loan_outstanding, null, 2));
+      $scope.data.stat = loan_outstanding;
+      var data = [];
+      for(var gName in loan_outstanding) {
+        var gLO = loan_outstanding[gName];
+        var values = [];
+        var i = 0, n = sels.length;
+        for(; i<n; ++i) {
+          var oName = sels[i].name;
+          values.push( {
+            label: oName,
+            value: (gLO[oName] || 0)
+          } );
+        }
+        data.push( {
+          key: gName,
+          color: (data.length ? "#ffbb11" : "#0022bb"),
+          values: values
+        } );
+      }
+      logger.log("data: " + JSON.stringify(data, null, 2));
+      $scope.data.show_saccos = false;
+      nv.addGraph(function() {
+        var chart = nv.models.multiBarChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .height(300)
+          .margin({top: 30, right: 20, bottom: 20, left: 50})
+//          .showValues(true)
+          .showControls(false)
+//          .tooltips(true)
+//          .transitionDuration(350)
+//          .showControls(true)
+          ;
+
+        chart.yAxis.tickFormat(d3.format(',.2f'));
+//        chart.rotateLabels(-45);
+        d3.select('#chart svg')
+          .datum(data)
+          .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+      } );
+    } );
+  };
+} )
 ;
