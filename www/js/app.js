@@ -372,8 +372,18 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     url: '/dashboard/active-clients',
     views: {
       'menuContent': {
-        templateUrl: 'templates/active-clients.html',
+        templateUrl: 'templates/sacco-report.html',
         controller: 'ActiveClientsCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-total-savings', {
+    url: '/dashboard/total-savings',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'TotalSavingsCtrl'
       }
     }
   } )
