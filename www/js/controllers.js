@@ -845,6 +845,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 
   $scope.prodChanged = function(productId) {
+    console.log(productId);
     if (!productId) return; // if null
     var product = $scope.prodHash[productId];
     $scope.product = product;
@@ -1064,7 +1065,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
-            transactionDate: $scope.deposit.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.deposit.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1107,7 +1108,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         onTap: function(res) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
-            transactionDate: $scope.withdrawal.transDate.toISOString().substr(0, 10),
+            transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
@@ -1158,6 +1159,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   var id = $stateParams.id;
   $scope.init = function() {
     Codes.getValues("Loan purpose", function(pcodes) {
+      console.log("Loan purpose",pcodes);
+      $scope.loanPurposeHash = HashUtil.from_a(pcodes);
       $scope.loanPurposes = pcodes;
     } );
     $scope.loan = {};
@@ -1166,31 +1169,54 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.loan.memberName = client.displayName;
     } );
     Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
+      console.log('own savings',savingsAccounts);
       $scope.linkAccounts = savingsAccounts.filter(function(a) {
         return a.status.active;
       } ).map(function(a) {
         a.name = a.accountNo + ' (' + a.productName + ')';
         return a;
       } );
+      $scope.ownSavingHash = HashUtil.from_a($scope.linkAccounts);
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log('loan officer',staff);
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.loanOfficerOptions = staff;
     } );
     LoanProducts.query(function(prods) {
+      console.log('product',prods);
       $scope.prodHash = HashUtil.from_a(prods);
       $scope.productList = prods;
     } );
   };
 
   $scope.prodChanged = function(prodId) {
+    console.log(prodId);
     var prodHash = $scope.prodHash;
     //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
     var prod = $scope.prodHash[prodId];
+    console.log(prod);
     $scope.productData = prod;
     $scope.loan.principalAmount = prod.principal;
     $scope.loan.loanTerm = prod.repaymentEvery;
     $scope.loan.repaymentsNo = prod.numberOfRepayments;
+    $scope.loan.name = prod.name;
+  };
+
+   $scope.loanpurposeChanged = function(prodId) {
+    console.log(prodId);
+    var loanPurposeHash = $scope.loanPurposeHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.loanPurposeHash[prodId];
+    $scope.loan.loanPurposeName = prod.name;
+  };
+
+  $scope.ownSavingChanged = function(prodId) {
+    console.log(prodId);
+    var ownSavingHash = $scope.loanPurposeHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.ownSavingHash[prodId];
+    $scope.loan.ownSavingName = prod.productName;
   };
 
   $scope.loanApply = function()  {
@@ -1256,6 +1282,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   $scope.saveLoanApplication = function(data){
     var product = $scope.productData;
+    console.log(product);
     var loan = $scope.loan;
     var loanData = {
       dateFormat : "dd/MM/yy",
@@ -2292,6 +2319,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 .controller('LoanOutstandingCtrl', ['$scope', 'SACCO', 'LoanAccounts', 'Cache', 'logger',
     function($scope, SACCO, LoanAccounts, Cache, logger) {
+
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
     $scope.data.reportTitle = 'Loan Outstanding Report';

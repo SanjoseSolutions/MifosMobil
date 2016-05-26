@@ -388,6 +388,26 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dashboard-savings-prods', {
+    url: '/dashboard/savings-prods',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-one-report.html',
+        controller: 'SavProdRptCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-loan-outstanding', {
+    url: '/dashboard/loan-outstanding',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'LoanOutstandingCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {
