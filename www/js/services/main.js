@@ -1176,11 +1176,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           //logger.log("Caching account " + k);
           var accts = accounts[atype];
           Cache.setObject(k, accts);
-          var i=0; n=accts.length;
-          for(; i<n; ++i) {
-            var acct = accts[i];
-            var k = 'share.' + acct.id;
-            Cache.setObject(k, acct);
+          if ('shareAccounts' == atype) {
+            var i=0; n=accts.length;
+            for(; i<n; ++i) {
+              var acct = accts[i];
+              var k = 'share.' + acct.id;
+              Cache.setObject(k, acct);
+            }
           }
         }
         fn_accts(accounts);
@@ -2029,8 +2031,21 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 } )
 
 .factory('Shares', function(authHttp, baseUrl, Cache, logger) {
+  var myUrl = baseUrl + '/accounts/share';
+  var fetch_share = function(id, fn_shares) {
+    authHttp.get(myUrl + '/' + id)
+      .then(function(response) {
+        var share = response.data;
+        logger.log('Got share: ' + share);
+        Cache.setObject('share.' + id, share);
+        fn_shares(share);
+      }, function(response) {
+        logger.log("Failed to get share:"+response.status);
+      } );
+  };
   return {
-    url: baseUrl + '/accounts/share',
+    url: myUrl,
+    fetch: fetch_share,
     get: function(id, fn_shares) {
       logger.log("Shares called for:"+id);
       var share = Cache.getObject('share.' + id);
@@ -2038,18 +2053,19 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         logger.log("Got cache share:" + JSON.stringify(share));
         fn_shares(share);
       } else {
-        authHttp.get(this.url + '/' + id)
-          .then(function(response) {
-            var share = response.data;
-            logger.log('Got share: ' + share);
-            fn_shares(share);
-          }, function(response) {
-            logger.log("Failed to get share:"+response.status);
-          } );
+        this.fetch(id, fn_shares);
       }
     },
+    query_pending: function(fn_shares) {
+      this.query(function(shares) {
+        fn_shares(shares.filter(function(s) {
+          return s.status.submittedAndPendingApproval
+        } ) );
+      } );
+    },
     query: function(fn_shares) {
-      logger.log("Shares called");
+      logger.log("Shares query called");
+      fn_shares([]);
     },
     save: function(sfields, fn_shares, fn_offline, fn_fail) {
       authHttp.post(this.url, sfields, {},
@@ -2076,6 +2092,45 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_shares(response.data);
       }, function(response) {
         logger.log("share update fail");
+      } );
+    },
+    approve: function(id, fields, fn_success, fn_offline, fn_fail) {
+      var url = this.url + '/' + id + '?command=approve';
+      authHttp.post(url, fields, {}, function(response) {
+        var data = response.data;
+        if (response.status == 202) {
+          fn_offline(data);
+          return;
+        }
+        fetch_share(data.resourceId, fn_success);
+      }, function(response) {
+        fn_fail(response.data);
+      } );
+    },
+    activate: function(id, fields, fn_success, fn_offline, fn_fail) {
+      var url = this.url + '/' + id + '?command=activate';
+      authHttp.post(url, fields, {}, function(response) {
+        var data = response.data;
+        if (response.status == 202) {
+          fn_offline(data);
+          return;
+        }
+        fetch_share(data.resourceId, fn_success);
+      }, function(response) {
+        fn_fail(response.data);
+      } );
+    },
+    reject: function(id, fields, fn_success, fn_offline, fn_fail) {
+      var url = this.url + '/' + id + '?command=reject';
+      authHttp.post(url, fields, {}, function(response) {
+        var data = response.data;
+        if (response.status == 202) {
+          fn_offline(data);
+          return;
+        }
+        fetch_share(data.resourceId, fn_success);
+      }, function(response) {
+        fn_fail(response.data);
       } );
     }
   };

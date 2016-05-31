@@ -1420,29 +1420,90 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 } )
 
-.controller('ShareViewCtrl', function($scope, $stateParams, Shares) {
+.controller('ShareViewCtrl', function($scope, $stateParams, Shares, DateUtil, logger) {
 
-  Shares.get($stateParams.id, function(share) {
+  var init_share = function(share) {
     $scope.data = {
       id: share.id,
       productName: share.productName,
-      totalApprovedShares: share.totalApprovedShares,
       totalPendingForApprovalShares: share.totalPendingForApprovalShares,
       status: share.status,
       accountNo: share.accountNo
     };
+    if (!share.status.submittedAndPendingApproval) {
+      var purchasedShares = share.purchasedShares;
+      var i=0; n=purchasedShares.length;
+      var totalShares = 0;
+      logger.log("Active Share Account. purshasedShares length: " + n);
+      for(; i<n; ++i) {
+        var sh = purchasedShares[i];
+        totalShares += sh.numberOfShares;
+      }
+      logger.log("Number of shares: " + totalShares);
+      $scope.data.totalShares = totalShares;
+    }
+  };
+
+  Shares.get($stateParams.id, function(share) {
+    logger.log("Share Details: " + JSON.stringify(share, null, 2));
+    init_share(share);
   } );
 
+  var dt = new Date();
   $scope.approveShare = function(id) {
+    var fields = {
+      approvedDate: DateUtil.toDateString(dt),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    Shares.approve(id, fields, function(share) {
+      alert("Approved");
+      init_share(share);
+    }, function(data) {
+      alert("Approval request accepted");
+    }, function(data) {
+      logger.log("Approval failed: " + JSON.stringify(data));
+      alert("Approval failed ");
+    } );
+  };
+
+  $scope.activateShare = function(id) {
+    var fields = {
+      activatedDate: DateUtil.toDateString(dt),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    Shares.activate(id, fields, function(share) {
+      alert("Activated");
+      init_share(share);
+    }, function(data) {
+      alert("Activation request accepted");
+    }, function(data) {
+      logger.log("Activation failed: " + JSON.stringify(data));
+      alert("Activation failed ");
+    } );
   };
 
   $scope.rejectShare = function(id) {
+    var fields = {
+      rejectedDate: DateUtil.toDateString(dt),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    Shares.reject(id, fields, function(data) {
+      alert("Rejected");
+    }, function(data) {
+      alert("Rejection request accepted");
+    }, function(data) {
+      logger.log("Rejection failed: " + JSON.stringify(data));
+      alert("Rejection failed ");
+    } );
   };
 } )
 
 .controller('SharesBuyCtrl', 
     function($scope, $stateParams, ShareProducts, Clients,
-     $ionicPopup, $timeout, logger, Shares) {
+     $state, $ionicPopup, $timeout, logger, Shares) {
 
   $scope.init = function() {
     $scope.data = {
@@ -1511,7 +1572,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               share['charges'] = []; // currently no charges
               share['productId'] = product.id;
               Shares.save(share, function(new_share) {
-                alert("Share application success: " + new_share.resourceId + ". Pending approval.");
+                var shareId = new_share.resourceId;
+                alert("Share application success: " + shareId + ". Pending approval.");
+                setTimeout(function() {
+                  $state.go('tab.client-share', { 'id': shareId } );
+                }, 1500);
               }, function(response) {
                 alert("Share application accepted (offline). Pending sync and approval");
               }, function(err) {
@@ -1833,11 +1898,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
     '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
-    'ShareProducts', 'LoanAccounts',
+    'Shares', 'ShareProducts', 'LoanAccounts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
       $ionicLoading, $ionicPopup, SavingsProducts, logger, Clients, 
-      ShareProducts, LoanAccounts) {
+      Shares, ShareProducts, LoanAccounts) {
 
   var session = null;
 
@@ -1879,6 +1944,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     LoanAccounts.query_pending(function(pendingLoanAccounts) {
       logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
       $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
+    } );
+    Shares.query_pending(function(pendingShares) {
+      $scope.pendingShareCount = pendingShares.length;
     } );
 
     $scope.num_inactiveClients = 0;
