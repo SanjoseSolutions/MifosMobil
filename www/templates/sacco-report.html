@@ -71,15 +71,15 @@
       <thead>
         <tr>
         <th>SACCO</th>
-        <th>Male</th>
-        <th>Female</th>
+        <th>{{data.cols[0]}}</th>
+        <th>{{data.cols[1]}}</th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="s in data.sels">
           <th>{{s.name}}</th>
-          <td>{{data.stat.Male[s.name]}}</td>
-          <td>{{data.stat.Female[s.name]}}</td>
+          <td>{{data.stat[data.cols[0]][s.name]}}</td>
+          <td>{{data.stat[data.cols[1]][s.name]}}</td>
         </tr>
       </tbody>
     </table>

@@ -2007,6 +2007,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
+    $scope.data.cols = ['Male', 'Female'];
   } );
 
   $scope.toggleSaccos = function() {
@@ -2086,6 +2087,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
     $scope.data.reportTitle = 'Total Savings Report';
+    $scope.data.cols = ['Male', 'Female'];
   } );
 
   $scope.toggleSaccos = function() {
@@ -2287,6 +2289,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
     $scope.data.reportTitle = 'Loan Outstanding Report';
+    $scope.data.cols = ['Male', 'Female'];
   } );
 
   $scope.toggleSaccos = function() {
@@ -2370,10 +2373,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } )
 
-.controller('DuevCollectedCtrl', function($scope, SACCO, SavingsAccounts, Cache, logger) {
+.controller('DuevCollectedCtrl', function($scope, SACCO, SavingsAccounts, Cache, DateUtil, DataTables, logger) {
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
     $scope.data.reportTitle = 'Due vs Collected Savings Report';
+    $scope.data.cols = [ 'Due', 'Collected' ];
   } );
 
   $scope.toggleSaccos = function() {
@@ -2385,37 +2389,63 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     var sel_saccos = $scope.data.sel_saccos || [];
     var sels = [];
     var h_offices = Cache.getObject('h_offices');
+    var monthlyDue = {};
     sel_saccos.forEach(function(s) {
       oHash[s] = true;
+      DataTables.get_one('SACCO_Fields', s, function(fields, dt) {
+        monthlyDue[s] = fields.MonthlySavingsDue || 10;
+      } );
       sels.push(h_offices[s]);
     } );
     $scope.data.sels = sels;
     var cHash = Cache.getObject('h_clients');
+    var today = new Date();
+    var officeDue = {};
+    for(var clientId in cHash) {
+      var client = cHash[clientId];
+      var officeId = client.officeId;
+      var aDate = client.activationDate;
+      if (aDate && oHash[officeId]) {
+        var dMonth = DateUtil.monthDiff(today, aDate);
+        var mDue = monthlyDue[officeId];
+        logger.log("officeId:"+officeId+" dMonth=" + dMonth + ", mDue=" + mDue);
+        var due = dMonth * mDue;
+        var oName = client.officeName;
+        oDue = officeDue[oName] || 0;
+        officeDue[oName] = oDue + due;
+      }
+    }
+    logger.log("Got officeDue: " + JSON.stringify(officeDue, null, 2));
     SavingsAccounts.query(function(accounts) {
+      var k1 = 'Due', k2 = 'Collected';
       var obal = {};
+      obal[k1] = officeDue;
+      obal[k2] = {};
       accounts.forEach(function(a) {
-        logger.log("ClientId: " + a.clientId);
+        //logger.log("ClientId: " + a.clientId);
         var client = cHash[a.clientId];
         if (!client) {
           logger.log("Client missing in hash: " + a.clientId);
           return;
         }
+        if (!a.savingsProductName.match(/^Mandatory Saving/)) {
+          return;
+        }
         var officeId = client.officeId;
         if (oHash[officeId] && client.active) {
-          var gName = client.gender.name;
-          obal[gName] = obal[gName] || {};
+          var k2 = 'Collected';
           var oName = client.officeName;
-          var tbal = obal[gName][oName] || 0;
+          var tbal = obal[k2][oName] || 0;
           var abal = a.summary.accountBalance;
           logger.log("Client #" + a.clientId + " account #" + a.accountNo + " savings:" + abal);
           tbal += abal;
-          obal[gName][oName] = tbal;
+          obal[k2][oName] = tbal;
         }
       } );
       $scope.data.stat = obal;
       var data = [];
-      for(var gname in obal) {
-        var gs = obal[gname];
+      for(var key in obal) {
+        var gs = obal[key];
         var values = [];
         var i = 0, n = sels.length;
         for(; i<n; ++i) {
@@ -2427,7 +2457,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
           } );
         }
         var datum = {
-          key: gname,
+          key: key,
           color: (data.length ? "#ffbb11" : "#0022bb"),
           values: values
         };

@@ -148,6 +148,26 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
         return a.join('-');
       }
       return dt;
+    },
+    monthDiff: function(dt2, dt1) {
+      var y1, m1, d1, y2, m2, d2;
+      if (dt1 instanceof Array) {
+        y1 = dt1[0];
+        m1 = dt1[1];
+        d1 = dt1[2];
+      } else {
+        y1 = dt1.getFullYear();
+        m1 = dt1.getMonth();
+        d1 = dt1.getDate();
+      }
+      y2 = dt2.getFullYear();
+      m2 = dt2.getMonth();
+      d2 = dt2.getDate();
+      var mDiff = (y2 - y1) * 12 + m2 - m1;
+      if (d2 > d1) {
+        ++mDiff;
+      }
+      return mDiff;
     }
   };
 } )
