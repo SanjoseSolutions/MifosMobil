@@ -803,6 +803,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 
   $scope.prodChanged = function(productId) {
+    console.log(productId);
     if (!productId) return; // if null
     var product = $scope.prodHash[productId];
     $scope.product = product;
@@ -1076,6 +1077,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   var id = $stateParams.id;
   $scope.init = function() {
     Codes.getValues("Loan purpose", function(pcodes) {
+      console.log("Loan purpose",pcodes);
+      $scope.loanPurposeHash = HashUtil.from_a(pcodes);
       $scope.loanPurposes = pcodes;
     } );
     $scope.loan = {};
@@ -1084,31 +1087,54 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.loan.memberName = client.displayName;
     } );
     Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
+      console.log('own savings',savingsAccounts);
       $scope.linkAccounts = savingsAccounts.filter(function(a) {
         return a.status.active;
       } ).map(function(a) {
         a.name = a.accountNo + ' (' + a.productName + ')';
         return a;
       } );
+      $scope.ownSavingHash = HashUtil.from_a($scope.linkAccounts);
     } );
     SACCO.get_staff($scope.client.officeId, function(staff) {
+      console.log('loan officer',staff);
       logger.log("Staff for office: " + JSON.stringify(staff));
       $scope.loanOfficerOptions = staff;
     } );
     LoanProducts.query(function(prods) {
+      console.log('product',prods);
       $scope.prodHash = HashUtil.from_a(prods);
       $scope.productList = prods;
     } );
   };
 
   $scope.prodChanged = function(prodId) {
+    console.log(prodId);
     var prodHash = $scope.prodHash;
     //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
     var prod = $scope.prodHash[prodId];
+    console.log(prod);
     $scope.productData = prod;
     $scope.loan.principalAmount = prod.principal;
     $scope.loan.loanTerm = prod.repaymentEvery;
     $scope.loan.repaymentsNo = prod.numberOfRepayments;
+    $scope.loan.name = prod.name;
+  };
+
+   $scope.loanpurposeChanged = function(prodId) {
+    console.log(prodId);
+    var loanPurposeHash = $scope.loanPurposeHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.loanPurposeHash[prodId];
+    $scope.loan.loanPurposeName = prod.name;
+  };
+
+  $scope.ownSavingChanged = function(prodId) {
+    console.log(prodId);
+    var ownSavingHash = $scope.loanPurposeHash;
+    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
+    var prod = $scope.ownSavingHash[prodId];
+    $scope.loan.ownSavingName = prod.productName;
   };
 
   $scope.loanApply = function()  {
@@ -1174,6 +1200,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   $scope.saveLoanApplication = function(data){
     var product = $scope.productData;
+    console.log(product);
     var loan = $scope.loan;
       var loanData = {
         dateFormat : "dd/MM/yy",
@@ -1393,29 +1420,90 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 } )
 
-.controller('ShareViewCtrl', function($scope, $stateParams, Shares) {
+.controller('ShareViewCtrl', function($scope, $stateParams, Shares, DateUtil, logger) {
 
-  Shares.get($stateParams.id, function(share) {
+  var init_share = function(share) {
     $scope.data = {
       id: share.id,
       productName: share.productName,
-      totalApprovedShares: share.totalApprovedShares,
       totalPendingForApprovalShares: share.totalPendingForApprovalShares,
       status: share.status,
       accountNo: share.accountNo
     };
+    if (!share.status.submittedAndPendingApproval) {
+      var purchasedShares = share.purchasedShares;
+      var i=0; n=purchasedShares.length;
+      var totalShares = 0;
+      logger.log("Active Share Account. purshasedShares length: " + n);
+      for(; i<n; ++i) {
+        var sh = purchasedShares[i];
+        totalShares += sh.numberOfShares;
+      }
+      logger.log("Number of shares: " + totalShares);
+      $scope.data.totalShares = totalShares;
+    }
+  };
+
+  Shares.get($stateParams.id, function(share) {
+    logger.log("Share Details: " + JSON.stringify(share, null, 2));
+    init_share(share);
   } );
 
+  var dt = new Date();
   $scope.approveShare = function(id) {
+    var fields = {
+      approvedDate: DateUtil.toDateString(dt),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    Shares.approve(id, fields, function(share) {
+      alert("Approved");
+      init_share(share);
+    }, function(data) {
+      alert("Approval request accepted");
+    }, function(data) {
+      logger.log("Approval failed: " + JSON.stringify(data));
+      alert("Approval failed ");
+    } );
+  };
+
+  $scope.activateShare = function(id) {
+    var fields = {
+      activatedDate: DateUtil.toDateString(dt),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    Shares.activate(id, fields, function(share) {
+      alert("Activated");
+      init_share(share);
+    }, function(data) {
+      alert("Activation request accepted");
+    }, function(data) {
+      logger.log("Activation failed: " + JSON.stringify(data));
+      alert("Activation failed ");
+    } );
   };
 
   $scope.rejectShare = function(id) {
+    var fields = {
+      rejectedDate: DateUtil.toDateString(dt),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+    Shares.reject(id, fields, function(data) {
+      alert("Rejected");
+    }, function(data) {
+      alert("Rejection request accepted");
+    }, function(data) {
+      logger.log("Rejection failed: " + JSON.stringify(data));
+      alert("Rejection failed ");
+    } );
   };
 } )
 
 .controller('SharesBuyCtrl', 
     function($scope, $stateParams, ShareProducts, Clients,
-     $ionicPopup, $timeout, logger, Shares) {
+     $state, $ionicPopup, $timeout, logger, Shares) {
 
   $scope.init = function() {
     $scope.data = {
@@ -1484,7 +1572,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               share['charges'] = []; // currently no charges
               share['productId'] = product.id;
               Shares.save(share, function(new_share) {
-                alert("Share application success: " + new_share.resourceId + ". Pending approval.");
+                var shareId = new_share.resourceId;
+                alert("Share application success: " + shareId + ". Pending approval.");
+                setTimeout(function() {
+                  $state.go('tab.client-share', { 'id': shareId } );
+                }, 1500);
               }, function(response) {
                 alert("Share application accepted (offline). Pending sync and approval");
               }, function(err) {
@@ -1806,11 +1898,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
     '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
-    'ShareProducts', 'LoanAccounts',
+    'Shares', 'ShareProducts', 'LoanAccounts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
       $ionicLoading, $ionicPopup, SavingsProducts, logger, Clients, 
-      ShareProducts, LoanAccounts) {
+      Shares, ShareProducts, LoanAccounts) {
 
   var session = null;
 
@@ -1852,6 +1944,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     LoanAccounts.query_pending(function(pendingLoanAccounts) {
       logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
       $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
+    } );
+    Shares.query_pending(function(pendingShares) {
+      $scope.pendingShareCount = pendingShares.length;
     } );
 
     $scope.num_inactiveClients = 0;

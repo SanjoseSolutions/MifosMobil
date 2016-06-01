@@ -33,20 +33,26 @@
       <ion-item ng-hide="data.status.active">
         <label> Status:</label> {{data.status.value}}
       </ion-item>
-      <ion-item ng-show="data.status.active">
-        <label> Shares:</label> {{data.totalApprovedShares || "Unspecified"}}
+      <ion-item ng-hide="data.status.submittedAndPendingApproval">
+        <label> Shares:</label> {{data.totalShares || "Unspecified"}}
       </ion-item>
-      <ion-item ng-hide="data.status.active">
+      <ion-item ng-show="data.status.submittedAndPendingApproval">
         <label> Shares:</label> {{data.totalPendingForApprovalShares || "Unspecified"}}
       </ion-item>
       <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
-        <ion-button-bar>
+        <ion-button-bar ng-show="data.status.submittedAndPendingApproval">
           <button class="button button-assertive left" ng-click="rejectShare(data.id)">
             Reject
             <i class="icon ion-close-round"></i>
           </button>
           <button class="button button-positive right" ng-click="approveShare(data.id)">
             Approve
+            <i class="icon ion-android-checkmark-circle"></i>
+          </button>
+        </ion-button-bar>
+        <ion-button-bar ng-hide="data.status.submittedAndPendingApproval">
+          <button class="button button-positive right" ng-click="activateShare(data.id)">
+            Activate
             <i class="icon ion-android-checkmark-circle"></i>
           </button>
         </ion-button-bar>
