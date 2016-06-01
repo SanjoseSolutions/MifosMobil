@@ -975,7 +975,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.deposit = {};
     $ionicPopup.show( {
       title: 'Make a Deposit',
-      template: '<input type="text" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
+      template: '<input type="tel" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
         '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="deposit.transDate">',
       scope: $scope,
       buttons: [ {
@@ -1018,7 +1018,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.withdrawal = {};
     $ionicPopup.show( {
       title: 'Make a Withdrawal',
-      template: '<input type="text" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
+      template: '<input type="tel" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
         '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="withdrawal.transDate">',
       scope: $scope,
       buttons: [ {
@@ -1357,7 +1357,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.repayment = {};
     $ionicPopup.show( {
       title: 'Make a Repayment',
-      template: '<input type="text" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
+      template: '<input type="tel" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
         '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
       scope: $scope,
       buttons: [ {
