@@ -20,12 +20,12 @@ body	{
 	font-style: bold;
 	font-style: italic;
 /*	background-color: grey; */
-
 }
 
 /*
 ion-content {
 	background-color:#CDBA96;
+ background-color:lightgrey;
 }
 */
 
@@ -70,10 +70,6 @@ ion-content {
 
 .centered {
   text-align: center;
-}
-
-ion-content  {
-/* background-color:lightgrey;  */
 }
 
 label, .label {
