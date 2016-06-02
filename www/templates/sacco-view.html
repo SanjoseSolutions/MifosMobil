@@ -12,7 +12,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<style>
+<style type="text/css">
 .item, ion-item {
   margin: 2px;
   padding: 2px 5px;
@@ -31,7 +31,7 @@
         {{data.SACCO_Fields["License Registration No"] || "Not set"}}
       </ion-item>
       <ion-item>
-        <label>Member Count: </label>{{data.members}}
+        <label>Member Count</label>: {{data.members || "0" }}
       </ion-item>
       <ion-item>
         <label>Parent Office:</label> {{data.parentName}}

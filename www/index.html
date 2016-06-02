@@ -22,6 +22,7 @@
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/ionicons.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="lib/nvd3/nv.d3.min.css" rel="stylesheet">
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
@@ -31,15 +32,25 @@
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <!--script src="lib/ionic/js/angular/angular-resource.min.js"></script-->
 
+    <script src="lib/checklist-model.js"></script>
+
     <!-- cordova script (this will be a 404 during development) -->
     <script src="lib/ngCordova/dist/ng-cordova.js"></script>
     <script src="cordova.js"></script>
-
+    
+    <!-- Angular translate -->
+    <script src="lib/angular-translate/angular-translate.js"></script>
+    <script src="lib/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+    
     <!-- your app's js -->
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services/utilities.js"></script>
     <script src="js/services/main.js"></script>
+
+    <!-- nvd3 -->
+    <script src="lib/nvd3/d3.js"></script>
+    <script src="lib/nvd3/nv.d3.min.js"></script>
   </head>
   <body ng-app="mifosmobil" ng-controller="MainCtrl">
     <!--

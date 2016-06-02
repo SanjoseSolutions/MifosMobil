@@ -13,24 +13,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <ion-view view-title="Open Saving Account">
-  <ion-content ng-controller="SavingsAccCreateCtrl">
-  <form name="SavingAccCreateForm" novalidate>
+  <ion-content ng-init="init()">
+  <form name="savingAccCreateForm" novalidate>
 
     <div class="list padding">
       <div class="Mandatory">
           <sup><i class="icon ion-asterisk assertive"></i></sup>
           : Mandatory fields
       </div>
-      <ion-item>
-        <!-- div ng-hide="savingAccCreateForm.name.$pristine">
-          <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.required">
-            SACCO Name is required
+      <ion-item ng-show="message || savingAccCreateForm.$invalid">
+        <div ng-hide="savingAccCreateForm.minBalancePaid.$pristine">
+          <span class="ion-warn" ng-show="savingAccCreateForm.minBalancePaid.$error.required">
+            Minimum Savings Deposit mush be paid
           </span>
-          <span class="ion-warn" ng-show="savingAccCreateForm.name.$error.minlength">
-            SACCO Name must be at least 3 characters
-          </span>
-        </div -->
-        <div ng-show="savingAccCreateForm.productId.$error.required">
+        </div>
+        <div ng-show="!savingAccCreateForm.productId.$pristine && savingAccCreateForm.productId.$error.required">
           <span class="ion-warn">Product is required</span>
         </div>
         <div ng-hide="savingAccCreateForm.openingDate.$pristine">
@@ -43,23 +40,21 @@
             Submit Date is required
           </span>
         </div>
-      </ion-item>
-
-      <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
 
-      <ion-item>
-        <label class="item item-input item-select">
-          <div class="input-label">
-            Select Product
-            <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          </div>
-          <select name="productID" ng-model="savings.productId" ng-change="prodChanged()"
-            required ng-options="p.id as p.name for p in products">
-          </select>
+      <div class="item item-input-inset">
+        <div class="input-label" style="float:left">
+          Product
+          <sup><i class="icon ion-asterisk assertive"></i></sup>:
+        </div>
+        <label class="item-input-wrapper" style="width:11em; float:right">
+        <select name="productId" ng-model="savings.productId" required
+          ng-options="p.id as p.name for p in products"
+          ng-change="prodChanged(savings.productId)">
+        </select>
         </label>
-      </ion-item>
+      </div>
 
       <div class="item item-input-inset">
         <span class="input-label">Date Submitted:</span>
@@ -68,22 +63,40 @@
             size="15" ng-model="savings.submittedOnDate" required>
         </label>
       </div>
-      <div class="item item-input-inset">
+      <ion-item>
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Field Officer :
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </div>
+          <select name="fieldOffireId" ng-model="savings.fieldOfficerId"
+            required ng-options="o.id as o.displayName for o in fieldOfficerOptions">
+          </select>
+        </label>
+      </ion-item>
+      <!-- <div class="item item-input-inset">
         <span class="input-label">Field Officer :</span>
         <label class="item-input-wrapper">
           <input type="text" size="20" ng-minlength="3" name="fieldOfficer"
             placeholder="Field Officer's Name" ng-model="savings.fieldOfficerId">
         </label>
-      </div>
+      </div> -->
       <div class="item item-input-inset">
         <span class="input-label">
           Minimum Balance
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" ng-minlength="1" name="initialDeposit"
+          <input type="tel" size="10" ng-minlength="1" name="initialDeposit"
             placeholder="Enter the value" ng-model="savings.minRequiredOpeningBalance">
         </label> <i class="icon ion-social-bitcoin"> </i>
+      </div>
+
+      <div class="item item-input-inset">
+        <label>
+        <input type="checkbox" id="minBalancePaid" name="minBalancePaid" ng-model="savings.minBalancePaid" value="true" required>
+        <span>Minumum opening balance paid?</span>
+        </label>
       </div>
 
       <div class="list card" ng-show="productSelected">
@@ -110,14 +123,15 @@
   </form>
   <!-- input ng-model="data.wifi" type="Password" placeholder=" x Password x " -->
   <script id="popup-template-html" type="text/ng-template">
-    <label> Product </label> : <strong>Product Name</strong>
-    <br /><label> Submitted on</label> : Date
-    <br /><label> Initial Deposit </label>: {{XYZ.initialDeposit}}
+    <p>Savings account application data:</p>
+    <label> Product </label> : <strong>{{savings.productName}}</strong>
+    <br /><label> Submitted on</label> : {{savings.SubmittedDate}}
+    <br /><label> Initial Deposit </label>: {{savings.minRequiredOpeningBalance}}
           <i class="icon ion-social-bitcoin"></i>
     <br /><label style="text-aling='center';"><strong>Interest Details</strong></label>
-    <br /><label> Percentage </label> : x %
-    <br /><label> Posting Period</label> : Quarterly
-    <br /><label> Charges</label> : xyz <i class="icon ion-social-bitcoin"></i>
+    <br /><label> Percentage </label> : {{prefilledDataToSaveForm.nominalAnnualInterestRate}} %
+    <br /><label> Posting Period</label> : {{prefilledDataToSaveForm.interestPostingPeriodType.value}}
+    <br /><label> Charges</label> : {{prefilledDataToSaveForm.charges}} <i class="icon ion-social-bitcoin"></i>
   </script>
   </ion-content>
 </ion-view>

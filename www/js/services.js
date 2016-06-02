@@ -51,6 +51,7 @@ angular.module('starter.services', ['ngCordova'] )
 } ] )
 
 .factory('Cache', ['logger', function(logger) {
+  console.log("dsadasdasdasd");
   var index = {};
   var lastSync = null;
   return {
@@ -62,6 +63,7 @@ angular.module('starter.services', ['ngCordova'] )
       index[key] = 1;
     },
     'getObject': function(key) {
+      console.log("======sadasda");
       var str = localStorage.getItem(key);
       return str ? JSON.parse(str) : null;
     },
@@ -98,9 +100,9 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } ] )
 
-.factory('baseUrl', function(Settings) {
+.factory('baseUrl', [ 'Settings', function(Settings) {
   return Settings.baseUrl;
-} )
+} ] )
 
 .factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache', 'logger',
     function($http, Settings, $cordovaNetwork, Cache, logger) {
@@ -228,7 +230,7 @@ angular.module('starter.services', ['ngCordova'] )
   return network;
 } ] )
 
-.factory('CommandQueue', function(authHttp, logger) {
+.factory('CommandQueue', [ 'authHttp', 'logger', function(authHttp, logger) {
   return {
     get: function() {
       var commands = Cache.getObject('commands');
@@ -267,9 +269,9 @@ angular.module('starter.services', ['ngCordova'] )
     runAndRemoveAll: function(fn_success, fn_fail) {
     }
   };
-} )
+} ] )
 
-.factory('Roles', function(Cache, logger) {
+.factory('Roles', [ 'Cache', 'logger', function(Cache, logger) {
   return {
     roleList: function() {
       return [ 'Super User', 'Admin', 'Management', 'Staff', 'Client' ];
@@ -312,11 +314,11 @@ angular.module('starter.services', ['ngCordova'] )
       return roles;
     }
   };
-} )
+} ] )
 
-.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles', 'Cache', 
-    'Codes', 'logger', '$rootScope', '$cordovaNetwork', function(baseUrl, authHttp,
-    $http, $state, Roles, Cache, Codes, logger, $rootScope, $cordovaNetwork) {
+.factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles', 'Cache',
+    'Codes', 'logger', '$rootScope', '$cordovaNetwork',
+    function(baseUrl, authHttp, $http, $state, Roles, Cache, Codes, logger, $rootScope, $cordovaNetwork) {
 
   var session = { isOnline: true, role: null, loginTime: null };
   session.takeOnline = function() {
@@ -459,7 +461,8 @@ angular.module('starter.services', ['ngCordova'] )
   return session;
 } ] )
 
-.factory('DataTables', function(authHttp, baseUrl, Settings, Cache, logger) {
+.factory('DataTables', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'logger',
+    function(authHttp, baseUrl, Settings, Cache, logger) {
   return {
     decode: function(obj) {
       var ret = new Object();
@@ -548,7 +551,7 @@ angular.module('starter.services', ['ngCordova'] )
       authHttp.saveOffline(baseUrl + '/datatables/' + name + '/', fields, {}, rid);
     }
   };
-} )
+} ] )
 
 .factory('DateUtil', function() {
   return {
@@ -592,7 +595,8 @@ angular.module('starter.services', ['ngCordova'] )
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
+.factory('Office', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'HashUtil', 'logger',
+    function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
   return {
     dateFields: function() {
       return ["openingDate"];
@@ -690,9 +694,10 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('SACCO', function(Office, Cache, DataTables, DateUtil, HashUtil, logger) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger',
+    function(Office, Cache, DataTables, DateUtil, HashUtil, logger) {
   return {
     query: function(fn_saccos, fn_sunions) {
       Office.query(function(data) {
@@ -797,9 +802,9 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     },
   };
-} )
+} ] )
 
-.factory('Staff', function(authHttp, baseUrl, Cache, logger) {
+.factory('Staff', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   var staff = [];
   return {
     query: function(fn_staff){
@@ -826,9 +831,9 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     }
   }
-} )
+} ] )
 
-.factory('FormHelper', function(DateUtil, logger) {
+.factory('FormHelper', [ 'DateUtil', 'logger', function(DateUtil, logger) {
   return {
     prepareForm: function(type, object) {
       var sfs = type.saveFields().concat(type.dataTables());
@@ -885,9 +890,9 @@ angular.module('starter.services', ['ngCordova'] )
       return sObject;
     },
   };
-} )
+} ] )
 
-.factory('HashUtil', function(logger) {
+.factory('HashUtil', [ 'logger', function(logger) {
   return {
     from_a: function(a) {
       var obj = new Object();
@@ -928,9 +933,10 @@ angular.module('starter.services', ['ngCordova'] )
       return a;
     }
   };
-} )
+} ] )
 
-.factory('Clients', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
+.factory('Clients', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'HashUtil', 'logger',
+    function(authHttp, baseUrl, Settings, Cache, HashUtil, logger) {
   var clients = null;
 
   return {
@@ -1069,9 +1075,10 @@ angular.module('starter.services', ['ngCordova'] )
         } );
     }
   };
-} )
+} ] )
 
-.factory('Customers', function(authHttp, baseUrl, Clients, DataTables, logger) {
+.factory('Customers', [ 'authHttp', 'baseUrl', 'Clients', 'DataTables', 'logger',
+    function(authHttp, baseUrl, Clients, DataTables, logger) {
   return {
     get_full: function(id, fn_customer) {
       Clients.get(id, function(client) {
@@ -1105,9 +1112,9 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('SelfService', function(authHttp, baseUrl, Cache, logger) {
+.factory('SelfService', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
     query: function(fn_clients) {
       authHttp.get(baseUrl + '/self/clients').then(function(response) {
@@ -1130,9 +1137,9 @@ angular.module('starter.services', ['ngCordova'] )
       }
     }
   };
-} )
+} ] )
 
-.factory('ClientImages', function(authHttp, baseUrl, logger) {
+.factory('ClientImages', [ 'authHttp', 'baseUrl', 'logger', function(authHttp, baseUrl, logger) {
   /* ClientImages.get, getB64
    * get image binary, base64 encoded image data
    * Arguments:
@@ -1171,9 +1178,9 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('SavingsProducts', function(authHttp, baseUrl, logger) {
+.factory('SavingsProducts', [ 'authHttp', 'baseUrl', 'logger' function(authHttp, baseUrl, logger) {
   return {
     get: function(id, fn_sav_prod) {
       authHttp.get(baseUrl + '/savingsproducts/' + id)
@@ -1190,9 +1197,9 @@ angular.module('starter.services', ['ngCordova'] )
         } );
     }
   }
-} )
+} ] )
 
-.factory('SavingsAccounts', function(authHttp, baseUrl, logger) {
+.factory('SavingsAccounts', [ 'authHttp', 'baseUrl', 'logger', function(authHttp, baseUrl, logger) {
   return {
     get: function(accountNo, fn_sac) {
       authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
@@ -1248,9 +1255,9 @@ angular.module('starter.services', ['ngCordova'] )
         } );
     },
   };
-} )
+} ] )
 
-.factory('LoanAccounts', function(authHttp, baseUrl, logger) {
+.factory('LoanAccounts', [ 'authHttp', 'baseUrl', 'logger', function(authHttp, baseUrl, logger) {
   return {
     get: function(accountNo, fn_account) {
       authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
@@ -1305,9 +1312,9 @@ angular.module('starter.services', ['ngCordova'] )
         } );
     }
   };
-} )
+} ] )
 
-.factory('Shares', function(authHttp, baseUrl) {
+.factory('Shares', [ 'authHttp', 'baseUrl', function(authHttp, baseUrl) {
   return {
     url: baseUrl + '/account/share',
     get: function(clientId, fn_shares) {
@@ -1344,9 +1351,9 @@ angular.module('starter.services', ['ngCordova'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('Codes', function(authHttp, baseUrl, Cache, logger) {
+.factory('Codes', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   var codeNames = {
     "Gender": 4,
     "ClientClassification": 17,
@@ -1402,7 +1409,7 @@ angular.module('starter.services', ['ngCordova'] )
       return 0;
     }
   };
-} )
+} ] )
 
 .factory('Camera', ['$q', function($q) {
 
@@ -1424,9 +1431,9 @@ angular.module('starter.services', ['ngCordova'] )
       return q.promise;
     }
   }
-}])
+} ] )
 
-.factory('MifosEntity', function(authHttp, DataTables) {
+.factory('MifosEntity', [ 'authHttp', 'DataTables', function(authHttp, DataTables) {
   var obj;
 
   return {
@@ -1448,7 +1455,6 @@ angular.module('starter.services', ['ngCordova'] )
     save: function(fields, fn_success, fn_offline, fn_fail) {
     }
   };
-} )
+} ] )
 
 ;
-

@@ -23,10 +23,12 @@
 
 <ion-view view-title="Client Loans Account Details">
   <ion-content class="padding">
-    <img src="img/kmayra.png" width="188" height="60" title="K-Mayra" />
     <div class="list card">
       <ion-item>
         <label> Account No:</label> {{data.accountNo || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Loan Status:</label> {{data.status.value || "Unspecified"}}
       </ion-item>
       <ion-item>
         <label> Account Type:</label> {{data.productName || "Unspecified"}}
@@ -34,25 +36,90 @@
       <ion-item>
         <label> Principal:</label> {{data.principal || "Unspecified"}}
       </ion-item>
-      <ion-item>
-        <label> Loan Outstanding:</label> {{data.totalOutstanding || "Unspecified"}}
-      </ion-item>
-      <ion-item>
-        <label> Loan Repayment:</label> {{data.totalRepayment || "0"}}
-      </ion-item>
-      <ion-item class="item-divider">
+      <div ng-show="data.status.active" >
+        <ion-item>
+          <label> Loan Outstanding:</label> {{data.totalOutstanding || "Unspecified"}}
+        </ion-item>
+        <ion-item>
+          <label> Loan Repayment:</label> {{data.totalRepayment || "0"}}
+        </ion-item>
+        <!-- <ion-item>
+          <label> Linked Accounts:</label> {{data.totalRepayment || "0"}}
+        </ion-item> -->
+        <!-- <ion-item>
+          <label> Repayment Schedule:</label> {{data.totalRepayment || "0"}}
+        </ion-item> -->
+      </div>
+      
+      <div ng-show="data.status.pendingApproval  || data.status.waitingForDisbursal">
+        <ion-item>
+          <label> Submitted On Date:</label> {{data.submittedOnDate || "0"}}
+        </ion-item>
+        <ion-item>
+          <label> Expected Disbursement Date:</label> {{data.expectedDisbursementDate || "0"}}
+        </ion-item>
+         <ion-item>
+          <label> Linked Accounts:</label> {{data.totalRepayment || "0"}}
+        </ion-item> 
+        <ion-item>
+          <label> Loan Type:</label> {{accountData.loanType.value || "0"}}
+        </ion-item>
+        <ion-item>
+          <label> Annual Interest Rate:</label> {{accountData.annualInterestRate || "0"}}
+        </ion-item>
+        <ion-item>
+          <label>Interest Type:</label> {{accountData.interestType.value || "Unspecified"}}
+        </ion-item>
+        <ion-item>
+          <label>Loan Term:</label> {{accountData.termFrequency}} {{accountData.repaymentFrequencyType.value || "Unspecified"}}
+        </ion-item>
+        <ion-item>
+          <label>Amortization Type:</label>{{accountData.amortizationType.value || "Unspecified"}}
+        </ion-item>
+        
+      </div>
+      
+    <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
+      <div ng-if="data.activeAccounts.length">
+        <strong>Client already has {{data.activeAccounts.length}} active loans.</strong>
+      </div>
+      <ion-button-bar>
+        <button class="button button-assertive leftBtn"
+            ng-click="rejectAccount()" ng-show="data.status.pendingApproval">
+          Reject
+          <i class="icon ion-close-round"></i>
+        </button>
+        <button class="button button-positive rightBtn"
+            ng-click="approveAccount()" ng-show="data.status.pendingApproval">
+          Approve
+          <i class="icon ion-android-checkmark-circle"></i>
+        </button>
+        <button class="button button-positive rightBtn"
+            ng-click="disburseLoan()" ng-show="data.status.waitingForDisbursal">
+          Disburse
+          <i class="icon ion-android-checkmark-circle"></i>
+        </button>
+      </ion-button-bar>
+    </ion-item>
+      <ion-item class="item-divider" ng-show="data.status.active">
         <p class="centered"> ACTIONS </p>
       </ion-item>
-      <ion-item>
+      <ion-item ng-show="data.status.active">
         <p class="centered">
           <a href="" class="button button-positive" ng-click="makeRepayment()">Make Repayment</a>
         </p>
       </ion-item>
-      <ion-item>
-        <button class="button button-block button-dark" ng-click="login(cred)">
+      <ion-item ng-show="data.status.active">
+        <button class="button button-block button-dark" ng-click="viewTransactions(data.id)" >
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </button>
       </ion-item>
+      <ion-item ng-show="data.status.active">
+        <a href="#/tab/loan/{{data.id}}/schedule" class="button button-block button-calm">
+          Repayment Schedule<span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
+        </a>
+      </ion-item>
+
     </div>
 
   </ion-content>

@@ -15,27 +15,35 @@
 <ion-view view-title="Clients">
 
   <ion-nav-buttons side="right">
-      <a class="right button button-icon icon ion-android-add" href="#/tab/client-register"></a>
+      <a class="right button button-icon" href="#/tab/client-register"
+          title="Register Client">
+        <i class="icon ion-person-add"></i>
+        <i class="icon ion-android-add"></i>
+      </a>
   </ion-nav-buttons>
 
   <div class="bar bar-subheader item-input-inset">
+    <i style="font-size:130%" class="icon ion-skip-backward" ng-click="scrollTop()"></i>
     <label class="item-input-wrapper">
       <i class="icon ion-search placeholder-icon"></i>
       <input type="search" ng-model="searchQuery" placeholder="Search ..." />
     </label>
+    <i style="font-size:130%" class="icon ion-skip-forward" ng-click="scrollBottom()"></i>
   </div>
 
   <ion-content class="has-subheader">
     <ion-refresher on-refresh="fetchNewClients()"></ion-refresher>
     <ion-list>
-      <!-- <ion-item class="item item-divider">Clients List
-        <a href="#/tab/client-register" class="ion-person-add button"
+      <!-- ion-item class="item item-divider">Clients List
+        <a href="#/tab/client-register" class="button icon ion-person-add"
           title="Register Client" style="float: right; font-size: 25px">&nbsp;+
         </a>
-      </ion-item> -->
-      <ion-item ng-class="{'iClient': !client.active}" class="item item-remove-animate item-avatar item-icon-left item-icon-right"
-          ng-repeat="client in clients | filter : searchQuery" type="item-text-wrap" href="#/tab/clients/{{client.id}}">
-        <img ng-src="{{client.face}}">
+      </ion-item -->
+
+      <ion-item ng-class="{'iClient': !client.active}"
+          class="item item-remove-animate item-avatar item-icon-left item-icon-right"
+          ng-repeat="client in clients | filter : searchQuery" type="item-text-wrap" href="#/tab/clients/{{client.id}}" ng-if="client.status.value != 'Rejected'">
+        <img ng-src="{{client.face}}" >
         <h2>#{{client.id}}: {{client.displayName}}</h2>
         <p> 
           <!-- {{client.fullname}} -->

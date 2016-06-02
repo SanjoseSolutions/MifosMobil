@@ -1,0 +1,64 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<style>
+
+.item, ion-item {
+	margin: 2px;
+	padding: 2px 5px;
+	border: none;
+}
+</style>
+
+<ion-view view-title="Client Share Account Details">
+  <ion-content class="padding">
+    <div class="list card">
+      <ion-item>
+        <label> Account No:</label> {{data.accountNo || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Product:</label> {{data.productName || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-hide="data.status.active">
+        <label> Status:</label> {{data.status.value}}
+      </ion-item>
+      <ion-item ng-hide="data.status.submittedAndPendingApproval">
+        <label> Shares:</label> {{data.totalShares || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="data.status.submittedAndPendingApproval">
+        <label> Shares:</label> {{data.totalPendingForApprovalShares || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-show="!data.status.active && (rolestat.isAdmin || rolestat.isManagement)">
+        <ion-button-bar ng-show="data.status.submittedAndPendingApproval">
+          <button class="button button-assertive left" ng-click="rejectShare(data.id)">
+            Reject
+            <i class="icon ion-close-round"></i>
+          </button>
+          <button class="button button-positive right" ng-click="approveShare(data.id)">
+            Approve
+            <i class="icon ion-android-checkmark-circle"></i>
+          </button>
+        </ion-button-bar>
+        <ion-button-bar ng-hide="data.status.submittedAndPendingApproval">
+          <button class="button button-positive right" ng-click="activateShare(data.id)">
+            Activate
+            <i class="icon ion-android-checkmark-circle"></i>
+          </button>
+        </ion-button-bar>
+      </ion-item>
+
+    </div>
+
+  </ion-content>
+</ion-view>

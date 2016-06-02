@@ -114,13 +114,33 @@ td {
           </tr>
           <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && num_inactiveClients">
             <td>
-              <div> Pending Approval: </div>
+              <div>Clients Pending Approval: </div>
             </td>
             <td> {{num_inactiveClients}} </td>
             <td> 
               <a href="#/tab/clients/inactive" class="button button-small noVertPadd">
                 Review
                 <span class="icon ion-infromation-circled"> </span>
+              </a>
+            </td>
+          </tr>
+          <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && pendingSavingsAccountsCount">
+            <td><div>Pending Savings Accounts:</div>
+            </td>
+            <td>{{ pendingSavingsAccountsCount }}</td>
+            <td>
+              <a href="#/tab/dashboard/pending-savings" class="button button-small noVertPadd">
+                Review
+              </a>
+            </td>
+          </tr>
+          <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && pendingLoanAccountsCount">
+            <td><div>Pending Loan Accounts:</div>
+            </td>
+            <td>{{ pendingLoanAccountsCount }}</td>
+            <td>
+              <a href="#/tab/dashboard/pending-loans" class="button button-small noVertPadd">
+                Review
               </a>
             </td>
           </tr>
@@ -131,6 +151,14 @@ td {
           </tr-->
           </tbody>
           </table>
+        </ion-item>
+        <ion-item>
+          <h2>Reports</h2>
+          <a href="#/tab/dashboard/active-clients" class="button button-calm">Active Members</a>
+          <a href="#/tab/dashboard/total-savings" class="button button-calm">Total Savings</a>
+          <a href="#/tab/dashboard/savings-prods" class="button button-calm">Account Types</a>
+          <a href="#/tab/dashboard/loan-outstanding" class="button button-calm">Loan Oustanding</a>
+
         </ion-item>
         <ion-item>
           <center>
@@ -144,7 +172,7 @@ td {
           </center>
         </ion-item>
         <ion-item>
-          Logged in <em>@ {{session.loginTime}}</em>
+          Logged in <em>@ {{loginTime}}</em>
         </ion-item>
         <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
@@ -158,7 +186,7 @@ td {
             <tt style="font-size:60%">{{msg}}</tt>
           </center>
           <center><a href="#/tab/dashboard/logs">View Logs</a></center>
-          <center>More visit: <label><a href="http://kmayra.org">kmayra.org</a> </label> </center>
+          <center>More visit: <label>kmayra.org</label> </center>
         </ion-item>
 
       </ion-list>
