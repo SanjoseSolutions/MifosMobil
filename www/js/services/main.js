@@ -1279,7 +1279,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
             clients = {};
             for(var i = 0; i < a_clients.length; ++i) {
               var c = a_clients[i];
-              logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
+              //logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
               clients[c.id] = c;
             }
             Cache.setObject('h_clients', clients);
@@ -1608,7 +1608,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/savingsproducts')
         .then(function(response) {
           var data = response.data;
-          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
           Cache.setObject('savingsproducts', data);
           fn_sav_prods(data);
         } );
@@ -1794,7 +1794,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
      authHttp.get(baseUrl + '/savingsaccounts/template?clientId='+cilentID+'&staffInSelectedOfficeOnly=true&productId='+productID)
        .then(function(response) {
          var data = response.data;
-         logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+         //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
          fn_sav_prods(data);
        } );
     }
@@ -1823,7 +1823,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/loanproducts')
         .then(function(response) {
           var data = response.data;
-          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
           Cache.setObject('loanproducts', data);
           fn_loan_prods(data);
         } );
@@ -1834,7 +1834,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
 .factory('LoanAccounts', function(authHttp, baseUrl, logger, HashUtil, Cache) {
   var fetch_account = function(id, fn_lac) {
-    logger.log("Called Loan fetch_account: " + id);
+    //logger.log("Called Loan fetch_account: " + id);
     authHttp.get(baseUrl + '/loans/' + id + '?associations=transactions,repaymentSchedule')
       .then(function(response) {
         var loan = response.data;

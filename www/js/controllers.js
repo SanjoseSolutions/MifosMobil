@@ -1898,11 +1898,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 .controller('DashboardCtrl', [ '$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts',
     'baseUrl', 'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil',
     '$ionicLoading', '$ionicPopup', 'SavingsProducts', 'logger', 'Clients',
-    'Shares', 'ShareProducts', 'LoanAccounts',
+    'Shares', 'ShareProducts', 'LoanAccounts', 'LoanProducts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts,
       baseUrl, Cache, Session, Customers, Staff, SACCO, HashUtil,
       $ionicLoading, $ionicPopup, SavingsProducts, logger, Clients, 
-      Shares, ShareProducts, LoanAccounts) {
+      Shares, ShareProducts, LoanAccounts, LoanProducts) {
 
   var session = null;
 
@@ -1923,11 +1923,13 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     }
     ShareProducts.fetch_all(function(prods) {
       logger.log("Got share products: " + prods.totalFilteredRecords + " products");
-      logger.log(JSON.stringify(prods.pageItems));
     } );
     SavingsProducts.fetch_all(function(prods) {
-      logger.log("Got savings " + prods.length + " products");
+      logger.log("Got " + prods.length + " savings products");
     });
+    LoanProducts.fetch_all(function(prods) {
+      logger.log("Got " + prods.length + " loan products");
+    } );
     SavingsAccounts.query(function(sacs) {
       sacs.forEach(function(sac) {
         SavingsAccounts.fetch(sac.id, function(ac){} );
