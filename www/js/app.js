@@ -408,6 +408,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dashboard-due-collected', {
+    url: '/dashboard/due-collected',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'DuevCollectedCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {
