@@ -2476,9 +2476,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
-
 .controller('DuevCollectedCtrl', ['$scope', 'SACCO', 'SavingsAccounts', 'Cache', 'DateUtil', 'DataTables', 'logger',
-    function($scope, SACCO, SavingsAccounts, Cache, DateUtil, DataTables, logger) {
+		function($scope, SACCO, SavingsAccounts, Cache, DateUtil, DataTables, logger) {
+
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
     $scope.data.reportTitle = 'Due vs Collected Savings Report';
