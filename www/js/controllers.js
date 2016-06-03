@@ -2033,6 +2033,36 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } )
 
+.controller('RptMemTransCtrl', function($scope, Office, Reports, logger) {
+  Office.query(function(offices) {
+    $scope.codes = {
+      offices: offices
+    };
+    $scope.data = {
+      title: 'Member Transactions'
+    };
+  } );
+
+  $scope.getReport = function() {
+    Reports.getReport('Client Detail', {
+      R_officeId: $scope.data.officeId,
+      exportCSV: true
+    }, function(path) {
+      $scope.data.path = path;
+      $scope.downloaded = true;
+      $scope.message = {
+        text: "Success",
+        type: "info"
+      };
+    }, function(res) {
+      $scope.message = {
+        type: "error",
+        text: "Failed"
+      };
+    } );
+  };
+} )
+
 .controller('ActiveClientsCtrl', function($scope, SACCO, Clients, logger, Cache) {
 
   SACCO.query(function(saccos) {
