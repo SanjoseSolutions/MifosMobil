@@ -378,6 +378,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dasbboard-borrowers', {
+    url: '/dashboard/borrowers',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'BorrowersCtrl'
+      }
+    }
+  } )
+
   .state('tab.dashboard-total-savings', {
     url: '/dashboard/total-savings',
     views: {

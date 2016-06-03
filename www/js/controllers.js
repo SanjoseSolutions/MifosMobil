@@ -2113,6 +2113,118 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } )
 
+.controller('BorrowersCtrl', function($scope, SACCO, LoanAccounts, logger, Cache) {
+
+  SACCO.query(function(saccos) {
+    $scope.data = {saccos: saccos, show_saccos: true};
+    $scope.data.cols = ['Male', 'Female'];
+    $scope.data.reportTitle = 'Total Borrowers Report';
+  } );
+
+  $scope.toggleSaccos = function() {
+    $scope.data.show_saccos = !$scope.data.show_saccos;
+  };
+
+  $scope.generateChart = function() {
+    var oHash = {};
+    var sel_saccos = $scope.data.sel_saccos || [];
+    var h_offices = Cache.getObject('h_offices');
+    var sels = [];
+    sel_saccos.forEach(function(s) {
+      oHash[s] = true;
+      sels.push(h_offices[s]);
+    } );
+    $scope.data.sels = sels;
+    var h_clients = Cache.getObject('h_clients');
+    LoanAccounts.query(function(accounts) {
+      var isBorrower = {};
+      var borrowers = {};
+      accounts.forEach(function(l) {
+        var clientId = l.clientId;
+        var c = h_clients[clientId];
+        if (!isBorrower[clientId] && oHash[c.officeId] && l.status.active) {
+          isBorrower[clientId] = true;
+          var oName = c.officeName;
+          borrowers[oName] = borrowers[oName] || {};
+          var gName = c.gender.name;
+          borrowers[oName][gName] = borrowers[oName][gName] || 0;
+          ++borrowers[oName][gName];
+        }
+      } );
+      var cols = $scope.data.cols;
+      var i=0, m=sels.length;
+      var oBorrowers = {};
+      for(;i<m; ++i) {
+        var oname = sels[i].name;
+        borrowers[oname] = borrowers[oname] || {};
+        var j = 0, n = cols.length;
+        oBorrowers[oname] = 0;
+        for(; j < n; ++j) {
+          var gname = cols[j];
+          borrowers[oname][gname] = borrowers[oname][gname] || 0;
+          oBorrowers[oname] += borrowers[oname][gname];
+        }
+      }
+      var data = [];
+      i=0;
+      m=cols.length;
+      var stat = {};
+      for(; i<m; ++i) {
+        var gname = cols[i];
+        var values = [];
+        j=0;
+        n=sels.length;
+        stat[gname] = {};
+        for(; j<n; ++j) {
+          var oname = sels[j].name;
+          var tot = oBorrowers[oname];
+          stat[gname][oname] = borrowers[oname][gname];
+          if (tot) {
+            values.push( {
+              label: oname,
+              value: (100 * borrowers[oname][gname] / tot)
+            } );
+          }
+        }
+        var datum = {
+          key: gname,
+          color: (data.length ? "#0022bb" : "#119911" ),
+          values: values
+        };
+        data.push(datum);
+      }
+      $scope.data.stat = stat;
+      $scope.data.show_saccos = false;
+      //logger.log("Got data: " + JSON.stringify(data, null, 2));
+      nv.addGraph(function() {
+        var chart = nv.models.multiBarHorizontalChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .height(300)
+          .margin({top: 30, right: 20, bottom: 20, left: 140})
+          .showValues(true)
+          .showControls(false)
+//          .tooltips(true)
+//          .transitionDuration(350)
+//          .showControls(true)
+          ;
+
+        chart
+          .multibar.stacked(true);
+
+        chart.yAxis.tickFormat(d3.format(',.2f'));
+//        chart.rotateLabels(-45);
+        d3.select('#chart svg')
+          .datum(data)
+          .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+      } );
+    } );
+  };
+} )
+
 .controller('TotalSavingsCtrl', function($scope, SACCO, SavingsAccounts, Cache, logger) {
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
