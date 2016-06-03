@@ -579,7 +579,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         if (data.length > 0) {
-          logger.log("Caching " + k + "::" + JSON.stringify(data));
+          //logger.log("Caching " + k + "::" + JSON.stringify(data));
           fn_dtrow(data[0], name);
         }
         Cache.setObject(k, data);
@@ -2267,7 +2267,43 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     }
 
     return docs;
-}]);
+}])
+
+.factory('Reports', function(authHttp, baseUrl, $cordovaFileTransfer, $http, Settings, logger) {
+  return {
+    getReport: function(name, params, fn_success, fn_fail) {
+      var url = baseUrl + '/runreports/' + name;
+      var pstrs = [];
+      for(var p in params) {
+        var v = params[p];
+        pstrs.push(p + '=' + v);
+      }
+      if (pstrs.length) {
+        url += '?' + pstrs.join('&');
+      }
+      var nm = name.replace(/ /g, '-');
+      var dt = new Date();
+      var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
+      var options = {
+        headers: {
+          "Fineract-Platform-TenantId": Settings.tenant,
+          "Authorization": $http.defaults.headers.common.Authorization
+        }
+      };
+      logger.log("URL: " + url + ", PATH: " + path);
+      $cordovaFileTransfer.download(url, path, options)
+        .then(function(entry) {
+          logger.log("Success downloading");
+          fn_success(entry.toURL());
+        }, function(err) {
+          logger.log("Download failed");
+          fn_fail();
+        }, function(progress) {
+          //logger.log(progress);
+        } );
+    }
+  };
+} )
 
 ;
 

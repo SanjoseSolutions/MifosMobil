@@ -418,6 +418,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dashboard-member-detail', {
+    url: '/dashboard/member-detail',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/rpt-member-detail.html',
+        controller: 'RptMemDetailCtrl'
+      }
+    }
+  } )
+
   .state('tab.settings', {
     url: '/settings',
     views: {
