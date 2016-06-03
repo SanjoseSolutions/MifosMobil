@@ -1,0 +1,61 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<style type="text/css">
+select {
+  width: 50%;
+}
+</style>
+<ion-view view-title="Member Details Report">
+
+  <ion-content class="padding">
+    <form name="reportForm" novalidate>
+    <ion-list>
+      <div class="Mandatory">
+          <sup><i class="icon ion-asterisk assertive"></i></sup>
+          : Mandatory fields
+      </div>
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
+      
+        <div class="item item-input-inset">
+          <span class="input-label">
+            Office
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
+          <label class="item-input-wrapper">
+            <select ng-model="data.officeId" ng-options="o.id as o.name for o in codes.offices" required>
+            </select>
+          </label>
+        </div>
+
+        <ion-item>
+
+      	  <button class="button button-block button-positive" 
+              ng-click="getReport()" ng-disabled="btnDisabled || reportForm.$invalid">
+            <h4>Get Report</h4>
+      	  </button>
+
+        </ion-item>
+
+        <ion-item ng-show="downloaded">
+          <a href="{{data.path}}">Download CSV</a>
+          <span style="font-size:60%">[{{data.path}}]</span>
+        </ion-item>
+
+      </ion-list> <!-- End of List -->
+    </form>  
+  </ion-content>
+</ion-view>
