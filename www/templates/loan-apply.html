@@ -26,6 +26,25 @@ select, input[type=text] {
         <sup><i class="icon ion-asterisk assertive"></i></sup>
         : Mandatory fields
       </div>
+      <div ng-show="loanAccCreateForm.productId.$error.required">
+        <span class="ion-warn">Product is required</span>
+      </div>
+      <div ng-hide="loanAccCreateForm.openingDate.$pristine">
+        <span ng-show="loanAccCreateForm.openingDate.$invalid"
+            class="ion-warn">
+          Submit Date must be Valid Date
+        </span>
+        <span ng-show="loanAccCreateForm.openingDate.$error.required"
+            class="ion-warn">
+          Submit Date is required
+        </span>
+      </div>
+
+      <div ng-hide="loanAccCreateForm.principalAmount.$pristine">
+        <span ng-show="loanAccCreateForm.principalAmount.$invalid" class="ion-warn">
+          Principal must be between {{loanPrincipal.min}} and {{loanPrincipal.max}}
+        </span>
+      </div>
       <!-- ion-item>
         <div ng-hide="loanAccCreateForm.name.$pristine">
           <span class="ion-warn" ng-show="loanAccCreateForm.name.$error.required">
@@ -48,22 +67,6 @@ select, input[type=text] {
             size="15" ng-model="loan.memberName" disabled>
         </label>
       </div>
-
-      <ion-item class="item">
-        <div ng-show="loanAccCreateForm.productId.$error.required">
-          <span class="ion-warn">Product is required</span>
-        </div>
-        <div ng-hide="loanAccCreateForm.openingDate.$pristine">
-          <span ng-show="loanAccCreateForm.openingDate.$invalid"
-              class="ion-warn">
-            Submit Date must be Valid Date
-          </span>
-          <span ng-show="loanAccCreateForm.openingDate.$error.required"
-              class="ion-warn">
-            Submit Date is required
-          </span>
-        </div>
-      </ion-item>
 
       <label class="item item-input item-select">
         <div class="input-label">Product
@@ -117,8 +120,9 @@ select, input[type=text] {
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-          <input type="number" size="10" ng-minlength="3" name="principalAmount"
-            placeholder="Enter the value" ng-model="loan.principalAmount">
+          <input type="number" size="10" ng-minlength="3"  name="principalAmount"
+              placeholder="Enter the value" ng-model="loan.principalAmount"
+              ng-min="loanPrincipal.min" ng-max="loanPrincipal.max">
         </label> <i class="icon ion-social-bitcoin"> </i>
       </div>
       <div class="item item-input-inset">

@@ -577,7 +577,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/datatables/' + name + '/' + id).then(function(response) {
         var data = response.data;
         if (data.length > 0) {
-          logger.log("Caching " + k + "::" + JSON.stringify(data));
+          //logger.log("Caching " + k + "::" + JSON.stringify(data));
           fn_dtrow(data[0], name);
         }
         Cache.setObject(k, data);
@@ -1276,7 +1276,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
             clients = {};
             for(var i = 0; i < a_clients.length; ++i) {
               var c = a_clients[i];
-              logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
+              //logger.log("Setting client " + c.id + " = " + JSON.stringify(c));
               clients[c.id] = c;
             }
             Cache.setObject('h_clients', clients);
@@ -1606,7 +1606,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/savingsproducts')
         .then(function(response) {
           var data = response.data;
-          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
           Cache.setObject('savingsproducts', data);
           fn_sav_prods(data);
         } );
@@ -1795,7 +1795,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
      authHttp.get(baseUrl + '/savingsaccounts/template?clientId='+cilentID+'&staffInSelectedOfficeOnly=true&productId='+productID)
        .then(function(response) {
          var data = response.data;
-         logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+         //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
          fn_sav_prods(data);
        } );
     }
@@ -1825,7 +1825,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       authHttp.get(baseUrl + '/loanproducts')
         .then(function(response) {
           var data = response.data;
-          logger.log("SavingsProducts.query got: " + JSON.stringify(data));
+          //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
           Cache.setObject('loanproducts', data);
           fn_loan_prods(data);
         } );
@@ -1836,10 +1836,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 .factory('LoanAccounts', ['authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
     function(authHttp, baseUrl, logger, HashUtil, Cache) {
 
-  //  var fetch_account = function(accountNo, fn_lac) {
+//  var fetch_account = function(accountNo, fn_lac) {
   var fetch_account = function(id, fn_lac) {
-    logger.log("Called Loan fetch_account: " + id);
-    //  authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
+//  logger.log("Called Loan fetch_account: " + id);
+//  authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
     authHttp.get(baseUrl + '/loans/' + id + '?associations=transactions,repaymentSchedule')
       .then(function(response) {
         var loan = response.data;
@@ -2275,8 +2275,44 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
     return deferred.promise;
   }
-
   return docs;
 } ] )
+
+
+.factory('Reports', function(authHttp, baseUrl, $cordovaFileTransfer, $http, Settings, logger) {
+  return {
+    getReport: function(name, params, fn_success, fn_fail) {
+      var url = baseUrl + '/runreports/' + name;
+      var pstrs = [];
+      for(var p in params) {
+        var v = params[p];
+        pstrs.push(p + '=' + v);
+      }
+      if (pstrs.length) {
+        url += '?' + pstrs.join('&');
+      }
+      var nm = name.replace(/ /g, '-');
+      var dt = new Date();
+      var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
+      var options = {
+        headers: {
+          "Fineract-Platform-TenantId": Settings.tenant,
+          "Authorization": $http.defaults.headers.common.Authorization
+        }
+      };
+      logger.log("URL: " + url + ", PATH: " + path);
+      $cordovaFileTransfer.download(url, path, options)
+        .then(function(entry) {
+          logger.log("Success downloading");
+          fn_success(entry.toURL());
+        }, function(err) {
+          logger.log("Download failed");
+          fn_fail();
+        }, function(progress) {
+          //logger.log(progress);
+        } );
+    }
+  };
+} )
 
 ;
