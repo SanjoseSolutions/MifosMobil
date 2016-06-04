@@ -863,7 +863,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         interestPostingPeriodType: product.interestPostingPeriodType.id,
         interestCalculationType: product.interestCalculationType.id,
         interestCalculationDaysInYearType: product.interestCalculationDaysInYearType.id,
-        minRequiredOpeningBalance: product.minRequiredOpeningBalance,
+        minRequiredOpeningBalance: saving.minRequiredOpeningBalance,
         minRequiredBalance: saving.minRequiredOpeningBalance,
         clientId: $scope.client.id,
         withdrawalFeeForTransfers: product.withdrawalFeeForTransfers,
@@ -976,7 +976,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $ionicPopup.show( {
       title: 'Make a Deposit',
       template: '<input type="tel" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
-        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="deposit.transDate">',
+        '<input type="date" placeholder="Date" ng-model="deposit.transDate">',
       scope: $scope,
       buttons: [ {
         text: 'Cancel'
@@ -1019,7 +1019,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $ionicPopup.show( {
       title: 'Make a Withdrawal',
       template: '<input type="tel" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
-        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="withdrawal.transDate">',
+        '<input type="date" placeholder="Date" ng-model="withdrawal.transDate">',
       scope: $scope,
       buttons: [ {
         text: 'Cancel'
