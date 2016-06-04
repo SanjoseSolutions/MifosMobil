@@ -1115,10 +1115,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     var prod = $scope.prodHash[prodId];
     console.log(prod);
     $scope.productData = prod;
-    $scope.loan.principalAmount = prod.principal;
+//    $scope.loan.principalAmount = prod.principal;
     $scope.loan.loanTerm = prod.repaymentEvery;
     $scope.loan.repaymentsNo = prod.numberOfRepayments;
     $scope.loan.name = prod.name;
+    $scope.updatePrincipalMinMax();
   };
 
    $scope.loanpurposeChanged = function(prodId) {
@@ -1129,12 +1130,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.loan.loanPurposeName = prod.name;
   };
 
-  $scope.ownSavingChanged = function(prodId) {
-    console.log(prodId);
-    var ownSavingHash = $scope.loanPurposeHash;
-    //logger.log("Product Hash: " + JSON.stringify(prodHash,null,2));
-    var prod = $scope.ownSavingHash[prodId];
-    $scope.loan.ownSavingName = prod.productName;
+  $scope.updatePrincipalMinMax = function() {
+    var loanProd = $scope.productData;
+    if (loanProd) {
+      var minPrincipal = loanProd.minPrincipal;
+      var maxPrincipal = loanProd.maxPrincipal;
+      var acctId = $scope.loan.linkAccountId;
+      if (acctId) {
+        var acct = $scope.ownSavingHash[acctId];
+        var maxPrin = 3 * acct.accountBalance;
+        if (maxPrin < minPrincipal) {
+          alert("Savings account has too less funds. Should be at least a third of principal");
+        } else {
+          maxPrincipal = maxPrin;
+        }
+      }
+      $scope.loanPrincipal = {
+        "min": minPrincipal,
+        "max": maxPrincipal
+      };
+      if ($scope.loan.principalAmount > maxPrincipal) {
+        $scope.loan.principalAmount = maxPrincipal;
+      }
+    }
+  };
+
+  $scope.ownSavingChanged = function(acctId) {
+    $scope.updatePrincipalMinMax();
   };
 
   $scope.loanApply = function()  {
