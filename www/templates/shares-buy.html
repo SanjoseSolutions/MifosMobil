@@ -54,7 +54,7 @@
       <div class="item item-input-inset">
         <span class="input-label">No. of Shares:</span>
         <label class="item-input-wrapper">
-          <input name="noOfShares" type="tel" placeholder=" ... "
+          <input name="noOfShares" type="number" placeholder=" ... "
             size="15" ng-model="share.requestedShares" required>
         </label>
       </div>
@@ -69,8 +69,6 @@
       <div class="item item-input-inset">
         <span class="input-label">Amount:</span>
         <label class="item-input-wrapper"> {{(share.requestedShares||0) * product.unitPrice}}
-          <!-- input type="text" size="10" ng-minlength="3" name="initialDeposit"
-            placeholder="Enter the value" ng-model="XYZ.initialDeposit" -->
         </label> <i class="icon ion-social-bitcoin"> </i>
       </div>
 
