@@ -12,7 +12,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<style>
+<style type="text/css">
 .item, ion-item {
   margin: 2px;
   padding: 2px 5px;
@@ -41,6 +41,9 @@
       </ion-item>
       <ion-item>
         <label>Date of Joining Union:</label> {{data.SACCO_Fields.joiningDate}}
+      </ion-item>
+      <ion-item>
+        <label>Monthly Savings Due:</label> {{data.SACCO_Fields.MonthlySavingsDue || "Not set"}}
       </ion-item>
       <ion-item class="item item-divider">
         <label style="font-size:18px;">Office Geo Location</label>

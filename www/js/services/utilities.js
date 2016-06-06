@@ -172,7 +172,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
   };
 } )
 
-.factory('HashUtil', function(logger) {
+.factory('HashUtil', [ 'logger', function(logger) {
   return {
     from_a: function(a) {
       var obj = new Object();
@@ -223,7 +223,7 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       return a;
     }
   };
-} )
+} ] )
 
 .factory('Camera', ['$q', function($q) {
 
@@ -245,6 +245,6 @@ angular.module('mifosmobil.utilities', ['ngCordova'])
       return q.promise;
     }
   }
-}])
+} ] )
 
 ;
