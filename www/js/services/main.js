@@ -1836,7 +1836,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 .factory('LoanAccounts', ['authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
     function(authHttp, baseUrl, logger, HashUtil, Cache) {
 
-  //  var fetch_account = function(accountNo, fn_lac) {
+//  var fetch_account = function(accountNo, fn_lac) {
   var fetch_account = function(id, fn_lac) {
 //  logger.log("Called Loan fetch_account: " + id);
 //  authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
@@ -1978,6 +1978,20 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         .then(function(response) {
           var data = response.data;
           fn_charges(data);
+        } );
+    },
+    add_guarantor: function(id, fields, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '/guarantors', fields, {},
+        function(response) {
+        },
+        function(response) {
+        } );
+    },
+    add_collateral: function(id, fields, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '/collaterals', fields, {},
+        function(response) {
+        },
+        function(response) {
         } );
     }
   };
@@ -2163,7 +2177,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     "ClientTitle": 28,
     "ClientType": 16,
     "Loan purpose": 3,
-    "MaritalStatus": 27
+    "MaritalStatus": 27,
+    "Loan collateral": 2
   };
 
   var codesObj = {

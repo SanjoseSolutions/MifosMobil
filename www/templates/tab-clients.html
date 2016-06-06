@@ -12,23 +12,29 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+<style type="text/css">
+.skipBtnSize {
+  font-size:130%
+}
+</style>
+
 <ion-view view-title="Clients">
 
   <ion-nav-buttons side="right">
-      <a class="right button button-icon" href="#/tab/client-register"
-          title="Register Client">
-        <i class="icon ion-person-add"></i>
-        <i class="icon ion-android-add"></i>
-      </a>
+    <a class="right button button-icon" href="#/tab/client-register"
+        title="Register Client">
+      <i class="icon ion-person-add"></i>
+      <i class="icon ion-android-add"></i>
+    </a>
   </ion-nav-buttons>
 
   <div class="bar bar-subheader item-input-inset">
-    <i style="font-size:130%" class="icon ion-skip-backward" ng-click="scrollTop()"></i>
+    <a class="button button calm button-icon icon ion-skip-backward skipBtnSize" ng-click="scrollTop()"></a>
     <label class="item-input-wrapper">
       <i class="icon ion-search placeholder-icon"></i>
       <input type="search" ng-model="searchQuery" placeholder="Search ..." />
     </label>
-    <i style="font-size:130%" class="icon ion-skip-forward" ng-click="scrollBottom()"></i>
+    <a class="button button calm button-icon icon ion-skip-forward skipBtnSize" ng-click="scrollBottom()"></a>
   </div>
 
   <ion-content class="has-subheader">
