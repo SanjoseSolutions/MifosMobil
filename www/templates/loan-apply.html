@@ -85,16 +85,26 @@ select, input[type=text] {
         </label>
       </div>
 
-      <ion-item>
-        <!-- label class="item item-input item-select" -->
-        <label class="item item-input item-select">
-          <div class="input-label">Loan Officer</div>
+      <div class="item item-input-inset">
+        <span class="input-label">Own Savings
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          <select name="loanOfficer" ng-model="loan.loanOfficerId"
-            ng-options="o.id as o.displayName for o in loanOfficerOptions">
+        </span>
+        <label class="item-input-wrapper">
+          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts"
+              ng-change="ownSavingChanged(loan.linkAccountId)">
           </select>
         </label>
-      </ion-item>
+      </div>
+
+      <!-- ion-item -->
+      <label class="item item-input item-select">
+        <div class="input-label">Loan Officer
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </div>
+        <select name="loanOfficer" ng-model="loan.loanOfficerId"
+          ng-options="o.id as o.displayName for o in loanOfficerOptions">
+        </select>
+      </label>
 
       <div class="item item-input-inset">
         <span class="input-label">Loan Purpose :</span>
@@ -142,22 +152,15 @@ select, input[type=text] {
       <div class="item item-input-inset">
         <span class="input-label">Guarantor s/Collateral:</span>
         <label class="item-input-wrapper">
-          <input type="number" size="10" ng-minlength="1" name="guarantorsOrCollateral"
+          <input type="text" size="10" ng-minlength="1" name="guarantorsOrCollateral"
             placeholder="Enter the value" ng-model="loan.guarantorsOrCollateral">
         </label>
       </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Own Savings:</span>
-        <label class="item-input-wrapper">
-          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts"
-              ng-change="ownSavingChanged(loan.linkAccountId)">
-          </select>
-        </label>
-      </div>
+
       <div class="item item-input-inset">
         <span class="input-label">Guarantors:</span>
         <label class="item-input-wrapper">
-          <input type="number" size="10" ng-minlength="1" name="guarantors"
+          <input type="text" size="10" ng-minlength="1" name="guarantors"
             placeholder="Enter the value" ng-model="loan.guarantors">
         </label>
       </div>
@@ -165,7 +168,7 @@ select, input[type=text] {
       <div class="item item-input-inset">
         <span class="input-label">Other collateral:</span>
         <label class="item-input-wrapper">
-          <input type="number" size="10" ng-minlength="1" name="otherCollateral"
+          <input type="text" size="10" ng-minlength="1" name="otherCollateral"
             placeholder="Enter the value" ng-model="loan.otherCollateral">
         </label>
       </div>
