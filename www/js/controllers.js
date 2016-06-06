@@ -2057,7 +2057,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 } ] )
 
-.controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts','baseUrl',
+.controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts', 'baseUrl',
     'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading', '$ionicPopup',
     'SavingsProducts', 'logger', 'Clients', 'Shares', 'ShareProducts', 'LoanAccounts', 'LoanProducts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts, baseUrl,
@@ -2163,10 +2163,16 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       }
     });
   };
+  $scope.toggleReports = function() {
+    $scope.displayReports = !$scope.displayReports;
+    logger.log("Display Reports : " + $scope.displayReports);
+  };
+
 } ] )
 
 .controller('RptMemDetailCtrl', ['$scope', 'Office', 'Reports', 'logger',
     function($scope, Office, Reports, logger) {
+
   Office.query(function(offices) {
     $scope.codes = {
       offices: offices
