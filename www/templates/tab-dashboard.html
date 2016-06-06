@@ -64,7 +64,7 @@ td {
         </tr>
         <tr ng-show="rolestat.isAdmin && num_saccos">
           <td><div> Total SACCOs: </div></td>
-          <td> {{num_saccos}} </td>
+          <td>{{num_saccos}}</td>
           <td>
             <a href="#/tab/saccos" class="button button-small noVertPadd w100">
               View <i class="icon ion-ios-briefcase-outline"> </i>
@@ -79,7 +79,7 @@ td {
         </tr>
         <tr ng-show="rolestat.isManagement && num_staff">
           <td><div> Your Staff: </div></td>
-          <td> {{num_staff}} </td>
+          <td>{{num_staff}}</td>
           <td>
             <a href="#/tab/staff" class="button button-small noVertPadd w100">
               View <i class="icon ion-happy-outline"> </i>
@@ -89,8 +89,7 @@ td {
         <tr ng-show="rolestat.isStaff && !num_clients">
           <td>Loading Clients</td>
           <td>..</td>
-          <td><ion-spinner></ion-spinner>
-          </td>
+          <td><ion-spinner></ion-spinner></td>
         </tr>
         <tr ng-show="rolestat.isStaff && num_clients">
           <td><div> Your Clients: </div></td>
@@ -104,7 +103,7 @@ td {
         </tr>
         <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && num_inactiveClients">
           <td><div>Clients Pending Approval: </div></td>
-          <td> {{num_inactiveClients}} </td>
+          <td>{{num_inactiveClients}}</td>
           <td>
             <a href="#/tab/clients/inactive" class="button button-small noVertPadd w100">
               Review <i class="icon ion-information-circled"> </i>
@@ -137,41 +136,51 @@ td {
         </tbody>
         </table>
       </ion-item>
-      <ion-item>
-        <h2>Reports</h2>
-        <div class="row responsive-sm">
-          <div class="col">
-            <a href="#/tab/dashboard/active-clients" class="button button-calm">Active Members</a>
-          </div>
-          <div class="col">
-            <a href="#/tab/dashboard/borrowers" class="button button-calm">Total Borrowers</a>
-          </div>
-        </div>
-        <div class="row responsive-sm">
-          <div class="col">
-            <a href="#/tab/dashboard/total-savings" class="button button-calm">Total Savings</a>
-          </div>
-          <div class="col">
-            <a href="#/tab/dashboard/savings-prods" class="button button-calm">Account Types</a>
-          </div>
-        </div>
-        <div class="row responsive-sm">
-          <div class="col">
-            <a href="#/tab/dashboard/loan-outstanding" class="button button-calm">Loan Oustanding</a>
-          </div>
-          <div class="col">
-            <a href="#/tab/dashboard/due-collected" class="button button-calm">Due vs Collected</a>
-          </div>
-        </div>
-        <div class="row responsive-sm">
-          <div class="col">
-            <a href="#/tab/dashboard/member-detail" class="button button-balanced">Member Details</a>
-          </div>
-          <div class="col">
-            <a href="#/tab/dashboard/member-transactions" class="button button-balanced">Member Transactions</a>
-          </div>
-        </div>
 
+      <ion-item class="item item-divider item-icon">
+        <label><strong class="centered">Analytic Reports</strong></label>
+        <span class="button button-small button-positive rightBtn w20"
+            ng-click="toggleReports()" title="Click to Display/Hide Reports">
+         <i class="icon ion-plus-circled"></i>
+        </span>
+      </ion-item>
+
+      <ion-item ng-show="displayReports">
+        <div class="row responsive-sm">
+          <div class="col">
+            <a href="#/tab/dashboard/active-clients" class="button button-calm button-small w100">Active Members</a>
+          </div>
+          <div class="col">
+            <a href="#/tab/dashboard/borrowers" class="button button-calm button-small w100">Total Borrowers</a>
+          </div>
+        </div>
+        <div class="row responsive-sm">
+          <div class="col">
+            <a href="#/tab/dashboard/total-savings" class="button button-calm button-small w100">Total Savings</a>
+          </div>
+          <div class="col">
+            <a href="#/tab/dashboard/savings-prods" class="button button-calm button-small w100">Account Types</a>
+          </div>
+        </div>
+        <div class="row responsive-sm">
+          <div class="col">
+            <a href="#/tab/dashboard/loan-outstanding" class="button button-calm button-small w100">Loan Oustanding</a>
+          </div>
+          <div class="col">
+            <a href="#/tab/dashboard/due-collected" class="button button-calm button-small w100">
+              Due vs Collected</a>
+          </div>
+        </div>
+        <div class="row responsive-sm">
+          <div class="col">
+            <a href="#/tab/dashboard/member-detail" class="button button-balanced button-small w100">
+              Member Details</a>
+          </div>
+          <div class="col">
+            <a href="#/tab/dashboard/member-transactions" class="button button-balanced button-small w100">
+              Member Transactions</a>
+          </div>
+        </div>
       </ion-item>
       <ion-item>
         <center>

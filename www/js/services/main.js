@@ -1979,6 +1979,20 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           var data = response.data;
           fn_charges(data);
         } );
+    },
+    add_guarantor: function(id, fields, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '/guarantors', fields, {},
+        function(response) {
+        },
+        function(response) {
+        } );
+    },
+    add_collateral: function(id, fields, fn_success, fn_offline, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '/collaterals', fields, {},
+        function(response) {
+        },
+        function(response) {
+        } );
     }
   };
 } ] )
@@ -2163,7 +2177,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     "ClientTitle": 28,
     "ClientType": 16,
     "Loan purpose": 3,
-    "MaritalStatus": 27
+    "MaritalStatus": 27,
+    "Loan collateral": 2
   };
 
   var codesObj = {
