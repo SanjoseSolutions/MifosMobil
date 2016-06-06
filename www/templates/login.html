@@ -45,7 +45,7 @@
           </div>
           <button class="button button-block button-positive"
               ng-click="login(cred)" ng-disabled="loginForm.$invalid">
-            Login
+            <strong>Login</strong>
             <span class="ion-log-in"></span>
           </button>
         </ion-item>
@@ -63,7 +63,10 @@
     </ion-card>
     </form>
     <center>{{data.today}}</center>
-    <center><a href="#/logs">View Logs</a></center>
+    <center>
+      <a href="#/logs" class="button button-small button-calm button-outline">
+        View Logs</a>
+    </center>
   </ion-content>
   <ion-footer-bar class="bar-dark">
     <div style="text-align: center; margin-left: auto; margin-right: auto">
