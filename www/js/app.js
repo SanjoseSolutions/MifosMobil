@@ -378,6 +378,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dasbboard-borrowers', {
+    url: '/dashboard/borrowers',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/sacco-report.html',
+        controller: 'BorrowersCtrl'
+      }
+    }
+  } )
+
   .state('tab.dashboard-total-savings', {
     url: '/dashboard/total-savings',
     views: {
@@ -414,6 +424,26 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
       'menuContent': {
         templateUrl: 'templates/sacco-report.html',
         controller: 'DuevCollectedCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-member-detail', {
+    url: '/dashboard/member-detail',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/rpt-member-detail.html',
+        controller: 'RptMemDetailCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-member-transactions', {
+    url: '/dashboard/member-transactions',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/rpt-member-detail.html',
+        controller: 'RptMemTransCtrl'
       }
     }
   } )
