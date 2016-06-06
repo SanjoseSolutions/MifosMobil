@@ -24,7 +24,7 @@
       <ion-item ng-show="message || savingAccCreateForm.$invalid">
         <div ng-hide="savingAccCreateForm.minBalancePaid.$pristine">
           <span class="ion-warn" ng-show="savingAccCreateForm.minBalancePaid.$error.required">
-            Minimum Savings Deposit mush be paid
+            Minimum Savings Deposit must be paid
           </span>
         </div>
         <div ng-show="!savingAccCreateForm.productId.$pristine && savingAccCreateForm.productId.$error.required">
@@ -45,7 +45,7 @@
 
       <div class="item item-input-inset">
         <div class="input-label" style="float:left">
-          Product
+          Select Product
           <sup><i class="icon ion-asterisk assertive"></i></sup>:
         </div>
         <label class="item-input-wrapper" style="width:11em; float:right">
@@ -87,7 +87,7 @@
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
-          <input type="tel" size="10" ng-minlength="1" name="initialDeposit"
+          <input type="number" size="10" ng-minlength="1" name="initialDeposit"
             placeholder="Enter the value" ng-model="savings.minRequiredOpeningBalance">
         </label> <i class="icon ion-social-bitcoin"> </i>
       </div>
