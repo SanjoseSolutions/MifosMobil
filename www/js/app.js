@@ -333,6 +333,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.client-loan-charges', {
+    url: '/loan/:id/charges',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/loan-charges.html',
+        controller: 'LoanChargesCtrl'
+      }
+    }
+  } )
+
   .state('tab.dashboard-logs', {
     url: '/dashboard/logs',
     views: {
