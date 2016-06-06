@@ -1463,6 +1463,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   $scope.makeRepayment = function() {
     $scope.repayment = {};
+    var hideMessage = function() {
+      setTimeout(function() {
+        $scope.message = null;
+      }, 2500);
+    };
     $ionicPopup.show( {
       title: 'Make a Repayment',
       template: '<input type="tel" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
@@ -1487,17 +1492,20 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               text: 'Repayment successful!'
             };
             update_loan(data);
+            hideMessage();
           }, function(res) {
             $scope.data.totalRepayment += $scope.repayment.transAmount;
             $scope.message = {
               type: 'info',
               text: 'Repayment accepted..'
             };
+            hideMessage();
           }, function(res) {
             $scope.message = {
               type: 'warn',
               text: 'Repayment failed'
             };
+            hideMessage();
             logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }
