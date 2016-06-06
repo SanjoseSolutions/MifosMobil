@@ -1224,7 +1224,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         if (maxPrin < minPrincipal) {
           alert("Savings account has too less funds. Should be at least a third of principal");
         } else {
-          maxPrincipal = maxPrin;
+          if (maxPrin < maxPrincipal) {
+            maxPrincipal = maxPrin;
+          }
         }
       }
       $scope.loanPrincipal = {
@@ -1358,6 +1360,15 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 } ] )
 
+.controller('LoanChargesCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
+    function($scope, $stateParams, LoanAccounts, logger) {
+  var id = $stateParams.id;
+  LoanAccounts.get_charges(id, function(data) {
+    logger.log("Got charges: " + JSON.stringify(data, null, 2));
+    $scope.data = { charges: data };
+  } );
+} ] )
+
 .controller('LoanAccountCtrl', [ '$scope', '$stateParams', 'LoanAccounts',
     '$ionicPopup', 'logger', 'Clients', 'HashUtil', 'DateUtil', '$location',
     function($scope, $stateParams, LoanAccounts,
@@ -1463,6 +1474,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   $scope.makeRepayment = function() {
     $scope.repayment = {};
+    var hideMessage = function() {
+      setTimeout(function() {
+        $scope.message = null;
+      }, 2500);
+    };
     $ionicPopup.show( {
       title: 'Make a Repayment',
       template: '<input type="tel" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
@@ -1487,17 +1503,20 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               text: 'Repayment successful!'
             };
             update_loan(data);
+            hideMessage();
           }, function(res) {
             $scope.data.totalRepayment += $scope.repayment.transAmount;
             $scope.message = {
               type: 'info',
               text: 'Repayment accepted..'
             };
+            hideMessage();
           }, function(res) {
             $scope.message = {
               type: 'warn',
               text: 'Repayment failed'
             };
+            hideMessage();
             logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
           } );
         }

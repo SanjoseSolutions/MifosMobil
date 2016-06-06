@@ -109,14 +109,22 @@
           <a href="" class="button button-positive" ng-click="makeRepayment()">Make Repayment</a>
         </p>
       </ion-item>
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
       <ion-item ng-show="data.status.active">
-        <button class="button button-block button-dark" ng-click="viewTransactions(data.id)" >
+        <button class="button button-block button-outline button-dark" ng-click="viewTransactions(data.id)" >
           View Transactions <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
         </button>
       </ion-item>
       <ion-item ng-show="data.status.active">
-        <a href="#/tab/loan/{{data.id}}/schedule" class="button button-block button-calm">
-          Repayment Schedule<span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
+        <a class="button button-block button-dark" href="#/tab/loan/{{data.id}}/charges" >
+          View Charges <span class="ion-ios-loop-strong"></span> <i class="ion-android-search"></i>
+        </a>
+      </ion-item>
+      <ion-item ng-show="data.status.active">
+        <a href="#/tab/loan/{{data.id}}/schedule" class="button button-block button-outline button-dark">
+          Repayment Schedule <i class="ion-android-search"></i>
         </a>
       </ion-item>
 
