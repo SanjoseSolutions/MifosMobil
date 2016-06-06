@@ -15,6 +15,9 @@
 
 
 <style type="text/css">
+.w100 {
+  width: 100%;
+}
 table#SavSum tr>td {
   padding: 3px;
 }
@@ -164,34 +167,37 @@ td {
         <ion-item ng-show="displayReports">
           <div class="row responsive-sm">
             <div class="col">
-              <a href="#/tab/dashboard/active-clients" class="button button-calm">Active Members</a>
+              <a href="#/tab/dashboard/active-clients" class="button button-calm button-small w100">Active Members</a>
             </div>
             <div class="col">
-              <a href="#/tab/dashboard/borrowers" class="button button-calm">Total Borrowers</a>
-            </div>
-          </div>
-          <div class="row responsive-sm">
-            <div class="col">
-              <a href="#/tab/dashboard/total-savings" class="button button-calm">Total Savings</a>
-            </div>
-            <div class="col">
-              <a href="#/tab/dashboard/savings-prods" class="button button-calm">Account Types</a>
+              <a href="#/tab/dashboard/borrowers" class="button button-calm button-small w100">Total Borrowers</a>
             </div>
           </div>
           <div class="row responsive-sm">
             <div class="col">
-              <a href="#/tab/dashboard/loan-outstanding" class="button button-calm">Loan Oustanding</a>
+              <a href="#/tab/dashboard/total-savings" class="button button-calm button-small w100">Total Savings</a>
             </div>
             <div class="col">
-              <a href="#/tab/dashboard/due-collected" class="button button-calm">Due vs Collected</a>
+              <a href="#/tab/dashboard/savings-prods" class="button button-calm button-small w100">Account Types</a>
             </div>
           </div>
           <div class="row responsive-sm">
             <div class="col">
-              <a href="#/tab/dashboard/member-detail" class="button button-balanced">Member Details</a>
+              <a href="#/tab/dashboard/loan-outstanding" class="button button-calm button-small w100">Loan Oustanding</a>
             </div>
             <div class="col">
-              <a href="#/tab/dashboard/member-transactions" class="button button-balanced">Member Transactions</a>
+              <a href="#/tab/dashboard/due-collected" class="button button-calm button-small w100">
+                Due vs Collected</a>
+            </div>
+          </div>
+          <div class="row responsive-sm">
+            <div class="col">
+              <a href="#/tab/dashboard/member-detail" class="button button-balanced button-small w100">
+                Member Details</a>
+            </div>
+            <div class="col">
+              <a href="#/tab/dashboard/member-transactions" class="button button-balanced button-small w100">
+                Member Transactions</a>
             </div>
           </div>
         </ion-item>

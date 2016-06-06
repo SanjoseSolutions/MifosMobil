@@ -1384,6 +1384,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 .controller('LoanChargesCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
     function($scope, $stateParams, LoanAccounts, logger) {
+
   var id = $stateParams.id;
   LoanAccounts.get_charges(id, function(data) {
     logger.log("Got charges: " + JSON.stringify(data, null, 2));
