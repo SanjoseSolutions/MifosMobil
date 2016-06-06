@@ -1967,6 +1967,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         function(response) {
           fn_fail(response);
         } );
+    },
+    get_charges: function(id, fn_charges) {
+      authHttp.get(baseUrl + '/loans/' + id + '/charges')
+        .then(function(response) {
+          var data = response.data;
+          fn_charges(data);
+        } );
     }
   };
 } )

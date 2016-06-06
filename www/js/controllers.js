@@ -1142,7 +1142,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         if (maxPrin < minPrincipal) {
           alert("Savings account has too less funds. Should be at least a third of principal");
         } else {
-          maxPrincipal = maxPrin;
+          if (maxPrin < maxPrincipal) {
+            maxPrincipal = maxPrin;
+          }
         }
       }
       $scope.loanPrincipal = {
@@ -1274,6 +1276,14 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
   };
 
+} )
+
+.controller('LoanChargesCtrl', function($scope, $stateParams, LoanAccounts, logger) {
+  var id = $stateParams.id;
+  LoanAccounts.get_charges(id, function(data) {
+    logger.log("Got charges: " + JSON.stringify(data, null, 2));
+    $scope.data = { charges: data };
+  } );
 } )
 
 .controller('LoanAccountCtrl', function($scope, $stateParams, LoanAccounts, $ionicPopup, logger,
