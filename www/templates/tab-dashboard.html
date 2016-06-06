@@ -152,8 +152,16 @@ td {
           </tbody>
           </table>
         </ion-item>
-        <ion-item>
-          <h2>Reports</h2>
+
+        <ion-item class="item item-divider item-icon">
+          <label><strong class="centered">Analytic Reports</strong></label>
+          <span class="button button-small button-positive rightBtn w20"
+              ng-click="toggleReports()" title="Click to Display/Hide Reports">
+           <i class="icon ion-plus-circled"></i>
+          </span>
+        </ion-item>
+
+        <ion-item ng-show="displayReports">
           <div class="row responsive-sm">
             <div class="col">
               <a href="#/tab/dashboard/active-clients" class="button button-calm">Active Members</a>
@@ -186,8 +194,8 @@ td {
               <a href="#/tab/dashboard/member-transactions" class="button button-balanced">Member Transactions</a>
             </div>
           </div>
-
         </ion-item>
+
         <ion-item>
           <center>
           Connection status: {{session.status()}}

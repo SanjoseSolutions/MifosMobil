@@ -2122,6 +2122,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       }
     });
   };
+  $scope.toggleReports = function() {
+    $scope.displayReports = !$scope.displayReports;
+    logger.log("Display Reports : " + $scope.displayReports);
+  };
+
 } ] )
 
 .controller('RptMemDetailCtrl', function($scope, Office, Reports, logger) {
