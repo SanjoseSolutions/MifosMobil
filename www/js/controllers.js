@@ -1081,9 +1081,22 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.loanPurposeHash = HashUtil.from_a(pcodes);
       $scope.loanPurposes = pcodes;
     } );
+    Codes.getValues("Loan collateral", function(codes) {
+      logger.log("Collaterals: " + JSON.stringify(codes,null,2));
+      //$scope.loanCollateralHash = HashUtil.from_a(codes);
+      $scope.loanCollateralTypes = codes;
+    } );
     $scope.loan = {};
     Clients.get(id, function(client) {
       $scope.client = client;
+      Clients.query(function(clients) {
+        var guarantors = clients.filter(function(c) {
+          return c.officeId == client.officeId && 
+          c.id != id;
+        } );
+        logger.log("Got " + clients.length + " clients, " + guarantors.length + " guarantors.");
+        $scope.guarantors = guarantors;
+      } );
       $scope.loan.memberName = client.displayName;
     } );
     Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
@@ -1254,10 +1267,19 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         loanData['linkAccountId'] = linkAccountId;
       }
     LoanAccounts.save(loanData, function(new_loan){
+      var id = new_loan.id;
+      var guarantor = $scope.loan.guarantor;
+      guarantor.guarantorTypeId = 1;
+      LoanAccounts.add_guarantor(id, guarantor, function(response) {});
+      var collateral = $scope.loan.collateral;
+      collateral.locale = 'en';
+      LoanAccounts.add_collateral(id, collateral, function(response) {});
       $timeout(function() {
         $state.go('tab.client-loan', { 'id': new_loan.id } );
       }, 3000);
     },function(sav) {
+      //LoanAccounts.add_guarantor(id, $scope.loan.guarantor, function(response) {});
+      //LoanAccounts.add_collateral(id, $scope.loan.collateral, function(response) {});
       logger.log("Loan Applied");
       alert("Loan application submitted offline." +
           " Pending sync, approval and activation");
