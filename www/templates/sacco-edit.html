@@ -35,6 +35,12 @@
           <span class="ion-warn" ng-show="saccoForm.openingDate.$invalid">SACCO Date Established must be valid date</span>
           <span class="ion-warn" ng-show="saccoForm.openingDate.$error.required">SACCO Date Established is required</span>
         </div>
+        <div ng-hide="saccoForm.MonthlySavingsDue.$pristine">
+          <!-- div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$invalid">Monthly Savings Due Value is Invalid</div -->
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.minlength">Monthly Savings Due Value is To Short</div>
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.min">Monthly Savings Due Value is Too Small</div>
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.required">Monthly Savings Due is Required &amp; Numeric</div>
+        </div>
       </ion-item>
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
@@ -95,6 +101,17 @@
             placeholder="ex: dd/mm/yyyy" ng-model="sacco.SACCO_Fields.joiningDate" required>
         </label>
       </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Monthly Savings Due
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :</span>
+        <label class="item-input-wrapper">
+          <input type="number" name="MonthlySavingsDue" placeholder="Monthly Savings Due"
+          		minlength="1" size="5" ng-model="sacco.SACCO_Fields.MonthlySavingsDue" required>
+        </label>
+      </div>
+      <!-- div class="item item-divider"> <! - - input-inset - - >
+        <label>Office Geo-Location</label>
+      </div -->
 
       <div class="item item-input-inset">
         <label class="item item-input item-stacked-label">

@@ -32,9 +32,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('baseUrl', function(Settings) {
+.factory('baseUrl', [ 'Settings', function(Settings) {
   return Settings.baseUrl;
-} )
+} ] )
 
 .factory('authHttp', [ '$http', 'Settings', '$cordovaNetwork', 'Cache', 'logger', '$rootScope',
     function($http, Settings, $cordovaNetwork, Cache, logger, $rootScope) {
@@ -241,9 +241,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   return authHttp;
 } ] )
 
-.factory('CachedHash', [ 'Cache', 'logger', 
-  function(Cache, logger) {
-    
+.factory('CachedHash', [ 'Cache', 'logger', function(Cache, logger) {    
   return {
     update: function(hkey, id, fn_item) {
       // takes parent entity id callback for cached cmd
@@ -257,7 +255,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 
 } ] )
 
-.factory('CommandQueue', function(authHttp, logger) {
+.factory('CommandQueue', ['authHttp', 'logger', function(authHttp, logger) {
   return {
     get: function() {
       var commands = Cache.getObject('commands');
@@ -296,9 +294,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     runAndRemoveAll: function(fn_success, fn_fail) {
     }
   };
-} )
+} ] )
 
-.factory('Roles', function(Cache, logger) {
+.factory('Roles', [ 'Cache', 'logger',function(Cache, logger) {
   return {
     roleList: function() {
       return [ 'Super User', 'Admin', 'Management', 'Staff', 'Client' ];
@@ -341,11 +339,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       return roles;
     }
   };
-} )
+} ] )
 
 .factory('Session', [ 'baseUrl', 'authHttp', '$http', '$state', 'Roles', 'Cache', 
-    'Codes', 'logger', '$rootScope', '$cordovaNetwork', function(baseUrl, authHttp,
-    $http, $state, Roles, Cache, Codes, logger, $rootScope, $cordovaNetwork) {
+    'Codes', 'logger', '$rootScope', '$cordovaNetwork',
+    function(baseUrl, authHttp, $http, $state, Roles, Cache, Codes, logger, $rootScope, $cordovaNetwork) {
 
   var session = { isOnline: true, role: null, loginTime: null };
   session.takeOnline = function() {
@@ -665,7 +663,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } )
 
-.factory('Office', function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Clients) {
+.factory('Office', [ 'authHttp', 'baseUrl', 'Settings', 'Cache', 'HashUtil', 'logger', 'Clients',
+    function(authHttp, baseUrl, Settings, Cache, HashUtil, logger, Clients) {
   var fetch_office = function(id, fn_office) {
     authHttp.get(baseUrl + '/offices/' + id)
     .then(function(response) {
@@ -818,12 +817,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil',
-    'logger', 'authHttp', 'baseUrl', 'Clients',
-      function(Office, Cache, DataTables, DateUtil, HashUtil, logger,
-        authHttp, baseUrl, Clients) {
+.factory('SACCO', [ 'Office', 'Cache', 'DataTables', 'DateUtil', 'HashUtil', 'logger', 'authHttp', 'baseUrl', 'Clients',
+    function(Office, Cache, DataTables, DateUtil, HashUtil, logger, authHttp, baseUrl, Clients) {
   return {
     set_member_counts: function() {
       var s_clients = {};
@@ -976,7 +973,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
-.factory('Staff', function(authHttp, baseUrl, Cache, logger) {
+.factory('Staff', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   var staff = [];
   return {
     query: function(fn_staff){
@@ -1003,7 +1000,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     }
   }
-} )
+} ] )
 
 .factory('Formatter', [ 'DateUtil', 'logger', function(DateUtil, logger) {
   return {
@@ -1466,7 +1463,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
-.factory('Customers', function(authHttp, baseUrl, Clients, DataTables, logger) {
+.factory('Customers', [ 'authHttp', 'baseUrl', 'Clients', 'DataTables', 'logger',
+    function(authHttp, baseUrl, Clients, DataTables, logger) {
   return {
     get_full: function(id, fn_customer, decode) {
       decode = null==decode && true;
@@ -1503,9 +1501,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('SelfService', function(authHttp, baseUrl, Cache, logger) {
+.factory('SelfService', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
     query: function(fn_clients) {
       authHttp.get(baseUrl + '/self/clients').then(function(response) {
@@ -1528,9 +1526,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       }
     }
   };
-} )
+} ] )
 
-.factory('ClientImages', function(authHttp, baseUrl, logger, Cache) {
+.factory('ClientImages', [ 'authHttp', 'baseUrl', 'logger', 'Cache', function(authHttp, baseUrl, logger, Cache) {
   /* ClientImages.get, getB64
    * get image binary, base64 encoded image data
    * Arguments:
@@ -1584,9 +1582,9 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('SavingsProducts', function(authHttp, baseUrl, Cache, logger) {
+.factory('SavingsProducts', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
     get: function(id, fn_sav_prod) {
       console.log("============+++++++++++++++++++++++",id);
@@ -1614,9 +1612,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     }
   }
-} )
+} ] )
 
-.factory('SavingsAccounts', function(authHttp, baseUrl, logger, HashUtil, Cache) {
+.factory('SavingsAccounts', [ 'authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
+    function(authHttp, baseUrl, logger, HashUtil, Cache) {
+
   var fetch_account = function(accountNo, fn_sac) {
     authHttp.get(baseUrl + '/savingsaccounts/' + accountNo + '?associations=transactions')
       .then(function(response) {
@@ -1635,6 +1635,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         fn_trans(resp.data);
       } );
   };
+
   return {
     fetch: fetch_account,
     get: function(accountNo, fn_sac) {
@@ -1799,9 +1800,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
        } );
     }
   };
-} )
+} ] )
 
-.factory('LoanProducts', function(authHttp, baseUrl, Cache, logger) {
+// 'LoanAccounts' --> 'LoanProducts'
+.factory('LoanProducts', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
   return {
     get: function(id, fn_loan_prod) {
       console.log("============+++++++++++++++++++++++",id);
@@ -1829,12 +1831,15 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     }
   }
-} )
+} ] )
 
+.factory('LoanAccounts', ['authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
+    function(authHttp, baseUrl, logger, HashUtil, Cache) {
 
-.factory('LoanAccounts', function(authHttp, baseUrl, logger, HashUtil, Cache) {
+//  var fetch_account = function(accountNo, fn_lac) {
   var fetch_account = function(id, fn_lac) {
-    //logger.log("Called Loan fetch_account: " + id);
+//  logger.log("Called Loan fetch_account: " + id);
+//  authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')
     authHttp.get(baseUrl + '/loans/' + id + '?associations=transactions,repaymentSchedule')
       .then(function(response) {
         var loan = response.data;
@@ -1990,10 +1995,13 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     }
   };
-} )
+} ] )
 
-.factory('ShareProducts', function(authHttp, baseUrl, Cache, logger, $q) {
+.factory('ShareProducts', ['authHttp', 'baseUrl', 'Cache', 'logger', '$q',
+    function(authHttp, baseUrl, Cache, logger, $q) {
+
   var url = baseUrl + '/products/share';
+
   return {
     fetch_one: function(id, fn_sh_prod) {
       authHttp.get(url + '/' + id)
@@ -2049,9 +2057,10 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         } );
     }
   }
-} )
+} ] )
 
-.factory('Shares', function(authHttp, baseUrl, Cache, logger) {
+.factory('Shares', [ 'authHttp', 'baseUrl', 'Cache', 'logger', function(authHttp, baseUrl, Cache, logger) {
+// <<<
   var myUrl = baseUrl + '/accounts/share';
   var fetch_share = function(id, fn_shares) {
     authHttp.get(myUrl + '/' + id)
@@ -2064,6 +2073,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         logger.log("Failed to get share:"+response.status);
       } );
   };
+// >>>
   return {
     url: myUrl,
     fetch: fetch_share,
@@ -2155,11 +2165,11 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       } );
     }
   };
-} )
+} ] )
 
-.factory('Codes', [
-    'authHttp', 'baseUrl', 'Cache', 'logger', 'HashUtil',
+.factory('Codes', [ 'authHttp', 'baseUrl', 'Cache', 'logger', 'HashUtil', 
     function(authHttp, baseUrl, Cache, logger, HashUtil) {
+
   var codeNames = {
     "Gender": 4,
     "ClientClassification": 17,
@@ -2234,7 +2244,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   };
 } ] )
 
-.factory('MifosEntity', function(authHttp, DataTables) {
+.factory('MifosEntity', ['authHttp', 'DataTables', function(authHttp, DataTables) {
   var obj;
 
   return {
@@ -2258,38 +2268,38 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     save: function(fields, fn_success, fn_offline, fn_fail) {
     }
   };
-} )
+} ] )
 
 .factory('Documents', [ '$q', 'authHttp', 'baseUrl', 'Settings', 'Cache', 'logger',
-  function($q, authHttp, baseUrl, Settings, Cache, logger) {
-    var docs = {};
+    function($q, authHttp, baseUrl, Settings, Cache, logger) {
+  var docs = {};
 
-    docs.getDocsList = function(clientId){
-      var deferred = $q.defer();
-      
-      authHttp.get(baseUrl + '/clients/' + clientId + '/documents').then(function(response) {
-          var data = response.data;
-          logger.log(data);
-          deferred.resolve(data);
-         } );
+  docs.getDocsList = function(clientId){
+    var deferred = $q.defer();
+    
+    authHttp.get(baseUrl + '/clients/' + clientId + '/documents').then(function(response) {
+        var data = response.data;
+        logger.log(data);
+        deferred.resolve(data);
+       } );
 
-      return deferred.promise;
-    },
+    return deferred.promise;
+  },
 
-    docs.removeDoc = function(clientId, docId){
-      var deferred = $q.defer();
-      
-      authHttp.delete(baseUrl + '/clients/' + clientId + '/documents/' + docId).then(function(response) {
-          var data = response.data;
-          logger.log(data);
-          deferred.resolve(data);
-         } );
+  docs.removeDoc = function(clientId, docId){
+    var deferred = $q.defer();
+    
+    authHttp.delete(baseUrl + '/clients/' + clientId + '/documents/' + docId).then(function(response) {
+      var data = response.data;
+      logger.log(data);
+      deferred.resolve(data);
+    } );
 
-      return deferred.promise;
-    }
+    return deferred.promise;
+  }
+  return docs;
+} ] )
 
-    return docs;
-}])
 
 .factory('Reports', function(authHttp, baseUrl, $cordovaFileTransfer, $http, Settings, logger) {
   return {
@@ -2328,4 +2338,3 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 } )
 
 ;
-
