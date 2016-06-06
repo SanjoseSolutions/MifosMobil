@@ -1836,7 +1836,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
 .factory('LoanAccounts', ['authHttp', 'baseUrl', 'logger', 'HashUtil', 'Cache',
     function(authHttp, baseUrl, logger, HashUtil, Cache) {
 
-  //  var fetch_account = function(accountNo, fn_lac) {
+//  var fetch_account = function(accountNo, fn_lac) {
   var fetch_account = function(id, fn_lac) {
 //  logger.log("Called Loan fetch_account: " + id);
 //  authHttp.get(baseUrl + '/loans/' + accountNo + '?associations=transactions')

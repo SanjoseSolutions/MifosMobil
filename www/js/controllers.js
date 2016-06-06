@@ -1055,8 +1055,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.deposit = {};
     $ionicPopup.show( {
       title: 'Make a Deposit',
-      template: '<input type="tel" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
-        '<input type="date" placeholder="Date" ng-model="deposit.transDate">',
+      template: '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
+        '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">',
       scope: $scope,
       buttons: [ {
         text: 'Cancel'
@@ -1098,8 +1098,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.withdrawal = {};
     $ionicPopup.show( {
       title: 'Make a Withdrawal',
-      template: '<input type="tel" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
-        '<input type="date" placeholder="Date" ng-model="withdrawal.transDate">',
+      template: '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
+        '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">',
       scope: $scope,
       buttons: [ {
         text: 'Cancel'
@@ -1482,7 +1482,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     };
     $ionicPopup.show( {
       title: 'Make a Repayment',
-      template: '<input type="tel" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
+      template: '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
         '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
       scope: $scope,
       buttons: [ {
@@ -2144,7 +2144,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
-.controller('RptMemDetailCtrl', function($scope, Office, Reports, logger) {
+.controller('RptMemDetailCtrl', ['$scope', 'Office', 'Reports', 'logger',
+    function($scope, Office, Reports, logger) {
+
   Office.query(function(offices) {
     $scope.codes = {
       offices: offices
@@ -2170,9 +2172,10 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       };
     } );
   };
-} )
+} ] )
 
-.controller('RptMemTransCtrl', function($scope, Office, Reports, logger) {
+.controller('RptMemTransCtrl', ['$scope', 'Office', 'Reports', 'logger',
+    function($scope, Office, Reports, logger) {
   Office.query(function(offices) {
     $scope.codes = {
       offices: offices
@@ -2200,7 +2203,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       };
     } );
   };
-} )
+} ] )
 
 .controller('ActiveClientsCtrl', ['$scope', 'SACCO', 'Clients', 'logger', 'Cache',
     function($scope, SACCO, Clients, logger, Cache) {
@@ -2692,6 +2695,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 .controller('DuevCollectedCtrl', ['$scope', 'SACCO', 'SavingsAccounts', 'Cache', 'DateUtil', 'DataTables', 'logger',
 		function($scope, SACCO, SavingsAccounts, Cache, DateUtil, DataTables, logger) {
+
   SACCO.query(function(saccos) {
     $scope.data = {saccos: saccos, show_saccos: true};
     $scope.data.reportTitle = 'Due vs Collected Savings Report';
