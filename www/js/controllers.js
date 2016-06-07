@@ -1385,9 +1385,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     }, function(response) {
       logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
     } );
-
   };
-
 } ] )
 
 .controller('LoanChargesCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
