@@ -2194,6 +2194,43 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
+.controller('RptMemAcctsCtrl', ['$scope', 'Office', 'Reports', 'logger',
+    function($scope, Office, Reports, logger) {
+
+  Office.query(function(offices) {
+    $scope.codes = {
+      offices: offices
+    };
+    $scope.data = {
+      title: 'Member Loan Accounts'
+    };
+  } );
+
+  $scope.getReport = function() {
+    Reports.getReport('Active Loans - Details', {
+      R_officeId: $scope.data.officeId,
+      R_currencyId: -1,
+      R_fundId: -1,
+      R_loanOfficerId: -1,
+      R_loanProductId: -1,
+      R_loanPurposeId: -1,
+      exportCSV: true
+    }, function(path) {
+      $scope.data.path = path;
+      $scope.downloaded = true;
+      $scope.message = {
+        text: "Success",
+        type: "info"
+      };
+    }, function(res) {
+      $scope.message = {
+        type: "error",
+        text: "Failed"
+      };
+    } );
+  };
+} ] )
+
 .controller('RptMemTransCtrl', ['$scope', 'Office', 'Reports', 'logger',
     function($scope, Office, Reports, logger) {
   Office.query(function(offices) {

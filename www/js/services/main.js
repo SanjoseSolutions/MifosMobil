@@ -2313,26 +2313,28 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       if (pstrs.length) {
         url += '?' + pstrs.join('&');
       }
-      var nm = name.replace(/ /g, '-');
-      var dt = new Date();
-      var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
-      var options = {
-        headers: {
-          "Fineract-Platform-TenantId": Settings.tenant,
-          "Authorization": $http.defaults.headers.common.Authorization
-        }
-      };
-      logger.log("URL: " + url + ", PATH: " + path);
-      $cordovaFileTransfer.download(url, path, options)
-        .then(function(entry) {
-          logger.log("Success downloading");
-          fn_success(entry.toURL());
-        }, function(err) {
-          logger.log("Download failed");
-          fn_fail();
-        }, function(progress) {
-          //logger.log(progress);
-        } );
+      document.addEventListener('deviceready', function () {
+        var nm = name.replace(/ /g, '-');
+        var dt = new Date();
+        var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
+        var options = {
+          headers: {
+            "Fineract-Platform-TenantId": Settings.tenant,
+            "Authorization": $http.defaults.headers.common.Authorization
+          }
+        };
+        logger.log("URL: " + url + ", PATH: " + path);
+        $cordovaFileTransfer.download(url, path, options)
+          .then(function(entry) {
+            logger.log("Success downloading");
+            fn_success(entry.toURL());
+          }, function(err) {
+            logger.log("Download failed");
+            fn_fail();
+          }, function(progress) {
+            //logger.log(progress);
+          } );
+      }, false);
     }
   };
 } )
