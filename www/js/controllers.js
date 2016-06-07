@@ -607,6 +607,14 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       logger.log("Client #" + id + " rejected");
     } );
   };
+
+  $scope.fetchClientData = function() {
+    Clients.get(clientId, function(client) {
+      $scope.client = client;
+      $scope.$broadcast('scroll.refreshComplete');
+    });
+  }
+
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
@@ -1377,13 +1385,12 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     }, function(response) {
       logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
     } );
-
   };
-
 } ] )
 
 .controller('LoanChargesCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
     function($scope, $stateParams, LoanAccounts, logger) {
+
   var id = $stateParams.id;
   LoanAccounts.get_charges(id, function(data) {
     logger.log("Got charges: " + JSON.stringify(data, null, 2));
@@ -2057,7 +2064,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 } ] )
 
-.controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts','baseUrl',
+.controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts', 'baseUrl',
     'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading', '$ionicPopup',
     'SavingsProducts', 'logger', 'Clients', 'Shares', 'ShareProducts', 'LoanAccounts', 'LoanProducts',
     function($rootScope, $scope, authHttp, $log, SavingsAccounts, baseUrl,
@@ -2163,10 +2170,16 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       }
     });
   };
+  $scope.toggleReports = function() {
+    $scope.displayReports = !$scope.displayReports;
+    logger.log("Display Reports : " + $scope.displayReports);
+  };
+
 } ] )
 
 .controller('RptMemDetailCtrl', ['$scope', 'Office', 'Reports', 'logger',
     function($scope, Office, Reports, logger) {
+
   Office.query(function(offices) {
     $scope.codes = {
       offices: offices

@@ -2300,7 +2300,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
   return docs;
 } ] )
 
-
 .factory('Reports', function(authHttp, baseUrl, $cordovaFileTransfer, $http, Settings, logger) {
   return {
     getReport: function(name, params, fn_success, fn_fail) {
