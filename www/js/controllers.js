@@ -607,6 +607,14 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       logger.log("Client #" + id + " rejected");
     } );
   };
+
+  $scope.fetchClientData = function() {
+    Clients.get(clientId, function(client) {
+      $scope.client = client;
+      $scope.$broadcast('scroll.refreshComplete');
+    });
+  }
+
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
