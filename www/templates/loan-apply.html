@@ -85,17 +85,6 @@ select, input[type=text] {
         </label>
       </div>
 
-      <div class="item item-input-inset">
-        <span class="input-label">Own Savings
-          <sup><i class="icon ion-asterisk assertive"></i></sup> :
-        </span>
-        <label class="item-input-wrapper">
-          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts"
-              ng-change="ownSavingChanged(loan.linkAccountId)">
-          </select>
-        </label>
-      </div>
-
       <!-- ion-item -->
       <label class="item item-input item-select">
         <div class="input-label">Loan Officer
@@ -106,13 +95,13 @@ select, input[type=text] {
         </select>
       </label>
 
-      <div class="item item-input-inset">
-        <span class="input-label">Loan Purpose :</span>
-        <label class="item-input-wrapper">
-          <select name="loanPurpose" ng-model="loan.loanPurposeId" ng-options="p.id as p.name for p in loanPurposes" ng-change="loanpurposeChanged(loan.loanPurposeId)">
-          </select>
-        </label>
-      </div>
+      <label class="item item-input item-select">
+        <div class="input-label">Loan Purpose :</div>
+        <select name="loanPurpose" ng-model="loan.loanPurposeId"
+            ng-options="p.id as p.name for p in loanPurposes"
+            ng-change="loanpurposeChanged(loan.loanPurposeId)">
+        </select>
+      </label>
 
       <div class="item item-input-inset">
         <span class="input-label">
@@ -125,62 +114,72 @@ select, input[type=text] {
               ng-model="loan.disbursemantDate" required>
         </label>
       </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Principal Amount
-          <sup><i class="icon ion-asterisk assertive"></i></sup> :
-        </span>
-        <label class="item-input-wrapper">
-          <input type="number" size="10" ng-minlength="3"  name="principalAmount"
-              placeholder="Enter the value" ng-model="loan.principalAmount"
-              ng-min="loanPrincipal.min" ng-max="loanPrincipal.max">
-        </label> <i class="icon ion-social-bitcoin"> </i>
-      </div>
+      <ion-item class="item">
+        <div class="item-input-inset">
+          <span class="input-label">Principal Amount
+            <sup><i class="icon ion-asterisk assertive"></i></sup> :
+          </span>
+          <label class="item-input-wrapper">
+            <input type="number" size="10" ng-minlength="3"  name="principalAmount"
+                placeholder="Value of Principal" ng-model="loan.principalAmount"
+                ng-min="loanPrincipal.min" ng-max="loanPrincipal.max">
+          </label> <i class="icon ion-social-bitcoin"> </i>
+        </div>
+        <!-- Warning -->
+        <div ng-hide="loanAccCreateForm.principalAmount.$pristine">
+          <span ng-show="loanAccCreateForm.principalAmount.$invalid" class="ion-warn">
+            Principal must be between {{loanPrincipal.min}} and {{loanPrincipal.max}}
+          </span>
+        </div>
+      </ion-item>
       <div class="item item-input-inset">
         <span class="input-label">Loan Term :</span>
         <label class="item-input-wrapper">
           <input type="number" size="10" ng-minlength="1" name="loanTerm"
-            placeholder="Enter the value" ng-model="loan.loanTerm">
+            placeholder="How many months ?" ng-model="loan.loanTerm">
         </label> Months
       </div>
       <div class="item item-input-inset">
         <span class="input-label">No. of Repayments :</span>
         <label class="item-input-wrapper">
           <input type="number" size="10" ng-minlength="1" name="repaymentsNo"
-            placeholder="Enter the value" ng-model="loan.repaymentsNo">
+            placeholder="How many repayments ?" ng-model="loan.repaymentsNo">
         </label>
       </div>
-      <div class="item item-input-inset">
-        <span class="input-label">Guarantor:</span>
+      <!-- div class="item item-input-inset">
+        <span class="input-label">Old Guarantor:</span>
         <label class="item-input-wrapper">
           <select ng-model="loan.guarantor.entityId" ng-options="g.id as g.displayName for g in guarantors">
           </select>
         </label>
+      </div -->
+
+      <label class="item item-input item-select">
+        <div class="input-label">Guarantor :</div>
+        <select ng-model="loan.guarantor.entityId"
+            ng-options="g.id as g.displayName for g in guarantors">
+        </select>
+      </label>
+      <label class="item item-input item-select">
+        <div class="input-label">Collateral Type :</div>
+        <select ng-model="loan.collateral.collateralTypeId"
+            ng-options="c.id as c.name for c in loanCollateralTypes">
+        </select>
+      </label>
+      <div class="item item-input-inset">
+        <span class="input-label">Value:</span>
+        <label class="item-input-wrapper">
+          <input type="number" size="10" placeholder="Value of Collateral" ng-model="loan.collateral.value">
+        </label>
+      </div>
+      <div class="item item-input-inset">
+        <span class="input-label">Description:</span>
+        <label class="item-input-wrapper">
+          <input type="text" size="10" ng-minlength="1" name="collateral"
+            placeholder="Short Description of it" ng-model="loan.collateral.description">
+        </label>
       </div>
 
-      <div class="item list">
-        <div class="item item-input-inset">
-          <span class="input-label">Collateral Type:</span>
-          <label class="item-input-wrapper">
-            <select ng-model="loan.collateral.collateralTypeId" ng-options="c.id as c.name
-              for c in loanCollateralTypes">
-            </select>
-          </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Value:</span>
-          <label class="item-input-wrapper">
-            <input type="tel" size="10" placeholder="Enter value" ng-model="loan.collateral.value">
-          </label>
-        </div>
-        <div class="item item-input-inset">
-          <span class="input-label">Description:</span>
-          <label class="item-input-wrapper">
-            <input type="text" size="10" ng-minlength="1" name="collateral"
-              placeholder="Enter the value" ng-model="loan.collateral.description">
-          </label>
-        </div>
-      </div>
-      </div>
       <div class="list card" ng-show="productSelected">
         <ion-item class="item-divider"> 
           <label><strong> Interest Details </strong></label>
