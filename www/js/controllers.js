@@ -1540,7 +1540,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         $scope.message = null;
       }, 2500);
     };
-    $ionicPopup.show( {
+    var repaymentPopup = $ionicPopup.show( {
       title: 'Make a Repayment',
       template: '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
         '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
@@ -1549,39 +1549,39 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         text: 'Cancel'
       }, {
         text: 'Repay',
-        onTap: function(res) {
+        onTap: function(e) {
           var params = {
             transactionAmount: $scope.repayment.transAmount,
             transactionDate: DateUtil.toDateString($scope.repayment.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          logger.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
-          LoanAccounts.repay(id, params, function(data) {
-            logger.log("Repayment successful!");
-            $scope.message = {
-              type: 'info',
-              text: 'Repayment successful!'
-            };
-            update_loan(data);
-            hideMessage();
-          }, function(res) {
-            $scope.data.totalRepayment += $scope.repayment.transAmount;
-            $scope.message = {
-              type: 'info',
-              text: 'Repayment accepted..'
-            };
-            hideMessage();
-          }, function(res) {
-            $scope.message = {
-              type: 'warn',
-              text: 'Repayment failed'
-            };
-            hideMessage();
-            logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
-          } );
+          return params;
         }
       } ]
+    } );
+    var informAndHide = function(msg, title) {
+      var popup = $ionicPopup.alert( {
+        title: (title || 'Success'),
+        template: msg
+      } );
+      setTimeout(function(e) {
+        popup.close()
+      }, 2000);
+    };
+    repaymentPopup.then(function(params) {
+      logger.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
+      LoanAccounts.repay(id, params, function(data) {
+        logger.log("Repayment successful!");
+        informAndHide("Repayment successful!");
+        update_loan(data);
+      }, function(res) {
+        $scope.data.totalRepayment += $scope.repayment.transAmount;
+        informAndHide("Repayment accepted (offline)");
+      }, function(res) {
+        informAndHide('Repayment failed', 'Failure');
+        logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
+      } );
     } );
   };
 } ] )
