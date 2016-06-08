@@ -1814,6 +1814,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     Customers.get_full(clientId, function(client) {
       logger.log("Going to call client #"+clientId+" edit prepareForm");
       Formatter.prepareForm(Clients, client);
+      if (client.activationDate instanceof Date) {
+        client.isActive = true;
+      }
       logger.log("Client to edit: " + JSON.stringify(client));
       $scope.client = client;
     }, false);
@@ -1833,6 +1836,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   $scope.saveClient = function(client) {
     $scope.btnDisabled = true;
     var cfields = Formatter.preSaveForm(Clients, client);
+    if (cfields['activationDate']) {
+      delete cfields['activationDate'];
+    }
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
     var i = 0, len = cdts.length;
