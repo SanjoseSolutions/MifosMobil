@@ -1061,7 +1061,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
   $scope.makeDeposit = function() {
     $scope.deposit = {};
-    $ionicPopup.show( {
+    var depositPopup = $ionicPopup.show( {
       title: 'Make a Deposit',
       template: '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
         '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">',
@@ -1070,41 +1070,46 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         text: 'Cancel'
       }, {
         text: 'Deposit',
-        onTap: function(res) {
+        onTap: function(e) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
             transactionDate: DateUtil.toDateString($scope.deposit.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
-          SavingsAccounts.deposit(id, params, function(data) {
-            logger.log("Deposit successful!");
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Deposit successful!'
-            };
-          }, function(data) {
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Deposit accepted..'
-            };
-          }, function(res) {
-            $scope.message = {
-              type: 'warn',
-              text: 'Deposit failed'
-            };
-            logger.log("Depsoit fail ("+ res.status+"): " + JSON.stringify(res.data));
-          } );
+          return params;
         }
       } ]
+    } );
+    depositPopup.then(function(params) {
+      logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params, null, 2));
+      SavingsAccounts.deposit(id, params, function(data) {
+        logger.log("Deposit successful!");
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: 'Deposit successful! Transaction #' + data.id
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(data) {
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: 'Deposit accepted..'
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(res) {
+        $scope.message = {
+          type: 'warn',
+          text: 'Deposit failed'
+        };
+        logger.log("Depsoit failed ("+ res.status+"): " + JSON.stringify(res.data));
+      } );
     } );
   };
   $scope.doWithdrawal = function() {
     $scope.withdrawal = {};
-    $ionicPopup.show( {
+    var withdrawalPopup = $ionicPopup.show( {
       title: 'Make a Withdrawal',
       template: '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
         '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">',
@@ -1113,36 +1118,42 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         text: 'Cancel'
       }, {
         text: 'Withdraw',
-        onTap: function(res) {
+        onTap: function(e) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
             transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
-          SavingsAccounts.withdraw(id, params, function(data) {
-            logger.log("Withdrawal successful!");
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Withdrawal successful!'
-            };
-          }, function(data) {
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Withdraw accepted'
-            };
-          }, function(res) {
-            $scope.message = {
-              type: 'warn',
-              text: 'Withdraw failed'
-            };
-            logger.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
-          } );
+          return params;
         }
       } ]
+    } );
+
+    withdrawalPopup.then(function(params) {
+      logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
+      SavingsAccounts.withdraw(id, params, function(data) {
+        logger.log("Withdrawal successful!");
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: 'Withdrawal successful! Transaction #' + data.id
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(data) {
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: "Withdrawal accepted (offline)"
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(res) {
+        $scope.message = {
+          type: 'warn',
+          text: 'Withdraw failed'
+        };
+        logger.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
+      } );
     } );
   };
 } ] )
