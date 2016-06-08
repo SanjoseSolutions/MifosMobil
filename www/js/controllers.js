@@ -1151,9 +1151,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 
   $scope.undoTransaction = function(transactionId) {
-    console.log(transactionId);
     SavingsAccounts.undoTransaction(id, transactionId, function(data) {
-      logger.log("Deposit successful!");
+      alert("Undo successful!");
       //updateBalance(data);
       $scope.message = {
         type: 'info',
@@ -1161,6 +1160,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       };
     }, function(data) {
       //updateTransactionBalance(data);
+      alert("Undo accepted")
       $scope.message = {
         type: 'info',
         text: 'Undo accepted..'
@@ -1170,6 +1170,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         type: 'warn',
         text: 'Undo failed'
       };
+      alert("Undo failed");
       logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
     } );
 
@@ -1594,7 +1595,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     };
 
     LoanAccounts.undoTransaction(id, transactionId, params, function(data) {
-      logger.log("Deposit successful!");
+      alert("Undo successful!");
       $scope.message = {
         type: 'info',
         text: 'Undo successful!'
@@ -1604,11 +1605,13 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         type: 'info',
         text: 'Undo accepted..'
       };
+      alert("Undo accepted!");
     }, function(res) {
       $scope.message = {
         type: 'warn',
         text: 'Undo failed'
       };
+      alert("Undo failed!");
       logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
     } );
 

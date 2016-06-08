@@ -1800,10 +1800,8 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
        } );
     },
     undoTransaction: function(id, transactionId, fn_res, fn_offline, fn_err) {
-
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions/' + transactionId +'?command=undo',
         {}, {}, function(response) {
-          console.log(response)
           if (202 == response.status) {
             fn_offline(response);
             return;
@@ -2015,7 +2013,6 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     undoTransaction: function(id, transactionId, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/loans/' + id + '/transactions/' + transactionId +'?command=undo',
         params, {}, function(response) {
-          console.log(response)
           if (202 == response.status) {
             fn_offline(response);
             return;
