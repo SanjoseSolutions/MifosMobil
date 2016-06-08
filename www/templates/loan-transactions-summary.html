@@ -102,6 +102,7 @@ tbody {
       <th title="Account Type"> Type </th>
       <th> Amount </th>
       <th> Balance </th>
+      <th> Actions </th>
     </tr>
     </thead>
     <!-- tfoot>
@@ -110,6 +111,7 @@ tbody {
       <td>$180 Actual Balance</td>
     </tr>
     </tfoot -->
+
     <tbody ng-repeat="trans in data.transactions">
     <tr>
       <td>{{trans.id}}</td>
@@ -117,6 +119,11 @@ tbody {
       <td>{{trans.type.value}}</td>
       <td><span class="icon ion-bitcoin"></span>{{trans.amount}}</td>
       <td><span class="icon ion-bitcoin"></span>{{trans.outstandingLoanBalance}}</td>
+      <td>
+        <button ng-click="undoTransaction(trans.id)" class="button button-small button-assertive">
+          Undo
+        </button>
+      </td>
     </tr>
     </tbody>
     </table>

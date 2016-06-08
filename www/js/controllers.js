@@ -1149,6 +1149,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.accountNo = sac.accountNo;
     $scope.data.transactions = sac.transactions;
   } );
+
+  $scope.undoTransaction = function(transactionId) {
+    SavingsAccounts.undoTransaction(id, transactionId, function(data) {
+      alert("Undo successful!");
+      //updateBalance(data);
+      $scope.message = {
+        type: 'info',
+        text: 'Undo successful!'
+      };
+    }, function(data) {
+      //updateTransactionBalance(data);
+      alert("Undo accepted")
+      $scope.message = {
+        type: 'info',
+        text: 'Undo accepted..'
+      };
+    }, function(res) {
+      $scope.message = {
+        type: 'warn',
+        text: 'Undo failed'
+      };
+      alert("Undo failed");
+      logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
+    } );
+
+  }
+
 } ] )
 
 .controller('LoansAccCreateCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'DateUtil', 'HashUtil', '$cordovaNetwork',
@@ -1548,8 +1575,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
-.controller('LoanTransCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'logger',
-    function($scope, $stateParams, LoanAccounts, logger) {
+.controller('LoanTransCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'logger', 'DateUtil',
+    function($scope, $stateParams, LoanAccounts, logger, DateUtil) {
 
   var id = $stateParams.id;
   logger.log("LoanTransCtrl called with: " + id);
@@ -1558,6 +1585,38 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.accountNo = lac.accountNo;
     $scope.data.transactions = lac.transactions;
   } );
+
+  $scope.undoTransaction = function(transactionId) {
+    var params = {
+      transactionAmount: 0,
+      transactionDate: DateUtil.toDateString(new Date()),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+
+    LoanAccounts.undoTransaction(id, transactionId, params, function(data) {
+      alert("Undo successful!");
+      $scope.message = {
+        type: 'info',
+        text: 'Undo successful!'
+      };
+    }, function(data) {
+      $scope.message = {
+        type: 'info',
+        text: 'Undo accepted..'
+      };
+      alert("Undo accepted!");
+    }, function(res) {
+      $scope.message = {
+        type: 'warn',
+        text: 'Undo failed'
+      };
+      alert("Undo failed!");
+      logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
+    } );
+
+  }
+
 } ] )
 
 .controller('LoanSchedCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
