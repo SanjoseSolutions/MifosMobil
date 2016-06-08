@@ -15,6 +15,9 @@
 
 
 <style type="text/css">
+.w100 {
+  width: 100%;
+}
 table#SavSum tr>td {
   padding: 3px;
 }
@@ -152,69 +155,85 @@ td {
           </tbody>
           </table>
         </ion-item>
-        <ion-item>
-          <h2>Reports</h2>
-          <div class="row responsive-sm">
-            <div class="col">
-              <a href="#/tab/dashboard/active-clients" class="button button-calm">Active Members</a>
-            </div>
-            <div class="col">
-              <a href="#/tab/dashboard/borrowers" class="button button-calm">Total Borrowers</a>
-            </div>
-          </div>
-          <div class="row responsive-sm">
-            <div class="col">
-              <a href="#/tab/dashboard/total-savings" class="button button-calm">Total Savings</a>
-            </div>
-            <div class="col">
-              <a href="#/tab/dashboard/savings-prods" class="button button-calm">Account Types</a>
-            </div>
-          </div>
-          <div class="row responsive-sm">
-            <div class="col">
-              <a href="#/tab/dashboard/loan-outstanding" class="button button-calm">Loan Oustanding</a>
-            </div>
-            <div class="col">
-              <a href="#/tab/dashboard/due-collected" class="button button-calm">Due vs Collected</a>
-            </div>
-          </div>
-          <div class="row responsive-sm">
-            <div class="col">
-              <a href="#/tab/dashboard/member-detail" class="button button-balanced">Member Details</a>
-            </div>
-            <div class="col">
-              <a href="#/tab/dashboard/member-transactions" class="button button-balanced">Member Transactions</a>
-            </div>
-          </div>
 
+        <ion-item class="item item-divider item-icon">
+          <label><strong class="centered">Analytic Reports</strong></label>
+          <span class="button button-small button-positive rightBtn w20"
+              ng-click="toggleReports()" title="Click to Display/Hide Reports">
+           <i class="icon ion-plus-circled"></i>
+          </span>
         </ion-item>
+
+        <ion-item ng-show="displayReports">
+          <div class="row responsive-sm">
+            <div class="col">
+              <a href="#/tab/dashboard/active-clients" class="button button-calm button-small w100">Active Members</a>
+            </div>
+            <div class="col">
+              <a href="#/tab/dashboard/borrowers" class="button button-calm button-small w100">Total Borrowers</a>
+            </div>
+          </div>
+          <div class="row responsive-sm">
+            <div class="col">
+              <a href="#/tab/dashboard/total-savings" class="button button-calm button-small w100">Total Savings</a>
+            </div>
+            <div class="col">
+              <a href="#/tab/dashboard/savings-prods" class="button button-calm button-small w100">Account Types</a>
+            </div>
+          </div>
+          <div class="row responsive-sm">
+            <div class="col">
+              <a href="#/tab/dashboard/loan-outstanding" class="button button-calm button-small w100">Loan Oustanding</a>
+            </div>
+            <div class="col">
+              <a href="#/tab/dashboard/due-collected" class="button button-calm button-small w100">
+                Due vs Collected</a>
+            </div>
+          </div>
+          <div class="row responsive-sm">
+            <div class="col">
+              <a href="#/tab/dashboard/member-detail" class="button button-balanced button-small w100">
+                Member Details</a>
+            </div>
+            <div class="col">
+              <a href="#/tab/dashboard/member-transactions" class="button button-balanced button-small w100">
+                Member Transactions</a>
+            </div>
+          </div>
+        </ion-item>
+
         <ion-item>
-          <center>
-          Connection status: {{session.status()}}
-            <span ng-if="session.isOnline" class="ion-android-cloud-done">&nbsp;</span>
+          <center>Connection status: <strong>{{session.status()}}</strong>
+            <i ng-show="session.isOnline" class="icon ion-android-cloud-done"></i><!-- &nbsp;</i -->
+            <i ng-show="!session.isOnline" class="icon ion-android-cloud-outline"></i>
           </center>
-          <center ng-if="!session.isOnline">
-            <span class="icon ion-android-cloud-outline">&nbsp;</span></center>
           <center ng-hide="session.isOnline">
-            Last synced: {{session.lastSyncSince()}}
+            Last synced: <strong> {{session.lastSyncSince()}}</strong>
           </center>
         </ion-item>
         <ion-item>
-          Logged in <em>@ {{loginTime}}</em>
+          <center>Logged in <em><strong>@ {{loginTime}}</strong></em></center>
         </ion-item>
         <ion-item class="centered">
           <button class="button-calm button button-clear button-outline"
               ng-click="ConfirmLogOut()">
-            Logout
-            <span class="ion-log-out"></span>
+            <strong>Logout</strong>
+            <span class="icon ion-log-out"></span>
           </button>
         </ion-item>
         <ion-item>
           <center ng-show="msg">
             <tt style="font-size:60%">{{msg}}</tt>
           </center>
-          <center><a href="#/tab/dashboard/logs">View Logs</a></center>
-          <center>More visit: <label>kmayra.org</label> </center>
+          <center><a href="#/tab/dashboard/logs"
+              class="button button-small button-calm button-outline">
+            View Logs</a>
+          </center>
+          <center>
+            <!-- K-Mayra is Micro-Financial Mobile App for <strong style="font-family:corsiva;"> KIFIYA </strong>
+            <br />powered by <a href="#" style="text-decoration:none;"> SanJoseSolutions.in</a  -->
+            More visit: <label><strong>kmayra.org</strong></label>
+          </center>
         </ion-item>
 
       </ion-list>
