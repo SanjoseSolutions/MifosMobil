@@ -607,14 +607,6 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       logger.log("Client #" + id + " rejected");
     } );
   };
-
-  $scope.fetchClientData = function() {
-    Clients.get(clientId, function(client) {
-      $scope.client = client;
-      $scope.$broadcast('scroll.refreshComplete');
-    });
-  }
-
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
@@ -1168,6 +1160,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.accountNo = sac.accountNo;
     $scope.data.transactions = sac.transactions;
   } );
+
+  $scope.undoTransaction = function(transactionId) {
+    SavingsAccounts.undoTransaction(id, transactionId, function(data) {
+      alert("Undo successful!");
+      //updateBalance(data);
+      $scope.message = {
+        type: 'info',
+        text: 'Undo successful!'
+      };
+    }, function(data) {
+      //updateTransactionBalance(data);
+      alert("Undo accepted")
+      $scope.message = {
+        type: 'info',
+        text: 'Undo accepted..'
+      };
+    }, function(res) {
+      $scope.message = {
+        type: 'warn',
+        text: 'Undo failed'
+      };
+      alert("Undo failed");
+      logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
+    } );
+
+  }
+
 } ] )
 
 .controller('LoansAccCreateCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'DateUtil', 'HashUtil', '$cordovaNetwork',
@@ -1396,7 +1415,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     }, function(response) {
       logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
     } );
+
   };
+
 } ] )
 
 .controller('LoanChargesCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
@@ -1565,8 +1586,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
-.controller('LoanTransCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'logger',
-    function($scope, $stateParams, LoanAccounts, logger) {
+.controller('LoanTransCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'logger', 'DateUtil',
+    function($scope, $stateParams, LoanAccounts, logger, DateUtil) {
 
   var id = $stateParams.id;
   logger.log("LoanTransCtrl called with: " + id);
@@ -1575,6 +1596,38 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.accountNo = lac.accountNo;
     $scope.data.transactions = lac.transactions;
   } );
+
+  $scope.undoTransaction = function(transactionId) {
+    var params = {
+      transactionAmount: 0,
+      transactionDate: DateUtil.toDateString(new Date()),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+
+    LoanAccounts.undoTransaction(id, transactionId, params, function(data) {
+      alert("Undo successful!");
+      $scope.message = {
+        type: 'info',
+        text: 'Undo successful!'
+      };
+    }, function(data) {
+      $scope.message = {
+        type: 'info',
+        text: 'Undo accepted..'
+      };
+      alert("Undo accepted!");
+    }, function(res) {
+      $scope.message = {
+        type: 'warn',
+        text: 'Undo failed'
+      };
+      alert("Undo failed!");
+      logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
+    } );
+
+  }
+
 } ] )
 
 .controller('LoanSchedCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
@@ -1709,71 +1762,77 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     ShareProducts.get_first(function(share_product) {
       //logger.log("Loaded product: " + JSON.stringify(share_product));
       $scope.product = share_product;
+      $scope.share.unitPrice = share_product.unitPrice;
     } );
   };
 
   $scope.sharesBuy = function()  {
-    var product = $scope.product;
-    $scope.amount = ($scope.share.requestedShares||0) * $scope.share.unitPrice;
-    var myPopup = $ionicPopup.show({
-      title: '<strong>Shares Buy</strong>',
-      /* This Url takes you to a script with the same ID Name in index.html */
-      templateUrl: 'popup-template-html',
-      scope: $scope, // null,
-      buttons: [
-        { text: 'Cancel',
-          type: 'button-default', //'button-clear',
-          onTap: function(e) {
-            // e.preventDefault() will stop the popup from closing when tapped.
-            return "Popup Canceled"; // false;
-          }
-        },
-        { text: '<b>Buy</b>',
-          type: 'button-positive',
-          onTap: function(e) {
-            if (!$scope.share.requestedShares) {
-              e.preventDefault();
-              //don't allow the user to close the popup if empty
-            } else {
-              // Returning a value will cause the promise to resolve with the given value.
-              var share = $scope.share;
-              share['locale'] = 'en';
-              share['dateFormat'] = 'yyyy-MM-dd';
-              var date = new Date();
-              var dt = date.toISOString().substr(0,10);
-              share['applicationDate'] = dt;
-              share['submittedDate'] = dt;
-              share['charges'] = []; // currently no charges
-              share['productId'] = product.id;
-              Shares.save(share, function(new_share) {
-                var shareId = new_share.resourceId;
-                alert("Share application success: " + shareId + ". Pending approval.");
-                setTimeout(function() {
-                  $state.go('tab.client-share', { 'id': shareId } );
-                }, 1500);
-              }, function(response) {
-                alert("Share application accepted (offline). Pending sync and approval");
-              }, function(err) {
-                alert("Failure share application");
-              } );
+    console.log($scope.product.minimumShares, $scope.share.requestedShares, $scope.product.minimumShares < $scope.share.requestedShares)
+    if($scope.product.minimumShares > $scope.share.requestedShares) {
+      alert("requestedShares is less than minimumShares that is: " + $scope.product.minimumShares)
+    } else {      
+      var product = $scope.product;
+      $scope.amount = ($scope.share.requestedShares||0) * $scope.share.unitPrice;
+      var myPopup = $ionicPopup.show({
+        title: '<strong>Shares Buy</strong>',
+        /* This Url takes you to a script with the same ID Name in index.html */
+        templateUrl: 'popup-template-html',
+        scope: $scope, // null,
+        buttons: [
+          { text: 'Cancel',
+            type: 'button-default', //'button-clear',
+            onTap: function(e) {
+              // e.preventDefault() will stop the popup from closing when tapped.
+              return "Popup Canceled"; // false;
+            }
+          },
+          { text: '<b>Buy</b>',
+            type: 'button-positive',
+            onTap: function(e) {
+              if (!$scope.share.requestedShares) {
+                e.preventDefault();
+                //don't allow the user to close the popup if empty
+              } else {
+                // Returning a value will cause the promise to resolve with the given value.
+                var share = $scope.share;
+                share['locale'] = 'en';
+                share['dateFormat'] = 'yyyy-MM-dd';
+                var date = new Date();
+                var dt = date.toISOString().substr(0,10);
+                share['applicationDate'] = dt;
+                share['submittedDate'] = dt;
+                share['charges'] = []; // currently no charges
+                share['productId'] = product.id;
+                Shares.save(share, function(new_share) {
+                  var shareId = new_share.resourceId;
+                  alert("Share application success: " + shareId + ". Pending approval.");
+                  setTimeout(function() {
+                    $state.go('tab.client-share', { 'id': shareId } );
+                  }, 1500);
+                }, function(response) {
+                  alert("Share application accepted (offline). Pending sync and approval");
+                }, function(err) {
+                  alert("Failure share application");
+                } );
 
-              return true; // true;
+                return true; // true;
+              }
             }
           }
-        }
-      ]
-    } );
+        ]
+      } );
 
-    myPopup.then(function(res) {
-      logger.log('Received : ' + '"' + res + '"');
-      // Insert the appropriate Code here
-      // to process the Received Data for Saving Account Creation
-    });
+      myPopup.then(function(res) {
+        logger.log('Received : ' + '"' + res + '"');
+        // Insert the appropriate Code here
+        // to process the Received Data for Saving Account Creation
+      });
 
-    $timeout(function() {
-      logger.log("Popup TimeOut");
-      myPopup.close();
-    }, 15000);
+      $timeout(function() {
+        logger.log("Popup TimeOut");
+        myPopup.close();
+      }, 15000);
+    }
   };
 
 } ] )
