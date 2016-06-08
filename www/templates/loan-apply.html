@@ -85,6 +85,17 @@ select, input[type=text] {
         </label>
       </div>
 
+      <div class="item item-input-inset">
+        <span class="input-label">Own Savings
+          <sup><i class="icon ion-asterisk assertive"></i></sup> :
+        </span>
+        <label class="item-input-wrapper">
+          <select name="linkAccount" ng-model="loan.linkAccountId" ng-options="a.id as a.name for a in linkAccounts"
+              ng-change="ownSavingChanged(loan.linkAccountId)">
+          </select>
+        </label>
+      </div>
+
       <!-- ion-item -->
       <label class="item item-input item-select">
         <div class="input-label">Loan Officer
