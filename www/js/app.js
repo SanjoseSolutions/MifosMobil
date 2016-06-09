@@ -448,6 +448,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dashboard-member-accounts', {
+    url: '/dashboard/member-accounts',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/rpt-member-detail.html',
+        controller: 'RptMemAcctsCtrl'
+      }
+    }
+  } )
+
   .state('tab.dashboard-member-transactions', {
     url: '/dashboard/member-transactions',
     views: {

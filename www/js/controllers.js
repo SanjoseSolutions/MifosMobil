@@ -607,14 +607,6 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       logger.log("Client #" + id + " rejected");
     } );
   };
-
-  $scope.fetchClientData = function() {
-    Clients.get(clientId, function(client) {
-      $scope.client = client;
-      $scope.$broadcast('scroll.refreshComplete');
-    });
-  }
-
   $scope.$on('$ionicView.enter', function(e) {
     logger.log("ClientView called for #" + clientId);
     Customers.get_full(clientId, function(client) {
@@ -1061,7 +1053,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
   $scope.makeDeposit = function() {
     $scope.deposit = {};
-    $ionicPopup.show( {
+    var depositPopup = $ionicPopup.show( {
       title: 'Make a Deposit',
       template: '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
         '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">',
@@ -1070,41 +1062,46 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         text: 'Cancel'
       }, {
         text: 'Deposit',
-        onTap: function(res) {
+        onTap: function(e) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
             transactionDate: DateUtil.toDateString($scope.deposit.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params));
-          SavingsAccounts.deposit(id, params, function(data) {
-            logger.log("Deposit successful!");
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Deposit successful!'
-            };
-          }, function(data) {
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Deposit accepted..'
-            };
-          }, function(res) {
-            $scope.message = {
-              type: 'warn',
-              text: 'Deposit failed'
-            };
-            logger.log("Depsoit fail ("+ res.status+"): " + JSON.stringify(res.data));
-          } );
+          return params;
         }
       } ]
+    } );
+    depositPopup.then(function(params) {
+      logger.log("Calling deposit with id:"+id+" and params:"+JSON.stringify(params, null, 2));
+      SavingsAccounts.deposit(id, params, function(data) {
+        logger.log("Deposit successful!");
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: 'Deposit successful! Transaction #' + data.id
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(data) {
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: 'Deposit accepted..'
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(res) {
+        $scope.message = {
+          type: 'warn',
+          text: 'Deposit failed'
+        };
+        logger.log("Depsoit failed ("+ res.status+"): " + JSON.stringify(res.data));
+      } );
     } );
   };
   $scope.doWithdrawal = function() {
     $scope.withdrawal = {};
-    $ionicPopup.show( {
+    var withdrawalPopup = $ionicPopup.show( {
       title: 'Make a Withdrawal',
       template: '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
         '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">',
@@ -1113,36 +1110,42 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         text: 'Cancel'
       }, {
         text: 'Withdraw',
-        onTap: function(res) {
+        onTap: function(e) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
             transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
-          SavingsAccounts.withdraw(id, params, function(data) {
-            logger.log("Withdrawal successful!");
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Withdrawal successful!'
-            };
-          }, function(data) {
-            updateBalance(data);
-            $scope.message = {
-              type: 'info',
-              text: 'Withdraw accepted'
-            };
-          }, function(res) {
-            $scope.message = {
-              type: 'warn',
-              text: 'Withdraw failed'
-            };
-            logger.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
-          } );
+          return params;
         }
       } ]
+    } );
+
+    withdrawalPopup.then(function(params) {
+      logger.log("Calling withdraw with id:"+id+" and params:"+JSON.stringify(params));
+      SavingsAccounts.withdraw(id, params, function(data) {
+        logger.log("Withdrawal successful!");
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: 'Withdrawal successful! Transaction #' + data.id
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(data) {
+        var popup = $ionicPopup.alert( {
+          title: 'Success',
+          template: "Withdrawal accepted (offline)"
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
+        updateBalance(data);
+      }, function(res) {
+        $scope.message = {
+          type: 'warn',
+          text: 'Withdraw failed'
+        };
+        logger.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
+      } );
     } );
   };
 } ] )
@@ -1157,6 +1160,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.accountNo = sac.accountNo;
     $scope.data.transactions = sac.transactions;
   } );
+
+  $scope.undoTransaction = function(transactionId) {
+    SavingsAccounts.undoTransaction(id, transactionId, function(data) {
+      alert("Undo successful!");
+      //updateBalance(data);
+      $scope.message = {
+        type: 'info',
+        text: 'Undo successful!'
+      };
+    }, function(data) {
+      //updateTransactionBalance(data);
+      alert("Undo accepted")
+      $scope.message = {
+        type: 'info',
+        text: 'Undo accepted..'
+      };
+    }, function(res) {
+      $scope.message = {
+        type: 'warn',
+        text: 'Undo failed'
+      };
+      alert("Undo failed");
+      logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
+    } );
+
+  }
+
 } ] )
 
 .controller('LoansAccCreateCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'DateUtil', 'HashUtil', '$cordovaNetwork',
@@ -1385,7 +1415,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     }, function(response) {
       logger.log("Failed to save datatables(" + response.status + ") data: " + JSON.stringify(response.data));
     } );
+
   };
+
 } ] )
 
 .controller('LoanChargesCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
@@ -1508,7 +1540,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         $scope.message = null;
       }, 2500);
     };
-    $ionicPopup.show( {
+    var repaymentPopup = $ionicPopup.show( {
       title: 'Make a Repayment',
       template: '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
         '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
@@ -1517,45 +1549,45 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         text: 'Cancel'
       }, {
         text: 'Repay',
-        onTap: function(res) {
+        onTap: function(e) {
           var params = {
             transactionAmount: $scope.repayment.transAmount,
             transactionDate: DateUtil.toDateString($scope.repayment.transDate),
             locale: 'en',
             dateFormat: 'yyyy-MM-dd'
           };
-          logger.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
-          LoanAccounts.repay(id, params, function(data) {
-            logger.log("Repayment successful!");
-            $scope.message = {
-              type: 'info',
-              text: 'Repayment successful!'
-            };
-            update_loan(data);
-            hideMessage();
-          }, function(res) {
-            $scope.data.totalRepayment += $scope.repayment.transAmount;
-            $scope.message = {
-              type: 'info',
-              text: 'Repayment accepted..'
-            };
-            hideMessage();
-          }, function(res) {
-            $scope.message = {
-              type: 'warn',
-              text: 'Repayment failed'
-            };
-            hideMessage();
-            logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
-          } );
+          return params;
         }
       } ]
+    } );
+    var informAndHide = function(msg, title) {
+      var popup = $ionicPopup.alert( {
+        title: (title || 'Success'),
+        template: msg
+      } );
+      setTimeout(function(e) {
+        popup.close()
+      }, 2000);
+    };
+    repaymentPopup.then(function(params) {
+      logger.log("Calling repayment with id:"+id+" and params:"+JSON.stringify(params));
+      LoanAccounts.repay(id, params, function(data) {
+        logger.log("Repayment successful!");
+        informAndHide("Repayment successful!");
+        update_loan(data);
+      }, function(res) {
+        $scope.data.totalRepayment += $scope.repayment.transAmount;
+        informAndHide("Repayment accepted (offline)");
+      }, function(res) {
+        informAndHide('Repayment failed', 'Failure');
+        logger.log("Repayment fail ("+ res.status+"): " + JSON.stringify(res.data));
+      } );
     } );
   };
 } ] )
 
-.controller('LoanTransCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'logger',
-    function($scope, $stateParams, LoanAccounts, logger) {
+.controller('LoanTransCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'logger', 'DateUtil',
+    function($scope, $stateParams, LoanAccounts, logger, DateUtil) {
 
   var id = $stateParams.id;
   logger.log("LoanTransCtrl called with: " + id);
@@ -1564,6 +1596,38 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.accountNo = lac.accountNo;
     $scope.data.transactions = lac.transactions;
   } );
+
+  $scope.undoTransaction = function(transactionId) {
+    var params = {
+      transactionAmount: 0,
+      transactionDate: DateUtil.toDateString(new Date()),
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd'
+    };
+
+    LoanAccounts.undoTransaction(id, transactionId, params, function(data) {
+      alert("Undo successful!");
+      $scope.message = {
+        type: 'info',
+        text: 'Undo successful!'
+      };
+    }, function(data) {
+      $scope.message = {
+        type: 'info',
+        text: 'Undo accepted..'
+      };
+      alert("Undo accepted!");
+    }, function(res) {
+      $scope.message = {
+        type: 'warn',
+        text: 'Undo failed'
+      };
+      alert("Undo failed!");
+      logger.log("Undo fail ("+ res.status+"): " + JSON.stringify(res.data));
+    } );
+
+  }
+
 } ] )
 
 .controller('LoanSchedCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
@@ -1698,71 +1762,77 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     ShareProducts.get_first(function(share_product) {
       //logger.log("Loaded product: " + JSON.stringify(share_product));
       $scope.product = share_product;
+      $scope.share.unitPrice = share_product.unitPrice;
     } );
   };
 
   $scope.sharesBuy = function()  {
-    var product = $scope.product;
-    $scope.amount = ($scope.share.requestedShares||0) * $scope.share.unitPrice;
-    var myPopup = $ionicPopup.show({
-      title: '<strong>Shares Buy</strong>',
-      /* This Url takes you to a script with the same ID Name in index.html */
-      templateUrl: 'popup-template-html',
-      scope: $scope, // null,
-      buttons: [
-        { text: 'Cancel',
-          type: 'button-default', //'button-clear',
-          onTap: function(e) {
-            // e.preventDefault() will stop the popup from closing when tapped.
-            return "Popup Canceled"; // false;
-          }
-        },
-        { text: '<b>Buy</b>',
-          type: 'button-positive',
-          onTap: function(e) {
-            if (!$scope.share.requestedShares) {
-              e.preventDefault();
-              //don't allow the user to close the popup if empty
-            } else {
-              // Returning a value will cause the promise to resolve with the given value.
-              var share = $scope.share;
-              share['locale'] = 'en';
-              share['dateFormat'] = 'yyyy-MM-dd';
-              var date = new Date();
-              var dt = date.toISOString().substr(0,10);
-              share['applicationDate'] = dt;
-              share['submittedDate'] = dt;
-              share['charges'] = []; // currently no charges
-              share['productId'] = product.id;
-              Shares.save(share, function(new_share) {
-                var shareId = new_share.resourceId;
-                alert("Share application success: " + shareId + ". Pending approval.");
-                setTimeout(function() {
-                  $state.go('tab.client-share', { 'id': shareId } );
-                }, 1500);
-              }, function(response) {
-                alert("Share application accepted (offline). Pending sync and approval");
-              }, function(err) {
-                alert("Failure share application");
-              } );
+    console.log($scope.product.minimumShares, $scope.share.requestedShares, $scope.product.minimumShares < $scope.share.requestedShares)
+    if($scope.product.minimumShares > $scope.share.requestedShares) {
+      alert("requestedShares is less than minimumShares that is: " + $scope.product.minimumShares)
+    } else {      
+      var product = $scope.product;
+      $scope.amount = ($scope.share.requestedShares||0) * $scope.share.unitPrice;
+      var myPopup = $ionicPopup.show({
+        title: '<strong>Shares Buy</strong>',
+        /* This Url takes you to a script with the same ID Name in index.html */
+        templateUrl: 'popup-template-html',
+        scope: $scope, // null,
+        buttons: [
+          { text: 'Cancel',
+            type: 'button-default', //'button-clear',
+            onTap: function(e) {
+              // e.preventDefault() will stop the popup from closing when tapped.
+              return "Popup Canceled"; // false;
+            }
+          },
+          { text: '<b>Buy</b>',
+            type: 'button-positive',
+            onTap: function(e) {
+              if (!$scope.share.requestedShares) {
+                e.preventDefault();
+                //don't allow the user to close the popup if empty
+              } else {
+                // Returning a value will cause the promise to resolve with the given value.
+                var share = $scope.share;
+                share['locale'] = 'en';
+                share['dateFormat'] = 'yyyy-MM-dd';
+                var date = new Date();
+                var dt = date.toISOString().substr(0,10);
+                share['applicationDate'] = dt;
+                share['submittedDate'] = dt;
+                share['charges'] = []; // currently no charges
+                share['productId'] = product.id;
+                Shares.save(share, function(new_share) {
+                  var shareId = new_share.resourceId;
+                  alert("Share application success: " + shareId + ". Pending approval.");
+                  setTimeout(function() {
+                    $state.go('tab.client-share', { 'id': shareId } );
+                  }, 1500);
+                }, function(response) {
+                  alert("Share application accepted (offline). Pending sync and approval");
+                }, function(err) {
+                  alert("Failure share application");
+                } );
 
-              return true; // true;
+                return true; // true;
+              }
             }
           }
-        }
-      ]
-    } );
+        ]
+      } );
 
-    myPopup.then(function(res) {
-      logger.log('Received : ' + '"' + res + '"');
-      // Insert the appropriate Code here
-      // to process the Received Data for Saving Account Creation
-    });
+      myPopup.then(function(res) {
+        logger.log('Received : ' + '"' + res + '"');
+        // Insert the appropriate Code here
+        // to process the Received Data for Saving Account Creation
+      });
 
-    $timeout(function() {
-      logger.log("Popup TimeOut");
-      myPopup.close();
-    }, 15000);
+      $timeout(function() {
+        logger.log("Popup TimeOut");
+        myPopup.close();
+      }, 15000);
+    }
   };
 
 } ] )
@@ -1814,6 +1884,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     Customers.get_full(clientId, function(client) {
       logger.log("Going to call client #"+clientId+" edit prepareForm");
       Formatter.prepareForm(Clients, client);
+      if (client.activationDate instanceof Date) {
+        client.isActive = true;
+      }
       logger.log("Client to edit: " + JSON.stringify(client));
       $scope.client = client;
     }, false);
@@ -1833,6 +1906,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   $scope.saveClient = function(client) {
     $scope.btnDisabled = true;
     var cfields = Formatter.preSaveForm(Clients, client);
+    if (cfields['activationDate']) {
+      delete cfields['activationDate'];
+    }
     logger.log("Going to save client: " + JSON.stringify(cfields));
     var cdts = Clients.dataTables();
     var i = 0, len = cdts.length;
@@ -2190,6 +2266,43 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   $scope.getReport = function() {
     Reports.getReport('Client Detail', {
       R_officeId: $scope.data.officeId,
+      exportCSV: true
+    }, function(path) {
+      $scope.data.path = path;
+      $scope.downloaded = true;
+      $scope.message = {
+        text: "Success",
+        type: "info"
+      };
+    }, function(res) {
+      $scope.message = {
+        type: "error",
+        text: "Failed"
+      };
+    } );
+  };
+} ] )
+
+.controller('RptMemAcctsCtrl', ['$scope', 'Office', 'Reports', 'logger',
+    function($scope, Office, Reports, logger) {
+
+  Office.query(function(offices) {
+    $scope.codes = {
+      offices: offices
+    };
+    $scope.data = {
+      title: 'Member Loan Accounts'
+    };
+  } );
+
+  $scope.getReport = function() {
+    Reports.getReport('Active Loans - Details', {
+      R_officeId: $scope.data.officeId,
+      R_currencyId: -1,
+      R_fundId: -1,
+      R_loanOfficerId: -1,
+      R_loanProductId: -1,
+      R_loanPurposeId: -1,
       exportCSV: true
     }, function(path) {
       $scope.data.path = path;

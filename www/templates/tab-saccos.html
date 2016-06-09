@@ -35,8 +35,8 @@ span.sacco-icon {
 .noMembers {
   color: #558;
   font-size:1rem;
-  font-family: Arial;
-/*  font-weight: bold; */
+  font-family: Times, Arial, Helvetica;
+  font-weight: bold;
 }
 </style>
 <ion-view view-title="SACCOs">
@@ -75,7 +75,7 @@ span.sacco-icon {
           </div -->
           <p ng-hide="{{sacco.members}}">
             <!-- i class="icon ion-close-round"></i -->
-            <span class="noMembers">No Members</span>
+            <i class="noMembers">No Members</i>
           </p>
           <p ng-show="{{sacco.members}}">	
             <!-- i class="ion-ios-people"></i -->

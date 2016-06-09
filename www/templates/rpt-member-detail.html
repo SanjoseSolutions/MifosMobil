@@ -51,8 +51,9 @@ select {
         </ion-item>
 
         <ion-item ng-show="downloaded">
-          <a href="{{data.path}}">Download CSV</a>
-          <span style="font-size:60%">[{{data.path}}]</span>
+          <!--a href="{{data.path}}">Download CSV</a-->
+          <span style="font-size:60%">File downloaded to device root folder
+            {{data.path}}</span>
         </ion-item>
 
       </ion-list> <!-- End of List -->

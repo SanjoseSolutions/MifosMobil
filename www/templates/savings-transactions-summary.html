@@ -81,7 +81,6 @@ Acc No | Saving Acc | Balance | Actions
       <ion-label>Savings Account #:</ion-label>
       <span>{{data.accountNo}}</span>
     </div>
-
     <!-- Table -->
     <table id="SavSum" border="1" style="width:100%">
     <caption>Transactions</caption>
@@ -92,6 +91,7 @@ Acc No | Saving Acc | Balance | Actions
       <th title="Account Type"> Type </th>
       <th>Amount</th>
       <th>Balance</th>
+      <th>Actions</th>
     </tr>
     </thead>
     <!-- tfoot>
@@ -101,12 +101,17 @@ Acc No | Saving Acc | Balance | Actions
     </tr>
     </tfoot -->
     <tbody>
-    <tr ng-repeat="trans in data.transactions">
+    <tr ng-repeat="trans in data.transactions" ng-if="!trans.reversed">
       <td>{{trans.id}}</td>
       <td>{{trans.date[0]}}-{{trans.date[1]}}-{{trans.date[2]}}</td>
       <td>{{trans.transactionType.value}}</td>
       <td><span class="icon ion-bitcoin"></span>{{trans.amount}}</td>
       <td><span class="icon ion-bitcoin"></span>{{trans.runningBalance}}</td>
+      <td>
+        <button ng-click="undoTransaction(trans.id)" class="button button-small button-assertive">
+          Undo
+        </button>
+      </td>
     </tr>
     </tbody>
     </table>
