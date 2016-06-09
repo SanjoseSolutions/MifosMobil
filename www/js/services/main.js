@@ -1798,6 +1798,22 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
          //logger.log("SavingsProducts.query got: " + JSON.stringify(data));
          fn_sav_prods(data);
        } );
+    },
+    undoTransaction: function(id, transactionId, fn_res, fn_offline, fn_err) {
+      authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions/' + transactionId +'?command=undo',
+        {}, {}, function(response) {
+          if (202 == response.status) {
+            fn_offline(response);
+            return;
+          }
+          var data = response.data;
+          fn_res(data);
+        }, function(response) {
+          fn_offline(response);
+        }, function(response) {
+          logger.log("Failed to Reverse Transaction. " + response.status);
+          fn_err(response);
+        } );
     }
   };
 } ] )
@@ -1992,6 +2008,22 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         function(response) {
         },
         function(response) {
+        } );
+    },
+    undoTransaction: function(id, transactionId, params, fn_res, fn_offline, fn_err) {
+      authHttp.post(baseUrl + '/loans/' + id + '/transactions/' + transactionId +'?command=undo',
+        params, {}, function(response) {
+          if (202 == response.status) {
+            fn_offline(response);
+            return;
+          }
+          var data = response.data;
+          fn_res(data);
+        }, function(response) {
+          fn_offline(response);
+        }, function(response) {
+          logger.log("Failed to Reverse Transaction. " + response.status);
+          fn_err(response);
         } );
     }
   };
@@ -2312,26 +2344,28 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       if (pstrs.length) {
         url += '?' + pstrs.join('&');
       }
-      var nm = name.replace(/ /g, '-');
-      var dt = new Date();
-      var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
-      var options = {
-        headers: {
-          "Fineract-Platform-TenantId": Settings.tenant,
-          "Authorization": $http.defaults.headers.common.Authorization
-        }
-      };
-      logger.log("URL: " + url + ", PATH: " + path);
-      $cordovaFileTransfer.download(url, path, options)
-        .then(function(entry) {
-          logger.log("Success downloading");
-          fn_success(entry.toURL());
-        }, function(err) {
-          logger.log("Download failed");
-          fn_fail();
-        }, function(progress) {
-          //logger.log(progress);
-        } );
+      document.addEventListener('deviceready', function () {
+        var nm = name.replace(/ /g, '-');
+        var dt = new Date();
+        var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
+        var options = {
+          headers: {
+            "Fineract-Platform-TenantId": Settings.tenant,
+            "Authorization": $http.defaults.headers.common.Authorization
+          }
+        };
+        logger.log("URL: " + url + ", PATH: " + path);
+        $cordovaFileTransfer.download(url, path, options)
+          .then(function(entry) {
+            logger.log("Success downloading");
+            fn_success(entry.toURL());
+          }, function(err) {
+            logger.log("Download failed");
+            fn_fail();
+          }, function(progress) {
+            //logger.log(progress);
+          } );
+      }, false);
     }
   };
 } )

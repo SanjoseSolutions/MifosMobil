@@ -41,7 +41,7 @@ select {
           <span class="input-label">Title:</span>
           <label class="item-input-wrapper">
             <select ng-model="client.Client_Fields.ClientTitle_cd_Title"
-              ng-options="t.id as t.name for t in codes.ClientTitles" required>
+              ng-options="t.id as t.name for t in codes.ClientTitles">
             </select>
           </label>
         </div>
@@ -117,7 +117,7 @@ select {
                 ng-model="client.Client_Fields.Email">
           </label>
         </div>
-        <div class="item item-input-inset" ng-show="rolestat.isManagement || rolestat.isAdmin">
+        <div class="item item-input-inset" ng-show="!client.officeId && (rolestat.isManagement || rolestat.isAdmin)">
           <span class="input-label">Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
@@ -135,7 +135,7 @@ select {
             </select>
           </label>
         </div>
-        <div class="item item-input-inset" ng-show="rolestat.isManagement || rolestat.isAdmin">
+        <div class="item item-input-inset" ng-show="!client.isActive && (rolestat.isManagement || rolestat.isAdmin)">
           <span class="input-label">Activation Date
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
