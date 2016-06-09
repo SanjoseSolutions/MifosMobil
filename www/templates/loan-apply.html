@@ -123,7 +123,8 @@ select, input[type=text] {
       </div>
       <ion-item class="item">
         <div class="item-input-inset">
-          <span class="input-label">Principal Amount
+          <!-- span class="input-label">Principal Amount -->
+          <span class="input-label">Member's Loan Request Amount
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -135,19 +136,22 @@ select, input[type=text] {
         <!-- Warning -->
         <div ng-hide="loanAccCreateForm.principalAmount.$pristine">
           <span ng-show="loanAccCreateForm.principalAmount.$invalid" class="ion-warn">
-            Principal must be between {{loanPrincipal.min}} and {{loanPrincipal.max}}
+            Amount must be between {{loanPrincipal.min}} and {{loanPrincipal.max}}
           </span>
         </div>
       </ion-item>
-      <div class="item item-input-inset">
+
+      <!-- div class="item item-input-inset">
         <span class="input-label">Loan Term :</span>
         <label class="item-input-wrapper">
           <input type="number" size="10" ng-minlength="1" name="loanTerm"
             placeholder="How many months ?" ng-model="loan.loanTerm">
         </label> Months
-      </div>
+      </div -->
+
       <div class="item item-input-inset">
-        <span class="input-label">No. of Repayments :</span>
+        <!-- span class="input-label">No. of Repayments :</span -->
+        <span class="input-label">Expected Payment Period :</span>
         <label class="item-input-wrapper">
           <input type="number" size="10" ng-minlength="1" name="repaymentsNo"
             placeholder="How many repayments ?" ng-model="loan.repaymentsNo">
