@@ -1715,13 +1715,17 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         params, {}, function(response) {
           var data = response.data;
           if (202 == response.status) {
-            var sacsHash = Cache.get('h_savingsaccounts');
+            var sacsHash = Cache.getObject('h_savingsaccounts');
             var bal = sacsHash[id]['summary']['accountBalance'], amt = params.transactionAmount;
-            if (bal < amt) {
-              sacsHash[id]['summary']['accountBalance'] = bal - amt;
+            if (bal > amt) {
+              bal -= amt;
+              logger.log("New balance: " + bal);
+              sacsHash[id]['summary']['accountBalance'] = bal;
               Cache.setObject('h_savingsaccounts', sacsHash);
             }
-            fn_offline(params);
+            fn_offline( {
+              runningBalance: bal
+            } );
             return;
           }
           var transId = data.resourceId;
@@ -1740,15 +1744,24 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     deposit: function(id, params, fn_res, fn_offline, fn_err) {
       authHttp.post(baseUrl + '/savingsaccounts/' + id + '/transactions?command=deposit',
         params, {}, function(response) {
-          var data = response.data;
           if (202 == response.status) {
-            var sacsHash = Cache.get('h_savingsaccounts');
-            sacsHash[id]['summary']['accountBalance'] += params.transactionAmount;
-            logger.log("New balance: " + sacsHash[id]['summary']['accountBalance']);
+            var sacsHash = Cache.getObject('h_savingsaccounts');
+            var ac = sacsHash[id];
+            logger.log("Got account " + id + "::" + JSON.stringify(ac,null,2));
+            var summary = ac['summary'];
+            logger.log("Summary:" + JSON.stringify(summary,null,2));
+            var bal = summary.accountBalance;
+            logger.log("Balance: " + bal);
+            bal += params.transactionAmount;
+            logger.log("New balance: " + bal);
+            sacsHash[id].summary.accountBalance = bal;
             Cache.setObject('h_savingsaccounts', sacsHash);
-            fn_offline(params);
+            fn_offline( {
+              runningBalance: bal
+            } );
             return;
           }
+          var data = response.data;
           var transId = data.resourceId;
           logger.log("Transaction #" + transId);
           fetch_account(id, function(account){
@@ -2344,7 +2357,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       if (pstrs.length) {
         url += '?' + pstrs.join('&');
       }
-      document.addEventListener('deviceready', function () {
+//      document.addEventListener('deviceready', function () {
         var nm = name.replace(/ /g, '-');
         var dt = new Date();
         var path = cordova.file.externalRootDirectory + nm + '-' + dt.getTime() + '.csv';
@@ -2365,7 +2378,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           }, function(progress) {
             //logger.log(progress);
           } );
-      }, false);
+//      }, false);
     }
   };
 } )
