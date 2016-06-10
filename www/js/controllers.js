@@ -1091,10 +1091,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         setTimeout(function(e) { popup.close(); }, 2000);
         updateBalance(data);
       }, function(res) {
-        $scope.message = {
-          type: 'warn',
-          text: 'Deposit failed'
-        };
+        var popup = $ionicPopup.alert( {
+          title: 'Failed',
+          template: 'Deposit failed'
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
         logger.log("Depsoit failed ("+ res.status+"): " + JSON.stringify(res.data));
       } );
     } );
@@ -1140,10 +1141,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         setTimeout(function(e) { popup.close(); }, 2000);
         updateBalance(data);
       }, function(res) {
-        $scope.message = {
-          type: 'warn',
-          text: 'Withdraw failed'
-        };
+        var popup = $ionicPopup.alert( {
+          title: 'Failure',
+          template: 'Withdrawal failed'
+        } );
+        setTimeout(function(e) { popup.close(); }, 2000);
         logger.log("Withdrawal fail ("+ res.status+"): " + JSON.stringify(res.data));
       } );
     } );
