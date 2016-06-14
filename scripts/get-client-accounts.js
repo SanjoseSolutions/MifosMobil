@@ -14,8 +14,14 @@ if (argv.length < 3) {
 
 var clientId = argv[2];
 
+var atype = argv[3], suf = '';
+
+if (atype) {
+  suf = '?fields=' + atype;
+}
+
 request( {
-  url: baseUrl + "/clients/" + clientId + "/accounts",
+  url: baseUrl + "/clients/" + clientId + "/accounts" + suf,
   headers: headers,
 }, function(error, response, body) {
   if (error) {

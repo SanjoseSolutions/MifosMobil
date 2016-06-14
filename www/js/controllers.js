@@ -2222,7 +2222,15 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
           }, 2000);
           for(; i < n; ++i) {
             var clientId = clients[i].id;
-            Clients.get_all_accounts(clientId, function(accounts) {} );
+            ClientAccounts.get(clientId, 'shareAccounts', function(accounts) {
+              var i = 0, n = accounts.length;
+              for(; i < n; ++i) {
+                Shares.fetch(accounts[i].id, function(share) {
+                  //logger.log("Share account #" + share.id + '::' + JSON.stringify(share, null, 2));
+                } );
+              }
+              //logger.log('Client #' + clientId + ' share accounts: ' + JSON.stringify(accounts, null, 2));
+            } );
           }
         } );
         Clients.query_inactive(function(iClients) {
