@@ -1058,15 +1058,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   $scope.makeDeposit = function() {
     $scope.deposit = {};
     var depositPopup = $ionicPopup.show( {
-      title: 'Make a Deposit',
-      template: '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
-        '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">',
+      title: '<strong class="positive">Make a Deposit</strong>',
+      template:
+        '<ion-list class="list card">' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Amount' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount" autofocus />' +
+            '</label>' +
+          '</div>' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Date' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">' +
+            '</label>' +
+          '</div>' +
+        '</ion-list>',
       scope: $scope,
       buttons: [ {
-        text: 'Cancel'
+        text: '<strong class="dark">Cancel</strong>'
       }, {
-        text: 'Deposit',
-        onTap: function(e) {
+        text: '<strong>Deposit</strong>',
+        type: 'button-positive',
+        onTap: function(res) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
             transactionDate: DateUtil.toDateString($scope.deposit.transDate),
@@ -1106,16 +1124,35 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
   $scope.doWithdrawal = function() {
     $scope.withdrawal = {};
+
     var withdrawalPopup = $ionicPopup.show( {
-      title: 'Make a Withdrawal',
-      template: '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
-        '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">',
+      title: '<strong class="positive">Make a Withdrawal</strong>',
+      template:
+        '<ion-list class="list card">' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Amount' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount" autofocus />' +
+            '</label>' +
+          '</div>' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Date' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">' +
+            '</label>' +
+          '</div>' +
+        '</ion-list>',
       scope: $scope,
       buttons: [ {
-        text: 'Cancel'
+        text: '<strong class="dark">Cancel</strong>'
       }, {
-        text: 'Withdraw',
-        onTap: function(e) {
+        text: '<strong>Withdraw</strong>',
+        type: 'button-positive',
+        onTap: function(res) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
             transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
@@ -1546,15 +1583,34 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         $scope.message = null;
       }, 2500);
     };
+
     var repaymentPopup = $ionicPopup.show( {
-      title: 'Make a Repayment',
-      template: '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
-        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
+      title: '<strong class="positive">Make a Repayment</strong>',
+      template:
+        '<ion-list class="list card">' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Amount' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount" autofocus />' +
+            '</label>' +
+          '</div>' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Date' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">' +
+            '</label>' +
+          '</div>' +
+        '</ion-list>',
       scope: $scope,
       buttons: [ {
-        text: 'Cancel'
+        text: '<strong class="dark">Cancel</strong>'
       }, {
-        text: 'Repay',
+        text: '<strong>Repay</strong>',
+        type: 'button-positive',
         onTap: function(e) {
           var params = {
             transactionAmount: $scope.repayment.transAmount,
