@@ -21,8 +21,7 @@ select {
 
   <ion-header-bar>
 	  <button class="button button-icon" ng-click="newTask()">
-      Edit
-      <i class="ion-compose icon"></i>
+      Edit <i class="ion-compose icon"></i>
     </button>
   </ion-header-bar>
 
@@ -30,17 +29,16 @@ select {
     <form name="clientEditForm" novalidate>
     <ion-list>
       <div class="Mandatory">
-          <sup><i class="icon ion-asterisk assertive"></i></sup>
-          : Mandatory fields
+        <sup><i class="icon ion-asterisk assertive"></i></sup>
+        : Mandatory fields
       </div>
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>
       </ion-item>
-      
+
       <div class="list card">
         <div class="item item-input-inset">
-          <span class="input-label">Title:
-          </span>
+          <span class="input-label">Title:</span>
           <label class="item-input-wrapper">
             <select ng-model="client.Client_Fields.ClientTitle_cd_Title"
               ng-options="t.id as t.name for t in codes.ClientTitles">
@@ -48,8 +46,7 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">
-            First Name
+          <span class="input-label">First Name
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -59,8 +56,7 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">
-            Last Name
+          <span class="input-label">Last Name
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -88,8 +84,7 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">
-            Date of Birth
+          <span class="input-label">Date of Birth
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -123,8 +118,7 @@ select {
           </label>
         </div>
         <div class="item item-input-inset" ng-show="!client.officeId && (rolestat.isManagement || rolestat.isAdmin)">
-          <span class="input-label">
-            Office
+          <span class="input-label">Office
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -133,8 +127,7 @@ select {
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">
-            Membership
+          <span class="input-label">Membership
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -143,8 +136,7 @@ select {
           </label>
         </div>
         <div class="item item-input-inset" ng-show="!client.isActive && (rolestat.isManagement || rolestat.isAdmin)">
-          <span class="input-label">
-            Activation Date
+          <span class="input-label">Activation Date
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
           </span>
           <label class="item-input-wrapper">
@@ -154,7 +146,8 @@ select {
         <div class="item item-input-inset">
           <span class="input-label">Education:</span>
           <label class="item-input-wrapper">
-            <input type="text" name="email" size="20" placeholder="Client Education" ng-model="client.Client_Fields.Education">
+            <input type="text" name="email" size="20" placeholder="Client Education"
+                ng-model="client.Client_Fields.Education">
           </label>
         </div>
         <div class="item item-input-inset">
@@ -192,13 +185,13 @@ select {
         </div>
 
         <div class="item item-input-inset">
-          <span class="input-label">Fathers Name:</span>
+          <span class="input-label">Father's Name:</span>
           <label class="item-input-wrapper">
             <input type="text" name="text" size="20" placeholder="Enter Father's Name" ng-model="client.Client_Fields['Fathers Name']">
           </label>
         </div>
         <div class="item item-input-inset">
-          <span class="input-label">Grand Fathers Name:</span>
+          <span class="input-label">Grand Father's Name:</span>
           <label class="item-input-wrapper">
             <input type="text" name="text" placeholder="Enter Grand Father's Name" ng-model="client.Client_Fields['Grandfathers Name']">
           </label>
@@ -301,7 +294,8 @@ select {
         <ion-item class="item item-input-inset">
           <span class="input-label">Relationship:</span>
           <label class="item-input-wrapper">
-            <select ng-model="client.Client_NextOfKin.Relationship_cd_Relationship" ng-options="r.id as r.name for r in codes.Relationships" />
+            <select ng-model="client.Client_NextOfKin.Relationship_cd_Relationship"
+                ng-options="r.id as r.name for r in codes.Relationships" />
             </select>
           </label>
         </ion-item>
@@ -314,7 +308,8 @@ select {
         <ion-item class="item item-input-inset">
           <span class="input-label">Grand Father's Name:</span>
           <label class="item-input-wrapper">
-            <input type="text" placeholder="Grand Father's Name" ng-model="client.Client_NextOfKin['Grandfathers Name']">
+            <input type="text" placeholder="Grand Father's Name"
+                ng-model="client.Client_NextOfKin['Grandfathers Name']">
           </label>
         </ion-item>
 
@@ -322,7 +317,9 @@ select {
         <div class="item item-input-inset">
           <span class="input-label">Unique Place Name</span>
           <label class="item-input-wrapper">
-            <input type="text" title="Your Address in short" name="UniquePName" placeholder="ex : No 243, Boulevard Street, Chicago" ng-model='client.Client_NextOfKin["UniquePlaceName"]' />
+            <input type="text" title="Your Address in short" name="UniquePName"
+                placeholder="ex : No 243, Boulevard Street, Chicago"
+                ng-model='client.Client_NextOfKin["UniquePlaceName"]' />
           </label>
         </div>    
         <div class="item item-input-inset">
@@ -356,7 +353,8 @@ select {
         <div class="item item-input-inset">
           <span class="input-label">Kebele :</span>
           <label class="item-input-wrapper">
-            <input type="text" name="Kebele" placeholder="Enter Kebele's Name" ng-model='client.Client_NextOfKin["Kebele"]'>
+            <input type="text" name="Kebele" placeholder="Enter Kebele's Name"
+                ng-model='client.Client_NextOfKin["Kebele"]'>
           </label>
         </div>
 
@@ -385,7 +383,7 @@ select {
 
       	  <button class="button button-block button-positive" 
               ng-click="saveClient(client)" ng-disabled="btnDisabled || clientEditForm.$invalid">
-            <h4>Save</h4>
+            <strong>Save</strong>
       	  </button>
 
         </ion-item>

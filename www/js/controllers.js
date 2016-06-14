@@ -531,9 +531,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 // 'ClientDetailCtrl' --> 'ClientViewCtrl'
-.controller('ClientViewCtrl', [ '$scope', '$stateParams', 'Clients', '$ionicPopup','Customers', 
+.controller('ClientViewCtrl', [ '$scope', '$stateParams', 'Clients', '$ionicPopup','Customers', 'ClientAccounts',
     'ClientImages', 'DateUtil', 'DataTables', 'Codes', 'SACCO', 'logger', 'Camera', '$cordovaPrinter', '$ionicPopover',
-    function($scope, $stateParams, Clients, $ionicPopup, Customers,
+    function($scope, $stateParams, Clients, $ionicPopup, Customers, ClientAccounts,
     ClientImages, DateUtil, DataTables, Codes, SACCO, logger, Camera, $cordovaPrinter, $ionicPopover) {
 
   var clientId = $stateParams.clientId;
@@ -625,16 +625,18 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       logger.log('Client Fields: ' + JSON.stringify(client.Client_Fields));
     } );
 
-    Clients.get_accounts(clientId, 'savingsAccounts', function(savingsAccounts) {
+    ClientAccounts.get(clientId, 'savingsAccounts', function(savingsAccounts) {
+      //logger.log("Savings accounts: " + JSON.stringify(savingsAccounts, null, 2));
       var sacs = savingsAccounts.map(function(sac) {
         return {
           "id": sac.id,
           "accountNo": sac.accountNo,
-          "productName": sac.productName,
+          "productName": sac.savingsProductName,
           "status": sac.status,
-          "accountBalance": sac.accountBalance
+          "accountBalance": sac.summary.accountBalance
         };
       } );
+      logger.log("Savings accounts: " + JSON.stringify(sacs, null, 2));
       var totalSavings = savingsAccounts.reduce(function(sum, account) {
         return sum + account.accountBalance;
       }, 0);
@@ -643,18 +645,20 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.client.TotalSavings = totalSavings;
     } );
 
-    Clients.get_accounts(clientId, 'loanAccounts', function(loanAccounts) {
-      logger.log("Loan Accounts:" + JSON.stringify(loanAccounts));
+    ClientAccounts.get(clientId, 'loanAccounts', function(loanAccounts) {
+      logger.log("Loan Accounts:" + JSON.stringify(loanAccounts, null, 2));
       var lacs = loanAccounts.map(function(lac) {
+        var summary = lac.summary;
+        var bal = summary ? summary.totalOutstanding : 0;
         return {
           "id": lac.id,
           "accountNo": lac.accountNo,
-          "productName": lac.productName,
+          "productName": lac.loanProductName,
           "status": lac.status,
-          "loanBalance": lac.loanBalance
+          "loanBalance":  bal
         };
       } );
-      var totalLoans = loanAccounts.reduce(function(sum, account) {
+      var totalLoans = lacs.reduce(function(sum, account) {
         return sum + account.loanBalance;
       }, 0);
       logger.log("Total Loans Bal: " + totalLoans);
@@ -662,8 +666,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.client.loanAccounts = lacs;
     } );
 
-    Clients.get_accounts(clientId, 'shareAccounts', function(shareAccounts) {
-      logger.log('Share accounts: ' + JSON.stringify(shareAccounts));
+    ClientAccounts.get(clientId, 'shareAccounts', function(shareAccounts) {
+      logger.log('Share accounts: ' + JSON.stringify(shareAccounts, null, 2));
       var shacs = shareAccounts.map(function(shac) {
         return {
           id: shac.id,
@@ -1054,15 +1058,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   $scope.makeDeposit = function() {
     $scope.deposit = {};
     var depositPopup = $ionicPopup.show( {
-      title: 'Make a Deposit',
-      template: '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount">' +
-        '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">',
+      title: '<strong class="positive">Make a Deposit</strong>',
+      template:
+        '<ion-list class="list card">' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Amount' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="number" placeholder="Enter Amount" ng-model="deposit.transAmount" autofocus />' +
+            '</label>' +
+          '</div>' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Date' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="deposit.transDate">' +
+            '</label>' +
+          '</div>' +
+        '</ion-list>',
       scope: $scope,
       buttons: [ {
-        text: 'Cancel'
+        text: '<strong class="dark">Cancel</strong>'
       }, {
-        text: 'Deposit',
-        onTap: function(e) {
+        text: '<strong>Deposit</strong>',
+        type: 'button-positive',
+        onTap: function(res) {
           var params = {
             transactionAmount: $scope.deposit.transAmount,
             transactionDate: DateUtil.toDateString($scope.deposit.transDate),
@@ -1102,16 +1124,35 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
   $scope.doWithdrawal = function() {
     $scope.withdrawal = {};
+
     var withdrawalPopup = $ionicPopup.show( {
-      title: 'Make a Withdrawal',
-      template: '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount">' +
-        '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">',
+      title: '<strong class="positive">Make a Withdrawal</strong>',
+      template:
+        '<ion-list class="list card">' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Amount' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="number" placeholder="Enter Amount" ng-model="withdrawal.transAmount" autofocus />' +
+            '</label>' +
+          '</div>' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Date' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="date" placeholder="Date: dd/mm/yyyy" ng-model="withdrawal.transDate">' +
+            '</label>' +
+          '</div>' +
+        '</ion-list>',
       scope: $scope,
       buttons: [ {
-        text: 'Cancel'
+        text: '<strong class="dark">Cancel</strong>'
       }, {
-        text: 'Withdraw',
-        onTap: function(e) {
+        text: '<strong>Withdraw</strong>',
+        type: 'button-positive',
+        onTap: function(res) {
           var params = {
             transactionAmount: $scope.withdrawal.transAmount,
             transactionDate: DateUtil.toDateString($scope.withdrawal.transDate),
@@ -1192,9 +1233,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 .controller('LoansAccCreateCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'DateUtil', 'HashUtil', '$cordovaNetwork',
-    '$state', '$ionicPopup', '$timeout', 'logger', 'Clients', 'SACCO', 'DataTables', 'Codes', 'LoanProducts',
-    function($scope, $stateParams, LoanAccounts, DateUtil, HashUtil, $cordovaNetwork,
-    $state, $ionicPopup, $timeout, logger, Clients, SACCO, DataTables, Codes, LoanProducts) {
+    '$state', '$ionicPopup', '$timeout', 'logger', 'Clients', 'SACCO', 'DataTables', 'Codes', 'LoanProducts', 'ClientAccounts',
+  function($scope, $stateParams, LoanAccounts, DateUtil, HashUtil, $cordovaNetwork,
+    $state, $ionicPopup, $timeout, logger, Clients, SACCO, DataTables, Codes, LoanProducts, ClientAccounts) {
 
   var id = $stateParams.id;
   $scope.init = function() {
@@ -1221,7 +1262,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       } );
       $scope.loan.memberName = client.displayName;
     } );
-    Clients.get_accounts(id, 'savingsAccounts', function(savingsAccounts) {
+    ClientAccounts.get(id, 'savingsAccounts', function(savingsAccounts) {
       console.log('own savings',savingsAccounts);
       $scope.linkAccounts = savingsAccounts.filter(function(a) {
         return a.status.active;
@@ -1432,9 +1473,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 } ] )
 
-.controller('LoanAccountCtrl', [ '$scope', '$stateParams', 'LoanAccounts',
+.controller('LoanAccountCtrl', [ '$scope', '$stateParams', 'LoanAccounts', 'ClientAccounts',
     '$ionicPopup', 'logger', 'Clients', 'HashUtil', 'DateUtil', '$location',
-    function($scope, $stateParams, LoanAccounts,
+    function($scope, $stateParams, LoanAccounts, ClientAccounts,
     $ionicPopup, logger, Clients, HashUtil, DateUtil, $location) {
 
   console.log("dsadasdasd===");
@@ -1456,7 +1497,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       $scope.data.totalRepayment = summary.totalRepayment;
     }
     var clientId = lac.clientId;
-    Clients.get_accounts(clientId, 'loanAccounts', function(accounts) {
+    ClientAccounts.get(clientId, 'loanAccounts', function(accounts) {
       $scope.data.activeAccounts = accounts.filter(function(a) {
         return a.status.active;
       } );
@@ -1542,15 +1583,34 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         $scope.message = null;
       }, 2500);
     };
+
     var repaymentPopup = $ionicPopup.show( {
-      title: 'Make a Repayment',
-      template: '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount">' +
-        '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">',
+      title: '<strong class="positive">Make a Repayment</strong>',
+      template:
+        '<ion-list class="list card">' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Amount' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="number" placeholder="Enter Amount" ng-model="repayment.transAmount" autofocus />' +
+            '</label>' +
+          '</div>' +
+          '<div class="item item-input-inset">' +
+            '<span class="input-label">Date' +
+              '<sup><i class="icon ion-asterisk assertive"></i></sup> :' +
+            '</span>' +
+            '<label class="item-input-wrapper">' +
+              '<input type="date" placeholder="e.g dd/mm/yyyy" ng-model="repayment.transDate">' +
+            '</label>' +
+          '</div>' +
+        '</ion-list>',
       scope: $scope,
       buttons: [ {
-        text: 'Cancel'
+        text: '<strong class="dark">Cancel</strong>'
       }, {
-        text: 'Repay',
+        text: '<strong>Repay</strong>',
+        type: 'button-positive',
         onTap: function(e) {
           var params = {
             transactionAmount: $scope.repayment.transAmount,
@@ -1730,8 +1790,9 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 } ] )
 
 .controller('SharesBuyCtrl', ['$scope', '$stateParams', 'ShareProducts',
-    'Clients', '$state', '$ionicPopup', '$timeout', 'logger', 'Shares',
-    function($scope, $stateParams, ShareProducts, Clients, $state, $ionicPopup, $timeout, logger, Shares) {
+    'Clients', '$state', '$ionicPopup', '$timeout', 'logger', 'Shares', 'ClientAccounts',
+  function($scope, $stateParams, ShareProducts, Clients, $state, $ionicPopup, $timeout,
+    logger, Shares, ClientAccounts) {
 
 
   $scope.init = function() {
@@ -1743,7 +1804,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
       clientId: clientId
     };
     logger.log("Client ID: " + clientId);
-    Clients.get_accounts(clientId, "savingsAccounts", function(saccounts) {
+    ClientAccounts.get(clientId, "savingsAccounts", function(saccounts) {
       var i=0, n=saccounts.length;
       logger.log("Got total " + n + " savings accounts");
       var asaccounts = [];
@@ -2145,9 +2206,11 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 .controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts', 'baseUrl',
     'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading', '$ionicPopup',
     'SavingsProducts', 'logger', 'Clients', 'Shares', 'ShareProducts', 'LoanAccounts', 'LoanProducts',
-    function($rootScope, $scope, authHttp, $log, SavingsAccounts, baseUrl,
+    'ClientAccounts',
+  function($rootScope, $scope, authHttp, $log, SavingsAccounts, baseUrl,
     Cache, Session, Customers, Staff, SACCO, HashUtil, $ionicLoading, $ionicPopup,
-    SavingsProducts, logger, Clients, Shares, ShareProducts, LoanAccounts, LoanProducts) {
+    SavingsProducts, logger, Clients, Shares, ShareProducts, LoanAccounts, LoanProducts,
+    ClientAccounts) {
 
   var session = null;
 
@@ -2174,26 +2237,6 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     });
     LoanProducts.fetch_all(function(prods) {
       logger.log("Got " + prods.length + " loan products");
-    } );
-    SavingsAccounts.query(function(sacs) {
-      sacs.forEach(function(sac) {
-        SavingsAccounts.fetch(sac.id, function(ac){} );
-      } );
-    } );
-    SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
-      $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
-    } );
-    LoanAccounts.query(function(accounts) {
-      accounts.forEach(function(a) {
-        LoanAccounts.fetch(a.id, function(ac){} );
-      } );
-    } );
-    LoanAccounts.query_pending(function(pendingLoanAccounts) {
-      logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
-      $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
-    } );
-    Shares.query_pending(function(pendingShares) {
-      $scope.pendingShareCount = pendingShares.length;
     } );
 
     $scope.num_inactiveClients = 0;
@@ -2236,6 +2279,27 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         Clients.query_inactive(function(iClients) {
           $scope.num_inactiveClients = iClients.length;
           $ionicLoading.hide();
+        } );
+        SavingsAccounts.query(function(sacs) {
+          sacs.forEach(function(sac) {
+            SavingsAccounts.fetch(sac.id, function(ac){} );
+          } );
+        } );
+        SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
+          $scope.pendingSavingsAccountsCount = pendingSavingsAccounts.length;
+        } );
+        LoanAccounts.query(function(accounts) {
+          accounts.forEach(function(a) {
+            LoanAccounts.fetch(a.id, function(ac){} );
+          } );
+        } );
+        LoanAccounts.query_pending(function(pendingLoanAccounts) {
+          logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
+          $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
+        } );
+        Shares.query_pending(function(pendingShares) {
+          logger.log("Pending shares: " + pendingShares.length);
+          $scope.pendingShareCount = pendingShares.length;
         } );
     }
   } );

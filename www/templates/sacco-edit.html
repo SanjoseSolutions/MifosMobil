@@ -15,11 +15,10 @@
 <ion-view view-title="{{data.op}} SACCO">
   <ion-content>
   <form name="saccoForm" novalidate>
-
     <div class="list">
       <div class="Mandatory">
-          <sup><i class="icon ion-asterisk assertive"></i></sup>
-          : Mandatory fields
+        <sup><i class="icon ion-asterisk assertive"></i></sup>
+        : Mandatory fields
       </div>
       <ion-item>
         <div ng-hide="saccoForm.name.$pristine">
@@ -32,14 +31,20 @@
           <span class="ion-warn">SACCO Parent Union is required</span>
         </div>
         <div ng-hide="saccoForm.openingDate.$pristine">
-          <span class="ion-warn" ng-show="saccoForm.openingDate.$invalid">SACCO Date Established must be valid date</span>
-          <span class="ion-warn" ng-show="saccoForm.openingDate.$error.required">SACCO Date Established is required</span>
+          <span class="ion-warn" ng-show="saccoForm.openingDate.$invalid">
+            SACCO Date Established must be valid date</span>
+          <span class="ion-warn" ng-show="saccoForm.openingDate.$error.required">
+            SACCO Date Established is required</span>
         </div>
         <div ng-hide="saccoForm.MonthlySavingsDue.$pristine">
-          <!-- div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$invalid">Monthly Savings Due Value is Invalid</div -->
-          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.minlength">Monthly Savings Due Value is To Short</div>
-          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.min">Monthly Savings Due Value is Too Small</div>
-          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.required">Monthly Savings Due is Required &amp; Numeric</div>
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$invalid">
+            Monthly Savings Due Value is Invalid</div>
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.minlength">
+            Monthly Savings Due Value is To Short</div>
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.min">
+            Monthly Savings Due Value is Too Small</div>
+          <div class="ion-warn" ng-show="saccoForm.MonthlySavingsDue.$error.required">
+            Monthly Savings Due is Required &amp; Numeric</div>
         </div>
       </ion-item>
       <ion-item ng-show="message">
@@ -50,59 +55,57 @@
         <label>Office Details</label>
       </ion-item>
 
-      <ion-list-item class="item item-input-inset">
-        <span class="input-label">
-          Sacco Name
+      <ion-item class="item item-input-inset">
+        <span class="input-label"> Sacco Name
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
           <input type="text" name="name" placeholder="Enter the SACCO's Name"
               ng-model="sacco.name" ng-minlength="3" size="25" autofocus required />
         </label>
-      </ion-list-item>
+      </ion-item>
 
         <!-- label class="item item-input item-input-wrapper item-stacked-label"-->
       <ion-item class="item item-input item-stacked-label">
         <label class="item item-input-wrapper item-stacked-label">
-          <span class="input-label">
-            Cooperative Licence Registration Number
+          <span class="input-label"> Cooperative Licence Registration Number
             <sup><i class="icon ion-asterisk assertive"></i></sup> :
-          </span>          
-          <input type="text" name="coopLicRegNo" placeholder="Enter the Licence Number" size="40" ng-minlength="3"
+          </span>
+          <input type="text" name="coopLicRegNo" ng-minlength="3" size="40"
+              placeholder="Enter the Licence Number"
               ng-model="sacco.SACCO_Fields['License Registration No']" required />
         </label>
       </ion-item>
 
       <label class="item item-input item-select">
-        <div class="input-label">
-          Parent Union 
+        <div class="input-label"> Parent Union
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </div>
-        <select name="parentId" ng-options="sacco.id as sacco.name
-          for sacco in data.sunions" ng-model="sacco.parentId" required>
+        <select name="parentId"
+            ng-options="sacco.id as sacco.name for sacco in data.sunions"
+            ng-model="sacco.parentId" required>
         </select>
       </label>
 
       <div class="item item-input-inset">
-        <span class="input-label">
-          Date Established
+        <span class="input-label"> Date Established
           <sup><i class="icon ion-asterisk assertive"></i></sup> :
         </span>
         <label class="item-input-wrapper">
           <input name="openingDate" type="date" size="10" name="DOEstab"
-            placeholder="ex: dd/mm/yyyy" ng-model="sacco.openingDate" required>
+              placeholder="ex: dd/mm/yyyy" ng-model="sacco.openingDate" required />
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Date of Joining Union
+        <span class="input-label"> Date of Joining Union
           <sup><i class="icon ion-asterisk assertive"></i></sup> :</span>
         <label class="item-input-wrapper">
-          <input type="date" size="9" name="joiningDate"
-            placeholder="ex: dd/mm/yyyy" ng-model="sacco.SACCO_Fields.joiningDate" required>
+          <input type="date" name="joiningDate" size="9"
+            placeholder="ex: dd/mm/yyyy" ng-model="sacco.SACCO_Fields.joiningDate" required />
         </label>
       </div>
       <div class="item item-input-inset">
-        <span class="input-label">Monthly Savings Due
+        <span class="input-label"> Monthly Savings Due
           <sup><i class="icon ion-asterisk assertive"></i></sup> :</span>
         <label class="item-input-wrapper">
           <input type="number" name="MonthlySavingsDue" placeholder="Monthly Savings Due"
@@ -115,7 +118,7 @@
 
       <div class="item item-input-inset">
         <label class="item item-input item-stacked-label">
-          <span class="input-label centered">Geo-Location</span>
+          <span class="input-label centered"> Geo-Location </span>
           <div class="row">
             <div class="col col-50">
               <label class="item-input-wrapper">
@@ -138,7 +141,7 @@
       <div class="item item-input-inset">
         <span class="input-label">Country :</span>
         <label class="item-input-wrapper">
-          <input type="text" size="10" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.SACCO_Fields.Country">
+          <input type="text" size="9" name="Country" placeholder="ex :Ethiopia" ng-model="sacco.SACCO_Fields.Country">
         </label>
       </div>
       <div class="item item-input-inset">
@@ -170,13 +173,13 @@
         <label class="item-input-wrapper">
           <input type="text" name="UniquePlaceName" placeholder="Enter Unique Place's Name" ng-model="sacco.SACCO_Fields.UniquePlaceName">
         </label>
-      </div>   
+      </div>
 
       <ion-list-item class="padding">
         <span ng-show="message"class="ion-{{message.type}}">{{message.text}}</span>
         <button class="button button-block button-positive"
             ng-click="saveSacco(sacco)" ng-disabled="btnDisabled || saccoForm.$invalid">
-          <h4>Save</h4>
+          <strong>Save</strong>
         </button>
       </ion-list-item>
 
