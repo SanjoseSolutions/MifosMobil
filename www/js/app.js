@@ -462,7 +462,7 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     url: '/dashboard/member-transactions',
     views: {
       'menuContent': {
-        templateUrl: 'templates/rpt-member-detail.html',
+        templateUrl: 'templates/rpt-trans-summary.html',
         controller: 'RptMemTransCtrl'
       }
     }

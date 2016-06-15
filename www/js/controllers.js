@@ -2394,20 +2394,62 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
-.controller('RptMemTransCtrl', ['$scope', 'Office', 'Reports', 'logger',
-    function($scope, Office, Reports, logger) {
+.controller('RptMemTransCtrl', ['$scope', 'Office', 'Clients', 'Reports', 'DateUtil', 'logger',
+    function($scope, Office, Clients, Reports, DateUtil, logger) {
+
+  $scope.codes = {
+    reportTypes: [ {
+      id: 'Savings Transaction Summary',
+      name: 'Savings'
+    }, {
+      id: 'Loan Transaction Summary',
+      name: 'Loans'
+    } ]
+  };
+
+  $scope.updateClientList = function(clients) {
+    var copts = clients.map(function(c) {
+      return {
+        id: c.id,
+        name: '#' + c.id + ' ' + c.displayName
+      }
+    } );
+    copts.unshift( { id: -1, name: 'All Clients' } );
+    $scope.codes.clients = copts;
+  };
+
+  Clients.query(function(clients) {
+    $scope.codes.all_clients = clients;
+    $scope.updateClientList(clients);
+  } );
+
   Office.query(function(offices) {
-    $scope.codes = {
-      offices: offices
-    };
+    $scope.codes.offices = offices;
     $scope.data = {
       title: 'Member Transactions'
     };
   } );
 
+  $scope.officeChanged = function() {
+    var officeId = $scope.data.officeId;
+    if (officeId) {
+      var clients = $scope.codes.all_clients;
+      $scope.updateClientList(clients.filter(function(c) {
+        return c.officeId == officeId;
+      } ) );
+    }
+  };
+
   $scope.getReport = function() {
-    Reports.getReport('Client Detail', {
+    var rname = $scope.data.rname;
+    var startDate = DateUtil.toDateString($scope.data.startDate);
+    var endDate = DateUtil.toDateString($scope.data.endDate);
+    logger.log("Start date: " + startDate + ", endDate: " + endDate);
+    Reports.getReport(rname, {
       R_officeId: $scope.data.officeId,
+      R_clientId: $scope.data.clientId,
+      R_startDate: startDate,
+      R_endDate: endDate,
       exportCSV: true
     }, function(path) {
       $scope.data.path = path;
