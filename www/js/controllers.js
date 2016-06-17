@@ -1707,8 +1707,8 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 } ] )
 
-.controller('LoanCloseCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
-    function($scope, $stateParams, LoanAccounts, logger) {
+.controller('LoanCloseCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'DateUtil', 'logger',
+    function($scope, $stateParams, LoanAccounts, DateUtil, logger) {
   var id = $stateParams.id;
   $scope.data = { id: id };
   var update_loan = function(lac) {
@@ -1732,6 +1732,23 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   LoanAccounts.get_guarantors(id, function(guarantors) {
     $scope.data.guarantors = guarantors;
   } );
+
+  $scope.closeLoan = function(id) {
+    var dt = DateUtil.toDateString(new Date());
+    var params = {
+      locale: 'en',
+      dateFormat: 'yyyy-MM-dd',
+      transactionDate: dt
+    };
+    LoanAccounts.writeoff(id, params, function(data) {
+      alert("Loan closed");
+      LoanAccounts.get(id, function(loan) {
+        update_loan(loan);
+      } );
+    }, function(response) {
+      alert("Failed to close loan");
+    } );
+  };
 } ] )
 
 .controller('ShareViewCtrl', ['$scope', '$stateParams', 'Shares', 'DateUtil', 'logger',

@@ -2169,6 +2169,15 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
         }, function(response) {
           fn_fail(response);
         } );
+    },
+    writeoff: function(id, params, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '/transactions?command=writeoff',
+        params, {}, function(response) {
+          var data = response.data;
+          fn_success(data);
+        }, function(response) {
+          fn_fail(response);
+        } );
     }
   };
 } ] )
