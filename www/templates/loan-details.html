@@ -104,10 +104,13 @@
       <ion-item class="item-divider" ng-show="data.status.active">
         <p class="centered"> ACTIONS </p>
       </ion-item>
-      <ion-item ng-show="data.status.active">
-        <p class="centered">
+      <ion-item class="row" ng-show="data.status.active">
+        <span class="col" ng-show="data.totalOverdue">
+          <a href="#/tab/loan/{{data.id}}/close" class="button button-assertive">Close Loan</a>
+        </span>
+        <span class="col">
           <a href="" class="button button-positive" ng-click="makeRepayment()">Make Repayment</a>
-        </p>
+        </span>
       </ion-item>
       <ion-item ng-show="message">
         <span class="ion-{{message.type}}">{{message.text}}</span>

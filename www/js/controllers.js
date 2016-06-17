@@ -1493,6 +1493,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     $scope.data.status = lac.status;
     var summary = lac.summary;
     if (summary) {
+      $scope.data.totalOverdue = summary.totalOverdue;
       $scope.data.totalOutstanding = summary.totalOutstanding;
       $scope.data.totalRepayment = summary.totalRepayment;
     }
@@ -1703,6 +1704,33 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
     var schedule = lac.repaymentSchedule;
     logger.log("Repayment schedule: " + JSON.stringify(schedule, null, 2));
     $scope.data.repaymentSchedule = schedule;
+  } );
+} ] )
+
+.controller('LoanCloseCtrl', ['$scope', '$stateParams', 'LoanAccounts', 'logger',
+    function($scope, $stateParams, LoanAccounts, logger) {
+  var id = $stateParams.id;
+  $scope.data = { id: id };
+  var update_loan = function(lac) {
+    $scope.data.accountNo = lac.accountNo;
+    $scope.data.productName = lac.loanProductName;
+    $scope.data.principal = lac.principal;
+    $scope.data.status = lac.status;
+    var summary = lac.summary;
+    if (summary) {
+      $scope.data.totalOverdue = summary.totalOverdue;
+      $scope.data.totalOutstanding = summary.totalOutstanding;
+      $scope.data.totalRepayment = summary.totalRepayment;
+    }
+  };
+  LoanAccounts.get(id, function(loan) {
+    update_loan(loan);
+  } );
+  LoanAccounts.get_collaterals(id, function(collaterals) {
+    $scope.data.collaterals = collaterals;
+  } );
+  LoanAccounts.get_guarantors(id, function(guarantors) {
+    $scope.data.guarantors = guarantors;
   } );
 } ] )
 
@@ -2203,6 +2231,16 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
 
 } ] )
 
+.controller('OverdueLoanCtrl', [ '$scope', 'LoanAccounts', 'logger',
+    function($scope, LoanAccounts, logger) {
+
+  $scope.data = { title: 'Overdue Loan Accounts' };
+
+  LoanAccounts.query_overdue(function(oAccts) {
+    $scope.accounts = oAccts;
+  } );
+} ] )
+
 .controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts', 'baseUrl',
     'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading', '$ionicPopup',
     'SavingsProducts', 'logger', 'Clients', 'Shares', 'ShareProducts', 'LoanAccounts', 'LoanProducts',
@@ -2229,13 +2267,13 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         $log.info('Dashboard controller reset session');
       }
     }
-    ShareProducts.fetch_all(function(prods) {
+    ShareProducts.query(function(prods) {
       logger.log("Got share products: " + prods.totalFilteredRecords + " products");
     } );
-    SavingsProducts.fetch_all(function(prods) {
+    SavingsProducts.query(function(prods) {
       logger.log("Got " + prods.length + " savings products");
     });
-    LoanProducts.fetch_all(function(prods) {
+    LoanProducts.query(function(prods) {
       logger.log("Got " + prods.length + " loan products");
     } );
 
@@ -2268,7 +2306,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
             ClientAccounts.get(clientId, 'shareAccounts', function(accounts) {
               var i = 0, n = accounts.length;
               for(; i < n; ++i) {
-                Shares.fetch(accounts[i].id, function(share) {
+                Shares.get(accounts[i].id, function(share) {
                   //logger.log("Share account #" + share.id + '::' + JSON.stringify(share, null, 2));
                 } );
               }
@@ -2282,7 +2320,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         } );
         SavingsAccounts.query(function(sacs) {
           sacs.forEach(function(sac) {
-            SavingsAccounts.fetch(sac.id, function(ac){} );
+            SavingsAccounts.get(sac.id, function(ac){} );
           } );
         } );
         SavingsAccounts.query_pending(function(pendingSavingsAccounts) {
@@ -2290,12 +2328,17 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
         } );
         LoanAccounts.query(function(accounts) {
           accounts.forEach(function(a) {
-            LoanAccounts.fetch(a.id, function(ac){} );
+            LoanAccounts.get(a.id, function(ac){} );
           } );
         } );
         LoanAccounts.query_pending(function(pendingLoanAccounts) {
           logger.log("PENDING LOAN ACCOUNTS: " + pendingLoanAccounts.length);
           $scope.pendingLoanAccountsCount = pendingLoanAccounts.length;
+        } );
+        LoanAccounts.query_overdue(function(oLoanAccounts) {
+          $scope.overdueLoanAccountsCount = oLoanAccounts.length;
+        }, function(response) {
+          logger.log("Failed to get overdue");
         } );
         Shares.query_pending(function(pendingShares) {
           logger.log("Pending shares: " + pendingShares.length);

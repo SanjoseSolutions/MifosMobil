@@ -296,6 +296,15 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
       }
     }
   } )
+  .state('tab.client-loan-close', {
+    url: '/loan/:id/close',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/loan-close.html',
+        controller: 'LoanCloseCtrl'
+      }
+    }
+  } )
   .state('tab.client-edit', {
     url: '/clients/:clientId/edit',
     views: {
@@ -364,6 +373,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
       'menuContent': {
         templateUrl: 'templates/savings-accounts.html',
         controller: 'PendingSavingsCtrl'
+      }
+    }
+  } )
+
+  .state('tab.dashboard-overdue-loans', {
+    url: '/dashboard/overdue-loans',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/loan-accounts.html',
+        controller: 'OverdueLoanCtrl'
       }
     }
   } )

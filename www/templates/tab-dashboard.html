@@ -128,6 +128,15 @@ td {
             </a>
           </td>
         </tr>
+        <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && overdueLoanAccountsCount">
+          <td><div>Overdue Loan Accounts:</div></td>
+          <td>{{ overdueLoanAccountsCount }}</td>
+          <td>
+            <a href="#/tab/dashboard/overdue-loans" class="button button-small noVertPadd w100">
+              Review <i class="icon ion-information-circled"> </i>
+            </a>
+          </td>
+        </tr>
         <!-- FOR SAVINGS, LOANS, SHARES, etc
           <tr>
           <td colspan="2"></td>

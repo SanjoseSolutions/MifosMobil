@@ -2118,6 +2118,57 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
           logger.log("Failed to Reverse Transaction. " + response.status);
           fn_err(response);
         } );
+    },
+    query_overdue: function(fn_loans, fn_fail) {
+      this.query(function(accounts) {
+        var oAccts = accounts.filter(function(a) {
+          if (a.status.value != "Active") return false;
+          var su = a.summary;
+          return su ? su.totalOverdue : 0;
+        } );
+        logger.log("Got overdue accounts:" + oAccts.length);
+        fn_loans(oAccts);
+      } );
+    },
+    get_collaterals: function(id, fn_success, fn_fail) {
+      authHttp.get(baseUrl + '/loans/' + id + '/collaterals')
+        .then(function(response) {
+          var data = response.data;
+          fn_success(data);
+        }, function(response) {
+          if (fn_fail != null) {
+            fn_fail(response);
+          }
+        } );
+    },
+    get_guarantors: function(id, fn_success, fn_fail) {
+      authHttp.get(baseUrl + '/loans/' + id + '/guarantors')
+        .then(function(response) {
+          var data = response.data;
+          fn_success(data);
+        }, function(response) {
+          if (fn_fail != null) {
+            fn_fail(response);
+          }
+        } );
+    },
+    recover_guarantors: function(id, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '?command=recoverGuarantees',
+        {}, {}, function(response) {
+          var data = response.data;
+          fn_success(data);
+        }, function(response) {
+          fn_fail(response);
+        } );
+    },
+    close: function(id, params, fn_success, fn_fail) {
+      authHttp.post(baseUrl + '/loans/' + id + '/transactions?command=close',
+        params, {}, function(response) {
+          var data = response.data;
+          fn_success(data);
+        }, function(response) {
+          fn_fail(response);
+        } );
     }
   };
 } ] )
@@ -2206,7 +2257,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
       logger.log("Shares called for:"+id);
       var share = Cache.getObject('shareAccounts.' + id);
       if (share) {
-        logger.log("Got cache share:" + JSON.stringify(share));
+        //logger.log("Got cache share:" + JSON.stringify(share));
         fn_shares(share);
       } else {
         this.fetch(id, fn_shares);
