@@ -2357,26 +2357,57 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   };
 } ] )
 
-.controller('RptMemAcctsCtrl', ['$scope', 'Office', 'Reports', 'logger',
-    function($scope, Office, Reports, logger) {
+.controller('RptMemAcctsCtrl', ['$scope', 'Office', 'Clients', 'Reports', 'logger',
+    function($scope, Office, Clients, Reports, logger) {
+
+  $scope.codes = {
+    reportTypes: [ {
+      id: 'Client Savings Account Details',
+      name: 'Savings'
+    }, {
+      id: 'Member Loan Account Details',//'Active Loans - Details',
+      name: 'Loans'
+    } ]
+  };
+
+  $scope.updateClientList = function(clients) {
+    var copts = clients.map(function(c) {
+      return {
+        id: c.id,
+        name: '#' + c.id + ' ' + c.displayName
+      }
+    } );
+    copts.unshift( { id: -1, name: 'All Clients' } );
+    $scope.codes.clients = copts;
+  };
+
+  Clients.query(function(clients) {
+    $scope.codes.all_clients = clients;
+    $scope.updateClientList(clients);
+  } );
 
   Office.query(function(offices) {
-    $scope.codes = {
-      offices: offices
-    };
+    $scope.codes.offices = offices;
     $scope.data = {
-      title: 'Member Loan Accounts'
+      title: 'Member Accounts'
     };
   } );
 
+  $scope.officeChanged = function() {
+    var officeId = $scope.data.officeId;
+    if (officeId) {
+      var clients = $scope.codes.all_clients;
+      $scope.updateClientList(clients.filter(function(c) {
+        return c.officeId == officeId;
+      } ) );
+    }
+  };
+
   $scope.getReport = function() {
-    Reports.getReport('Active Loans - Details', {
+    var rname = $scope.data.rname;
+    Reports.getReport(rname, {
       R_officeId: $scope.data.officeId,
-      R_currencyId: -1,
-      R_fundId: -1,
-      R_loanOfficerId: -1,
-      R_loanProductId: -1,
-      R_loanPurposeId: -1,
+      R_clientId: $scope.data.clientId,
       exportCSV: true
     }, function(path) {
       $scope.data.path = path;
