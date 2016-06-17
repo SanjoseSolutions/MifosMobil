@@ -1,0 +1,56 @@
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<style>
+
+.item, ion-item {
+	margin: 2px;
+	padding: 2px 5px;
+	border: none;
+}
+</style>
+
+<ion-view view-title="Close Client Loan">
+  <ion-content class="padding">
+    <div class="list card">
+      <ion-item>
+        <label> Account No:</label> {{data.accountNo || "Unspecified"}}
+      </ion-item>
+      <ion-item>
+        <label> Loan Status:</label> {{data.status.value || "Unspecified"}} {{data.totalOverdue ? "(Overdue)" : ""}}
+      </ion-item>
+      <ion-item>
+        <label> Account Type:</label> {{data.productName || "Unspecified"}}
+      </ion-item>
+      <ion-item ng-repeat="guarantor in data.guarantors">
+        <label>Guarantor: </label>
+        #{{guarantor.entityId}} {{guarantor.firstname}} {{guarantor.lastname}}        
+      </ion-item>
+      <ion-item ng-repeat="collateral in data.collaterals">
+        <label>Collateral: </label>
+        <p>{{collateral.type.name}} {{collateral.description}}</p>
+        <p>Value: {{collateral.value}}</p>
+      </ion-item>
+      <ion-item>
+        <a href="" class="button button-assertive" ng-click="closeLoan(data.id)">Close Loan</a>
+      </ion-item>
+      
+      <ion-item ng-show="message">
+        <span class="ion-{{message.type}}">{{message.text}}</span>
+      </ion-item>
+
+    </div>
+
+  </ion-content>
+</ion-view>
