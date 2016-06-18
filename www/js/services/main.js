@@ -2265,7 +2265,7 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     get: function(id, fn_shares) {
       logger.log("Shares called for:"+id);
       var share = Cache.getObject('shareAccounts.' + id);
-      if (share) {
+      if (share && share.clientId) {
         //logger.log("Got cache share:" + JSON.stringify(share));
         fn_shares(share);
       } else {
@@ -2274,14 +2274,22 @@ angular.module('mifosmobil.services', ['ngCordova', 'mifosmobil.utilities'] )
     },
     query_pending: function(fn_shares) {
       this.query(function(shares) {
+        logger.log("Total shares: " + shares.length);
         fn_shares(shares.filter(function(s) {
           return s.status.submittedAndPendingApproval
         } ) );
       } );
     },
     query: function(fn_shares) {
-      logger.log("Shares query called");
-      fn_shares([]);
+      var keys = Object.keys(localStorage);
+      var shareKeys = keys.filter(function(k) {
+        return k.match(/^shareAccounts\./);
+      } );
+      var shares = shareKeys.map(function(k) {
+        return Cache.getObject(k);
+      } );
+      //logger.log("Share keys: " + shareKeys.length + "(" + keys.length + "), shares: " + shares.length);
+      fn_shares(shares);
     },
     save: function(sfields, fn_shares, fn_offline, fn_fail) {
       authHttp.post(this.url, sfields, {},

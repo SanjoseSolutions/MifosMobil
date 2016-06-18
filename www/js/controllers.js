@@ -2258,6 +2258,14 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
   } );
 } ] )
 
+.controller('PendingShareCtrl', [ '$scope', 'Shares', 'logger',
+    function($scope, Shares, logger) {
+
+  Shares.query_pending(function(sAccts) {
+    $scope.accounts = sAccts;
+  } );
+
+} ] )
 .controller('DashboardCtrl', ['$rootScope', '$scope', 'authHttp', '$log', 'SavingsAccounts', 'baseUrl',
     'Cache', 'Session', 'Customers', 'Staff', 'SACCO', 'HashUtil', '$ionicLoading', '$ionicPopup',
     'SavingsProducts', 'logger', 'Clients', 'Shares', 'ShareProducts', 'LoanAccounts', 'LoanProducts',
@@ -2324,7 +2332,7 @@ angular.module('mifosmobil.controllers', ['ngCordova', 'checklist-model'])
               var i = 0, n = accounts.length;
               for(; i < n; ++i) {
                 Shares.get(accounts[i].id, function(share) {
-                  //logger.log("Share account #" + share.id + '::' + JSON.stringify(share, null, 2));
+                  logger.log("Share account #" + share.id + '::' + JSON.stringify(share, null, 2));
                 } );
               }
               //logger.log('Client #' + clientId + ' share accounts: ' + JSON.stringify(accounts, null, 2));

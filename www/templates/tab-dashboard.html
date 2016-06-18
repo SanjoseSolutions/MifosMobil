@@ -137,6 +137,15 @@ td {
             </a>
           </td>
         </tr>
+        <tr ng-show="(rolestat.isManagement || rolestat.isAdmin) && pendingShareCount">
+          <td><div>Pending Share Accounts:</div></td>
+          <td>{{ pendingShareCount }}</td>
+          <td>
+            <a href="#/tab/dashboard/pending-shares" class="button button-small noVertPadd w100">
+              Review <i class="icon ion-information-circled"> </i>
+            </a>
+          </td>
+        </tr>
         <!-- FOR SAVINGS, LOANS, SHARES, etc
           <tr>
           <td colspan="2"></td>

@@ -397,6 +397,16 @@ angular.module('mifosmobil', ['ionic', 'mifosmobil.controllers', 'mifosmobil.ser
     }
   } )
 
+  .state('tab.dashboard-pending-shares', {
+    url: '/dashboard/pending-shares',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/share-accounts.html',
+        controller: 'PendingShareCtrl'
+      }
+    }
+  } )
+
   .state('tab.dasbboard-active-clients', {
     url: '/dashboard/active-clients',
     views: {
